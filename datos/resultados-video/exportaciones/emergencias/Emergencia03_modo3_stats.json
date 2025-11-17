@@ -1,0 +1,15 @@
+{
+  "video": "Emergencia03.mp4",
+  "modo": 3,
+  "modo_nombre": "DETECCIÓN DE EMERGENCIAS",
+  "frames_procesados": 294,
+  "duracion_segundos": 12.218515429524604,
+  "vehiculos_promedio": 1.9591836734693877,
+  "vehiculos_maximo": 10,
+  "velocidad_promedio_kmh": 57.09464573917044,
+  "icv_promedio": 0.3099625850340136,
+  "frames_fluidos": 132,
+  "frames_moderados": 162,
+  "frames_congestionados": 0,
+  "emergencias_detectadas": 0
+}

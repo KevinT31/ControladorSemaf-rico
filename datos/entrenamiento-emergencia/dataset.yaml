@@ -1,0 +1,49 @@
+# YOLOv8 Dataset Configuration for Emergency Vehicles
+# ========================================================
+#
+# PROPÓSITO: Entrenar modelo custom para detectar vehículos de emergencia
+# en Lima, Perú (ambulancias, bomberos, policía)
+#
+# INSTRUCCIONES DE USO:
+# 1. Colocar imágenes en images/train/ y images/val/
+# 2. Colocar anotaciones YOLO (.txt) en labels/train/ y labels/val/
+# 3. Entrenar con: yolo train data=dataset.yaml model=yolov8n.pt epochs=50
+#
+# ========================================================
+
+# Rutas
+path: C:\Users\kevin\OneDrive\Desktop\ControladorSemaforicoTFC2\datos\entrenamiento-emergencia
+train: images/train
+val: images/val
+
+# Clases (0-indexed)
+nc: 3  # Número de clases
+
+names:
+  0: ambulancia
+  1: bomberos
+  2: policia
+
+# ========================================================
+# NOTAS DE ETIQUETADO:
+# ========================================================
+# - Usar herramienta LabelImg o Roboflow para anotar
+# - Formato YOLO: <class_id> <x_center> <y_center> <width> <height> (normalized 0-1)
+# - Ejemplo: 0 0.5 0.5 0.3 0.2
+# - Un archivo .txt por cada imagen con el mismo nombre
+#
+# RECOMENDACIONES:
+# - Mínimo 100 imágenes por clase para entrenamiento básico
+# - Idealmente 500+ imágenes por clase para producción
+# - Incluir diferentes ángulos, iluminación, distancias
+# - Capturar vehículos de emergencia peruanos específicamente
+#
+# FUENTES DE DATOS:
+# - Videos de YouTube de tráfico en Lima
+# - Dataset público: Roboflow Universe - Emergency Vehicles
+# - Capturas de Google Street View
+# - Frames del simulador SUMO con modelos custom
+# ========================================================
+
+# Hiperparámetros recomendados para entrenamiento
+# yolo train data=dataset.yaml model=yolov8n.pt epochs=50 imgsz=640 batch=16 patience=10

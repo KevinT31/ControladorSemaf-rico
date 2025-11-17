@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control Semafórico Adaptativo Inteligente</title>
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Partículas de fondo -->
+    <div id="particles-js"></div>
+
+    <!-- Header Profesional -->
+    <header class="header-pro">
+        <div class="header-left">
+            <div class="logo-container">
+                <i class="fas fa-traffic-light logo-icon"></i>
+                <div class="logo-text">
+                    <h1>Sistema de Control Semafórico Inteligente</h1>
+                    <p class="subtitle">Gestión Adaptativa del Tráfico - Lima Metropolitana</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-center">
+            <div class="status-indicator">
+                <div class="status-dot pulsing"></div>
+                <span id="connection-status">CONECTADO</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="control-group">
+                <label><i class="fas fa-cog"></i> Modo</label>
+                <select id="modo-operacion" class="select-pro">
+                    <option value="simulador" selected>Simulador</option>
+                    <option value="video">Procesador Video</option>
+                    <option value="sumo">SUMO</option>
+                </select>
+            </div>
+            <button id="btn-emergencia" class="btn-emergency">
+                <i class="fas fa-ambulance"></i> Emergencia
+            </button>
+        </div>
+    </header>
+
+    <!-- Dashboard Principal -->
+    <div class="dashboard-container">
+        <!-- Sidebar Izquierda: Estadísticas -->
+        <aside class="sidebar-left">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Estadísticas del Sistema</h3>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="fas fa-road"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Intersecciones</span>
+                            <span class="stat-value" id="num-intersecciones">0</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">ICV Promedio</span>
+                            <span class="stat-value" id="icv-promedio">0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Flujo Promedio</span>
+                            <span class="stat-value" id="flujo-promedio">0</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <i class="fas fa-traffic-light"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Olas Verdes</span>
+                            <span class="stat-value" id="olas-activas">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mini Stats Split -->
+                <div class="mini-stats-split">
+                    <div class="mini-stat-card success">
+                        <span class="mini-stat-icon">🟢</span>
+                        <span class="mini-stat-value" id="calles-fluidas">0</span>
+                        <span class="mini-stat-label">Fluidas</span>
+                    </div>
+                    <div class="mini-stat-card warning">
+                        <span class="mini-stat-icon">🟡</span>
+                        <span class="mini-stat-value" id="calles-moderadas">0</span>
+                        <span class="mini-stat-label">Moderadas</span>
+                    </div>
+                    <div class="mini-stat-card danger">
+                        <span class="mini-stat-icon">🔴</span>
+                        <span class="mini-stat-value" id="calles-congestionadas">0</span>
+                        <span class="mini-stat-label">Congestionadas</span>
+                    </div>
+                    <div class="mini-stat-card info">
+                        <span class="mini-stat-icon">⚡</span>
+                        <span class="mini-stat-value" id="velocidad-promedio">0</span>
+                        <span class="mini-stat-label">km/h Prom.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico ICV en Tiempo Real -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <i class="fas fa-chart-area"></i>
+                    <h3>ICV en Tiempo Real</h3>
+                </div>
+                <canvas id="chartICV"></canvas>
+            </div>
+
+            <!-- Gráfico de Flujo -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <i class="fas fa-water"></i>
+                    <h3>Flujo Vehicular</h3>
+                </div>
+                <canvas id="chartFlujo"></canvas>
+            </div>
+        </aside>
+
+        <!-- Área Central: Mapa -->
+        <main class="main-content">
+            <div class="card glass-card full-height">
+                <div class="card-header">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>Mapa Interactivo de Lima</h3>
+                </div>
+                <div id="mapa" class="map-container"></div>
+            </div>
+        </main>
+
+        <!-- Sidebar Derecha: Métricas e Información -->
+        <aside class="sidebar-right">
+            <!-- Panel de Video con YOLO -->
+            <div class="card glass-card" id="panel-video">
+                <div class="card-header">
+                    <i class="fas fa-video"></i>
+                    <h3>Detección en Tiempo Real</h3>
+                    <div class="header-actions">
+                        <button class="btn-icon" id="btn-toggle-video" title="Activar/Desactivar Cámara">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="btn-icon" id="btn-expand-video" title="Expandir/Contraer">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="video-container">
+                    <div class="video-controls">
+                        <select id="selector-interseccion-cam" class="select-pro">
+                            <option value="">Selecciona intersección...</option>
+                        </select>
+                        <div class="camera-mode-indicator">
+                            <i class="fas fa-circle"></i>
+                            <span id="modo-camara-texto">Desactivado</span>
+                        </div>
+                    </div>
+
+                    <!-- Canvas para Video -->
+                    <canvas id="video-canvas" width="400" height="220"></canvas>
+
+                    <!-- Controles de Motor Giratorio Horizontal -->
+                    <div class="ptz-controls" id="ptz-controls" style="display: none;">
+                        <div class="ptz-info">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Motor Giratorio Horizontal</span>
+                        </div>
+
+                        <!-- Modo: Automático / Manual -->
+                        <div class="rotation-mode">
+                            <label class="switch-mode">
+                                <span class="mode-label">Modo:</span>
+                                <input type="checkbox" id="toggle-seguimiento-auto">
+                                <span class="slider-mode"></span>
+                                <span class="mode-text" id="mode-text">Manual</span>
+                            </label>
+                        </div>
+
+                        <!-- Controles de Rotación Horizontal -->
+                        <div class="rotation-controls">
+                            <button class="rotation-btn" id="ptz-left" title="Rotar Izquierda">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Izquierda</span>
+                            </button>
+                            <div class="rotation-indicator">
+                                <i class="fas fa-video"></i>
+                                <div class="rotation-value">
+                                    <span id="ptz-pan-value">0</span>°
+                                </div>
+                            </div>
+                            <button class="rotation-btn" id="ptz-right" title="Rotar Derecha">
+                                <i class="fas fa-arrow-right"></i>
+                                <span>Derecha</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="video-stats">
+                        <div class="video-stat">
+                            <i class="fas fa-car"></i>
+                            <span id="video-vehiculos">0</span> vehículos
+                        </div>
+                        <div class="video-stat">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span id="video-fps">0</span> FPS
+                        </div>
+                        <div class="video-stat">
+                            <i class="fas fa-signal"></i>
+                            ICV: <span id="video-icv">0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Métricas de Intersecciones -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <i class="fas fa-list"></i>
+                    <h3>Intersecciones en Tiempo Real</h3>
+                </div>
+                <div id="metricas-container" class="metricas-scroll"></div>
+            </div>
+
+            <!-- Olas Verdes Activas -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <i class="fas fa-route"></i>
+                    <h3>Olas Verdes Activas</h3>
+                </div>
+                <div id="olas-verdes-container" class="olas-container">
+                    <div class="empty-state">
+                        <i class="fas fa-road"></i>
+                        <p>No hay olas verdes activas</p>
+                        <small>Activa una emergencia para ver la ruta</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Control Difuso -->
+            <div class="card glass-card">
+                <div class="card-header">
+                    <i class="fas fa-brain"></i>
+                    <h3>Sistema Difuso</h3>
+                </div>
+                <div class="diffuse-info">
+                    <div class="diffuse-row">
+                        <span>Reglas Activas:</span>
+                        <span class="badge badge-info" id="reglas-activas">9</span>
+                    </div>
+                    <div class="diffuse-row">
+                        <span>Tiempo Verde Medio:</span>
+                        <span class="badge badge-success" id="tiempo-verde-medio">45s</span>
+                    </div>
+                    <div class="diffuse-row">
+                        <span>Decisiones Tomadas:</span>
+                        <span class="badge badge-primary" id="decisiones-tomadas">0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modal de Emergencia Mejorado -->
+    <div id="modal-emergencia" class="modal-overlay" style="display: none;">
+        <div class="modal-pro">
+            <div class="modal-header-pro">
+                <div class="modal-icon">
+                    <i class="fas fa-ambulance"></i>
+                </div>
+                <div>
+                    <h2>Activar Ola Verde de Emergencia</h2>
+                    <p>Configure los parámetros del vehículo de emergencia</p>
+                </div>
+                <button class="modal-close-btn" onclick="cerrarModalEmergencia()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body-pro">
+                <div class="form-row">
+                    <div class="form-group-pro">
+                        <label><i class="fas fa-car"></i> Tipo de Vehículo</label>
+                        <select id="tipo-emergencia" class="input-pro">
+                            <option value="ambulancia">🚑 Ambulancia</option>
+                            <option value="bomberos">🚒 Bomberos</option>
+                            <option value="policia">🚓 Policía</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Indicador de Prioridad Dinámica -->
+                <div id="prioridad-indicator" class="prioridad-badge">
+                    <div class="prioridad-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span class="prioridad-nivel">CRÍTICA</span>
+                        <span class="prioridad-peso">Peso: 100</span>
+                    </div>
+                    <p class="prioridad-descripcion">Vida en peligro - Prioridad Absoluta</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-pro">
+                        <label><i class="fas fa-map-marker-alt"></i> Origen</label>
+                        <select id="origen-emergencia" class="input-pro"></select>
+                    </div>
+                    <div class="form-group-pro">
+                        <label><i class="fas fa-flag-checkered"></i> Destino</label>
+                        <select id="destino-emergencia" class="input-pro"></select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-pro">
+                        <label>
+                            <i class="fas fa-tachometer-alt"></i> Velocidad Estimada
+                            <span class="info-tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltip-text">
+                                    <strong>¿Qué es la Velocidad Estimada?</strong><br><br>
+                                    Es la velocidad promedio a la que el vehículo de emergencia se desplazará por la ruta.
+                                    Este valor se usa para:<br>
+                                    • Calcular el tiempo de llegada<br>
+                                    • Sincronizar los semáforos en verde<br>
+                                    • Optimizar la coordinación de la ola verde<br><br>
+                                    <em>Rango típico: Ambulancias 50-70 km/h en ciudad</em>
+                                </span>
+                            </span>
+                        </label>
+                        <input type="range" id="velocidad-emergencia" class="range-pro"
+                               min="20" max="80" value="50" step="5">
+                        <div class="range-labels">
+                            <span>20 km/h</span>
+                            <span id="velocidad-display" class="range-value">50 km/h</span>
+                            <span>80 km/h</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer-pro">
+                <button class="btn-secondary-pro" onclick="cerrarModalEmergencia()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn-primary-pro" onclick="activarEmergencia()">
+                    <i class="fas fa-check"></i> Activar Ola Verde
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="intersecciones_lima.js"></script>
+    <script src="app_mejorado.js"></script>
+</body>
+</html>

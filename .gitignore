@@ -1,0 +1,118 @@
+# Sistema de Control Semafórico - .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Entornos virtuales
+venv/
+ENV/
+env/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Variables de entorno
+.env
+.env.local
+
+# Logs
+*.log
+datos/logs-sistema/*.log
+
+# Base de datos
+*.db
+*.sqlite
+*.sqlite3
+base-datos/*.db
+
+# Videos (muy grandes para git) - Excluir TODOS los videos
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.flv
+*.wmv
+*.m4v
+
+# Modelos entrenados (grandes)
+datos/modelos-entrenados/*.pt
+datos/modelos-entrenados/*.pth
+datos/modelos-entrenados/*.h5
+vision-computadora/modelos/*.pt
+
+# Resultados de SUMO
+datos/resultados-sumo/*.xml
+datos/resultados-sumo/*.csv
+integracion-sumo/escenarios/lima-centro/*.xml
+!integracion-sumo/escenarios/lima-centro/README.md
+
+# Archivos temporales
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Compilados de Windows
+*.exe
+*.dll
+
+# Backups
+*.bak
+*.backup
+
+# Archivos de sistema
+Thumbs.db
+desktop.ini
+
+# Documentos grandes
+*.pdf
+*.docx
+documentacion/**/*.pdf
+
+# Archivos grandes comprimidos
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Modelos en raíz
+/*.pt
+/*.pth
+/*.h5
+
+# Mantener carpetas vacías
+!datos/modelos-entrenados/.gitkeep
+!datos/videos-procesados/.gitkeep
+!datos/logs-sistema/.gitkeep
+!datos/resultados-sumo/.gitkeep
+!vision-computadora/modelos/.gitkeep
+!vision-computadora/videos-prueba/.gitkeep

@@ -1,0 +1,15 @@
+{
+  "video": "VideoPuentePUCP.mp4",
+  "modo": 3,
+  "modo_nombre": "DETECCIÓN DE EMERGENCIAS",
+  "frames_procesados": 2822,
+  "duracion_segundos": 94.01469549570832,
+  "vehiculos_promedio": 1.3185683912119064,
+  "vehiculos_maximo": 10,
+  "velocidad_promedio_kmh": 99.4365966111073,
+  "icv_promedio": 0.2057834868887314,
+  "frames_fluidos": 2155,
+  "frames_moderados": 666,
+  "frames_congestionados": 1,
+  "emergencias_detectadas": 0
+}

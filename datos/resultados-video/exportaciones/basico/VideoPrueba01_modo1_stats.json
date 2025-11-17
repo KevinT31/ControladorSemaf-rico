@@ -1,0 +1,15 @@
+{
+  "video": "VideoPrueba01.mp4",
+  "modo": 1,
+  "modo_nombre": "DETECCIÓN BÁSICA",
+  "frames_procesados": 700,
+  "duracion_segundos": 23.3233,
+  "vehiculos_promedio": 25.56142857142857,
+  "vehiculos_maximo": 35,
+  "velocidad_promedio_kmh": 7.559681860516525,
+  "icv_promedio": 0.6705957142857143,
+  "frames_fluidos": 0,
+  "frames_moderados": 3,
+  "frames_congestionados": 697,
+  "emergencias_detectadas": 0
+}

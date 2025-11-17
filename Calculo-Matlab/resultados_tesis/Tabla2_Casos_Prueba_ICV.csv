@@ -1,0 +1,9 @@
+Caso,L_m,V_kmh,F_vehmin,N_veh,Densidad_vehm,ICV,Nivel,Color
+Flujo Libre Nocturno,5,58,8,10,0.033,0.112,Bajo,Verde
+Flujo Libre Diurno,15,52,12,18,0.060,0.213,Bajo,Verde
+Transición Matutina,35,40,18,28,0.093,0.385,Medio,Amarillo
+Congestión Leve,60,30,20,35,0.117,0.519,Medio,Amarillo
+Congestión Moderada,85,22,24,45,0.150,0.669,Alto,Rojo
+Congestión Severa,115,15,27,52,0.173,0.811,Alto,Rojo
+Atasco Parcial,135,10,29,58,0.193,0.910,Alto,Rojo
+Atasco Total,148,5,30,60,0.200,0.975,Alto,Rojo
