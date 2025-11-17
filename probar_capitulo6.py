@@ -219,12 +219,15 @@ try:
     print("\nOK - Exportador creado")
     print(f"  Carpeta salida: {exportador.carpeta_salida}")
 
-    # Generar datos de prueba
+    # Generar datos de prueba (determinísticos)
     print("\n[3.1] Generando datos de prueba...")
     timestamps = list(np.linspace(0, 300, 100))  # 5 minutos, 100 puntos
-    icv_valores = list(0.3 + 0.3 * np.sin(np.array(timestamps) / 30) + 0.05 * np.random.randn(100))
+    # Variación determinística usando múltiples frecuencias
+    ts_array = np.array(timestamps)
+    variacion = 0.05 * (np.sin(ts_array / 10) * 0.6 + np.cos(ts_array / 15) * 0.4)
+    icv_valores = list(0.3 + 0.3 * np.sin(ts_array / 30) + variacion)
     icv_valores = list(np.clip(icv_valores, 0, 1))
-    print(f"  {len(timestamps)} puntos generados")
+    print(f"  {len(timestamps)} puntos generados (determinísticos)")
 
     # Exportar serie temporal
     print("\n[3.2] Exportando serie temporal a MATLAB...")

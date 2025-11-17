@@ -350,24 +350,36 @@ def modo_demostracion_completa():
 
         agregador = AgregadorMetricasRed(configuraciones_red)
 
-        print("\n📊 Simulando métricas de 3 intersecciones...")
+        print("\n📊 Simulando métricas de 3 intersecciones (valores determinísticos)...")
 
-        for config in configuraciones_red:
+        # Usar valores base diferentes para cada intersección (determinístico)
+        valores_base = [
+            {'sc': 25, 'vavg': 35, 'q': 17, 'k': 0.07, 'icv': 0.4, 'pi': 0.55},  # I001
+            {'sc': 30, 'vavg': 30, 'q': 15, 'k': 0.08, 'icv': 0.5, 'pi': 0.50},  # I002
+            {'sc': 20, 'vavg': 40, 'q': 20, 'k': 0.06, 'icv': 0.3, 'pi': 0.65},  # I003
+        ]
+
+        for i, config in enumerate(configuraciones_red):
+            base = valores_base[i]
+            # Variación determinística basada en índice
+            factor_ns = 1.0 + 0.1 * math.sin(i * 0.5)
+            factor_eo = 1.0 + 0.1 * math.cos(i * 0.5)
+
             metricas = MetricasInterseccion(
                 interseccion_id=config.id,
                 timestamp=datetime.now(),
-                sc_ns=np.random.uniform(10, 40),
-                sc_eo=np.random.uniform(10, 40),
-                vavg_ns=np.random.uniform(20, 50),
-                vavg_eo=np.random.uniform(20, 50),
-                q_ns=np.random.uniform(10, 25),
-                q_eo=np.random.uniform(10, 25),
-                k_ns=np.random.uniform(0.04, 0.10),
-                k_eo=np.random.uniform(0.04, 0.10),
-                icv_ns=np.random.uniform(0.2, 0.6),
-                icv_eo=np.random.uniform(0.2, 0.6),
-                pi_ns=np.random.uniform(0.3, 0.8),
-                pi_eo=np.random.uniform(0.3, 0.8)
+                sc_ns=base['sc'] * factor_ns,
+                sc_eo=base['sc'] * factor_eo,
+                vavg_ns=base['vavg'] * factor_ns,
+                vavg_eo=base['vavg'] * factor_eo,
+                q_ns=base['q'] * factor_ns,
+                q_eo=base['q'] * factor_eo,
+                k_ns=base['k'] * factor_ns,
+                k_eo=base['k'] * factor_eo,
+                icv_ns=min(1.0, base['icv'] * factor_ns),
+                icv_eo=min(1.0, base['icv'] * factor_eo),
+                pi_ns=min(1.0, base['pi'] * factor_ns),
+                pi_eo=min(1.0, base['pi'] * factor_eo)
             )
             agregador.actualizar_metricas_interseccion(metricas)
 
@@ -385,7 +397,7 @@ def modo_demostracion_completa():
         print("PARTE 5: GENERACIÓN DE MÉTRICAS REALISTAS")
         print("="*70)
 
-        generador = GeneradorMetricasRealistas(semilla=42)
+        generador = GeneradorMetricasRealistas(offset_temporal=0.0)
 
         print("\n📊 Generando series temporales para comparación...")
         patron_fijo = GeneradorMetricasRealistas.PATRON_MODERADO
