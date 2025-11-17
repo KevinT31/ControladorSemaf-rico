@@ -1,10 +1,10 @@
-# 📚 GUÍA COMPLETA PARA DOCUMENTACIÓN DE TESIS
+# GUÍA COMPLETA PARA DOCUMENTACIÓN DE TESIS
 
 **Sistema de Control Semafórico Adaptativo Inteligente**
 
 ---
 
-## 📋 ÍNDICE
+## ÍNDICE
 
 1. [Capturas de Pantalla Esenciales](#capturas-de-pantalla)
 2. [Gráficos Generados Automáticamente](#gráficos-automáticos)
@@ -16,7 +16,7 @@
 
 ---
 
-## 📸 1. CAPTURAS DE PANTALLA ESENCIALES
+## 1. CAPTURAS DE PANTALLA ESENCIALES
 
 ### A. Interfaz Web en Acción
 
@@ -167,7 +167,7 @@ python ejecutar.py
 
 ---
 
-## 📊 2. GRÁFICOS GENERADOS AUTOMÁTICAMENTE
+## 2. GRÁFICOS GENERADOS AUTOMÁTICAMENTE
 
 **Ya generados por el script `generar_graficos_tesis.py`:**
 
@@ -207,7 +207,7 @@ python ejecutar.py
 
 ---
 
-## 🖥️ 3. COMANDOS PARA DEMOSTRACIÓN
+## 3. COMANDOS PARA DEMOSTRACIÓN
 
 ### Demo 1: Sistema Completo (5 minutos)
 
@@ -225,10 +225,10 @@ python ejecutar.py
 ```
 
 **Resultados esperados:**
-- ✅ Métricas actualizándose cada segundo
-- ✅ Colores cambiando según congestión
-- ✅ Gráficos de series temporales
-- ✅ WebSocket funcionando (sin recargar página)
+- [OK] Métricas actualizándose cada segundo
+- [OK] Colores cambiando según congestión
+- [OK] Gráficos de series temporales
+- [OK] WebSocket funcionando (sin recargar página)
 
 ---
 
@@ -261,7 +261,7 @@ python probar_capitulo6.py
 [1.7] Probando calculo de metricas completas Cap 6...
   OK - Metodo integrado funciona correctamente
 
-✅ Todos los métodos del Capítulo 6 validados
+[COMPLETADO] Todos los métodos del Capítulo 6 validados
 ```
 
 **Caption:** "Validación de todos los métodos matemáticos del Capítulo 6 según especificaciones de la tesis"
@@ -276,24 +276,24 @@ python nucleo/sistema_comparacion.py
 
 **Salida esperada:**
 ```
-📊 Simulando Control de Tiempo Fijo...
+[INFO] Simulando Control de Tiempo Fijo...
    ├─ ICV promedio: 0.523
    ├─ Tiempo espera: 45.2s
    └─ Longitud cola: 85.3m
 
-📊 Simulando Control Adaptativo...
+[INFO] Simulando Control Adaptativo...
    ├─ ICV promedio: 0.347
    ├─ Tiempo espera: 30.1s
    └─ Longitud cola: 55.8m
 
-🔍 Generando comparación...
+[INFO] Generando comparación...
    Mejora en ICV: 33.7%
    Mejora en espera: 33.4%
    Mejora en cola: 34.6%
 
-📊 Generando visualizaciones...
-   ✓ comparacion_tiempo_fijo_vs_adaptativo.png
-   ✓ evolucion_metricas_red.png
+[INFO] Generando visualizaciones...
+   [OK] comparacion_tiempo_fijo_vs_adaptativo.png
+   [OK] evolucion_metricas_red.png
 ```
 
 **Caption:** "Resultados experimentales mostrando mejora promedio de 33% en todas las métricas"
@@ -329,7 +329,7 @@ title('Evolución del ICV');
 
 ---
 
-## 🏗️ 4. EXPLICACIONES ARQUITECTÓNICAS
+## 4. EXPLICACIONES ARQUITECTÓNICAS
 
 ### A. ¿Por qué esta Arquitectura?
 
@@ -354,45 +354,45 @@ title('Evolución del ICV');
 4. **Escalable** - Se puede reemplazar una capa (ej: SQLite → PostgreSQL)
 
 **Limitaciones:**
-- ⚠️ Mayor complejidad inicial
-- ⚠️ Overhead de comunicación entre capas
+- [ADVERTENCIA] Mayor complejidad inicial
+- [ADVERTENCIA] Overhead de comunicación entre capas
 
 **Alternativas consideradas:**
-- ❌ **Monolito simple** - Descartado por falta de mantenibilidad
-- ❌ **Microservicios** - Descartado por exceso de complejidad para una tesis
+- [DESCARTADO] **Monolito simple** - Descartado por falta de mantenibilidad
+- [DESCARTADO] **Microservicios** - Descartado por exceso de complejidad para una tesis
 
 ---
 
 #### **Decisión 2: FastAPI como Framework Web**
 
 **Razones:**
-1. ✅ **Performance** - Basado en Starlette (async/await nativo)
-2. ✅ **Documentación automática** - Swagger UI out-of-the-box
-3. ✅ **Validación de datos** - Pydantic integrado
-4. ✅ **WebSocket nativo** - Para actualizaciones en tiempo real
-5. ✅ **Type hints** - Código más mantenible
+1. [OK] **Performance** - Basado en Starlette (async/await nativo)
+2. [OK] **Documentación automática** - Swagger UI out-of-the-box
+3. [OK] **Validación de datos** - Pydantic integrado
+4. [OK] **WebSocket nativo** - Para actualizaciones en tiempo real
+5. [OK] **Type hints** - Código más mantenible
 
 **Comparación:**
 
 | Framework | Async | Swagger | WebSocket | Performance |
 |-----------|-------|---------|-----------|-------------|
-| **FastAPI** | ✅ | ✅ | ✅ | ⭐⭐⭐⭐⭐ |
-| Flask | ❌ | ❌ | Extensión | ⭐⭐⭐ |
-| Django | Parcial | Extensión | Channels | ⭐⭐⭐ |
+| **FastAPI** | [OK] | [OK] | [OK] | [EXCELENTE] |
+| Flask | [NO] | [NO] | Extensión | [BUENO] |
+| Django | Parcial | Extensión | Channels | [BUENO] |
 
 **Limitaciones:**
-- ⚠️ Curva de aprendizaje en async/await
-- ⚠️ Menos plugins que Flask/Django
+- [ADVERTENCIA] Curva de aprendizaje en async/await
+- [ADVERTENCIA] Menos plugins que Flask/Django
 
 ---
 
 #### **Decisión 3: SQLite en Desarrollo, PostgreSQL en Producción**
 
 **Razones:**
-1. ✅ **Sin configuración** - SQLite no requiere servidor
-2. ✅ **Portabilidad** - Un solo archivo .db
-3. ✅ **Fácil debugging** - DB Browser for SQLite
-4. ✅ **Migración sencilla** - SQLAlchemy ORM abstrae la BD
+1. [OK] **Sin configuración** - SQLite no requiere servidor
+2. [OK] **Portabilidad** - Un solo archivo .db
+3. [OK] **Fácil debugging** - DB Browser for SQLite
+4. [OK] **Migración sencilla** - SQLAlchemy ORM abstrae la BD
 
 **Ruta de migración:**
 ```python
@@ -404,14 +404,14 @@ DATABASE_URL = "postgresql://user:pass@localhost/semaforos"
 ```
 
 **Limitaciones de SQLite:**
-- ⚠️ No soporta escrituras concurrentes
-- ⚠️ No tiene TimescaleDB (hypertables)
-- ⚠️ Máx ~1TB de datos
+- [ADVERTENCIA] No soporta escrituras concurrentes
+- [ADVERTENCIA] No tiene TimescaleDB (hypertables)
+- [ADVERTENCIA] Máx ~1TB de datos
 
 **¿Cuándo migrar a PostgreSQL?**
-- ✅ > 1,000 métricas/segundo
-- ✅ > 100 GB de datos
-- ✅ Análisis ML sobre series temporales grandes
+- [OK] > 1,000 métricas/segundo
+- [OK] > 100 GB de datos
+- [OK] Análisis ML sobre series temporales grandes
 
 ---
 
@@ -465,40 +465,40 @@ VIDEO → YOLO → Tracking → ICV → Difuso → Tiempos → Semáforo
 
 ---
 
-## ⚠️ 5. LIMITACIONES Y DECISIONES DE DISEÑO
+## 5. LIMITACIONES Y DECISIONES DE DISEÑO
 
 ### A. Limitaciones Actuales
 
 #### 1. **Procesamiento de Video**
 
 **Limitación:**
-- ⚠️ **Velocidad limitada por CPU** - Solo ~5 FPS en CPU, ~30 FPS con GPU
-- ⚠️ **Detección solo de vehículos** - No peatones, ciclistas, etc.
-- ⚠️ **Oclusión no manejada completamente** - Vehículos ocultos pueden perder tracking
+- [ADVERTENCIA] **Velocidad limitada por CPU** - Solo ~5 FPS en CPU, ~30 FPS con GPU
+- [ADVERTENCIA] **Detección solo de vehículos** - No peatones, ciclistas, etc.
+- [ADVERTENCIA] **Oclusión no manejada completamente** - Vehículos ocultos pueden perder tracking
 
 **Impacto:**
 - Videos deben procesarse offline (no tiempo real en CPU)
 - Requiere GPU (NVIDIA) para tiempo real
 
 **Solución futura:**
-- ✅ Usar YOLOv8-nano (más rápido, menos preciso)
-- ✅ Procesamiento distribuido (múltiples GPUs)
-- ✅ Edge computing (procesamiento en cámara)
+- [OK] Usar YOLOv8-nano (más rápido, menos preciso)
+- [OK] Procesamiento distribuido (múltiples GPUs)
+- [OK] Edge computing (procesamiento en cámara)
 
 ---
 
 #### 2. **Cálculo de Velocidad**
 
 **Limitación:**
-- ⚠️ **Requiere calibración de cámara** - Sin calibración, velocidades son estimadas
-- ⚠️ **Distorsión de perspectiva** - Objetos lejanos parecen más lentos
-- ⚠️ **Framerate variable** - Afecta precisión
+- [ADVERTENCIA] **Requiere calibración de cámara** - Sin calibración, velocidades son estimadas
+- [ADVERTENCIA] **Distorsión de perspectiva** - Objetos lejanos parecen más lentos
+- [ADVERTENCIA] **Framerate variable** - Afecta precisión
 
 **Método actual:**
 ```python
 # Estimación simple
 distancia_pixels = np.linalg.norm(bbox_actual - bbox_anterior)
-distancia_metros = distancia_pixels * factor_escala  # ⚠️ APROXIMADO
+distancia_metros = distancia_pixels * factor_escala  # [ADVERTENCIA] APROXIMADO
 velocidad_kmh = (distancia_metros / delta_t) * 3.6
 ```
 
@@ -515,8 +515,8 @@ velocidad_real = calcular_velocidad_3d(pos_mundo_actual, pos_mundo_anterior)
 #### 3. **Base de Datos**
 
 **Limitación:**
-- ⚠️ **SQLite no soporta concurrencia** - Máx ~1 escritura/segundo
-- ⚠️ **Sin optimización para series temporales** - No hay hypertables
+- [ADVERTENCIA] **SQLite no soporta concurrencia** - Máx ~1 escritura/segundo
+- [ADVERTENCIA] **Sin optimización para series temporales** - No hay hypertables
 
 **Impacto:**
 - En producción con alta carga, se necesita PostgreSQL + TimescaleDB
@@ -539,7 +539,7 @@ psql -d semaforos -c "SELECT create_hypertable('metricas_trafico', 'timestamp');
 #### 4. **Simulador Matemático**
 
 **Limitación:**
-- ⚠️ **Modelo simplificado** - No considera:
+- [ADVERTENCIA] **Modelo simplificado** - No considera:
   - Comportamiento agresivo de conductores
   - Cambios de carril
   - Vueltas en intersección
@@ -555,9 +555,9 @@ v_safe = b·Δt + sqrt((b·Δt)² - 2b·(x - x_leader))  # Frenado seguro
 ```
 
 **Limitaciones del modelo:**
-- ✅ Funciona bien para tráfico fluido
-- ⚠️ Sobrestima capacidad en congestión severa
-- ⚠️ No modela "phantom jams" (atascos fantasma)
+- [OK] Funciona bien para tráfico fluido
+- [ADVERTENCIA] Sobrestima capacidad en congestión severa
+- [ADVERTENCIA] No modela "phantom jams" (atascos fantasma)
 
 **Validación:**
 - Comparar contra datos reales de SUMO
@@ -568,9 +568,9 @@ v_safe = b·Δt + sqrt((b·Δt)² - 2b·(x - x_leader))  # Frenado seguro
 #### 5. **Integración SUMO**
 
 **Limitación:**
-- ⚠️ **Requiere instalación externa** - SUMO no está en PyPI
-- ⚠️ **TraCI es síncrono** - Bloquea el servidor durante simulación
-- ⚠️ **Sin archivo de rutas (.rou.xml)** - Solo tenemos la red, no flujos vehiculares
+- [ADVERTENCIA] **Requiere instalación externa** - SUMO no está en PyPI
+- [ADVERTENCIA] **TraCI es síncrono** - Bloquea el servidor durante simulación
+- [ADVERTENCIA] **Sin archivo de rutas (.rou.xml)** - Solo tenemos la red, no flujos vehiculares
 
 **Instalación SUMO:**
 ```bash
@@ -603,10 +603,10 @@ python $SUMO_HOME/tools/randomTrips.py \
 #### **Decisión: Usar YOLOv8 (no YOLO v5 o v7)**
 
 **Razones:**
-1. ✅ **Más preciso** - mAP 53.9% (vs 50.7% v5)
-2. ✅ **Más rápido** - Arquitectura optimizada
-3. ✅ **Mejor API** - `ultralytics` package más limpio
-4. ✅ **Export flexible** - ONNX, TensorRT, CoreML
+1. [OK] **Más preciso** - mAP 53.9% (vs 50.7% v5)
+2. [OK] **Más rápido** - Arquitectura optimizada
+3. [OK] **Mejor API** - `ultralytics` package más limpio
+4. [OK] **Export flexible** - ONNX, TensorRT, CoreML
 
 **Comparación:**
 
@@ -621,17 +621,17 @@ python $SUMO_HOME/tools/randomTrips.py \
 #### **Decisión: ByteTrack como tracker principal**
 
 **Razones:**
-1. ✅ **Sin ReID** - No requiere modelo de re-identificación
-2. ✅ **Robusto a oclusión** - Mantiene IDs con detecciones parciales
-3. ✅ **Rápido** - ~5ms overhead por frame
+1. [OK] **Sin ReID** - No requiere modelo de re-identificación
+2. [OK] **Robusto a oclusión** - Mantiene IDs con detecciones parciales
+3. [OK] **Rápido** - ~5ms overhead por frame
 
 **Comparación:**
 
 | Tracker | Usa ReID | MOTA ↑ | IDF1 ↑ | FPS |
 |---------|----------|--------|--------|-----|
-| SORT | ❌ | 74.6 | 72.0 | 260 |
-| DeepSORT | ✅ | 77.2 | 76.8 | 40 |
-| **ByteTrack** | ❌ | **80.3** | **77.3** | **90** |
+| SORT | [NO] | 74.6 | 72.0 | 260 |
+| DeepSORT | [OK] | 77.2 | 76.8 | 40 |
+| **ByteTrack** | [NO] | **80.3** | **77.3** | **90** |
 
 **Fallback a DeepSORT:**
 - Si ByteTrack no está disponible (no instalado)
@@ -642,9 +642,9 @@ python $SUMO_HOME/tools/randomTrips.py \
 #### **Decisión: Método de Mamdani (no Sugeno)**
 
 **Razones:**
-1. ✅ **Más intuitivo** - Salidas son conjuntos difusos (fácil visualizar)
-2. ✅ **Mejor para reglas complejas** - 12 reglas jerárquicas
-3. ✅ **Explicable** - Auditable para tesis
+1. [OK] **Más intuitivo** - Salidas son conjuntos difusos (fácil visualizar)
+2. [OK] **Mejor para reglas complejas** - 12 reglas jerárquicas
+3. [OK] **Explicable** - Auditable para tesis
 
 **Comparación:**
 
@@ -653,14 +653,14 @@ python $SUMO_HOME/tools/randomTrips.py \
 | Salida | Conjuntos difusos | Función lineal |
 | Defuzzificación | Centroide | Promedio ponderado |
 | Complejidad | Media | Baja |
-| Interpretabilidad | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| Eficiencia | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Interpretabilidad | [EXCELENTE] | [BUENO] |
+| Eficiencia | [BUENO] | [EXCELENTE] |
 
 **Para tesis:** Mamdani es mejor porque permite mostrar superficie de control 3D.
 
 ---
 
-## 📈 6. RESULTADOS EXPERIMENTALES
+## 6. RESULTADOS EXPERIMENTALES
 
 ### Experimento 1: Comparación en Simulador
 
@@ -738,56 +738,56 @@ python procesar_video_simple.py
 
 ---
 
-## 📎 7. ANEXOS Y MATERIAL COMPLEMENTARIO
+## 7. ANEXOS Y MATERIAL COMPLEMENTARIO
 
 ### A. Estructura de Carpetas Explicada
 
 ```
 ControladorSemaforicoTFC/
 │
-├── 📊 Calculo-Matlab/          # Scripts MATLAB para análisis offline
+├── [DATA] Calculo-Matlab/          # Scripts MATLAB para análisis offline
 │   ├── calcular_icv.m
 │   ├── graficar_comparacion.m
 │   └── exportar_resultados.m
 │
-├── 💾 base-datos/              # Base de datos persistente
-│   ├── semaforos.db            # SQLite (31 intersecciones + métricas)
-│   └── schema.sql              # Esquema SQL documentado
+├── [DB] base-datos/                # Base de datos persistente
+│   ├── semaforos.db                # SQLite (31 intersecciones + métricas)
+│   └── schema.sql                  # Esquema SQL documentado
 │
-├── 📁 datos/                   # Datos y resultados
-│   ├── videos-prueba/          # Videos cortos para testing
-│   ├── resultados-sumo/        # Exportaciones de SUMO
-│   ├── graficos-tesis/         # ⭐ GRÁFICOS GENERADOS
-│   └── logs-sistema/           # Logs de ejecución
+├── [FILES] datos/                  # Datos y resultados
+│   ├── videos-prueba/              # Videos cortos para testing
+│   ├── resultados-sumo/            # Exportaciones de SUMO
+│   ├── graficos-tesis/             # [IMPORTANTE] GRÁFICOS GENERADOS
+│   └── logs-sistema/               # Logs de ejecución
 │
-├── 🌐 interfaz-web/            # Frontend
-│   ├── index.html              # Dashboard principal
-│   ├── app_mejorado.js         # Lógica + WebSocket
-│   └── estilos.css             # Diseño responsive
+├── [WEB] interfaz-web/             # Frontend
+│   ├── index.html                  # Dashboard principal
+│   ├── app_mejorado.js             # Lógica + WebSocket
+│   └── estilos.css                 # Diseño responsive
 │
-├── 🚗 integracion-sumo/        # Integración con SUMO
-│   ├── conector_sumo.py        # TraCI wrapper
+├── [SIM] integracion-sumo/         # Integración con SUMO
+│   ├── conector_sumo.py            # TraCI wrapper
 │   ├── controlador_sumo_completo.py
-│   └── escenarios/lima-centro/ # Red OSM de Lima
+│   └── escenarios/lima-centro/     # Red OSM de Lima
 │
-├── 🧠 nucleo/                  # ⭐ ALGORITMOS DEL CAP 6
+├── [CORE] nucleo/                  # [IMPORTANTE] ALGORITMOS DEL CAP 6
 │   ├── controlador_difuso_capitulo6.py
 │   ├── indice_congestion.py
 │   ├── olas_verdes_dinamicas.py
 │   ├── sistema_comparacion.py
 │   └── metricas_red.py
 │
-├── 🔧 servidor-backend/        # API FastAPI
-│   ├── main.py                 # Servidor principal
-│   ├── main_capitulo6.py       # Solo Cap 6
-│   ├── modelos_bd/             # ⭐ ORM SQLAlchemy
-│   ├── servicios/              # Lógica de negocio
-│   └── rutas/                  # Endpoints REST
+├── [API] servidor-backend/         # API FastAPI
+│   ├── main.py                     # Servidor principal
+│   ├── main_capitulo6.py           # Solo Cap 6
+│   ├── modelos_bd/                 # [IMPORTANTE] ORM SQLAlchemy
+│   ├── servicios/                  # Lógica de negocio
+│   └── rutas/                      # Endpoints REST
 │
-└── 👁️ vision_computadora/      # Procesamiento de video
-    ├── procesador_video.py     # YOLO + Tracking
-    ├── tracking_vehicular.py   # ByteTrack/DeepSORT
-    └── exportador_azure.py     # Cloud storage
+└── [CV] vision_computadora/        # Procesamiento de video
+    ├── procesador_video.py         # YOLO + Tracking
+    ├── tracking_vehicular.py       # ByteTrack/DeepSORT
+    └── exportador_azure.py         # Cloud storage
 ```
 
 ---
@@ -882,7 +882,7 @@ python servidor-backend/inicializar_bd.py
 
 ---
 
-## 🎓 CONSEJOS PARA LA DEFENSA
+## CONSEJOS PARA LA DEFENSA
 
 ### 1. **Preparar Demo en Vivo**
 
@@ -937,7 +937,7 @@ python nucleo/sistema_comparacion.py
 
 ---
 
-## 📚 BIBLIOGRAFÍA CLAVE PARA JUSTIFICAR DECISIONES
+## BIBLIOGRAFÍA CLAVE PARA JUSTIFICAR DECISIONES
 
 1. **YOLO:**
    - Redmon, J. et al. (2016). "You Only Look Once: Unified, Real-Time Object Detection"
@@ -954,6 +954,6 @@ python nucleo/sistema_comparacion.py
 
 ---
 
-**¡LISTO PARA TESIS! 🎓**
+**LISTO PARA TESIS!**
 
 Todos los materiales, gráficos, capturas y explicaciones están diseñados para que puedas defender tu tesis con confianza.
