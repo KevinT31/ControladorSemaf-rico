@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funciones de Pertenencia - Sistema Difuso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #F9FAFB;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1400px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #64748B;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .graph-container {
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .graph-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .graph-subtitle {
+            font-size: 11px;
+            color: #64748B;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 200px;
+            border-radius: 6px;
+        }
+
+        .legend-box {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #0078D4 0%, #0053A0 100%);
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            margin-top: 30px;
+        }
+
+        .info-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .info-item-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            opacity: 0.9;
+        }
+
+        .info-item-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .formula-box {
+            background: #FEF3C7;
+            border: 2px solid #F59E0B;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .formula-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #92400E;
+            margin-bottom: 10px;
+        }
+
+        .formula {
+            font-size: 13px;
+            color: #78350F;
+            line-height: 1.8;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">FUNCIONES DE PERTENENCIA DEL SISTEMA DIFUSO</div>
+            <div class="subtitle">Método Mamdani - Controlador Semafórico Adaptativo</div>
+        </div>
+
+        <div class="grid">
+            <!-- ICV -->
+            <div class="graph-container">
+                <div class="graph-title">📊 ICV - Índice de Congestión Vehicular</div>
+                <div class="graph-subtitle">Rango: [0.0, 1.0] | Tipo: Entrada</div>
+                <canvas id="canvas-icv"></canvas>
+                <div class="legend-box">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3B82F6;"></div>
+                        <span>Bajo [0.0 - 0.5]</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #F59E0B;"></div>
+                        <span>Medio [0.3 - 0.7]</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #EF4444;"></div>
+                        <span>Alto [0.5 - 1.0]</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PI -->
+            <div class="graph-container">
+                <div class="graph-title">⚡ PI - Parámetro de Intensidad</div>
+                <div class="graph-subtitle">Rango: [0.0, 1.0] | Tipo: Entrada</div>
+                <canvas id="canvas-pi"></canvas>
+                <div class="legend-box">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #EF4444;"></div>
+                        <span>Ineficiente [0.0 - 0.5]</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #F59E0B;"></div>
+                        <span>Mod. Eficiente [0.3 - 0.7]</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10B981;"></div>
+                        <span>Muy Eficiente [0.5 - 1.0]</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EV -->
+            <div class="graph-container">
+                <div class="graph-title">🚨 EV - Vehículo de Emergencia</div>
+                <div class="graph-subtitle">Rango: [0.0, 1.0] | Tipo: Entrada</div>
+                <canvas id="canvas-ev"></canvas>
+                <div class="legend-box">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10B981;"></div>
+                        <span>Ausente [0.0 - 0.5]</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #EF4444;"></div>
+                        <span>Presente [0.5 - 1.0]</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ΔTverde Output -->
+            <div class="graph-container">
+                <div class="graph-title">🟢 ΔTverde - Ajuste Tiempo Verde (Salida)</div>
+                <div class="graph-subtitle">Rango: [-10s, +10s] | Tipo: Salida</div>
+                <canvas id="canvas-output"></canvas>
+                <div class="legend-box">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #DC2626;"></div>
+                        <span>Reducir Mucho [-10, -5]</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #F97316;"></div>
+                        <span>Reducir [-7, -2]</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #FBBF24;"></div>
+                        <span>Mantener [-3, +3]</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #84CC16;"></div>
+                        <span>Extender [+2, +7]</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #22C55E;"></div>
+                        <span>Extender Mucho [+5, +10]</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo Fuzzificación -->
+            <div class="graph-container">
+                <div class="graph-title">🎯 Ejemplo: Fuzzificación de ICV = 0.65</div>
+                <div class="graph-subtitle">Conversión de valor crisp a grados de pertenencia</div>
+                <canvas id="canvas-fuzzification"></canvas>
+                <div class="legend-box">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3B82F6;"></div>
+                        <span>μ_Bajo(0.65) = 0.00</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #F59E0B;"></div>
+                        <span>μ_Medio(0.65) = 0.25</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #EF4444;"></div>
+                        <span>μ_Alto(0.65) = 0.75</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo Defuzzificación -->
+            <div class="graph-container">
+                <div class="graph-title">🎲 Ejemplo: Defuzzificación (Centroide)</div>
+                <div class="graph-subtitle">Área sombreada → Centroide = +4.2 segundos</div>
+                <canvas id="canvas-defuzzification"></canvas>
+                <div class="legend-box">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(132, 204, 22, 0.3);"></div>
+                        <span>Regla 1: Extender (α=0.6)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(251, 191, 36, 0.3);"></div>
+                        <span>Regla 2: Mantener (α=0.3)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: black;"></div>
+                        <span style="font-weight: 700;">⊗ Centroide</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <div class="info-title">
+                <span>📐</span>
+                <span>PARÁMETROS DEL MÉTODO MAMDANI</span>
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-item-title">Variables de Entrada</div>
+                    <div class="info-item-value">3</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-title">Variable de Salida</div>
+                    <div class="info-item-value">1</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-title">Total de Reglas</div>
+                    <div class="info-item-value">27</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-title">Operador AND</div>
+                    <div class="info-item-value">MIN</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-title">Agregación</div>
+                    <div class="info-item-value">MAX</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-title">Defuzzificación</div>
+                    <div class="info-item-value">Centroide</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formula Box -->
+        <div class="formula-box">
+            <div class="formula-title">📋 FÓRMULA DE DEFUZZIFICACIÓN (CENTROIDE)</div>
+            <div class="formula">
+                ΔTverde = ∫ x · μ(x) dx / ∫ μ(x) dx
+                <br><br>
+                Donde:
+                <br>• x = valor en el eje horizontal (tiempo en segundos)
+                <br>• μ(x) = función de pertenencia agregada resultante
+                <br>• ∫ = suma de áreas bajo la curva (integración numérica)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helper: Draw trapezoidal membership function
+        function drawTrapezoid(ctx, x1, x2, x3, x4, color, label, width, height) {
+            const scale = width / 1.0;
+            const y0 = height - 20;
+
+            ctx.fillStyle = color + '40'; // 25% opacity for fill
+            ctx.beginPath();
+            ctx.moveTo(x1 * scale, y0);
+            ctx.lineTo(x2 * scale, y0 - height + 40);
+            ctx.lineTo(x3 * scale, y0 - height + 40);
+            ctx.lineTo(x4 * scale, y0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Label
+            ctx.fillStyle = color;
+            ctx.font = 'bold 11px Segoe UI';
+            ctx.textAlign = 'center';
+            const labelX = ((x2 + x3) / 2) * scale;
+            ctx.fillText(label, labelX, y0 - height + 30);
+        }
+
+        // Graph 1: ICV
+        const canvasICV = document.getElementById('canvas-icv');
+        const ctxICV = canvasICV.getContext('2d');
+        canvasICV.width = 600;
+        canvasICV.height = 200;
+
+        // Axes
+        ctxICV.strokeStyle = '#94A3B8';
+        ctxICV.lineWidth = 1.5;
+        ctxICV.beginPath();
+        ctxICV.moveTo(40, 20);
+        ctxICV.lineTo(40, 160);
+        ctxICV.lineTo(580, 160);
+        ctxICV.stroke();
+
+        // Labels
+        ctxICV.fillStyle = '#64748B';
+        ctxICV.font = '11px Segoe UI';
+        ctxICV.textAlign = 'center';
+        ctxICV.fillText('0.0', 40, 175);
+        ctxICV.fillText('0.5', 310, 175);
+        ctxICV.fillText('1.0', 580, 175);
+        ctxICV.textAlign = 'right';
+        ctxICV.fillText('μ', 35, 25);
+        ctxICV.fillText('1.0', 35, 30);
+        ctxICV.fillText('0.0', 35, 165);
+
+        // Membership functions
+        drawTrapezoid(ctxICV, 0.0, 0.0, 0.3, 0.5, '#3B82F6', 'Bajo', 540, 140);
+        drawTrapezoid(ctxICV, 0.3, 0.5, 0.5, 0.7, '#F59E0B', 'Medio', 540, 140);
+        drawTrapezoid(ctxICV, 0.5, 0.7, 1.0, 1.0, '#EF4444', 'Alto', 540, 140);
+
+        // Graph 2: PI
+        const canvasPI = document.getElementById('canvas-pi');
+        const ctxPI = canvasPI.getContext('2d');
+        canvasPI.width = 600;
+        canvasPI.height = 200;
+
+        ctxPI.strokeStyle = '#94A3B8';
+        ctxPI.lineWidth = 1.5;
+        ctxPI.beginPath();
+        ctxPI.moveTo(40, 20);
+        ctxPI.lineTo(40, 160);
+        ctxPI.lineTo(580, 160);
+        ctxPI.stroke();
+
+        ctxPI.fillStyle = '#64748B';
+        ctxPI.font = '11px Segoe UI';
+        ctxPI.textAlign = 'center';
+        ctxPI.fillText('0.0', 40, 175);
+        ctxPI.fillText('0.5', 310, 175);
+        ctxPI.fillText('1.0', 580, 175);
+        ctxPI.textAlign = 'right';
+        ctxPI.fillText('μ', 35, 25);
+        ctxPI.fillText('1.0', 35, 30);
+        ctxPI.fillText('0.0', 35, 165);
+
+        drawTrapezoid(ctxPI, 0.0, 0.0, 0.3, 0.5, '#EF4444', 'Ineficiente', 540, 140);
+        drawTrapezoid(ctxPI, 0.3, 0.5, 0.5, 0.7, '#F59E0B', 'Mod. Efic.', 540, 140);
+        drawTrapezoid(ctxPI, 0.5, 0.7, 1.0, 1.0, '#10B981', 'Muy Efic.', 540, 140);
+
+        // Graph 3: EV
+        const canvasEV = document.getElementById('canvas-ev');
+        const ctxEV = canvasEV.getContext('2d');
+        canvasEV.width = 600;
+        canvasEV.height = 200;
+
+        ctxEV.strokeStyle = '#94A3B8';
+        ctxEV.lineWidth = 1.5;
+        ctxEV.beginPath();
+        ctxEV.moveTo(40, 20);
+        ctxEV.lineTo(40, 160);
+        ctxEV.lineTo(580, 160);
+        ctxEV.stroke();
+
+        ctxEV.fillStyle = '#64748B';
+        ctxEV.font = '11px Segoe UI';
+        ctxEV.textAlign = 'center';
+        ctxEV.fillText('0.0', 40, 175);
+        ctxEV.fillText('0.5', 310, 175);
+        ctxEV.fillText('1.0', 580, 175);
+        ctxEV.textAlign = 'right';
+        ctxEV.fillText('μ', 35, 25);
+        ctxEV.fillText('1.0', 35, 30);
+        ctxEV.fillText('0.0', 35, 165);
+
+        drawTrapezoid(ctxEV, 0.0, 0.0, 0.3, 0.5, '#10B981', 'Ausente', 540, 140);
+        drawTrapezoid(ctxEV, 0.5, 0.7, 1.0, 1.0, '#EF4444', 'Presente', 540, 140);
+
+        // Graph 4: Output ΔTverde
+        const canvasOutput = document.getElementById('canvas-output');
+        const ctxOut = canvasOutput.getContext('2d');
+        canvasOutput.width = 600;
+        canvasOutput.height = 200;
+
+        ctxOut.strokeStyle = '#94A3B8';
+        ctxOut.lineWidth = 1.5;
+        ctxOut.beginPath();
+        ctxOut.moveTo(40, 20);
+        ctxOut.lineTo(40, 160);
+        ctxOut.lineTo(580, 160);
+        ctxOut.stroke();
+
+        ctxOut.fillStyle = '#64748B';
+        ctxOut.font = '11px Segoe UI';
+        ctxOut.textAlign = 'center';
+        ctxOut.fillText('-10s', 40, 175);
+        ctxOut.fillText('0s', 310, 175);
+        ctxOut.fillText('+10s', 580, 175);
+        ctxOut.textAlign = 'right';
+        ctxOut.fillText('μ', 35, 25);
+
+        // Map from [-10, +10] to [0, 540]
+        function mapOutput(val) {
+            return ((val + 10) / 20) * 540;
+        }
+
+        // Draw output membership functions
+        const outWidth = 540;
+        const outHeight = 140;
+
+        // Reducir Mucho: [-10, -10, -7, -5]
+        drawTrapezoid(ctxOut, mapOutput(-10)/540, mapOutput(-10)/540, mapOutput(-7)/540, mapOutput(-5)/540, '#DC2626', 'Reducir Mucho', outWidth, outHeight);
+
+        // Reducir: [-7, -5, -3, -2]
+        drawTrapezoid(ctxOut, mapOutput(-7)/540, mapOutput(-5)/540, mapOutput(-3)/540, mapOutput(-2)/540, '#F97316', 'Reducir', outWidth, outHeight);
+
+        // Mantener: [-3, -1, +1, +3]
+        drawTrapezoid(ctxOut, mapOutput(-3)/540, mapOutput(-1)/540, mapOutput(1)/540, mapOutput(3)/540, '#FBBF24', 'Mantener', outWidth, outHeight);
+
+        // Extender: [+2, +3, +5, +7]
+        drawTrapezoid(ctxOut, mapOutput(2)/540, mapOutput(3)/540, mapOutput(5)/540, mapOutput(7)/540, '#84CC16', 'Extender', outWidth, outHeight);
+
+        // Extender Mucho: [+5, +7, +10, +10]
+        drawTrapezoid(ctxOut, mapOutput(5)/540, mapOutput(7)/540, mapOutput(10)/540, mapOutput(10)/540, '#22C55E', 'Ext. Mucho', outWidth, outHeight);
+
+        // Graph 5: Fuzzification Example
+        const canvasFuzz = document.getElementById('canvas-fuzzification');
+        const ctxFuzz = canvasFuzz.getContext('2d');
+        canvasFuzz.width = 600;
+        canvasFuzz.height = 200;
+
+        ctxFuzz.strokeStyle = '#94A3B8';
+        ctxFuzz.lineWidth = 1.5;
+        ctxFuzz.beginPath();
+        ctxFuzz.moveTo(40, 20);
+        ctxFuzz.lineTo(40, 160);
+        ctxFuzz.lineTo(580, 160);
+        ctxFuzz.stroke();
+
+        ctxFuzz.fillStyle = '#64748B';
+        ctxFuzz.font = '11px Segoe UI';
+        ctxFuzz.textAlign = 'center';
+        ctxFuzz.fillText('0.0', 40, 175);
+        ctxFuzz.fillText('0.5', 310, 175);
+        ctxFuzz.fillText('1.0', 580, 175);
+        ctxFuzz.textAlign = 'right';
+        ctxFuzz.fillText('μ', 35, 25);
+
+        drawTrapezoid(ctxFuzz, 0.0, 0.0, 0.3, 0.5, '#3B82F6', 'Bajo', 540, 140);
+        drawTrapezoid(ctxFuzz, 0.3, 0.5, 0.5, 0.7, '#F59E0B', 'Medio', 540, 140);
+        drawTrapezoid(ctxFuzz, 0.5, 0.7, 1.0, 1.0, '#EF4444', 'Alto', 540, 140);
+
+        // Vertical line at x = 0.65
+        const xVal = 0.65;
+        const xPix = 40 + xVal * 540;
+
+        ctxFuzz.strokeStyle = '#1E293B';
+        ctxFuzz.lineWidth = 3;
+        ctxFuzz.setLineDash([5, 5]);
+        ctxFuzz.beginPath();
+        ctxFuzz.moveTo(xPix, 160);
+        ctxFuzz.lineTo(xPix, 20);
+        ctxFuzz.stroke();
+        ctxFuzz.setLineDash([]);
+
+        // Intersection points
+        // μ_Bajo(0.65) = 0.00 (out of range)
+        // μ_Medio(0.65) = (0.7 - 0.65) / (0.7 - 0.5) = 0.25
+        // μ_Alto(0.65) = (0.65 - 0.5) / (0.7 - 0.5) = 0.75
+
+        const muMedio = 0.25;
+        const muAlto = 0.75;
+
+        // Draw intersection circles
+        ctxFuzz.fillStyle = '#F59E0B';
+        ctxFuzz.beginPath();
+        ctxFuzz.arc(xPix, 160 - muMedio * 140, 5, 0, Math.PI * 2);
+        ctxFuzz.fill();
+
+        ctxFuzz.fillStyle = '#EF4444';
+        ctxFuzz.beginPath();
+        ctxFuzz.arc(xPix, 160 - muAlto * 140, 5, 0, Math.PI * 2);
+        ctxFuzz.fill();
+
+        // Graph 6: Defuzzification Example
+        const canvasDefuzz = document.getElementById('canvas-defuzzification');
+        const ctxDefuzz = canvasDefuzz.getContext('2d');
+        canvasDefuzz.width = 600;
+        canvasDefuzz.height = 200;
+
+        ctxDefuzz.strokeStyle = '#94A3B8';
+        ctxDefuzz.lineWidth = 1.5;
+        ctxDefuzz.beginPath();
+        ctxDefuzz.moveTo(40, 20);
+        ctxDefuzz.lineTo(40, 160);
+        ctxDefuzz.lineTo(580, 160);
+        ctxDefuzz.stroke();
+
+        ctxDefuzz.fillStyle = '#64748B';
+        ctxDefuzz.font = '11px Segoe UI';
+        ctxDefuzz.textAlign = 'center';
+        ctxDefuzz.fillText('-10s', 40, 175);
+        ctxDefuzz.fillText('0s', 310, 175);
+        ctxDefuzz.fillText('+10s', 580, 175);
+        ctxDefuzz.textAlign = 'right';
+        ctxDefuzz.fillText('μ', 35, 25);
+
+        // Draw two fuzzy sets with different activation levels
+        // Rule 1: Extender (activated at 0.6)
+        const alpha1 = 0.6;
+        const extend_x1 = mapOutput(2);
+        const extend_x2 = mapOutput(3);
+        const extend_x3 = mapOutput(5);
+        const extend_x4 = mapOutput(7);
+
+        ctxDefuzz.fillStyle = 'rgba(132, 204, 22, 0.4)';
+        ctxDefuzz.beginPath();
+        ctxDefuzz.moveTo(40 + extend_x1, 160);
+        ctxDefuzz.lineTo(40 + extend_x2, 160 - alpha1 * 140);
+        ctxDefuzz.lineTo(40 + extend_x3, 160 - alpha1 * 140);
+        ctxDefuzz.lineTo(40 + extend_x4, 160);
+        ctxDefuzz.closePath();
+        ctxDefuzz.fill();
+
+        ctxDefuzz.strokeStyle = '#84CC16';
+        ctxDefuzz.lineWidth = 2.5;
+        ctxDefuzz.stroke();
+
+        // Rule 2: Mantener (activated at 0.3)
+        const alpha2 = 0.3;
+        const mant_x1 = mapOutput(-3);
+        const mant_x2 = mapOutput(-1);
+        const mant_x3 = mapOutput(1);
+        const mant_x4 = mapOutput(3);
+
+        ctxDefuzz.fillStyle = 'rgba(251, 191, 36, 0.4)';
+        ctxDefuzz.beginPath();
+        ctxDefuzz.moveTo(40 + mant_x1, 160);
+        ctxDefuzz.lineTo(40 + mant_x2, 160 - alpha2 * 140);
+        ctxDefuzz.lineTo(40 + mant_x3, 160 - alpha2 * 140);
+        ctxDefuzz.lineTo(40 + mant_x4, 160);
+        ctxDefuzz.closePath();
+        ctxDefuzz.fill();
+
+        ctxDefuzz.strokeStyle = '#FBBF24';
+        ctxDefuzz.lineWidth = 2.5;
+        ctxDefuzz.stroke();
+
+        // Centroid (approximate at +4.2s)
+        const centroid = 4.2;
+        const centroidPix = 40 + mapOutput(centroid);
+
+        ctxDefuzz.strokeStyle = '#1E293B';
+        ctxDefuzz.lineWidth = 3;
+        ctxDefuzz.setLineDash([8, 4]);
+        ctxDefuzz.beginPath();
+        ctxDefuzz.moveTo(centroidPix, 160);
+        ctxDefuzz.lineTo(centroidPix, 20);
+        ctxDefuzz.stroke();
+        ctxDefuzz.setLineDash([]);
+
+        // Centroid marker
+        ctxDefuzz.fillStyle = '#1E293B';
+        ctxDefuzz.beginPath();
+        ctxDefuzz.arc(centroidPix, 90, 7, 0, Math.PI * 2);
+        ctxDefuzz.fill();
+
+        ctxDefuzz.fillStyle = 'white';
+        ctxDefuzz.font = 'bold 10px Segoe UI';
+        ctxDefuzz.textAlign = 'center';
+        ctxDefuzz.fillText('⊗', centroidPix, 93);
+
+        // Label
+        ctxDefuzz.fillStyle = '#1E293B';
+        ctxDefuzz.font = 'bold 12px Segoe UI';
+        ctxDefuzz.fillText('+4.2s', centroidPix, 12);
+    </script>
+</body>
+</html>

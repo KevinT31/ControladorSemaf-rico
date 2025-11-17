@@ -3,6 +3,7 @@ Configuración del Sistema
 """
 
 from pathlib import Path
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
@@ -17,7 +18,7 @@ class Settings(BaseSettings):
     # Servidor
     HOST: str = "0.0.0.0"
     PORT: int = 8000
-    DEBUG: bool = False
+    DEBUG: bool = Field(default=False, description="Modo debug - configurable por .env")
 
     # Base de datos
     DATABASE_URL: str = "sqlite:///./base-datos/semaforos.db"

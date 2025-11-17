@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitectura Completa del Sistema - Control Semafórico Adaptativo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #F9FAFB;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1200px;
+            height: 800px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: 700;
+            color: #1E293B;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .subtitle {
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #64748B;
+            text-align: center;
+            z-index: 100;
+        }
+
+        /* Capas */
+        .layer {
+            position: absolute;
+            left: 50px;
+            right: 50px;
+            height: 180px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .layer-cloud {
+            top: 100px;
+            background: linear-gradient(135deg, #0078D4 0%, #0053A0 100%);
+            border: 2px solid #004578;
+        }
+
+        .layer-communication {
+            top: 320px;
+            background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+            border: 2px solid #374151;
+            height: 80px;
+        }
+
+        .layer-local {
+            top: 440px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            border: 2px solid #047857;
+        }
+
+        .layer-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Componentes */
+        .component {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            font-size: 12px;
+            font-weight: 600;
+            color: #1E293B;
+            text-align: center;
+            min-width: 120px;
+            transition: transform 0.2s ease;
+        }
+
+        .component:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .component-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* Componentes Cloud */
+        .comp-iot-hub { top: 140px; left: 80px; }
+        .comp-stream { top: 140px; left: 250px; }
+        .comp-cosmos { top: 140px; left: 420px; }
+        .comp-ml { top: 140px; left: 590px; }
+        .comp-rl { top: 220px; left: 170px; background: #FEF3C7; border: 2px solid #F59E0B; }
+        .comp-cnn { top: 220px; left: 340px; background: #FEF3C7; border: 2px solid #F59E0B; }
+        .comp-powerbi { top: 140px; left: 760px; }
+
+        /* Componente Communication */
+        .comp-4g { top: 340px; left: 450px; background: #E5E7EB; }
+
+        /* Componentes Local */
+        .comp-camera { top: 480px; left: 80px; }
+        .comp-yolo { top: 480px; left: 240px; background: #DBEAFE; border: 2px solid #3B82F6; }
+        .comp-fuzzy { top: 480px; left: 410px; background: #FEF3C7; border: 2px solid #F59E0B; }
+        .comp-sensors { top: 560px; left: 150px; }
+        .comp-actuator { top: 560px; left: 340px; }
+
+        /* Flechas */
+        .arrow {
+            position: absolute;
+            stroke: #475569;
+            stroke-width: 2;
+            fill: none;
+            pointer-events: none;
+        }
+
+        .arrow-up {
+            stroke: #EF4444;
+            stroke-dasharray: 5, 5;
+            animation: dash 20s linear infinite;
+        }
+
+        .arrow-down {
+            stroke: #10B981;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -100;
+            }
+        }
+
+        .arrow-label {
+            position: absolute;
+            font-size: 11px;
+            color: #64748B;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Leyenda */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .legend-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        .legend-line {
+            width: 30px;
+            height: 2px;
+            margin-right: 8px;
+        }
+
+        .legend-solid { background: #10B981; }
+        .legend-dashed { background: linear-gradient(to right, #EF4444 50%, transparent 50%); background-size: 10px 2px; }
+
+        .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">ARQUITECTURA COMPLETA DEL SISTEMA</div>
+        <div class="subtitle">Control Semafórico Adaptativo Inteligente con Edge-Cloud Computing</div>
+
+        <!-- CAPA CLOUD -->
+        <div class="layer layer-cloud">
+            <div class="layer-title">☁️ NUBE (Microsoft Azure)</div>
+        </div>
+
+        <div class="component comp-iot-hub">
+            <div class="component-icon">🔌</div>
+            <div>IoT Hub</div>
+        </div>
+
+        <div class="component comp-stream">
+            <div class="component-icon">⚡</div>
+            <div>Stream<br>Analytics</div>
+        </div>
+
+        <div class="component comp-cosmos">
+            <div class="component-icon">💾</div>
+            <div>Cosmos DB</div>
+        </div>
+
+        <div class="component comp-ml">
+            <div class="component-icon">🤖</div>
+            <div>Azure ML</div>
+        </div>
+
+        <div class="component comp-rl">
+            <div>⭐ Motor RL A2C</div>
+            <div style="font-size: 10px; color: #92400E; margin-top: 5px;">Optimización Global</div>
+        </div>
+
+        <div class="component comp-cnn">
+            <div>⭐ CNN-LSTM</div>
+            <div style="font-size: 10px; color: #92400E; margin-top: 5px;">Predicción +15min</div>
+        </div>
+
+        <div class="component comp-powerbi">
+            <div class="component-icon">📊</div>
+            <div>Power BI</div>
+        </div>
+
+        <!-- CAPA COMUNICACIÓN -->
+        <div class="layer layer-communication">
+            <div class="layer-title">📡 COMUNICACIÓN 4G LTE</div>
+        </div>
+
+        <div class="component comp-4g">
+            <div style="font-weight: 700; color: #374151;">Quectel EG25-G</div>
+            <div style="font-size: 10px; color: #6B7280; margin-top: 5px;">Latencia P50: 85ms | P99: 150ms</div>
+        </div>
+
+        <!-- CAPA LOCAL -->
+        <div class="layer layer-local">
+            <div class="layer-title">🖥️ CONTROLADOR LOCAL (Raspberry Pi 5)</div>
+        </div>
+
+        <div class="component comp-camera">
+            <div class="component-icon">📷</div>
+            <div>Cámara Domo</div>
+            <div style="font-size: 10px; color: #064E3B; margin-top: 3px;">5MP @ 20 FPS</div>
+        </div>
+
+        <div class="component comp-yolo">
+            <div>YOLO + ByteTrack</div>
+            <div style="font-size: 10px; color: #1E40AF; margin-top: 5px;">Detección + Tracking</div>
+        </div>
+
+        <div class="component comp-fuzzy">
+            <div>⚡ Controlador Difuso</div>
+            <div style="font-size: 10px; color: #92400E; margin-top: 5px;">27 Reglas | <100ms</div>
+        </div>
+
+        <div class="component comp-sensors">
+            <div class="component-icon">🌡️</div>
+            <div>Sensores</div>
+            <div style="font-size: 10px; color: #064E3B; margin-top: 3px;">Temp, Corriente, US</div>
+        </div>
+
+        <div class="component comp-actuator">
+            <div class="component-icon">🚦</div>
+            <div>Motor PAP</div>
+            <div style="font-size: 10px; color: #064E3B; margin-top: 3px;">Actuador Semáforo</div>
+        </div>
+
+        <!-- FLECHAS -->
+        <svg width="1200" height="800" style="position: absolute; top: 0; left: 0; pointer-events: none;">
+            <!-- Flecha Local → Comunicación (Telemetría UP) -->
+            <defs>
+                <marker id="arrowhead-up" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#EF4444" />
+                </marker>
+                <marker id="arrowhead-down" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#10B981" />
+                </marker>
+            </defs>
+
+            <!-- Telemetría UP: Local → Cloud -->
+            <path d="M 350 440 L 350 410" class="arrow arrow-up" marker-end="url(#arrowhead-up)"/>
+            <path d="M 350 320 L 350 290" class="arrow arrow-up" marker-end="url(#arrowhead-up)"/>
+
+            <!-- Comandos DOWN: Cloud → Local -->
+            <path d="M 800 290 L 800 320" class="arrow arrow-down" marker-end="url(#arrowhead-down)"/>
+            <path d="M 800 410 L 800 440" class="arrow arrow-down" marker-end="url(#arrowhead-down)"/>
+
+            <!-- Flujo interno Cloud -->
+            <path d="M 200 165 L 240 165" class="arrow" marker-end="url(#arrowhead-down)"/>
+            <path d="M 370 165 L 410 165" class="arrow" marker-end="url(#arrowhead-down)"/>
+            <path d="M 540 165 L 580 165" class="arrow" marker-end="url(#arrowhead-down)"/>
+            <path d="M 710 165 L 750 165" class="arrow" marker-end="url(#arrowhead-down)"/>
+
+            <!-- Flujo RL/CNN → IoT Hub -->
+            <path d="M 240 235 L 140 200" class="arrow" marker-end="url(#arrowhead-down)"/>
+            <path d="M 410 235 L 140 200" class="arrow" marker-end="url(#arrowhead-down)"/>
+
+            <!-- Flujo interno Local -->
+            <path d="M 190 505 L 230 505" class="arrow" marker-end="url(#arrowhead-down)"/>
+            <path d="M 350 505 L 400 505" class="arrow" marker-end="url(#arrowhead-down)"/>
+            <path d="M 470 520 L 470 550" class="arrow" marker-end="url(#arrowhead-down)"/>
+        </svg>
+
+        <!-- ETIQUETAS DE FLECHAS -->
+        <div class="arrow-label" style="top: 365px; left: 360px;">📤 Telemetría</div>
+        <div class="arrow-label" style="top: 365px; left: 355px; top: 380px;">MQTT/TLS 1.2</div>
+        <div class="arrow-label" style="top: 405px; left: 810px;">📥 Comandos</div>
+        <div class="arrow-label" style="top: 405px; left: 810px; top: 420px;">NTCIP 1202</div>
+
+        <!-- LEYENDA -->
+        <div class="legend">
+            <div class="legend-title">LEYENDA</div>
+            <div class="legend-item">
+                <div class="legend-line legend-solid"></div>
+                <div>Comandos (Cloud → Edge)</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line legend-dashed"></div>
+                <div>Telemetría (Edge → Cloud)</div>
+            </div>
+            <div class="legend-item" style="margin-top: 10px;">
+                <div style="width: 16px; height: 16px; background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 4px; margin-right: 8px;"></div>
+                <div>Componente Destacado (IA/ML)</div>
+            </div>
+        </div>
+
+        <!-- Indicador de capas -->
+        <div style="position: absolute; left: 15px; top: 170px; writing-mode: vertical-rl; transform: rotate(180deg); color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 700;">OPTIMIZACIÓN GLOBAL</div>
+        <div style="position: absolute; left: 15px; top: 505px; writing-mode: vertical-rl; transform: rotate(180deg); color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 700;">CONTROL AUTÓNOMO</div>
+    </div>
+
+    <script>
+        // Animación de pulso en componentes destacados
+        const destacados = document.querySelectorAll('.comp-rl, .comp-cnn, .comp-fuzzy');
+        destacados.forEach(comp => {
+            setInterval(() => {
+                comp.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.5)';
+                setTimeout(() => {
+                    comp.style.boxShadow = '0 2px 6px rgba(0,0,0,0.15)';
+                }, 500);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
