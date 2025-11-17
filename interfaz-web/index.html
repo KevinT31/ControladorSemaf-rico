@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Control Semafórico Adaptativo Inteligente</title>
     <link rel="stylesheet" href="estilos.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Librerías locales (instaladas con npm) -->
+    <link rel="stylesheet" href="libs/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="libs/fontawesome/all.min.css" />
 </head>
 <body>
     <!-- Partículas de fondo -->
@@ -374,9 +374,20 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="libs/chart/chart.umd.min.js"></script>
+    <script src="libs/leaflet/leaflet.js"></script>
+    <script src="libs/particles/particles.min.js"></script>
     <script src="intersecciones_lima.js"></script>
+    <script>
+        // Debug: Verificar que todas las librerías se cargaron
+        console.log('=== VERIFICACIÓN DE LIBRERÍAS ===');
+        console.log('Chart.js:', typeof Chart !== 'undefined' ? 'OK' : 'FALTA');
+        console.log('Leaflet:', typeof L !== 'undefined' ? 'OK' : 'FALTA');
+        console.log('Particles:', typeof particlesJS !== 'undefined' ? 'OK' : 'FALTA');
+        console.log('INTERSECCIONES_LIMA:', typeof INTERSECCIONES_LIMA !== 'undefined' ? `OK (${INTERSECCIONES_LIMA.length} intersecciones)` : 'FALTA');
+        console.log('ZONAS_LIMA:', typeof ZONAS_LIMA !== 'undefined' ? 'OK' : 'FALTA');
+        console.log('===================================');
+    </script>
     <script src="app_mejorado.js"></script>
 </body>
 </html>

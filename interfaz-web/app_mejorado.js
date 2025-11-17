@@ -34,9 +34,28 @@ const estado = {
 
 // ==================== INICIALIZACIÓN ====================
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('%c=== SISTEMA DE CONTROL SEMAFÓRICO ===', 'color: #10b981; font-size: 16px; font-weight: bold;');
     console.log('Inicializando sistema...');
 
     try {
+        // Verificar dependencias críticas
+        console.log('%cVerificando dependencias...', 'color: #3b82f6;');
+        const dependencias = {
+            'Chart.js': typeof Chart !== 'undefined',
+            'Leaflet': typeof L !== 'undefined',
+            'Particles': typeof particlesJS !== 'undefined',
+            'INTERSECCIONES_LIMA': typeof INTERSECCIONES_LIMA !== 'undefined',
+            'ZONAS_LIMA': typeof ZONAS_LIMA !== 'undefined'
+        };
+
+        Object.entries(dependencias).forEach(([nombre, cargado]) => {
+            if (!cargado) {
+                console.error(`❌ ${nombre} NO CARGADO`);
+            } else {
+                console.log(`✓ ${nombre} cargado correctamente`);
+            }
+        });
+
         // Inicializar componentes
         console.log('Iniciando partículas...');
         inicializarParticulas();
@@ -60,14 +79,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Solo se iniciará como fallback si el WebSocket no conecta en 5 segundos
         setTimeout(() => {
             if (!estado.backendConectado && estado.modoActual === 'simulador') {
-                console.warn('Backend no responde, usando simulación local como fallback');
+                console.warn('⚠️ Backend no responde, usando simulación local como fallback');
                 iniciarSimulacion();
             }
         }, 5000);
 
-        console.log('Sistema inicializado correctamente');
+        console.log('%c✓ Sistema inicializado correctamente', 'color: #10b981; font-weight: bold;');
     } catch (error) {
-        console.error('ERROR en la inicialización:', error);
+        console.error('%c❌ ERROR en la inicialización:', 'color: #ef4444; font-weight: bold;', error);
         alert('Error al inicializar el sistema. Revisa la consola del navegador (F12) para más detalles.');
     }
 });
@@ -543,14 +562,38 @@ function actualizarDatosInterfaz(metricas, origen = 'backend') {
     document.getElementById('icv-promedio').textContent = icvPromedio.toFixed(2);
     document.getElementById('flujo-promedio').textContent = Math.round(flujoPromedio);
 
-    // 6. Actualizar sistema difuso
+    // 6. Actualizar mini-stats (fluidas, moderadas, congestionadas, velocidad promedio)
+    let callesFluidas = 0;
+    let callesModeradas = 0;
+    let callesCongestionadas = 0;
+    let velocidadTotal = 0;
+
+    metricas.forEach(metrica => {
+        if (metrica.icv < 0.3) {
+            callesFluidas++;
+        } else if (metrica.icv < 0.6) {
+            callesModeradas++;
+        } else {
+            callesCongestionadas++;
+        }
+        velocidadTotal += (metrica.velocidad || 0);
+    });
+
+    const velocidadPromedio = metricas.length > 0 ? velocidadTotal / metricas.length : 0;
+
+    document.getElementById('calles-fluidas').textContent = callesFluidas;
+    document.getElementById('calles-moderadas').textContent = callesModeradas;
+    document.getElementById('calles-congestionadas').textContent = callesCongestionadas;
+    document.getElementById('velocidad-promedio').textContent = Math.round(velocidadPromedio);
+
+    // 7. Actualizar sistema difuso
     actualizarSistemaDifuso(metricas);
 
-    // 7. Actualizar contador de decisiones
+    // 8. Actualizar contador de decisiones
     estado.estadisticas.contadorActualizaciones++;
     document.getElementById('decisiones-tomadas').textContent = estado.estadisticas.contadorActualizaciones;
 
-    // 8. Calcular olas verdes activas (intersecciones con alto tráfico)
+    // 9. Calcular olas verdes activas (intersecciones con alto tráfico)
     const olasActivas = metricas.filter(m => m.icv > 0.6).length;
     document.getElementById('olas-activas').textContent = olasActivas;
 }
@@ -1233,25 +1276,30 @@ function conectarWebSocket() {
 function procesarMensajeWebSocket(mensaje) {
     const { tipo, datos } = mensaje;
 
+    console.log(`[WebSocket] Mensaje recibido - Tipo: ${tipo}`, datos);
+
     switch (tipo) {
         case 'metricas_actualizadas':
+            console.log(`[WebSocket] Actualizando ${datos.length} métricas...`);
             actualizarMetricasDesdeBackend(datos);
             break;
 
         case 'ola_verde_activada':
+            console.log('[WebSocket] Ola verde activada');
             mostrarOlaVerdeActivada(datos);
             break;
 
         case 'modo_cambiado':
-            console.log(`Modo cambiado a: ${datos.modo}`);
+            console.log(`[WebSocket] Modo cambiado a: ${datos.modo}`);
             break;
 
         default:
-            console.log('Mensaje WebSocket desconocido:', tipo);
+            console.warn('[WebSocket] Mensaje desconocido:', tipo);
     }
 }
 
 function actualizarMetricasDesdeBackend(metricas) {
+    console.log(`[Backend] Recibidas ${metricas.length} métricas, actualizando interfaz...`);
     // Función actualizada - ahora usa la función unificada
     actualizarDatosInterfaz(metricas, 'backend');
 }

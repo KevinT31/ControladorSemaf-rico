@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple - Sistema Semafórico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .status h2 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-indicator.connected {
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+        .status-indicator.disconnected {
+            background: #ef4444;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .metric-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #10b981;
+            padding-left: 10px;
+        }
+        .log-entry.error {
+            border-left-color: #ef4444;
+        }
+        .log-entry.warning {
+            border-left-color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚦 Test Simple - Sistema de Control Semafórico</h1>
+
+        <div class="status">
+            <h2>
+                <span class="status-indicator" id="status-dot"></span>
+                Estado: <span id="status-text">Desconectado</span>
+            </h2>
+            <p>WebSocket: <span id="ws-url">ws://localhost:8000/ws</span></p>
+        </div>
+
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-label">Intersecciones</div>
+                <div class="metric-value" id="num-intersecciones">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">ICV Promedio</div>
+                <div class="metric-value" id="icv-promedio">0.00</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Flujo Promedio</div>
+                <div class="metric-value" id="flujo-promedio">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Mensajes Recibidos</div>
+                <div class="metric-value" id="mensajes-count">0</div>
+            </div>
+        </div>
+
+        <h2>📜 Log de Eventos</h2>
+        <div class="log" id="log-container"></div>
+    </div>
+
+    <script>
+        const WS_URL = 'ws://localhost:8000/ws';
+        let ws = null;
+        let mensajesRecibidos = 0;
+
+        // Función para agregar log
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logContainer.insertBefore(entry, logContainer.firstChild);
+
+            // Limitar a 50 entradas
+            while (logContainer.children.length > 50) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        // Función para actualizar estado
+        function updateStatus(connected) {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+
+            if (connected) {
+                statusDot.classList.add('connected');
+                statusDot.classList.remove('disconnected');
+                statusText.textContent = 'CONECTADO';
+            } else {
+                statusDot.classList.add('disconnected');
+                statusDot.classList.remove('connected');
+                statusText.textContent = 'DESCONECTADO';
+            }
+        }
+
+        // Conectar WebSocket
+        function conectarWebSocket() {
+            addLog('Intentando conectar a ' + WS_URL);
+
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                addLog('✅ WebSocket conectado exitosamente', 'info');
+                updateStatus(true);
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const mensaje = JSON.parse(event.data);
+                    mensajesRecibidos++;
+                    document.getElementById('mensajes-count').textContent = mensajesRecibidos;
+
+                    addLog(`Mensaje recibido: ${mensaje.tipo}`, 'info');
+
+                    if (mensaje.tipo === 'metricas_actualizadas' && mensaje.datos) {
+                        const metricas = mensaje.datos;
+
+                        // Calcular promedios
+                        const icvPromedio = metricas.reduce((sum, m) => sum + m.icv, 0) / metricas.length;
+                        const flujoPromedio = metricas.reduce((sum, m) => sum + m.flujo, 0) / metricas.length;
+
+                        // Actualizar interfaz
+                        document.getElementById('num-intersecciones').textContent = metricas.length;
+                        document.getElementById('icv-promedio').textContent = icvPromedio.toFixed(2);
+                        document.getElementById('flujo-promedio').textContent = Math.round(flujoPromedio);
+
+                        addLog(`Actualizado: ${metricas.length} intersecciones, ICV: ${icvPromedio.toFixed(2)}, Flujo: ${Math.round(flujoPromedio)}`, 'info');
+                    }
+                } catch (error) {
+                    addLog('❌ Error procesando mensaje: ' + error.message, 'error');
+                }
+            };
+
+            ws.onerror = (error) => {
+                addLog('❌ Error WebSocket: ' + error, 'error');
+                updateStatus(false);
+            };
+
+            ws.onclose = () => {
+                addLog('⚠️ WebSocket desconectado. Reconectando en 3s...', 'warning');
+                updateStatus(false);
+                setTimeout(conectarWebSocket, 3000);
+            };
+        }
+
+        // Iniciar al cargar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            addLog('🚀 Página cargada, iniciando conexión...');
+            conectarWebSocket();
+        });
+    </script>
+</body>
+</html>

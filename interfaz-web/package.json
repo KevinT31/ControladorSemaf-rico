@@ -1,0 +1,14 @@
+{
+  "name": "controlador-semaforico-interfaz",
+  "version": "1.0.0",
+  "description": "Interfaz web del sistema de control semafórico",
+  "scripts": {
+    "install-libs": "node scripts/install-libs.js"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "chart.js": "^4.4.0",
+    "leaflet": "^1.9.4",
+    "particles.js": "^2.0.0"
+  }
+}
