@@ -239,10 +239,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Registrar routers modulares
+try:
+    from rutas import emergencias, simulacion, intersecciones, sumo, video, websocket
+
+    app.include_router(emergencias.router)
+    app.include_router(simulacion.router)
+    app.include_router(intersecciones.router)
+    app.include_router(sumo.router)
+    app.include_router(video.router)
+    app.include_router(websocket.router)
+
+    logger.info("Routers modulares registrados correctamente")
+except ImportError as e:
+    logger.warning(f"No se pudieron cargar algunos routers modulares: {e}")
+
 
 # ==================== RUTAS API ====================
-
-# La ruta raíz está manejada por los archivos estáticos
 
 
 @app.get("/api/estado")
