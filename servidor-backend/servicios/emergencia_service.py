@@ -132,26 +132,100 @@ class EmergenciaService:
     def obtener_historial(limite: int = 50) -> List[Dict]:
         """
         Obtiene historial de olas verdes desde la base de datos
-
-        TODO: Implementar consulta a BD cuando esté lista
         """
-        # Por ahora retorna las activas como placeholder
-        return EmergenciaService.obtener_activas()[:limite]
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+
+        from modelos_bd import SessionLocal, OlaVerde
+
+        db = SessionLocal()
+        try:
+            olas = db.query(OlaVerde).order_by(
+                OlaVerde.timestamp_activacion.desc()
+            ).limit(limite).all()
+
+            return [
+                {
+                    'vehiculo_id': ola.vehiculo_id,
+                    'tipo': ola.tipo_vehiculo,
+                    'origen': ola.interseccion_origen_id,
+                    'destino': ola.interseccion_destino_id,
+                    'ruta': ola.ruta_json,
+                    'distancia_total': ola.distancia_total_metros,
+                    'tiempo_estimado': ola.tiempo_estimado_segundos,
+                    'activo': ola.activo,
+                    'completado': ola.completado,
+                    'timestamp_activacion': ola.timestamp_activacion.isoformat(),
+                    'timestamp_finalizacion': ola.timestamp_finalizacion.isoformat() if ola.timestamp_finalizacion else None
+                }
+                for ola in olas
+            ]
+        except Exception as e:
+            logger.error(f"Error obteniendo historial: {e}")
+            # Fallback a las activas
+            return EmergenciaService.obtener_activas()[:limite]
+        finally:
+            db.close()
 
     @staticmethod
     def calcular_estadisticas() -> Dict:
         """
-        Calcula estadísticas generales sobre olas verdes
-
-        TODO: Implementar consulta agregada a BD
+        Calcula estadísticas generales sobre olas verdes desde la BD
         """
-        activas = estado_sistema.olas_verdes_activas
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent.parent))
 
-        return {
-            'total_activas': len(activas),
-            'tipos': {
-                'ambulancia': sum(1 for d in activas.values() if d['vehiculo'].tipo == 'ambulancia'),
-                'bomberos': sum(1 for d in activas.values() if d['vehiculo'].tipo == 'bomberos'),
-                'policia': sum(1 for d in activas.values() if d['vehiculo'].tipo == 'policia')
+        from modelos_bd import SessionLocal, OlaVerde
+        from sqlalchemy import func
+
+        db = SessionLocal()
+        try:
+            # Estadísticas de la BD
+            total_historico = db.query(func.count(OlaVerde.id)).scalar()
+            total_activas_bd = db.query(func.count(OlaVerde.id)).filter(
+                OlaVerde.activo == True
+            ).scalar()
+            total_completadas = db.query(func.count(OlaVerde.id)).filter(
+                OlaVerde.completado == True
+            ).scalar()
+
+            # Por tipo
+            tipos_query = db.query(
+                OlaVerde.tipo_vehiculo,
+                func.count(OlaVerde.id)
+            ).group_by(OlaVerde.tipo_vehiculo).all()
+
+            tipos_dict = {tipo: count for tipo, count in tipos_query}
+
+            # Tiempo promedio (solo completadas)
+            tiempo_promedio = db.query(
+                func.avg(OlaVerde.tiempo_total_segundos)
+            ).filter(OlaVerde.completado == True).scalar() or 0
+
+            return {
+                'total_historico': total_historico,
+                'total_activas': total_activas_bd,
+                'total_completadas': total_completadas,
+                'tiempo_promedio_segundos': float(tiempo_promedio),
+                'tipos': {
+                    'ambulancia': tipos_dict.get('ambulancia', 0),
+                    'bomberos': tipos_dict.get('bomberos', 0),
+                    'policia': tipos_dict.get('policia', 0)
+                }
             }
-        }
+        except Exception as e:
+            logger.error(f"Error calculando estadísticas: {e}")
+            # Fallback a memoria
+            activas = estado_sistema.olas_verdes_activas
+            return {
+                'total_activas': len(activas),
+                'tipos': {
+                    'ambulancia': sum(1 for d in activas.values() if d['vehiculo'].tipo == 'ambulancia'),
+                    'bomberos': sum(1 for d in activas.values() if d['vehiculo'].tipo == 'bomberos'),
+                    'policia': sum(1 for d in activas.values() if d['vehiculo'].tipo == 'policia')
+                }
+            }
+        finally:
+            db.close()

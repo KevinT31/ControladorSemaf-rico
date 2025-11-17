@@ -59,14 +59,22 @@ class SimulacionService:
     @staticmethod
     def obtener_parametros() -> Dict:
         """Obtiene parámetros de la simulación"""
+        escenario = getattr(estado_sistema, 'escenario_actual', 'hora_pico_manana')
         return {
             'modo': estado_sistema.modo,
             'pausada': estado_sistema.simulacion_pausada,
-            'escenario': 'hora_pico_manana'  # TODO: hacer dinámico
+            'escenario': escenario
         }
 
     @staticmethod
     def actualizar_parametros(parametros: Dict):
-        """Actualiza parámetros de la simulación"""
-        # TODO: Implementar actualización dinámica de parámetros
-        logger.info(f"Parámetros actualizados: {parametros}")
+        """Actualiza parámetros de la simulación dinámicamente"""
+        if 'escenario' in parametros:
+            estado_sistema.escenario_actual = parametros['escenario']
+            logger.info(f"Escenario cambiado a: {parametros['escenario']}")
+
+        if 'intervalo' in parametros:
+            estado_sistema.intervalo_simulacion = parametros['intervalo']
+            logger.info(f"Intervalo de simulación cambiado a: {parametros['intervalo']}")
+
+        logger.info(f"Parámetros actualizados correctamente: {parametros}")
