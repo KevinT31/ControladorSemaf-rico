@@ -654,6 +654,9 @@ async def bucle_simulacion():
     """Bucle principal de simulación"""
     logger.info("Iniciando bucle de simulación...")
 
+    # Importar servicio de estadísticas
+    from servicios.estadisticas_service import EstadisticasService
+
     while True:
         try:
             if estado_sistema['modo'] == 'simulador' and estado_sistema['simulador']:
@@ -683,6 +686,21 @@ async def bucle_simulacion():
                     }
                     metricas_actualizadas.append(metricas)
 
+                    # Guardar métricas en base de datos
+                    try:
+                        EstadisticasService.guardar_metrica(
+                            interseccion_id=inter_id,
+                            timestamp=estado.timestamp,
+                            num_vehiculos=estado.num_vehiculos,
+                            icv=resultado_icv['icv'],
+                            flujo_vehicular=estado.flujo_vehicular,
+                            velocidad_promedio=estado.velocidad_promedio,
+                            longitud_cola=estado.longitud_cola,
+                            fuente='simulador'
+                        )
+                    except Exception as e_db:
+                        logger.warning(f"No se pudo guardar métrica en BD para {inter_id}: {e_db}")
+
                 # Broadcast a clientes WebSocket
                 await broadcast_mensaje({
                     'tipo': 'metricas_actualizadas',
@@ -693,7 +711,7 @@ async def bucle_simulacion():
             await asyncio.sleep(1.0)
 
         except Exception as e:
-            logger.error(f"Error en bucle de simulación: {e}")
+            logger.error(f"Error en bucle de simulación: {e}", exc_info=True)
             await asyncio.sleep(5.0)
 
 

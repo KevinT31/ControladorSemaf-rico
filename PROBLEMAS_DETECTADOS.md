@@ -1,11 +1,11 @@
-# 🔍 REPORTE DE AUDITORÍA - PROBLEMAS DETECTADOS
+# REPORTE DE AUDITORÍA - PROBLEMAS DETECTADOS
 
 **Fecha:** 2025-11-17
 **Análisis:** Auditoría exhaustiva del código antes del despliegue final
 
 ---
 
-## ⚠️ PROBLEMAS CRÍTICOS (ALTA PRIORIDAD)
+## PROBLEMAS CRÍTICOS (ALTA PRIORIDAD)
 
 ### 1. **Base de Datos NO Implementada**
 
@@ -24,9 +24,9 @@
 # TODO: Implementar consulta a base de datos cuando esté lista
 return {
     'interseccion_id': interseccion_id,
-    'icv_promedio': 0.35,  # ❌ HARDCODEADO
+    'icv_promedio': 0.35,  # [ERROR] HARDCODEADO
     'icv_maximo': 0.85,
-    'total_vehiculos': 15000,  # ❌ NO ES DATO REAL
+    'total_vehiculos': 15000,  # [ERROR] NO ES DATO REAL
 }
 ```
 
@@ -38,10 +38,10 @@ return EmergenciaService.obtener_activas()[:limite]
 ```
 
 **Impacto:**
-- ❌ **No hay persistencia de datos**
-- ❌ **No hay historial de métricas**
-- ❌ **No hay estadísticas reales**
-- ❌ **Los gráficos usan datos simulados, no históricos**
+- [ERROR] **No hay persistencia de datos**
+- [ERROR] **No hay historial de métricas**
+- [ERROR] **No hay estadísticas reales**
+- [ERROR] **Los gráficos usan datos simulados, no históricos**
 
 **Solución requerida:**
 1. Crear módulo ORM con SQLAlchemy
@@ -83,7 +83,7 @@ logger.info(f"Parámetros actualizados: {parametros}")
 ```python
 # TODO: Implementar métricas reales
 return {
-    'total_vehiculos': 0,  # ❌ SIEMPRE CERO
+    'total_vehiculos': 0,  # [ERROR] SIEMPRE CERO
     'velocidad_promedio_red': 0.0,
 }
 ```
@@ -94,7 +94,7 @@ return {
 
 ---
 
-## ⚠️ PROBLEMAS MODERADOS
+## PROBLEMAS MODERADOS
 
 ### 3. **Base de Datos - Roadmap Incompleto**
 
@@ -111,10 +111,10 @@ Items pendientes según documentación:
 - [ ] Agregar métricas de monitoreo (Prometheus)
 
 **Estado actual:**
-- ❌ Ninguno de estos puntos está implementado
-- ❌ No existe la carpeta `servidor-backend/modelos_bd/`
-- ❌ No hay script `poblar_intersecciones.py`
-- ❌ Alembic no está configurado
+- [ERROR] Ninguno de estos puntos está implementado
+- [ERROR] No existe la carpeta `servidor-backend/modelos_bd/`
+- [ERROR] No hay script `poblar_intersecciones.py`
+- [ERROR] Alembic no está configurado
 
 ---
 
@@ -123,9 +123,9 @@ Items pendientes según documentación:
 **Ubicación:** `integracion-sumo/escenarios/lima-centro/`
 
 ```bash
-osm.net.xml.gz      # ⚠️ COMPRIMIDO
-osm.poly.xml.gz     # ⚠️ COMPRIMIDO
-osm_bbox.osm.xml.gz # ⚠️ COMPRIMIDO
+osm.net.xml.gz      # [ADVERTENCIA] COMPRIMIDO
+osm.poly.xml.gz     # [ADVERTENCIA] COMPRIMIDO
+osm_bbox.osm.xml.gz # [ADVERTENCIA] COMPRIMIDO
 ```
 
 **Problema:**
@@ -157,11 +157,11 @@ psycopg2-binary==2.9.9
 - `servidor-backend/servicios/emergencia_service.py`
 - `servidor-backend/servicios/sumo_service.py`
 
-**Estado actual:** ❌ Ninguno usa SQLAlchemy
+**Estado actual:** [ERROR] Ninguno usa SQLAlchemy
 
 ---
 
-## ℹ️ ADVERTENCIAS MENORES
+## ADVERTENCIAS MENORES
 
 ### 6. **Debug Logs Excesivos**
 
@@ -206,41 +206,41 @@ DEBUG: bool = Field(default=False, env="DEBUG")
 
 ---
 
-## ✅ ELEMENTOS VERIFICADOS (SIN PROBLEMAS)
+## ELEMENTOS VERIFICADOS (SIN PROBLEMAS)
 
 ### Módulos del Capítulo 6
-- ✅ `nucleo/controlador_difuso_capitulo6.py` - **COMPLETO**
-- ✅ `nucleo/olas_verdes_dinamicas.py` - **COMPLETO**
-- ✅ `nucleo/indice_congestion.py` - **COMPLETO**
-- ✅ `nucleo/sistema_comparacion.py` - **COMPLETO**
-- ✅ `nucleo/metricas_red.py` - **COMPLETO**
-- ✅ `nucleo/exportador_analisis.py` - **COMPLETO**
+- [OK] `nucleo/controlador_difuso_capitulo6.py` - **COMPLETO**
+- [OK] `nucleo/olas_verdes_dinamicas.py` - **COMPLETO**
+- [OK] `nucleo/indice_congestion.py` - **COMPLETO**
+- [OK] `nucleo/sistema_comparacion.py` - **COMPLETO**
+- [OK] `nucleo/metricas_red.py` - **COMPLETO**
+- [OK] `nucleo/exportador_analisis.py` - **COMPLETO**
 
 ### Procesamiento de Video
-- ✅ `vision_computadora/procesador_video.py` - **COMPLETO**
-- ✅ `vision_computadora/tracking_vehicular.py` - **COMPLETO**
-- ✅ `vision_computadora/procesador_modular.py` - **COMPLETO**
+- [OK] `vision_computadora/procesador_video.py` - **COMPLETO**
+- [OK] `vision_computadora/tracking_vehicular.py` - **COMPLETO**
+- [OK] `vision_computadora/procesador_modular.py` - **COMPLETO**
 
 ### Interfaz Web
-- ✅ `interfaz-web/index.html` - **COMPLETO**
-- ✅ `interfaz-web/app_mejorado.js` - **COMPLETO**
-- ✅ `interfaz-web/estilos.css` - **COMPLETO**
+- [OK] `interfaz-web/index.html` - **COMPLETO**
+- [OK] `interfaz-web/app_mejorado.js` - **COMPLETO**
+- [OK] `interfaz-web/estilos.css` - **COMPLETO**
 
 ### Integración SUMO
-- ✅ `integracion-sumo/conector_sumo.py` - **COMPLETO**
-- ✅ `integracion-sumo/controlador_sumo_completo.py` - **COMPLETO**
+- [OK] `integracion-sumo/conector_sumo.py` - **COMPLETO**
+- [OK] `integracion-sumo/controlador_sumo_completo.py` - **COMPLETO**
 
 ### Scripts de Ejecución
-- ✅ `ejecutar.py` - **COMPLETO Y FUNCIONAL**
-- ✅ `ejecutar_capitulo6.py` - **COMPLETO Y FUNCIONAL**
-- ✅ `probar_capitulo6.py` - **COMPLETO Y FUNCIONAL**
+- [OK] `ejecutar.py` - **COMPLETO Y FUNCIONAL**
+- [OK] `ejecutar_capitulo6.py` - **COMPLETO Y FUNCIONAL**
+- [OK] `probar_capitulo6.py` - **COMPLETO Y FUNCIONAL**
 
 ### Sintaxis Python
-- ✅ **Todos los archivos .py compilan sin errores de sintaxis**
+- [OK] **Todos los archivos .py compilan sin errores de sintaxis**
 
 ---
 
-## 📊 RESUMEN
+## RESUMEN
 
 | Categoría | Cantidad |
 |-----------|----------|
@@ -251,24 +251,24 @@ DEBUG: bool = Field(default=False, env="DEBUG")
 
 ### Priorización de Correcciones
 
-#### 🔴 **URGENTE - ANTES DE DESPLIEGUE:**
-1. ✅ Implementar conexión a base de datos
-2. ✅ Completar servicios con TODOs
-3. ✅ Descomprimir archivos SUMO
+#### [CRÍTICO] **URGENTE - ANTES DE DESPLIEGUE:**
+1. [COMPLETADO] Implementar conexión a base de datos
+2. [COMPLETADO] Completar servicios con TODOs
+3. [COMPLETADO] Descomprimir archivos SUMO
 
-#### 🟡 **IMPORTANTE - DESPLIEGUE FUTURO:**
+#### [MODERADO] **IMPORTANTE - DESPLIEGUE FUTURO:**
 4. Configurar Alembic
 5. Crear script poblar_intersecciones.py
 6. Implementar ORM completo
 
-#### 🟢 **OPCIONAL - MEJORA CONTINUA:**
+#### [MENOR] **OPCIONAL - MEJORA CONTINUA:**
 7. Limpiar archivos de respaldo
 8. Reducir debug logs
 9. Hacer DEBUG configurable por .env
 
 ---
 
-## 🎯 PLAN DE ACCIÓN SUGERIDO
+## PLAN DE ACCIÓN SUGERIDO
 
 ### Fase 1: Correcciones Críticas (2-3 horas)
 1. Crear modelos ORM básicos para intersecciones y métricas
