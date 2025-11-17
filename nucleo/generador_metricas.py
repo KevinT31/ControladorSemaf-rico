@@ -4,7 +4,10 @@ Generador de Métricas Realistas
 Genera métricas de tráfico realistas basadas en patrones reales cuando SUMO no está disponible
 
 Este módulo simula el comportamiento del tráfico usando modelos matemáticos
-en lugar de valores aleatorios, para demostraciones más creíbles del sistema.
+DETERMINÍSTICOS (sin valores aleatorios) para demostraciones creíbles del sistema.
+
+✅ Usa funciones matemáticas (sin, cos, etc.) para variación natural
+❌ NO usa np.random - Todo es determinístico y reproducible
 """
 
 import numpy as np
@@ -79,12 +82,12 @@ class GeneradorMetricasRealistas:
         densidad_base=0.06
     )
 
-    def __init__(self, semilla: int = 42):
+    def __init__(self, offset_temporal: float = 0.0):
         """
         Args:
-            semilla: Semilla para reproducibilidad
+            offset_temporal: Offset en segundos para variar la fase inicial (determinístico)
         """
-        self.rng = np.random.RandomState(semilla)
+        self.offset_temporal = offset_temporal
         self.tiempo_inicio = datetime.now()
         self.paso_actual = 0
 
@@ -187,7 +190,7 @@ class GeneradorMetricasRealistas:
         paso: int
     ) -> Dict:
         """
-        Genera métricas realistas para una dirección usando modelos matemáticos
+        Genera métricas realistas para una dirección usando modelos matemáticos DETERMINÍSTICOS
 
         Args:
             patron: Patrón de tráfico
@@ -198,17 +201,22 @@ class GeneradorMetricasRealistas:
         Returns:
             Dict con sc, vavg, q, k
         """
+        # Tiempo ajustado con offset (permite variación entre instancias)
+        tiempo_ajustado = tiempo + self.offset_temporal
+
         # Obtener valores base del patrón
         if es_direccion_ns:
             flujo_base = patron.flujo_base_ns
             vel_base = patron.velocidad_base_ns
+            fase_offset = 0.0  # NS sin offset
         else:
             flujo_base = patron.flujo_base_eo
             vel_base = patron.velocidad_base_eo
+            fase_offset = 0.5  # EO desfasado 180° para simular semáforo coordinado
 
         # Variación temporal (ciclos de semáforo de 90s)
         ciclo_periodo = 90.0
-        fase_ciclo = (tiempo % ciclo_periodo) / ciclo_periodo
+        fase_ciclo = ((tiempo_ajustado + fase_offset * ciclo_periodo) % ciclo_periodo) / ciclo_periodo
 
         # Durante fase verde (0.0-0.33): velocidad alta, colas bajas
         # Durante fase roja (0.33-0.66): velocidad baja, colas altas
@@ -227,29 +235,47 @@ class GeneradorMetricasRealistas:
         # Aplicar factores de congestión
         factor_congestion = patron.factor_congestion
 
+        # Variación determinística usando funciones sinusoidales
+        # Simula micro-variaciones naturales del tráfico (platoons, ondas de choque)
+
+        # Frecuencias diferentes para cada métrica
+        freq_rapida = 0.1  # 10 segundos
+        freq_media = 0.03  # 30 segundos
+        freq_lenta = 0.01  # 100 segundos
+
         # Velocidad promedio (km/h)
         # Relación fundamental del tráfico: v = v_libre * (1 - factor_congestion)
         vavg = vel_base * factor_velocidad * (1.0 - 0.7 * factor_congestion)
-        # Añadir ruido pequeño (+/- 5%)
-        vavg += self.rng.normal(0, vavg * 0.05)
+        # Añadir variación sinusoidal (+/- 5%)
+        variacion_vavg = vavg * 0.05 * math.sin(2 * math.pi * tiempo_ajustado * freq_media)
+        vavg += variacion_vavg
         vavg = max(5.0, min(vavg, 60.0))  # Limitar entre 5 y 60 km/h
 
         # Stopped Count (vehículos detenidos)
         # Más vehículos detenidos con mayor congestión
         sc_base = 50.0 * factor_congestion * factor_cola
-        sc = sc_base + self.rng.normal(0, 5.0)
+        # Variación sinusoidal compuesta (simula llegada en pelotones)
+        variacion_sc = 5.0 * (
+            math.sin(2 * math.pi * tiempo_ajustado * freq_rapida) * 0.5 +
+            math.cos(2 * math.pi * tiempo_ajustado * freq_media) * 0.5
+        )
+        sc = sc_base + variacion_sc
         sc = max(0.0, min(sc, 50.0))
 
         # Flujo vehicular (veh/min)
         # Relación: q = k * v (flujo = densidad * velocidad)
         q = flujo_base * (1.0 + 0.3 * factor_congestion) * factor_velocidad
-        q += self.rng.normal(0, 1.0)
+        # Variación sinusoidal
+        variacion_q = 1.0 * math.sin(2 * math.pi * tiempo_ajustado * freq_rapida + 0.3)
+        q += variacion_q
         q = max(0.0, min(q, 30.0))
 
         # Densidad (veh/m)
         # Relación: k = q / v
         k = patron.densidad_base * (1.0 + factor_congestion * 2.0) * factor_cola
-        k += self.rng.normal(0, 0.01)
+        # Variación sinusoidal pequeña
+        variacion_k = 0.01 * math.sin(2 * math.pi * tiempo_ajustado * freq_lenta)
+        k += variacion_k
         k = max(0.0, min(k, 0.15))
 
         return {
@@ -308,11 +334,14 @@ class GeneradorMetricasRealistas:
         Returns:
             Tupla (serie_base, serie_mejorada)
         """
+        # Serie base con offset original
         serie_base = self.generar_serie_temporal(patron_base, num_pasos)
 
-        # Cambiar semilla para variación
-        self.rng = np.random.RandomState(self.rng.randint(0, 10000))
+        # Serie mejorada con pequeño offset para ligera variación determinística
+        offset_original = self.offset_temporal
+        self.offset_temporal += 10.0  # Offset de 10 segundos para variación
         serie_mejorada = self.generar_serie_temporal(patron_mejorado, num_pasos)
+        self.offset_temporal = offset_original  # Restaurar
 
         return serie_base, serie_mejorada
 
@@ -377,10 +406,11 @@ class GeneradorMetricasRealistas:
 if __name__ == "__main__":
     print("\n" + "="*70)
     print("GENERADOR DE MÉTRICAS REALISTAS")
-    print("Sistema de Tráfico Basado en Modelos Matemáticos")
+    print("Sistema de Tráfico Basado en Modelos Matemáticos DETERMINÍSTICOS")
+    print("(Sin valores aleatorios - 100% reproducible)")
     print("="*70 + "\n")
 
-    generador = GeneradorMetricasRealistas(semilla=42)
+    generador = GeneradorMetricasRealistas(offset_temporal=0.0)
 
     # Probar diferentes patrones
     patrones_prueba = [
@@ -420,7 +450,7 @@ if __name__ == "__main__":
     patron_fijo = GeneradorMetricasRealistas.PATRON_MODERADO
     patron_adaptativo = GeneradorMetricasRealistas.crear_patron_adaptativo_mejorado(patron_fijo)
 
-    generador2 = GeneradorMetricasRealistas(semilla=123)
+    generador2 = GeneradorMetricasRealistas(offset_temporal=5.0)  # Offset determinístico
     serie_fijo, serie_adapt = generador2.generar_comparacion_patrones(
         patron_fijo,
         patron_adaptativo,
@@ -449,5 +479,6 @@ if __name__ == "__main__":
     print(f"  ✓ Aumento de velocidad: {mejora_vel:.1f}%")
 
     print("\n" + "="*70)
-    print("✓ Generador funcionando correctamente")
+    print("✓ Generador funcionando correctamente (100% determinístico)")
+    print("✓ Ejecutar de nuevo producirá los MISMOS resultados")
     print("="*70 + "\n")
