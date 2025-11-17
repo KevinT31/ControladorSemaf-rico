@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flujo de Control Local - Ciclo 5 segundos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #F9FAFB;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1000px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #64748B;
+        }
+
+        .flow-container {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .flow-step {
+            background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+            border: 3px solid #3B82F6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .flow-step.start {
+            background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+            border-color: #10B981;
+        }
+
+        .flow-step.decision {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border-color: #F59E0B;
+            clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+            padding: 25px 40px;
+        }
+
+        .flow-step.process {
+            background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
+            border-color: #6366F1;
+        }
+
+        .flow-step.output {
+            background: linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%);
+            border-color: #10B981;
+        }
+
+        .flow-step.end {
+            background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+            border-color: #EF4444;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            background: #3B82F6;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-number.start { background: #10B981; }
+        .step-number.decision { background: #F59E0B; }
+        .step-number.process { background: #6366F1; }
+        .step-number.output { background: #10B981; }
+        .step-number.end { background: #EF4444; }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1E293B;
+        }
+
+        .step-content {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.6;
+            margin-left: 44px;
+        }
+
+        .step-metrics {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            margin-left: 44px;
+        }
+
+        .metric-badge {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .metric-badge strong {
+            color: #1E293B;
+        }
+
+        .arrow-down {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 28px;
+            margin: -5px 0;
+            position: relative;
+        }
+
+        .arrow-label {
+            position: absolute;
+            right: -180px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #FEF3C7;
+            border: 2px solid #F59E0B;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #92400E;
+            white-space: nowrap;
+        }
+
+        .timeline {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 15px;
+            width: 200px;
+        }
+
+        .timeline-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #3B82F6;
+            flex-shrink: 0;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #0078D4 0%, #0053A0 100%);
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            margin-top: 30px;
+        }
+
+        .info-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            padding: 12px;
+            backdrop-filter: blur(5px);
+        }
+
+        .info-item-label {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-bottom: 6px;
+        }
+
+        .info-item-value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .decision-branches {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-left: 44px;
+            margin-top: 12px;
+        }
+
+        .branch {
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        .branch.yes {
+            border-color: #10B981;
+            background: #F0FDF4;
+        }
+
+        .branch.no {
+            border-color: #EF4444;
+            background: #FEF2F2;
+        }
+
+        .branch-label {
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #1E293B;
+        }
+
+        .branch-label.yes { color: #047857; }
+        .branch-label.no { color: #B91C1C; }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">FLUJO DE CONTROL LOCAL</div>
+            <div class="subtitle">Ciclo de Procesamiento Autónomo - Raspberry Pi 5 (Edge Computing)</div>
+        </div>
+
+        <div class="flow-container">
+            <!-- PASO 1: INICIO -->
+            <div class="flow-step start">
+                <div class="step-header">
+                    <div class="step-number start">▶</div>
+                    <div class="step-title">INICIO DE CICLO (t = 0ms)</div>
+                </div>
+                <div class="step-content">
+                    El sistema inicia un nuevo ciclo de control cada <strong>5 segundos</strong>.
+                    Se inicializan buffers de datos y se verifican sensores.
+                </div>
+            </div>
+
+            <div class="arrow-down">▼</div>
+
+            <!-- PASO 2: CAPTURA -->
+            <div class="flow-step process">
+                <div class="step-header">
+                    <div class="step-number process">1</div>
+                    <div class="step-title">CAPTURA DE FRAME DE VIDEO</div>
+                </div>
+                <div class="step-content">
+                    La cámara domo (5MP @ 20 FPS) captura un frame del flujo vehicular.
+                    Resolución: 1920×1080, formato: RGB, tiempo de captura: ~50ms.
+                </div>
+                <div class="step-metrics">
+                    <div class="metric-badge">⏱️ Latencia: <strong>~50ms</strong></div>
+                    <div class="metric-badge">📷 Res: <strong>1920×1080</strong></div>
+                    <div class="metric-badge">🎯 FPS: <strong>20</strong></div>
+                </div>
+            </div>
+
+            <div class="arrow-down">▼</div>
+
+            <!-- PASO 3: DETECCIÓN YOLO -->
+            <div class="flow-step process">
+                <div class="step-header">
+                    <div class="step-number process">2</div>
+                    <div class="step-title">DETECCIÓN CON YOLO + BYTETRACK</div>
+                </div>
+                <div class="step-content">
+                    YOLOv8n procesa el frame para detectar vehículos (autos, buses, motos).
+                    ByteTrack mantiene el seguimiento de cada vehículo detectado para calcular velocidades.
+                </div>
+                <div class="step-metrics">
+                    <div class="metric-badge">⏱️ Inferencia: <strong>~60ms</strong></div>
+                    <div class="metric-badge">🚗 Clases: <strong>4</strong></div>
+                    <div class="metric-badge">🎯 Confianza: <strong>&gt;0.5</strong></div>
+                </div>
+            </div>
+
+            <div class="arrow-down">
+                ▼
+                <span class="arrow-label">⚡ t = 110ms</span>
+            </div>
+
+            <!-- PASO 4: CÁLCULO ICV -->
+            <div class="flow-step process">
+                <div class="step-header">
+                    <div class="step-number process">3</div>
+                    <div class="step-title">CÁLCULO DE MÉTRICAS (ICV, PI, EV)</div>
+                </div>
+                <div class="step-content">
+                    <strong>ICV:</strong> Índice de Congestión = f(densidad, velocidad)
+                    <br><strong>PI:</strong> Parámetro de Intensidad = f(flujo_actual, flujo_histórico)
+                    <br><strong>EV:</strong> Detección de vehículo de emergencia (sirena/visual)
+                </div>
+                <div class="step-metrics">
+                    <div class="metric-badge">⏱️ Cálculo: <strong>~5ms</strong></div>
+                    <div class="metric-badge">📊 Variables: <strong>3</strong></div>
+                    <div class="metric-badge">💾 RAM: <strong>~80MB</strong></div>
+                </div>
+            </div>
+
+            <div class="arrow-down">▼</div>
+
+            <!-- PASO 5: CONTROLADOR DIFUSO -->
+            <div class="flow-step process">
+                <div class="step-header">
+                    <div class="step-number process">4</div>
+                    <div class="step-title">CONTROLADOR DIFUSO (MAMDANI)</div>
+                </div>
+                <div class="step-content">
+                    Sistema difuso de 27 reglas que procesa ICV, PI y EV para determinar ΔTverde.
+                    Fuzzificación → Evaluación de reglas (MIN/MAX) → Defuzzificación (Centroide).
+                </div>
+                <div class="step-metrics">
+                    <div class="metric-badge">⏱️ Ejecución: <strong>&lt;10ms</strong></div>
+                    <div class="metric-badge">📋 Reglas: <strong>27</strong></div>
+                    <div class="metric-badge">🎯 Salida: <strong>[-10s, +10s]</strong></div>
+                </div>
+            </div>
+
+            <div class="arrow-down">
+                ▼
+                <span class="arrow-label">⚡ t = 125ms</span>
+            </div>
+
+            <!-- PASO 6: DECISIÓN EV -->
+            <div class="flow-step decision">
+                <div class="step-header">
+                    <div class="step-number decision">?</div>
+                    <div class="step-title">¿VEHÍCULO DE EMERGENCIA?</div>
+                </div>
+                <div class="step-content">
+                    Si EV &gt; 0.5: Activar protocolo de emergencia (prioridad absoluta).
+                    <br>Si EV ≤ 0.5: Aplicar ΔTverde calculado normalmente.
+                </div>
+                <div class="decision-branches">
+                    <div class="branch yes">
+                        <div class="branch-label yes">✓ SÍ (EV &gt; 0.5)</div>
+                        Verde inmediato en dirección del vehículo de emergencia. Rojo en otras direcciones.
+                    </div>
+                    <div class="branch no">
+                        <div class="branch-label no">✗ NO (EV ≤ 0.5)</div>
+                        Aplicar ajuste ΔTverde según resultado del controlador difuso.
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-down">▼</div>
+
+            <!-- PASO 7: ACTUACIÓN -->
+            <div class="flow-step output">
+                <div class="step-header">
+                    <div class="step-number output">5</div>
+                    <div class="step-title">ACTUACIÓN DEL MOTOR PAP</div>
+                </div>
+                <div class="step-content">
+                    El motor paso a paso (NEMA 17) ajusta físicamente las aspas del semáforo
+                    según el tiempo de verde calculado. Confirmación mediante encoder.
+                </div>
+                <div class="step-metrics">
+                    <div class="metric-badge">⏱️ Actuación: <strong>~20ms</strong></div>
+                    <div class="metric-badge">🔧 Precisión: <strong>±0.5°</strong></div>
+                    <div class="metric-badge">✓ Feedback: <strong>SÍ</strong></div>
+                </div>
+            </div>
+
+            <div class="arrow-down">▼</div>
+
+            <!-- PASO 8: TELEMETRÍA -->
+            <div class="flow-step output">
+                <div class="step-header">
+                    <div class="step-number output">6</div>
+                    <div class="step-title">ENVÍO DE TELEMETRÍA (4G)</div>
+                </div>
+                <div class="step-content">
+                    Datos se envían a Azure IoT Hub vía MQTT/TLS 1.2 (Quectel EG25-G).
+                    Payload: ICV, PI, EV, ΔTverde, timestamp, ID_intersección.
+                </div>
+                <div class="step-metrics">
+                    <div class="metric-badge">⏱️ Envío: <strong>~85ms (P50)</strong></div>
+                    <div class="metric-badge">📡 Protocolo: <strong>MQTT</strong></div>
+                    <div class="metric-badge">🔒 Seguridad: <strong>TLS 1.2</strong></div>
+                </div>
+            </div>
+
+            <div class="arrow-down">▼</div>
+
+            <!-- PASO 9: ESPERA -->
+            <div class="flow-step process">
+                <div class="step-header">
+                    <div class="step-number process">7</div>
+                    <div class="step-title">ESPERA HASTA PRÓXIMO CICLO</div>
+                </div>
+                <div class="step-content">
+                    El sistema entra en sleep mode de baja potencia hasta completar el ciclo de 5 segundos.
+                    Total procesado: ~230ms. Tiempo de espera: ~4770ms.
+                </div>
+                <div class="step-metrics">
+                    <div class="metric-badge">⏱️ Sleep: <strong>~4770ms</strong></div>
+                    <div class="metric-badge">⚡ Consumo: <strong>~3W</strong></div>
+                    <div class="metric-badge">🔁 Frecuencia: <strong>0.2 Hz</strong></div>
+                </div>
+            </div>
+
+            <div class="arrow-down">▼</div>
+
+            <!-- PASO 10: FIN -->
+            <div class="flow-step end">
+                <div class="step-header">
+                    <div class="step-number end">■</div>
+                    <div class="step-title">FIN DE CICLO (t = 5000ms)</div>
+                </div>
+                <div class="step-content">
+                    El ciclo se completa. El sistema retorna al INICIO para procesar el siguiente frame.
+                </div>
+            </div>
+        </div>
+
+        <!-- INFO BOX -->
+        <div class="info-box">
+            <div class="info-title">⚙️ CARACTERÍSTICAS DEL CICLO DE CONTROL</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-item-label">Duración Total</div>
+                    <div class="info-item-value">5.0s</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-label">Tiempo Procesamiento</div>
+                    <div class="info-item-value">~230ms</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-label">Utilización CPU</div>
+                    <div class="info-item-value">4.6%</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-label">Consumo RAM</div>
+                    <div class="info-item-value">~280MB</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-label">Consumo Energía</div>
+                    <div class="info-item-value">~8W</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-label">Autonomía (UPS)</div>
+                    <div class="info-item-value">4h</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div style="margin-top: 30px; padding: 15px; background: #F9FAFB; border-radius: 8px; font-size: 11px; color: #64748B;">
+            <strong style="display: block; margin-bottom: 8px; color: #1E293B;">🖥️ ESPECIFICACIONES DE HARDWARE</strong>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                <div><strong>Procesador:</strong> Broadcom BCM2712 (Quad-core Cortex-A76 @ 2.4GHz)</div>
+                <div><strong>RAM:</strong> 8GB LPDDR4X-4267</div>
+                <div><strong>Almacenamiento:</strong> MicroSD 64GB (UHS-I)</div>
+                <div><strong>Cámara:</strong> Domo 5MP (OV5647)</div>
+                <div><strong>Módem 4G:</strong> Quectel EG25-G (LTE Cat 4)</div>
+                <div><strong>Motor:</strong> NEMA 17 Stepper (1.8°/step)</div>
+                <div><strong>Sensores:</strong> DHT22 (Temp), ACS712 (Corriente), HC-SR04 (Ultrasónico)</div>
+                <div><strong>SO:</strong> Raspberry Pi OS 64-bit (Debian Bookworm)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animación de entrada suave
+        window.addEventListener('load', () => {
+            const steps = document.querySelectorAll('.flow-step');
+            steps.forEach((step, index) => {
+                step.style.opacity = '0';
+                step.style.transform = 'translateY(20px)';
+                step.style.transition = 'all 0.4s ease';
+
+                setTimeout(() => {
+                    step.style.opacity = '1';
+                    step.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

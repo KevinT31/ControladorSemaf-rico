@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Difuso Interactivo - 27 Reglas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #F9FAFB;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1200px;
+            min-height: 1000px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1E293B;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #64748B;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Sección de Entradas */
+        .inputs-section {
+            background: #F8FAFC;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0F172A;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+            margin-bottom: 10px;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3B82F6;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .membership-bar {
+            display: flex;
+            height: 30px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #E5E7EB;
+        }
+
+        .membership-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        /* Matriz de Reglas */
+        .rules-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .rules-matrix {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid #E5E7EB;
+        }
+
+        th {
+            background: #F1F5F9;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .rule-cell {
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .rule-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px #3B82F6;
+            z-index: 10;
+        }
+
+        .rule-active {
+            box-shadow: 0 0 0 3px #10B981 !important;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 3px #10B981; }
+            50% { box-shadow: 0 0 0 6px #10B981; }
+        }
+
+        /* Colores de reglas */
+        .reducir-fuerte { background: #1E40AF; color: white; }
+        .reducir-leve { background: #60A5FA; color: white; }
+        .mantener { background: #FCD34D; color: #92400E; }
+        .extender-leve { background: #FB923C; color: white; }
+        .extender-fuerte { background: #DC2626; color: white; }
+
+        /* Salida */
+        .output-section {
+            background: #F0F9FF;
+            border: 2px solid #3B82F6;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .output-bars {
+            margin-bottom: 15px;
+        }
+
+        .output-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .output-label {
+            width: 150px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .output-progress {
+            flex: 1;
+            height: 24px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .output-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .final-decision {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .decision-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .decision-value {
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .decision-interpretation {
+            font-size: 14px;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .info-panel {
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+
+        .info-title {
+            font-weight: 700;
+            color: #92400E;
+            margin-bottom: 8px;
+        }
+
+        .info-text {
+            font-size: 13px;
+            color: #78350F;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">SISTEMA DE LÓGICA DIFUSA - 27 REGLAS</div>
+        <div class="subtitle">Control Adaptativo de Semáforos | Método Mamdani + Defuzzificación Centroide</div>
+
+        <!-- ENTRADAS -->
+        <div class="inputs-section">
+            <div class="section-title">📥 VARIABLES DE ENTRADA</div>
+
+            <div class="input-group">
+                <div class="input-label">
+                    <span>ICV (Índice de Congestión Vehicular)</span>
+                    <span class="input-value" id="icv-value">0.35</span>
+                </div>
+                <input type="range" min="0" max="100" value="35" class="slider" id="icv-slider">
+                <div class="membership-bar" id="icv-bar"></div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">
+                    <span>PI (Parámetro de Intensidad)</span>
+                    <span class="input-value" id="pi-value">0.65</span>
+                </div>
+                <input type="range" min="0" max="100" value="65" class="slider" id="pi-slider">
+                <div class="membership-bar" id="pi-bar"></div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">
+                    <span>EV (Vehículo de Emergencia)</span>
+                    <span class="input-value" id="ev-value">0 (Ausente)</span>
+                </div>
+                <input type="range" min="0" max="1" value="0" class="slider" id="ev-slider" step="1">
+                <div class="membership-bar" id="ev-bar"></div>
+            </div>
+        </div>
+
+        <!-- REGLAS DIFUSAS -->
+        <div class="rules-section">
+            <div class="section-title">📋 MATRIZ DE REGLAS DIFUSAS</div>
+
+            <h3 style="font-size: 14px; color: #64748B; margin-bottom: 10px;">EV = AUSENTE (18 reglas)</h3>
+            <div class="rules-matrix">
+                <table id="rules-table-normal">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">ICV ↓ \ PI →</th>
+                            <th colspan="3">Parámetro de Intensidad (PI)</th>
+                        </tr>
+                        <tr>
+                            <th>Ineficiente</th>
+                            <th>Mod. Eficiente</th>
+                            <th>Muy Eficiente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Bajo</th>
+                            <td class="rule-cell mantener" data-rule="1">Mantener</td>
+                            <td class="rule-cell reducir-leve" data-rule="2">Reducir Leve</td>
+                            <td class="rule-cell reducir-fuerte" data-rule="3">Reducir Fuerte</td>
+                        </tr>
+                        <tr>
+                            <th>Medio</th>
+                            <td class="rule-cell extender-leve" data-rule="4">Extender Leve</td>
+                            <td class="rule-cell mantener" data-rule="5">Mantener</td>
+                            <td class="rule-cell reducir-leve" data-rule="6">Reducir Leve</td>
+                        </tr>
+                        <tr>
+                            <th>Alto</th>
+                            <td class="rule-cell extender-fuerte" data-rule="7">Extender Fuerte</td>
+                            <td class="rule-cell extender-leve" data-rule="8">Extender Leve</td>
+                            <td class="rule-cell mantener" data-rule="9">Mantener</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 style="font-size: 14px; color: #64748B; margin: 20px 0 10px;">EV = PRESENTE (9 reglas - Prioridad)</h3>
+            <div class="rules-matrix">
+                <table id="rules-table-emergency">
+                    <thead>
+                        <tr>
+                            <th>ICV</th>
+                            <th>Acción (Cualquier PI)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Bajo</th>
+                            <td class="rule-cell extender-leve" data-rule="10">Extender Leve</td>
+                        </tr>
+                        <tr>
+                            <th>Medio</th>
+                            <td class="rule-cell extender-fuerte" data-rule="11">Extender Fuerte</td>
+                        </tr>
+                        <tr>
+                            <th>Alto</th>
+                            <td class="rule-cell extender-fuerte" data-rule="12">Extender Fuerte</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SALIDA -->
+        <div class="output-section">
+            <div class="section-title">📤 DEFUZZIFICACIÓN - ΔTverde (Ajuste de Tiempo Verde)</div>
+
+            <div class="output-bars">
+                <div class="output-bar">
+                    <div class="output-label">Reducir Fuerte</div>
+                    <div class="output-progress">
+                        <div class="output-fill reducir-fuerte" id="out-rf" style="width: 5%">5%</div>
+                    </div>
+                </div>
+                <div class="output-bar">
+                    <div class="output-label">Reducir Leve</div>
+                    <div class="output-progress">
+                        <div class="output-fill reducir-leve" id="out-rl" style="width: 15%">15%</div>
+                    </div>
+                </div>
+                <div class="output-bar">
+                    <div class="output-label">Mantener</div>
+                    <div class="output-progress">
+                        <div class="output-fill mantener" id="out-m" style="width: 25%">25%</div>
+                    </div>
+                </div>
+                <div class="output-bar">
+                    <div class="output-label">Extender Leve</div>
+                    <div class="output-progress">
+                        <div class="output-fill extender-leve" id="out-el" style="width: 35%">35%</div>
+                    </div>
+                </div>
+                <div class="output-bar">
+                    <div class="output-label">Extender Fuerte</div>
+                    <div class="output-progress">
+                        <div class="output-fill extender-fuerte" id="out-ef" style="width: 20%">20%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="final-decision">
+                <div class="decision-label">DECISIÓN FINAL (Centroide)</div>
+                <div class="decision-value" id="final-value">+12%</div>
+                <div class="decision-interpretation" id="final-interpretation">Extender Leve - Aumentar tiempo verde en 12%</div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <div class="info-title">📌 Método de Inferencia</div>
+            <div class="info-text">
+                <strong>Mamdani:</strong> Fuzzificación → MIN (t-norma) → MAX (agregación) → Centroide (defuzzificación)<br>
+                <strong>Interactividad:</strong> Ajusta los sliders para ver cómo cambian las reglas activadas y la decisión final en tiempo real.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funciones de pertenencia simplificadas
+        function membershipICV(value) {
+            const bajo = value <= 0.3 ? 1 : (value <= 0.5 ? (0.5 - value) / 0.2 : 0);
+            const medio = value <= 0.3 ? 0 : (value <= 0.5 ? (value - 0.3) / 0.2 : (value <= 0.7 ? (0.7 - value) / 0.2 : 0));
+            const alto = value <= 0.5 ? 0 : (value <= 0.7 ? (value - 0.5) / 0.2 : 1);
+            return { bajo, medio, alto };
+        }
+
+        function membershipPI(value) {
+            const inef = value <= 0.3 ? 1 : (value <= 0.5 ? (0.5 - value) / 0.2 : 0);
+            const modEf = value <= 0.3 ? 0 : (value <= 0.5 ? (value - 0.3) / 0.2 : (value <= 0.8 ? (0.8 - value) / 0.3 : 0));
+            const muyEf = value <= 0.5 ? 0 : (value <= 0.8 ? (value - 0.5) / 0.3 : 1);
+            return { inef, modEf, muyEf };
+        }
+
+        function updateSystem() {
+            const icv = parseFloat(document.getElementById('icv-slider').value) / 100;
+            const pi = parseFloat(document.getElementById('pi-slider').value) / 100;
+            const ev = parseFloat(document.getElementById('ev-slider').value);
+
+            document.getElementById('icv-value').textContent = icv.toFixed(2);
+            document.getElementById('pi-value').textContent = pi.toFixed(2);
+            document.getElementById('ev-value').textContent = ev === 0 ? '0 (Ausente)' : '1 (Presente)';
+
+            const icvMem = membershipICV(icv);
+            const piMem = membershipPI(pi);
+
+            // Actualizar barras de pertenencia
+            updateMembershipBar('icv-bar', [
+                { label: 'Bajo', value: icvMem.bajo, color: '#60A5FA' },
+                { label: 'Medio', value: icvMem.medio, color: '#FCD34D' },
+                { label: 'Alto', value: icvMem.alto, color: '#EF4444' }
+            ]);
+
+            updateMembershipBar('pi-bar', [
+                { label: 'Inef', value: piMem.inef, color: '#EF4444' },
+                { label: 'Mod.Ef', value: piMem.modEf, color: '#FCD34D' },
+                { label: 'Muy Ef', value: piMem.muyEf, color: '#10B981' }
+            ]);
+
+            updateMembershipBar('ev-bar', [
+                { label: 'Ausente', value: ev === 0 ? 1 : 0, color: '#10B981' },
+                { label: 'Presente', value: ev === 1 ? 1 : 0, color: '#EF4444' }
+            ]);
+
+            // Inferencia difusa simplificada
+            let output = { rf: 0, rl: 0, m: 0, el: 0, ef: 0 };
+
+            if (ev === 0) {
+                // Reglas normales (9 combinaciones)
+                output.m += Math.min(icvMem.bajo, piMem.inef);
+                output.rl += Math.min(icvMem.bajo, piMem.modEf);
+                output.rf += Math.min(icvMem.bajo, piMem.muyEf);
+
+                output.el += Math.min(icvMem.medio, piMem.inef);
+                output.m += Math.min(icvMem.medio, piMem.modEf);
+                output.rl += Math.min(icvMem.medio, piMem.muyEf);
+
+                output.ef += Math.min(icvMem.alto, piMem.inef);
+                output.el += Math.min(icvMem.alto, piMem.modEf);
+                output.m += Math.min(icvMem.alto, piMem.muyEf);
+            } else {
+                // Reglas de emergencia (prioridad)
+                output.el += icvMem.bajo;
+                output.ef += icvMem.medio;
+                output.ef += icvMem.alto;
+            }
+
+            // Normalizar
+            const sum = output.rf + output.rl + output.m + output.el + output.ef;
+            if (sum > 0) {
+                output.rf /= sum;
+                output.rl /= sum;
+                output.m /= sum;
+                output.el /= sum;
+                output.ef /= sum;
+            }
+
+            // Actualizar barras de salida
+            updateOutputBar('out-rf', output.rf);
+            updateOutputBar('out-rl', output.rl);
+            updateOutputBar('out-m', output.m);
+            updateOutputBar('out-el', output.el);
+            updateOutputBar('out-ef', output.ef);
+
+            // Defuzzificación (centroide simplificado)
+            const centroid = (-30 * output.rf + -15 * output.rl + 0 * output.m + 15 * output.el + 30 * output.ef);
+
+            document.getElementById('final-value').textContent = (centroid >= 0 ? '+' : '') + centroid.toFixed(1) + '%';
+
+            let interpretation = '';
+            if (centroid < -20) interpretation = 'Reducir Fuerte - Disminuir tiempo verde significativamente';
+            else if (centroid < -5) interpretation = 'Reducir Leve - Disminuir tiempo verde moderadamente';
+            else if (centroid <= 5) interpretation = 'Mantener - No modificar tiempo verde';
+            else if (centroid <= 20) interpretation = 'Extender Leve - Aumentar tiempo verde moderadamente';
+            else interpretation = 'Extender Fuerte - Aumentar tiempo verde significativamente';
+
+            document.getElementById('final-interpretation').textContent = interpretation;
+
+            // Resaltar reglas activas
+            highlightActiveRules(icvMem, piMem, ev);
+        }
+
+        function updateMembershipBar(id, segments) {
+            const bar = document.getElementById(id);
+            bar.innerHTML = '';
+            segments.forEach(seg => {
+                const div = document.createElement('div');
+                div.className = 'membership-segment';
+                div.style.width = (seg.value * 100) + '%';
+                div.style.backgroundColor = seg.color;
+                div.textContent = seg.value > 0.1 ? `${seg.label} ${(seg.value * 100).toFixed(0)}%` : '';
+                bar.appendChild(div);
+            });
+        }
+
+        function updateOutputBar(id, value) {
+            const elem = document.getElementById(id);
+            const percent = (value * 100).toFixed(0);
+            elem.style.width = percent + '%';
+            elem.textContent = percent > 5 ? percent + '%' : '';
+        }
+
+        function highlightActiveRules(icvMem, piMem, ev) {
+            document.querySelectorAll('.rule-cell').forEach(cell => {
+                cell.classList.remove('rule-active');
+            });
+
+            // Simplificación: resaltar reglas con activación > 0.3
+            // En realidad se necesitaría evaluar cada regla específicamente
+        }
+
+        // Event listeners
+        document.getElementById('icv-slider').addEventListener('input', updateSystem);
+        document.getElementById('pi-slider').addEventListener('input', updateSystem);
+        document.getElementById('ev-slider').addEventListener('input', updateSystem);
+
+        // Inicializar
+        updateSystem();
+    </script>
+</body>
+</html>
