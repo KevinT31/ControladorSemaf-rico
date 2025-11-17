@@ -426,9 +426,11 @@ if __name__ == "__main__":
     # Crear exportador
     exportador = ExportadorAnalisis()
 
-    # Simular datos de prueba
+    # Simular datos de prueba (determinísticos)
     timestamps = np.linspace(0, 300, 100)  # 5 minutos
-    icv_valores = 0.3 + 0.3 * np.sin(timestamps / 30) + 0.1 * np.random.randn(100)
+    # Variación determinística usando múltiples frecuencias sinusoidales
+    variacion = 0.1 * (np.sin(timestamps / 10) * 0.5 + np.cos(timestamps / 15) * 0.5)
+    icv_valores = 0.3 + 0.3 * np.sin(timestamps / 30) + variacion
     icv_valores = np.clip(icv_valores, 0, 1)
 
     # Exportar serie temporal

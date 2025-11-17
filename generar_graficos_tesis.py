@@ -172,15 +172,17 @@ def grafico_comparacion_control():
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
-    # Simular datos de comparación
+    # Simular datos de comparación (determinístico)
     tiempo = np.arange(0, 300, 1)  # 5 minutos
 
-    # Tiempo Fijo: ICV oscila más
-    icv_fijo = 0.5 + 0.2 * np.sin(tiempo / 20) + 0.1 * np.random.randn(len(tiempo))
+    # Tiempo Fijo: ICV oscila más (variación determinística)
+    variacion_fijo = 0.1 * (np.sin(tiempo / 10) * 0.7 + np.cos(tiempo / 15) * 0.3)
+    icv_fijo = 0.5 + 0.2 * np.sin(tiempo / 20) + variacion_fijo
     icv_fijo = np.clip(icv_fijo, 0, 1)
 
-    # Adaptativo: ICV más estable
-    icv_adapt = 0.35 + 0.1 * np.sin(tiempo / 30) + 0.05 * np.random.randn(len(tiempo))
+    # Adaptativo: ICV más estable (variación determinística menor)
+    variacion_adapt = 0.05 * (np.sin(tiempo / 12) * 0.6 + np.cos(tiempo / 18) * 0.4)
+    icv_adapt = 0.35 + 0.1 * np.sin(tiempo / 30) + variacion_adapt
     icv_adapt = np.clip(icv_adapt, 0, 1)
 
     # Subplot 1: ICV en el tiempo
@@ -193,9 +195,11 @@ def grafico_comparacion_control():
     axes[0, 0].legend()
     axes[0, 0].grid(True, alpha=0.3)
 
-    # Subplot 2: Tiempos de espera promedio
-    espera_fijo = 45 + 10 * np.sin(tiempo / 25) + 5 * np.random.randn(len(tiempo))
-    espera_adapt = 30 + 5 * np.sin(tiempo / 35) + 3 * np.random.randn(len(tiempo))
+    # Subplot 2: Tiempos de espera promedio (determinístico)
+    variacion_espera_fijo = 5 * (np.sin(tiempo / 12) * 0.5 + np.cos(tiempo / 17) * 0.5)
+    espera_fijo = 45 + 10 * np.sin(tiempo / 25) + variacion_espera_fijo
+    variacion_espera_adapt = 3 * (np.sin(tiempo / 14) * 0.4 + np.cos(tiempo / 19) * 0.6)
+    espera_adapt = 30 + 5 * np.sin(tiempo / 35) + variacion_espera_adapt
 
     axes[0, 1].plot(tiempo, espera_fijo, label='Tiempo Fijo', color='red', linewidth=2, alpha=0.7)
     axes[0, 1].plot(tiempo, espera_adapt, label='Adaptativo', color='green', linewidth=2, alpha=0.7)
@@ -397,10 +401,16 @@ def grafico_calculo_icv():
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
-    # Datos simulados
-    np.random.seed(42)
+    # Datos simulados (determinístico - simula distribución beta usando funciones matemáticas)
     n_vehiculos = 50
-    velocidades = 60 * np.random.beta(2, 2, n_vehiculos)  # km/h
+    # Generar valores determinísticos que simulen distribución beta(2,2)
+    # Beta(2,2) tiene forma de campana centrada en 0.5
+    indices = np.arange(n_vehiculos)
+    # Usar combinación de seno y coseno para simular distribución beta
+    valores_base = 0.5 + 0.3 * np.sin(indices * 0.4) + 0.2 * np.cos(indices * 0.7)
+    # Normalizar entre 0 y 1
+    valores_norm = (valores_base - valores_base.min()) / (valores_base.max() - valores_base.min())
+    velocidades = 60 * valores_norm  # km/h
 
     # Subplot 1: Distribución de velocidades
     axes[0, 0].hist(velocidades, bins=15, color='steelblue', alpha=0.7, edgecolor='black')
