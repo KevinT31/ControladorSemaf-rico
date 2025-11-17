@@ -1,4 +1,4 @@
-# 📚 Implementación Completa del Capítulo 6
+# Implementación Completa del Capítulo 6
 
 ## Sistema de Control Semafórico Adaptativo Inteligente
 
@@ -9,7 +9,7 @@
 
 ---
 
-## 🎯 Descripción General
+## Descripción General
 
 Esta implementación representa la materialización completa del Capítulo 6 de la tesis de control semafórico adaptativo. El sistema integra:
 
@@ -24,29 +24,29 @@ Esta implementación representa la materialización completa del Capítulo 6 de 
 
 ---
 
-## 📂 Estructura de Archivos Nuevos
+## Estructura de Archivos Nuevos
 
 ```
 ControladorSemaforicoTFC/
 │
 ├── nucleo/
-│   ├── estado_local.py                    # ⭐ Estado Local + CamMask
-│   ├── controlador_difuso_capitulo6.py    # ⭐ Control Difuso (12 reglas)
-│   ├── metricas_red.py                    # ⭐ Agregación de métricas
-│   └── sistema_comparacion.py             # ⭐ Comparación adaptativo vs fijo
+│   ├── estado_local.py                    # [IMPORTANTE] Estado Local + CamMask
+│   ├── controlador_difuso_capitulo6.py    # [IMPORTANTE] Control Difuso (12 reglas)
+│   ├── metricas_red.py                    # [IMPORTANTE] Agregación de métricas
+│   └── sistema_comparacion.py             # [IMPORTANTE] Comparación adaptativo vs fijo
 │
 ├── integracion-sumo/
-│   └── controlador_sumo_completo.py       # ⭐ Integración SUMO completa
+│   └── controlador_sumo_completo.py       # [IMPORTANTE] Integración SUMO completa
 │
 ├── servidor-backend/
-│   └── main_capitulo6.py                  # ⭐ Backend con todos los módulos
+│   └── main_capitulo6.py                  # [IMPORTANTE] Backend con todos los módulos
 │
-└── ejecutar_capitulo6.py                  # ⭐ Ejecutable maestro
+└── ejecutar_capitulo6.py                  # [IMPORTANTE] Ejecutable maestro
 ```
 
 ---
 
-## 🚀 Inicio Rápido
+## Inicio Rápido
 
 ### 1. Verificar Dependencias
 
@@ -77,7 +77,7 @@ El sistema estará disponible en:
 
 ---
 
-## 📊 Componentes Implementados
+## Componentes Implementados
 
 ### 1. Sistema de Estado Local (estado_local.py)
 
@@ -462,7 +462,7 @@ python ejecutar_capitulo6.py
 
 ---
 
-## 🧪 Pruebas y Demostraciones
+## Pruebas y Demostraciones
 
 ### Demostración 1: Cálculo de ICV
 
@@ -473,15 +473,15 @@ python ejecutar_capitulo6.py
 
 **Salida esperada:**
 ```
-🟢 Flujo Libre:
+[OK] Flujo Libre:
    SC=5, Vavg=50 km/h, q=12 veh/min, k=0.030
    → ICV = 0.185 (FLUJO LIBRE)
 
-🟡 Congestión Moderada:
+[MODERADO] Congestión Moderada:
    SC=25, Vavg=25 km/h, q=20 veh/min, k=0.080
    → ICV = 0.485 (CONGESTIÓN MODERADA)
 
-🔴 Atasco Severo:
+[CRÍTICO] Atasco Severo:
    SC=45, Vavg=8 km/h, q=28 veh/min, k=0.130
    → ICV = 0.756 (ATASCO SEVERO)
 ```
@@ -495,7 +495,7 @@ python ejecutar_capitulo6.py
 
 **Salida esperada:**
 ```
-🚦 NS Congestionado, EO Fluido:
+NS Congestionado, EO Fluido:
    NS: ICV=0.75, PI=0.30, EV=0
    EO: ICV=0.20, PI=0.75, EV=0
    → T_verde_NS = 39.0s  (extendido +30%)
@@ -514,17 +514,17 @@ python ejecutar_capitulo6.py
 Comparación: ADAPTATIVO vs TIEMPO_FIJO
 
 Mejoras observadas:
-  ✓ Reducción de congestión (ICV): 24.3%
-  ✓ Aumento de velocidad: 18.7%
-  ✓ Aumento de throughput: 12.5%
-  ✓ Reducción de tiempo de espera: 21.2%
+  [OK] Reducción de congestión (ICV): 24.3%
+  [OK] Aumento de velocidad: 18.7%
+  [OK] Aumento de throughput: 12.5%
+  [OK] Reducción de tiempo de espera: 21.2%
 
-🎯 MEJORA SIGNIFICATIVA detectada (>5%)
+MEJORA SIGNIFICATIVA detectada (>5%)
 ```
 
 ---
 
-## 📈 Métricas de Rendimiento Esperadas
+## Métricas de Rendimiento Esperadas
 
 Basado en simulaciones de prueba, el sistema adaptativo muestra:
 
@@ -537,7 +537,7 @@ Basado en simulaciones de prueba, el sistema adaptativo muestra:
 
 ---
 
-## 🔧 Configuración y Personalización
+## Configuración y Personalización
 
 ### Ajustar Pesos del ICV
 
@@ -586,7 +586,7 @@ intersecciones_lima = [
 
 ---
 
-## 📊 Exportación de Datos
+## Exportación de Datos
 
 ### Formato JSON
 
@@ -623,7 +623,7 @@ intersecciones_lima = [
 
 ---
 
-## 🚨 Solución de Problemas
+## Solución de Problemas
 
 ### Error: "TraCI no disponible"
 
@@ -667,7 +667,7 @@ pip install -r requirements.txt
 
 ---
 
-## 📚 Referencias
+## Referencias
 
 1. **Capítulo 6 de la Tesis** - Diseño del sistema de control adaptativo
 2. **Fuzzy Logic Control** - Mamdani method
@@ -676,7 +676,7 @@ pip install -r requirements.txt
 
 ---
 
-## 🎓 Notas para la Tesis
+## Notas para la Tesis
 
 ### Aspectos a Destacar
 
@@ -703,7 +703,7 @@ pip install -r requirements.txt
 
 ---
 
-## ✅ Checklist de Demostración
+## Checklist de Demostración
 
 - [ ] Sistema arranca sin errores
 - [ ] Dashboard muestra métricas en tiempo real
@@ -717,7 +717,7 @@ pip install -r requirements.txt
 
 ---
 
-## 🤝 Soporte
+## Soporte
 
 Para preguntas o problemas:
 1. Revisar logs en `sistema_control.log`
@@ -727,12 +727,12 @@ Para preguntas o problemas:
 
 ---
 
-## 📝 Licencia
+## Licencia
 
 Sistema desarrollado para tesis de la Pontificia Universidad Católica del Perú.
 
 ---
 
-**¡Sistema listo para demostración!** 🚀
+**Sistema listo para demostración!**
 
 Todo el código está completamente funcional y documentado. Cada módulo puede ejecutarse de forma independiente para pruebas, y el sistema completo se integra perfectamente para demostraciones de tesis.

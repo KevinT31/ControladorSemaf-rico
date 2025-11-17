@@ -75,9 +75,13 @@ class SumoService:
     def exportar_historico(formato: str = "csv") -> str:
         """
         Exporta datos históricos de SUMO a CSV o Parquet
-
-        TODO: Implementar exportación real desde simulación SUMO
         """
+        conector = estado_sistema.conector_sumo
+
+        if not conector or not getattr(conector, 'conectado', False):
+            logger.warning("SUMO no conectado, no se puede exportar")
+            return ""
+
         ruta_base = Path(__file__).parent.parent.parent / 'datos' / 'resultados-sumo'
         ruta_base.mkdir(parents=True, exist_ok=True)
 
@@ -85,19 +89,69 @@ class SumoService:
         nombre_archivo = f"simulacion_{timestamp}.{formato}"
         ruta_completa = ruta_base / nombre_archivo
 
-        logger.info(f"Exportación SUMO guardada en: {ruta_completa}")
-        return str(ruta_completa)
+        try:
+            # Obtener datos del conector
+            estados_calles = conector.obtener_estado_calles(limite=1000)
+
+            if formato == "csv":
+                import csv
+                with open(ruta_completa, 'w', newline='') as f:
+                    if estados_calles:
+                        writer = csv.DictWriter(f, fieldnames=estados_calles[0].keys())
+                        writer.writeheader()
+                        writer.writerows(estados_calles)
+            elif formato == "json":
+                import json
+                with open(ruta_completa, 'w') as f:
+                    json.dump(estados_calles, f, indent=2)
+
+            logger.info(f"Exportación SUMO guardada en: {ruta_completa}")
+            return str(ruta_completa)
+
+        except Exception as e:
+            logger.error(f"Error exportando datos SUMO: {e}")
+            return ""
 
     @staticmethod
     def obtener_metricas() -> Dict:
         """Obtiene métricas agregadas de SUMO"""
-        # TODO: Implementar métricas reales
-        return {
-            'timestamp': datetime.now().isoformat(),
-            'total_vehiculos': 0,
-            'velocidad_promedio_red': 0.0,
-            'tiempo_viaje_promedio': 0.0
-        }
+        conector = estado_sistema.conector_sumo
+
+        if not conector or not getattr(conector, 'conectado', False):
+            return {
+                'timestamp': datetime.now().isoformat(),
+                'total_vehiculos': 0,
+                'velocidad_promedio_red': 0.0,
+                'tiempo_viaje_promedio': 0.0,
+                'conectado': False
+            }
+
+        try:
+            # Obtener métricas reales desde TraCI
+            import traci
+            vehiculos = traci.vehicle.getIDList()
+            total_vehiculos = len(vehiculos)
+
+            velocidades = [traci.vehicle.getSpeed(v) * 3.6 for v in vehiculos]  # m/s -> km/h
+            velocidad_promedio = sum(velocidades) / len(velocidades) if velocidades else 0.0
+
+            return {
+                'timestamp': datetime.now().isoformat(),
+                'total_vehiculos': total_vehiculos,
+                'velocidad_promedio_red': velocidad_promedio,
+                'tiempo_viaje_promedio': 0.0,  # Requiere tracking más complejo
+                'conectado': True
+            }
+        except Exception as e:
+            logger.error(f"Error obteniendo métricas SUMO: {e}")
+            return {
+                'timestamp': datetime.now().isoformat(),
+                'total_vehiculos': 0,
+                'velocidad_promedio_red': 0.0,
+                'tiempo_viaje_promedio': 0.0,
+                'conectado': False,
+                'error': str(e)
+            }
 
     @staticmethod
     def obtener_estado() -> Dict:
