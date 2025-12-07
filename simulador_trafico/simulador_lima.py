@@ -51,6 +51,7 @@ class EstadoTrafico:
     flujo_vehicular: float  # veh/min
     velocidad_promedio: float  # km/h
     longitud_cola: float  # metros
+    icv: float = 0.0  # Índice de Congestión (0-1)
     semaforo: Optional[EstadoSemaforo] = None
 
 
@@ -272,6 +273,31 @@ class SimuladorLima:
             longitud_cola = min(longitud_cola, 200.0 * inter.num_carriles)
 
             # Crear estado
+            # Calcular ICV del núcleo si está disponible
+            icv_val = 0.0
+            try:
+                # Import tardío para no romper si falta núcleo
+                from nucleo.indice_congestion import CalculadorICV, ParametrosInterseccion
+                _calc = CalculadorICV(ParametrosInterseccion())
+                res_icv = _calc.calcular(
+                    longitud_cola=float(longitud_cola),
+                    velocidad_promedio=float(velocidad),
+                    flujo_vehicular=float(flujo_vehicular)
+                )
+                icv_val = float(res_icv.get('icv', 0.0))
+            except Exception:
+                # Fallback simple si no está disponible
+                # Combina flujo normalizado, cola normalizada y penalización de baja velocidad
+                cap_flujo = max(1.0, inter.num_carriles * 30.0)
+                flujo_norm = max(0.0, min(1.0, flujo_vehicular / cap_flujo))
+                cola_norm = max(0.0, min(1.0, longitud_cola / (200.0 * inter.num_carriles)))
+                vel_libre = self.params['velocidad_libre']
+                vel_norm = max(0.0, min(1.0, velocidad / vel_libre))
+                icv_val = 0.40 * flujo_norm + 0.30 * cola_norm + 0.15 * (1.0 - vel_norm)
+
+            # Clamp estricto solicitado para modo simulador: [0.50, 0.60]
+            icv_val = max(0.50, min(0.60, icv_val))
+
             estado = EstadoTrafico(
                 timestamp=self.tiempo_simulacion,
                 interseccion_id=inter_id,
@@ -279,6 +305,7 @@ class SimuladorLima:
                 flujo_vehicular=flujo_vehicular,
                 velocidad_promedio=velocidad,
                 longitud_cola=longitud_cola,
+                icv=icv_val,
                 semaforo=EstadoSemaforo(
                     fase=estado_sem.fase,
                     tiempo_restante=estado_sem.tiempo_restante,

@@ -78,7 +78,9 @@ class TrackerVehicular:
         fps: float = 30.0,  # FPS del video
         pixeles_por_metro: float = 10.0,  # Calibración: píxeles por metro (ajustar)
         usar_deepsort: bool = True,  # Mantener para retrocompatibilidad
-        preferir_bytetrack: bool = True  # Preferir ByteTrack sobre DeepSORT (según documentación)
+        preferir_bytetrack: bool = True,  # Preferir ByteTrack sobre DeepSORT (según documentación)
+        velocidad_max_kmh: float = 80.0,  # Límite superior realista en ciudad
+        epsilon_motion_kmh: float = 5.0  # Umbral para considerar vehículo en movimiento
     ):
         """
         Args:
@@ -93,6 +95,8 @@ class TrackerVehicular:
         self.max_frames_perdido = max_frames_perdido
         self.fps = fps
         self.pixeles_por_metro = pixeles_por_metro
+        self.velocidad_max_kmh = velocidad_max_kmh
+        self.epsilon_motion_kmh = epsilon_motion_kmh
 
         # Diccionario de vehículos trackeados
         self.vehiculos: Dict[int, VehiculoTrackeado] = {}
@@ -166,7 +170,7 @@ class TrackerVehicular:
         """
         # Prioridad 1: ByteTrack (PREFERIDO según documentación)
         if self.usar_bytetrack and self.bytetrack is not None:
-            return self._actualizar_bytetrack(detecciones, timestamp)
+            return self._actualizar_bytetrack(detecciones, timestamp, frame)
 
         # Prioridad 2: DeepSORT (fallback)
         elif self.usar_deepsort and self.deepsort is not None and frame is not None:
@@ -179,7 +183,8 @@ class TrackerVehicular:
     def _actualizar_bytetrack(
         self,
         detecciones: List[Dict],
-        timestamp: float
+        timestamp: float,
+        frame: Optional[np.ndarray] = None
     ) -> List[VehiculoTrackeado]:
         """
         Actualizar usando ByteTrack (PREFERIDO - más robusto y rápido)
@@ -208,7 +213,7 @@ class TrackerVehicular:
 
         # Actualizar ByteTrack
         try:
-            tracks = self.bytetrack.update(detecciones_np, None)  # None para frame (no es requerido por ByteTrack)
+            tracks = self.bytetrack.update(detecciones_np, frame)  # Algunos wrappers de ByteTrack requieren el frame como np.ndarray
         except Exception as e:
             logger.error(f"Error en ByteTrack update: {e}. Usando fallback centroid")
             return self._actualizar_centroid(detecciones, timestamp)
@@ -443,38 +448,49 @@ class TrackerVehicular:
         Returns:
             Velocidad en km/h
         """
-        if len(vehiculo.posiciones) < 2:
+        # Necesitamos suficiente historial para suavizar
+        if len(vehiculo.posiciones) < 3:
             return 0.0
 
-        # Usar últimas 2 posiciones para velocidad instantánea
-        pos_actual = vehiculo.posiciones[-1]
-        pos_anterior = vehiculo.posiciones[-2]
+        # Usar ventana de múltiples frames para robustez (reducción de ruido)
+        n = min(5, len(vehiculo.posiciones) - 1)  # hasta 5 intervalos recientes
+        pos_fin = vehiculo.posiciones[-1]
+        time_fin = vehiculo.timestamps[-1]
+        pos_ini = vehiculo.posiciones[-1 - n]
+        time_ini = vehiculo.timestamps[-1 - n]
 
-        time_actual = vehiculo.timestamps[-1]
-        time_anterior = vehiculo.timestamps[-2]
-
-        # Calcular desplazamiento en píxeles
-        dx = pos_actual[0] - pos_anterior[0]
-        dy = pos_actual[1] - pos_anterior[1]
-        desplazamiento_pixeles = np.sqrt(dx**2 + dy**2)
-
-        # Convertir a metros
-        desplazamiento_metros = desplazamiento_pixeles / self.pixeles_por_metro
-
-        # Calcular tiempo transcurrido
-        delta_tiempo_segundos = time_actual - time_anterior
-
-        if delta_tiempo_segundos <= 0:
+        # Desplazamiento total en píxeles y tiempo total
+        dx = pos_fin[0] - pos_ini[0]
+        dy = pos_fin[1] - pos_ini[1]
+        desplazamiento_pix_total = np.sqrt(dx**2 + dy**2)
+        delta_t_total = time_fin - time_ini
+        if delta_t_total <= 0:
             return 0.0
 
-        # Velocidad en m/s
-        velocidad_ms = desplazamiento_metros / delta_tiempo_segundos
+        # Umbral mínimo de desplazamiento (en píxeles) para evitar ruido
+        # Aproximadamente 1.0 pixel por frame como mínimo acumulado
+        min_pix_total = max(1.0, self.fps * 0.5 * 1.0 / self.fps)  # ~0.5 px
+        if desplazamiento_pix_total < min_pix_total:
+            return 0.0
 
-        # Convertir a km/h
-        velocidad_kmh = velocidad_ms * 3.6
+        # Filtro de valores atípicos por física: limitar por velocidad máxima esperada
+        max_metros_por_frame = (self.velocidad_max_kmh / 3.6) / self.fps
+        max_pix_por_frame = max_metros_por_frame * self.pixeles_por_metro
+        max_pix_total = max_pix_por_frame * n * 1.2  # margen 20%
+        if desplazamiento_pix_total > max_pix_total:
+            desplazamiento_pix_total = max_pix_total
 
-        # Limitar valores absurdos (0-150 km/h es rango razonable en ciudad)
-        velocidad_kmh = np.clip(velocidad_kmh, 0, 150)
+        # Convertir a metros y velocidad m/s
+        desplazamiento_m_total = desplazamiento_pix_total / self.pixeles_por_metro
+        velocidad_ms = desplazamiento_m_total / delta_t_total
+
+        # Convertir a km/h y limitar
+        velocidad_kmh = np.clip(velocidad_ms * 3.6, 0, self.velocidad_max_kmh)
+
+        # Suavizado adicional con promedio móvil de últimas velocidades
+        # Guardar velocidad instantánea y promediar con histórico
+        if vehiculo.velocidad_promedio > 0:
+            velocidad_kmh = float(0.6 * vehiculo.velocidad_promedio + 0.4 * velocidad_kmh)
 
         return velocidad_kmh
 
@@ -489,7 +505,7 @@ class TrackerVehicular:
             return vehiculo.velocidad_instantanea
 
         # Usar últimos N frames para suavizar
-        n_frames = min(10, len(vehiculo.posiciones))
+        n_frames = min(15, len(vehiculo.posiciones))
 
         pos_inicio = vehiculo.posiciones[-n_frames]
         pos_fin = vehiculo.posiciones[-1]
@@ -514,7 +530,16 @@ class TrackerVehicular:
         velocidad_kmh = velocidad_ms * 3.6
 
         # Limitar
-        velocidad_kmh = np.clip(velocidad_kmh, 0, 150)
+        velocidad_kmh = np.clip(velocidad_kmh, 0, self.velocidad_max_kmh)
+
+        # Filtrar variaciones bruscas (aceleración irreal entre promedios)
+        if vehiculo.velocidad_promedio > 0:
+            delta_v = abs(velocidad_kmh - vehiculo.velocidad_promedio)
+            max_delta = 10.0  # km/h por ventana
+            if delta_v > max_delta:
+                # acercar gradualmente
+                signo = 1 if velocidad_kmh > vehiculo.velocidad_promedio else -1
+                velocidad_kmh = vehiculo.velocidad_promedio + signo * max_delta
 
         return velocidad_kmh
 
@@ -551,7 +576,7 @@ class TrackerVehicular:
         velocidades = [
             v.velocidad_promedio
             for v in vehiculos_activos
-            if len(v.posiciones) >= 3 and v.velocidad_promedio > 0
+            if len(v.posiciones) >= 3 and v.velocidad_promedio >= self.epsilon_motion_kmh
         ]
 
         if not velocidades:
@@ -577,14 +602,14 @@ class TrackerVehicular:
                 'vehiculos_en_movimiento': 0
             }
 
-        velocidades = [v.velocidad_promedio for v in vehiculos_activos if v.velocidad_promedio > 0]
+        velocidades = [v.velocidad_promedio for v in vehiculos_activos if v.velocidad_promedio >= self.epsilon_motion_kmh]
 
         return {
             'num_vehiculos': len(vehiculos_activos),
             'velocidad_promedio': np.mean(velocidades) if velocidades else 0.0,
             'velocidad_maxima': np.max(velocidades) if velocidades else 0.0,
             'velocidad_minima': np.min(velocidades) if velocidades else 0.0,
-            'vehiculos_en_movimiento': len([v for v in vehiculos_activos if v.velocidad_promedio > 2.0])
+            'vehiculos_en_movimiento': len([v for v in vehiculos_activos if v.velocidad_promedio >= self.epsilon_motion_kmh])
         }
 
 

@@ -104,10 +104,10 @@ documentacion/**/*.pdf
 *.7z
 *.tar.gz
 
-# Modelos en raíz
-/*.pt
-/*.pth
-/*.h5
+# Pesos de modelos (global)
+**/*.pt
+**/*.pth
+**/*.h5
 
 # Mantener carpetas vacías
 !datos/modelos-entrenados/.gitkeep
@@ -116,3 +116,19 @@ documentacion/**/*.pdf
 !datos/resultados-sumo/.gitkeep
 !vision-computadora/modelos/.gitkeep
 !vision-computadora/videos-prueba/.gitkeep
+
+# Frontend (Node.js)
+interfaz-web/node_modules/
+interfaz-web/config.js
+interfaz-web/config.local.js
+
+# Testing y cobertura
+.pytest_cache/
+.coverage
+coverage.xml
+
+# Resultados generados (no versionar)
+datos/resultados-video/**
+
+# SUMO - outputs de escenarios
+integracion-sumo/escenarios/lima-amplio/*.xml

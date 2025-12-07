@@ -258,7 +258,8 @@ class EstadoLocalInterseccion:
         Returns:
             Número de vehículos de emergencia detectados
         """
-        clases_emergencia = {'ambulancia', 'ambulance', 'bomberos', 'fire_truck', 'policia', 'police'}
+        # Requerimiento: considerar solo ambulancia y bomberos como emergencia
+        clases_emergencia = {'ambulancia', 'ambulance', 'bomberos', 'fire_truck'}
 
         count = 0
         for veh in vehiculos_detectados:
@@ -508,6 +509,92 @@ class EstadoLocalInterseccion:
         }
 
         return paquete
+
+    def actualizar_desde_tracks(self,
+                                tracks: List[Dict],
+                                pixeles_por_metro: float,
+                                cam_mask: Optional[int] = None,
+                                lineas_conteo: Optional[Dict[str, Tuple[int, int, int, int]]] = None,
+                                epsilon_velocidad_kmh: Optional[float] = None):
+        """
+        Adapta vehículos trackeados (ByteTrack/DeepSORT) al estado local.
+
+        tracks: Lista de dicts con claves: id, clase, bbox [x1,y1,x2,y2], centroide (px),
+                velocidad_promedio (km/h), velocidad_xy (px/s opcional)
+        pixeles_por_metro: calibración para convertir posiciones a metros
+        cam_mask: si se provee, actualiza la orientación de cámara antes de computar métricas
+        lineas_conteo: opcional, dict por dirección con líneas virtuales para flujo q
+        epsilon_velocidad_kmh: opcional, sobreescribe umbral de movimiento
+
+        Heurística de dirección por movimiento:
+        - Dominancia eje Y → NS; signo dy<0=N, dy>0=S
+        - Dominancia eje X → EO; signo dx>0=E, dx<0=O
+        Si no hay velocidad_xy, inferir con historial de centroides si disponible.
+        """
+        if cam_mask is not None:
+            self.actualizar_cam_mask(cam_mask)
+
+        # Preparar contenedores por dirección
+        vehiculos_por_direccion: Dict[str, List[Dict]] = {d: [] for d in self.direcciones}
+        cruces_por_direccion: Dict[str, int] = {d: 0 for d in self.direcciones}
+
+        eps = epsilon_velocidad_kmh if epsilon_velocidad_kmh is not None else self.params.EPSILON_VELOCIDAD
+
+        for t in tracks:
+            cx_px, cy_px = t.get('centroide', (None, None))
+            if cx_px is None:
+                # Centroide desde bbox
+                x1, y1, x2, y2 = t.get('bbox', [0, 0, 0, 0])
+                cx_px, cy_px = (x1 + x2) / 2.0, (y1 + y2) / 2.0
+
+            # Convertir a metros (origen relativo a centroide_interseccion si disponible)
+            cx_m = (cx_px - self.params.CENTROIDE_X) / pixeles_por_metro
+            cy_m = (cy_px - self.params.CENTROIDE_Y) / pixeles_por_metro
+
+            # Velocidad promedio y componentes
+            v_kmh = float(t.get('velocidad_promedio', t.get('velocidad', 0.0) or 0.0))
+            vx_px_s, vy_px_s = t.get('velocidad_xy', (0.0, 0.0))
+
+            # Inferir dirección dominante
+            dir_grupo = None
+            dir_fina = None
+            if abs(vy_px_s) >= abs(vx_px_s):
+                dir_grupo = 'NS'
+                dir_fina = 'N' if vy_px_s < 0 else 'S'
+            else:
+                dir_grupo = 'EO'
+                dir_fina = 'E' if vx_px_s > 0 else 'O'
+
+            # Construir entrada de vehículo
+            veh = {
+                'id': t.get('id', -1),
+                'velocidad': v_kmh,
+                'clase': t.get('clase', 'car'),
+                'confidence': t.get('confianza', 0.0),
+                'pos_x': cx_m,
+                'pos_y': cy_m,
+                'vel_x': (vx_px_s / pixeles_por_metro) if vx_px_s is not None else 0.0,
+                'vel_y': (vy_px_s / pixeles_por_metro) if vy_px_s is not None else 0.0
+            }
+
+            # Agregar solo si dirección está visible según cam_mask
+            if self.cam_mask == 0 and dir_grupo == 'EO' and dir_fina in ['E', 'O']:
+                vehiculos_por_direccion[dir_fina].append(veh)
+            elif self.cam_mask == 1 and dir_grupo == 'NS' and dir_fina in ['N', 'S']:
+                vehiculos_por_direccion[dir_fina].append(veh)
+
+            # Flujo por línea virtual (opcional)
+            if lineas_conteo and dir_fina in lineas_conteo:
+                x1, y1, x2, y2 = lineas_conteo[dir_fina]
+                # Conteo simple: si el centroide cruza el segmento (proyección)
+                # Aquí usar una regla básica (ej.: cruce de umbral en y para N/S y x para E/O)
+                if dir_fina in ['N', 'S'] and ((dir_fina == 'N' and cy_px <= y1) or (dir_fina == 'S' and cy_px >= y2)):
+                    cruces_por_direccion[dir_fina] += 1
+                if dir_fina in ['E', 'O'] and ((dir_fina == 'E' and cx_px >= x2) or (dir_fina == 'O' and cx_px <= x1)):
+                    cruces_por_direccion[dir_fina] += 1
+
+        # Actualizar estado completo
+        self.actualizar_estado(vehiculos_por_direccion, cruces_por_direccion)
 
     def obtener_resumen_legible(self) -> str:
         """

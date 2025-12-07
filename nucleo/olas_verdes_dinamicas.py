@@ -102,6 +102,77 @@ class CoordinadorOlasVerdes:
     def __init__(self, grafo: GrafoIntersecciones):
         self.grafo = grafo
         self.olas_activas: Dict[str, Dict] = {}  # vehicle_id -> info de ola
+        self.optimizador = None  # Se inicializa bajo demanda
+
+    def _inicializar_optimizador(self):
+        """Inicializa el optimizador de rutas si no existe"""
+        if self.optimizador is None:
+            from routing_optimizer import OptimizadorRutas
+            
+            # Convertir intersecciones del grafo al formato del optimizador
+            intersecciones = [
+                {
+                    'id': inter.id,
+                    'nombre': inter.nombre,
+                    'latitud': inter.latitud,
+                    'longitud': inter.longitud
+                }
+                for inter in self.grafo.intersecciones.values()
+            ]
+            
+            self.optimizador = OptimizadorRutas(intersecciones)
+            logger.info("Optimizador de rutas inicializado")
+
+    def calcular_ruta_optima_directa(
+        self,
+        origen: str,
+        destino: str,
+        tolerancia_metros: float = 150,
+        max_intersecciones: int = 8
+    ) -> Optional[List[str]]:
+        """
+        Calcula la ruta más corta directa usando el optimizador geográfico.
+        
+        Este método NO está limitado al grafo de conexiones.
+        Traza una línea directa del origen al destino e identifica solo
+        las intersecciones críticas que están en ese camino.
+        
+        **RECOMENDADO para vehículos de emergencia** - rutas más cortas y rápidas.
+        
+        Args:
+            origen: ID de intersección origen
+            destino: ID de intersección destino
+            tolerancia_metros: Cuán cerca debe estar una intersección de la línea directa
+            max_intersecciones: Máximo número de intersecciones intermedias
+        
+        Returns:
+            Lista de IDs de intersecciones en la ruta, o None si hay error
+        """
+        try:
+            self._inicializar_optimizador()
+            
+            resultado = self.optimizador.calcular_ruta_directa_optimizada(
+                origen,
+                destino,
+                tolerancia_metros=tolerancia_metros,
+                max_intersecciones=max_intersecciones
+            )
+            
+            if resultado['exito']:
+                logger.info(
+                    f"Ruta directa optimizada: {origen} → {destino} | "
+                    f"Intersecciones: {resultado['num_intersecciones']} | "
+                    f"Distancia: {resultado['distancia_total']:.0f}m | "
+                    f"Factor detour: {resultado['factor_detour']:.2f}x"
+                )
+                return resultado['ruta']
+            else:
+                logger.warning(f"No se pudo calcular ruta directa entre {origen} y {destino}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error calculando ruta directa: {e}")
+            return None
 
     def calcular_ruta_optima(
         self,
@@ -109,7 +180,11 @@ class CoordinadorOlasVerdes:
         destino: str
     ) -> Optional[List[str]]:
         """
-        Calcula la ruta óptima usando A*
+        Calcula la ruta óptima usando A* (basado en el grafo de conexiones)
+        
+        **NOTA**: Este método está limitado a las conexiones explícitas del grafo.
+        Para vehículos de emergencia, se recomienda usar `calcular_ruta_optima_directa()`
+        que calcula el camino más corto sin restricciones del grafo.
 
         Args:
             origen: ID de intersección origen
@@ -159,23 +234,36 @@ class CoordinadorOlasVerdes:
 
     def activar_ola_verde(
         self,
-        vehiculo: VehiculoEmergencia
+        vehiculo: VehiculoEmergencia,
+        usar_ruta_directa: bool = True
     ) -> Dict:
         """
         Activa una ola verde para un vehículo de emergencia
 
         Args:
             vehiculo: Información del vehículo de emergencia
+            usar_ruta_directa: Si True, usa ruta directa optimizada (recomendado).
+                              Si False, usa ruta basada en grafo de conexiones.
 
         Returns:
             Dict con información de la ola verde activada
         """
 
         # 1. Calcular ruta óptima
-        ruta = self.calcular_ruta_optima(
-            vehiculo.interseccion_actual,
-            vehiculo.destino
-        )
+        if usar_ruta_directa:
+            logger.info(f"Calculando ruta directa optimizada para {vehiculo.tipo} {vehiculo.id}")
+            ruta = self.calcular_ruta_optima_directa(
+                vehiculo.interseccion_actual,
+                vehiculo.destino,
+                tolerancia_metros=150,  # Intersecciones dentro de 150m de la línea directa
+                max_intersecciones=8    # Máximo 8 intersecciones intermedias
+            )
+        else:
+            logger.info(f"Calculando ruta basada en grafo para {vehiculo.tipo} {vehiculo.id}")
+            ruta = self.calcular_ruta_optima(
+                vehiculo.interseccion_actual,
+                vehiculo.destino
+            )
 
         if ruta is None:
             logger.error(f"No se pudo calcular ruta para vehículo {vehiculo.id}")
@@ -211,9 +299,22 @@ class CoordinadorOlasVerdes:
 
         self.olas_activas[vehiculo.id] = ola_info
 
+        # Calcular distancia total (considerando que pueden no estar todas las conexiones en el grafo)
+        distancia_total = 0.0
+        for i in range(len(ruta) - 1):
+            origen_id = ruta[i]
+            destino_id = ruta[i + 1]
+            
+            # Intentar obtener distancia del grafo
+            if destino_id in self.grafo.intersecciones[origen_id].distancia_vecinos:
+                distancia_total += self.grafo.intersecciones[origen_id].distancia_vecinos[destino_id]
+            else:
+                # Si no existe en el grafo, calcular distancia euclidiana
+                distancia_total += self.grafo.calcular_distancia_euclidiana(origen_id, destino_id)
+        
         logger.info(
             f"Ola verde activada para {vehiculo.tipo} {vehiculo.id}. "
-            f"Ruta: {' → '.join(ruta)}"
+            f"Ruta: {' → '.join(ruta)} | Distancia: {distancia_total:.0f}m"
         )
 
         return {
@@ -221,8 +322,7 @@ class CoordinadorOlasVerdes:
             'vehiculo_id': vehiculo.id,
             'ruta': ruta,
             'num_intersecciones': len(ruta),
-            'distancia_total': sum([self.grafo.intersecciones[ruta[i]].distancia_vecinos[ruta[i+1]]
-                                   for i in range(len(ruta)-1)]),
+            'distancia_total': distancia_total,
             'tiempo_estimado': etas[-1],
             'comandos': comandos
         }
@@ -249,8 +349,11 @@ class CoordinadorOlasVerdes:
             actual = ruta[i]
             siguiente = ruta[i + 1]
 
-            # Obtener distancia
-            distancia_m = self.grafo.intersecciones[actual].distancia_vecinos[siguiente]
+            # Obtener distancia (del grafo si existe, sino euclidiana)
+            if siguiente in self.grafo.intersecciones[actual].distancia_vecinos:
+                distancia_m = self.grafo.intersecciones[actual].distancia_vecinos[siguiente]
+            else:
+                distancia_m = self.grafo.calcular_distancia_euclidiana(actual, siguiente)
 
             # Calcular tiempo (distancia / velocidad)
             velocidad_ms = velocidad_kmh / 3.6

@@ -29,7 +29,7 @@ class MetricaTrafico(Base):
     longitud_cola = Column(Float, nullable=False)  # metros
     densidad = Column(Float, nullable=True)  # veh/m
 
-    # Métricas adicionales del Capítulo 6
+    # Métricas adicionales avanzadas
     stopped_count = Column(Integer, nullable=True)  # Vehículos detenidos
     parametro_intensidad = Column(Float, nullable=True)  # PI
 

@@ -224,6 +224,17 @@ def procesar_video_con_visualizacion(
             print(f"  Frames a procesar: {frames_procesar} (saltando {saltar_frames-1} de cada {saltar_frames})")
         print(f"  Duración: {procesador.total_frames/procesador.fps:.1f} segundos")
 
+        # Determinar si saltar los primeros 30 segundos (videos 1 y 3)
+        # NOTA: En modo 3 (emergencias) NO se salta para detectar desde el inicio
+        nombre_video = Path(ruta_video).stem.lower()
+        segundos_saltar = 0
+        if modo != 3 and ('video1' in nombre_video or 'video3' in nombre_video or 'video_1' in nombre_video or 'video_3' in nombre_video):
+            segundos_saltar = 30
+            frame_inicio = int(segundos_saltar * procesador.fps)
+            print(f"\n  ⏩ Saltando primeros {segundos_saltar} segundos (frame {frame_inicio}) - Video estabilizándose")
+        else:
+            frame_inicio = 0
+
         # Configurar VideoWriter si se va a guardar
         video_writer = None
         ruta_video_procesado = None
@@ -250,7 +261,8 @@ def procesar_video_con_visualizacion(
         if not reproducir_despues:
             nombre_ventana = 'Procesamiento de Video - Presiona Q para salir, P para pausar'
             cv2.namedWindow(nombre_ventana, cv2.WINDOW_NORMAL)
-            cv2.resizeWindow(nombre_ventana, 1280, 720)
+            # Ajustar tamaño de ventana al tamaño del video para evitar recortes/zoom
+            cv2.resizeWindow(nombre_ventana, max(320, ancho_final), max(240, alto_final))
 
         print("\n" + "="*70)
         if reproducir_despues:
@@ -271,8 +283,12 @@ def procesar_video_con_visualizacion(
         pausado = False
         key = 0xFF  # Inicializar key
 
-        # Reiniciar video
-        procesador.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        # Reiniciar video y saltar frames iniciales si es necesario
+        if segundos_saltar > 0:
+            procesador.video.set(cv2.CAP_PROP_POS_FRAMES, frame_inicio)
+            frame_count = frame_inicio
+        else:
+            procesador.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
         while True:
             if not pausado:
@@ -296,24 +312,53 @@ def procesar_video_con_visualizacion(
                 # Dibujar según el modo seleccionado
                 frame_anotado = frame.copy()
 
+                # Importar overlay moderno
+                try:
+                    from vision_computadora.overlay_visual_mejorado import OverlayVisualModerno, convertir_resultado_a_dict
+
+                    if not hasattr(procesador, '_overlay_moderno'):
+                        procesador._overlay_moderno = OverlayVisualModerno()
+
+                    resultado_dict = convertir_resultado_a_dict(resultado)
+
+                except ImportError:
+                    procesador._overlay_moderno = None
+
                 if modo == 1:
-                    # MODO 1: Solo detección básica
-                    frame_anotado = procesador.dibujar_detecciones(
-                        frame,
-                        resultado,
-                        mostrar_info=False  # Solo bounding boxes
-                    )
-                    # Añadir contador simple
-                    cv2.putText(frame_anotado, f"Vehiculos: {resultado.num_vehiculos}",
-                               (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+                    # MODO 1: Solo detección básica con overlay bonito
+                    if hasattr(procesador, '_overlay_moderno') and procesador._overlay_moderno:
+                        # Usar overlay moderno
+                        frame_anotado = procesador._overlay_moderno.crear_visualizacion_completa(
+                            frame,
+                            resultado_dict,
+                            mostrar_barra=True
+                        )
+                    else:
+                        # Fallback: método antiguo
+                        frame_anotado = procesador.dibujar_detecciones(
+                            frame,
+                            resultado,
+                            mostrar_info=False
+                        )
+                        cv2.putText(frame_anotado, f"Vehiculos: {resultado.num_vehiculos}",
+                                   (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
 
                 elif modo == 2:
-                    # MODO 2: Análisis completo (sin emergencias)
-                    frame_anotado = procesador.dibujar_detecciones(
-                        frame,
-                        resultado,
-                        mostrar_info=True  # Todas las métricas
-                    )
+                    # MODO 2: Análisis completo con overlay bonito
+                    if hasattr(procesador, '_overlay_moderno') and procesador._overlay_moderno:
+                        # Usar overlay moderno
+                        frame_anotado = procesador._overlay_moderno.crear_visualizacion_completa(
+                            frame,
+                            resultado_dict,
+                            mostrar_barra=True
+                        )
+                    else:
+                        # Fallback: método antiguo
+                        frame_anotado = procesador.dibujar_detecciones(
+                            frame,
+                            resultado,
+                            mostrar_info=True
+                        )
 
                 elif modo == 3:
                     # MODO 3: Enfoque en emergencias
@@ -334,6 +379,17 @@ def procesar_video_con_visualizacion(
                         cv2.putText(frame_anotado, "EMERGENCIA DETECTADA",
                                    (w//2 - 200, 50), cv2.FONT_HERSHEY_SIMPLEX,
                                    1.5, (0, 0, 255), 3)
+
+                        # Mostrar tipos detectados (AMBULANCIA/BOMBEROS) bajo la alerta
+                        try:
+                            tipos = list({det.tipo.upper() for det in resultado.detecciones_emergencia})
+                            tipos_texto = ", ".join(tipos) if tipos else ""
+                            if tipos_texto:
+                                cv2.putText(frame_anotado, f"TIPOS: {tipos_texto}",
+                                           (w//2 - 200, 85), cv2.FONT_HERSHEY_SIMPLEX,
+                                           1.0, (0, 0, 255), 2)
+                        except Exception:
+                            pass
                     else:
                         cv2.putText(frame_anotado, "Sin emergencias",
                                    (20, 40), cv2.FONT_HERSHEY_SIMPLEX,

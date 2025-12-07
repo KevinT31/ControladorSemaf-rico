@@ -63,8 +63,8 @@ class EmergenciaService:
             timestamp=datetime.now()
         )
 
-        # Activar ola verde
-        resultado = coordinador.activar_ola_verde(vehiculo)
+        # Activar ola verde con ruta directa optimizada (usa el camino más corto posible)
+        resultado = coordinador.activar_ola_verde(vehiculo, usar_ruta_directa=True)
 
         # Guardar en estado global
         estado_sistema.olas_verdes_activas[vehiculo_id] = {
@@ -167,6 +167,56 @@ class EmergenciaService:
             return EmergenciaService.obtener_activas()[:limite]
         finally:
             db.close()
+
+    @staticmethod
+    def estimar_destinos(origen: str, destinos: List[str]) -> List[Dict]:
+        """
+        Estima tiempo/distancia para varios destinos sin activar la ola verde.
+
+        Args:
+            origen: ID de intersección origen
+            destinos: lista de IDs de intersección destino
+
+        Returns:
+            Lista de dicts: { destino: id, tiempo_estimado: segundos, distancia: metros }
+        """
+        coordinador = estado_sistema.coordinador_olas_verdes
+        if not coordinador:
+            raise ValueError("Coordinador de olas verdes no inicializado")
+
+        resultados = []
+        for dest in destinos:
+            try:
+                # Usar ruta directa optimizada para estimaciones
+                ruta = coordinador.calcular_ruta_optima_directa(origen, dest)
+                if not ruta:
+                    continue
+
+                # Calcular etas usando la velocidad por defecto (50 km/h)
+                etas = coordinador._calcular_etas(ruta, 50.0)
+
+                # Calcular distancia total considerando que pueden no estar en el grafo
+                distancia_total = 0.0
+                for i in range(len(ruta) - 1):
+                    o = ruta[i]
+                    d = ruta[i + 1]
+                    # Intentar obtener del grafo, sino calcular euclidiana
+                    if d in coordinador.grafo.intersecciones[o].distancia_vecinos:
+                        distancia_total += coordinador.grafo.intersecciones[o].distancia_vecinos[d]
+                    else:
+                        distancia_total += coordinador.grafo.calcular_distancia_euclidiana(o, d)
+
+                resultados.append({
+                    'destino': dest,
+                    'ruta': ruta,
+                    'distancia_metros': distancia_total,
+                    'tiempo_estimado': etas[-1] if etas else 0
+                })
+            except Exception as e:
+                logger.debug(f"Error estimando destino {dest}: {e}")
+                continue
+
+        return resultados
 
     @staticmethod
     def calcular_estadisticas() -> Dict:

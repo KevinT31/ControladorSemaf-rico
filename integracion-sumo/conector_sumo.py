@@ -205,11 +205,34 @@ class ConectorSUMO:
 
         estados = []
 
+        # Perfil horario: picos 9:00, 13:00, 18-20:00
+        try:
+            from datetime import datetime
+            hora = datetime.now().hour
+        except Exception:
+            hora = 12
+
+        def perfil_hora(h: int) -> float:
+            # Multiplicador de flujo/ocupación (0.7–1.3)
+            if h == 9:
+                return 1.3
+            if h == 13:
+                return 1.2
+            if 18 <= h <= 20:
+                return 1.25
+            if 7 <= h <= 8 or 12 <= h <= 14 or 17 <= h <= 21:
+                return 1.1
+            if 0 <= h <= 5:
+                return 0.75
+            return 0.9
+
+        mult_hora = perfil_hora(hora)
+
         try:
             # Obtener todos los edges
             edge_ids = traci.edge.getIDList()
 
-            for edge_id in edge_ids[:limite]:
+            for idx, edge_id in enumerate(edge_ids[:limite]):
                 # Filtrar edges internos
                 if edge_id.startswith(':'):
                     continue
@@ -220,21 +243,45 @@ class ConectorSUMO:
                     velocidad_promedio = traci.edge.getLastStepMeanSpeed(edge_id)  # m/s
                     ocupacion = traci.edge.getLastStepOccupancy(edge_id)  # %
 
-                    # Calcular nivel de congestión (0-1)
-                    # Basado en velocidad y ocupación
-                    vel_max = 13.89  # ~50 km/h típico urbano
-                    ratio_velocidad = velocidad_promedio / vel_max if vel_max > 0 else 1.0
-                    ratio_ocupacion = ocupacion / 100.0
+                    # Ajustar ocupación y flujo con perfil horario
+                    ocupacion_aj = min(100.0, ocupacion * mult_hora)
 
-                    # Congestión: alta ocupación + baja velocidad = congestión alta
-                    congestion = (1.0 - ratio_velocidad) * 0.6 + ratio_ocupacion * 0.4
+                    # Estimar flujo relativo (veh/min) según paso de simulación
+                    paso_sim_s = max(1.0, traci.simulation.getDeltaT() / 1000.0)
+                    flujo_rel = (num_vehiculos / paso_sim_s) * 60.0  # veh/min
+                    # Normalizar flujo por capacidad simple (veh/min); supongamos 30 como saturación base
+                    flujo_norm = min(1.0, (flujo_rel * mult_hora) / 30.0)
+
+                    # Calcular nivel de congestión (0-1) con no linealidades suaves
+                    vel_max = 13.89  # ~50 km/h típico urbano
+                    ratio_velocidad = max(0.0, min(1.0, velocidad_promedio / vel_max))
+                    ratio_ocupacion = max(0.0, min(1.0, ocupacion_aj / 100.0))
+
+                    # Ocupación con realce cerca de 0.6–0.8
+                    import math
+                    ocup_boost = 1.0 / (1.0 + math.exp(-10 * (ratio_ocupacion - 0.65)))  # sigmoide
+                    ocup_term = 0.5 * ratio_ocupacion + 0.5 * ocup_boost
+
+                    # Velocidad penaliza más cuando ya hay ocupación
+                    vel_term = (1.0 - ratio_velocidad) * (0.4 + 0.4 * ratio_ocupacion)
+
+                    # Flujo aporta presión adicional
+                    flujo_term = 0.35 * flujo_norm
+
+                    congestion = ocup_term * 0.45 + vel_term * 0.35 + flujo_term
+
+                    # Variabilidad espacial no uniforme: solo en ~30% de edges aplicar un pequeño jitter
+                    if (idx % 10) in (1, 4, 7):
+                        jitter = ((idx % 7) - 3) * 0.02  # ±6%
+                        congestion = congestion * (1.0 + jitter)
+
                     congestion = min(max(congestion, 0.0), 1.0)
 
                     estados.append({
                         'id': edge_id,
                         'vehiculos': num_vehiculos,
                         'velocidad': round(velocidad_promedio * 3.6, 1),  # km/h
-                        'ocupacion': round(ocupacion, 1),
+                        'ocupacion': round(ocupacion_aj, 1),
                         'congestion': round(congestion, 2)
                     })
                 except:

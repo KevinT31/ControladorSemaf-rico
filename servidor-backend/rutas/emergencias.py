@@ -35,9 +35,35 @@ async def activar_ola_verde(request: VehiculoEmergenciaRequest):
         resultado = await EmergenciaService.activar_ola_verde(request)
         return resultado
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        msg = str(e)
+        # Si el coordinador no está inicializado, esto es un error de servidor
+        if 'Coordinador' in msg or 'coordinador' in msg:
+            raise HTTPException(status_code=500, detail=msg)
+        raise HTTPException(status_code=400, detail=msg)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error activando ola verde: {str(e)}")
+
+
+@router.post("/estimar")
+async def estimar_destinos(request: dict):
+    """
+    Estima tiempo/distancia para varios destinos sin activar la ola verde.
+
+    Request JSON esperado: { "origen": "INT-001", "destinos": ["INT-007","INT-010"] }
+    """
+    try:
+        origen = request.get('origen')
+        destinos = request.get('destinos', [])
+        from servicios.emergencia_service import EmergenciaService
+        resultados = EmergenciaService.estimar_destinos(origen, destinos)
+        return resultados
+    except ValueError as e:
+        msg = str(e)
+        if 'Coordinador' in msg or 'coordinador' in msg:
+            raise HTTPException(status_code=500, detail=msg)
+        raise HTTPException(status_code=400, detail=msg)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error estimando destinos: {str(e)}")
 
 
 @router.post("/desactivar/{vehiculo_id}", response_model=MensajeResponse)
