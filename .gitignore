@@ -132,3 +132,6 @@ datos/resultados-video/**
 
 # SUMO - outputs de escenarios
 integracion-sumo/escenarios/lima-amplio/*.xml
+ 
+# Excluir cualquier rastro local de herramientas externas
+.claude/
