@@ -18,6 +18,8 @@ const estado = {
     backendConectado: false,  // Flag para saber si el backend está enviando datos
     intersecciones: [],
     olaVerdeActiva: null,
+    timeoutOlaVerde: null,  // Timeout para desactivación automática
+    marcadoresOlaVerde: [],  // Marcadores de la ola verde
     chartICV: null,
     chartFlujo: null,
     estadisticas: {
@@ -25,11 +27,16 @@ const estado = {
         contadorActualizaciones: 0,
         tiempoInicio: Date.now()
     },
+    // Establecer modo por defecto para evitar que quede vacío y no arranque
     modoActual: 'simulador',
     simulacionInterval: null,
     actualizacionTraficoInterval: null,
     capaTrafico: null,  // Layer group para calles con tráfico
-    datosTrafico: {}  // Datos de tráfico por conexión
+    datosTrafico: {},  // Datos de tráfico por conexión
+    mostrarSUMOTrafico: false // Control para ocultar visualización de tráfico SUMO
+    ,metricasSUMOResumen: null  // Resumen global de SUMO para sesgo en simulador
+    ,__proxSUMOCache: {} // cache de proximidad por intersección
+    ,__hudSUMO: null // control HUD con totales
 };
 
 // ==================== INICIALIZACIÓN ====================
@@ -39,10 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         // Verificar dependencias críticas
-        console.log('%cVerificando dependencias...', 'color: #3b82f6;');
         const dependencias = {
             'Chart.js': typeof Chart !== 'undefined',
-            'Leaflet': typeof L !== 'undefined',
             'Particles': typeof particlesJS !== 'undefined',
             'INTERSECCIONES_LIMA': typeof INTERSECCIONES_LIMA !== 'undefined',
             'ZONAS_LIMA': typeof ZONAS_LIMA !== 'undefined'
@@ -52,18 +57,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!cargado) {
                 console.error(`❌ ${nombre} NO CARGADO`);
             } else {
-                console.log(`✓ ${nombre} cargado correctamente`);
             }
         });
 
-        // Inicializar componentes
-        console.log('Iniciando partículas...');
-        inicializarParticulas();
-
         console.log('Iniciando mapa...');
         inicializarMapa();
-
-        console.log('Iniciando gráficos...');
         inicializarGraficos();
 
         console.log('Cargando intersecciones...');
@@ -75,14 +73,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Conectando WebSocket...');
         conectarWebSocket();  // CRITICO: Conectar WebSocket para recibir actualizaciones
 
-        // NO iniciar simulación local automáticamente
-        // Solo se iniciará como fallback si el WebSocket no conecta en 5 segundos
-        setTimeout(() => {
-            if (!estado.backendConectado && estado.modoActual === 'simulador') {
-                console.warn('⚠️ Backend no responde, usando simulación local como fallback');
-                iniciarSimulacion();
-            }
-        }, 5000);
+        // Importante: NO iniciar simulación local automáticamente.
+        // La simulación solo debe correr cuando el usuario elija modo 'simulador'.
+
+        // DEMO RÁPIDA: iniciar simulación local inmediata en modo simulador
+        // para asegurar que "prenda" incluso sin backend.
+        estado.modoActual = 'simulador';
+        iniciarSimulacion();
 
         console.log('%c✓ Sistema inicializado correctamente', 'color: #10b981; font-weight: bold;');
     } catch (error) {
@@ -164,6 +161,9 @@ function inicializarMapa() {
         maxZoom: 19
     }).addTo(estado.mapa);
 
+    // Configurar modo de obtener coordenadas
+    setupMapClickForCoords();
+
     console.log('Mapa inicializado');
 }
 
@@ -173,8 +173,8 @@ function agregarMarcadorInterseccion(interseccion) {
     // Marcador con etiqueta de ID
     const icono = L.divIcon({
         html: `<div class="marcador-container">
-                   <div class="marcador-semaforo" data-zona="${interseccion.zona}">
-                       <div class="semaforo-luz luz-activa"></div>
+                   <div class="marcador-semaforo" data-zona="${interseccion.zona}" data-interseccion="${interseccion.id}">
+                       <div class="semaforo-luz luz-activa" id="luz-${interseccion.id}"></div>
                    </div>
                    <div class="marcador-label">${interseccion.id}</div>
                </div>`,
@@ -215,44 +215,163 @@ function agregarMarcadorInterseccion(interseccion) {
     `);
 
     estado.marcadores[interseccion.id] = marcador;
+    // Log para debugging
+    if (interseccion.id.includes('LV-') || interseccion.id.includes('SJL-')) {
+        console.log(`✓ Marcador creado para ${interseccion.id}`);
+    }
 }
 
-function dibujarConexiones() {
+async function dibujarConexiones() {
     // Limpiar líneas existentes
     estado.lineas.forEach(linea => estado.mapa.removeLayer(linea));
     estado.lineas = [];
 
-    CONEXIONES_PRINCIPALES.forEach(conexion => {
+    console.log(`📍 Dibujando ${CONEXIONES_PRINCIPALES.length} conexiones...`);
+
+    // Procesar conexiones en serie (para mejor control y caché)
+    for (const conexion of CONEXIONES_PRINCIPALES) {
         const origen = INTERSECCIONES_LIMA.find(i => i.id === conexion.origen);
         const destino = INTERSECCIONES_LIMA.find(i => i.id === conexion.destino);
 
-        if (origen && destino) {
-            const linea = L.polyline(
-                [[origen.latitud, origen.longitud], [destino.latitud, destino.longitud]],
-                {
-                    color: '#4a5568',
-                    weight: 2,
-                    opacity: 0.4,
-                    dashArray: '5, 10'
-                }
-            ).addTo(estado.mapa);
+        if (!origen || !destino) {
+            console.warn(`No se encontró origen o destino para: ${conexion.origen} -> ${conexion.destino}`);
+            continue;
+        }
 
-            linea.bindTooltip(conexion.via, {
+        // Intentar obtener ruta real usando Mapbox
+        const inicioCoords = [origen.latitud, origen.longitud];
+        const finCoords = [destino.latitud, destino.longitud];
+
+        let coordenadasRuta;
+
+        try {
+            const ruta = await obtenerRutaMapbox(inicioCoords, finCoords, 'driving');
+
+            if (ruta && ruta.geometry && ruta.geometry.coordinates) {
+                // Convertir de [lng, lat] (GeoJSON) a [lat, lng] (Leaflet)
+                coordenadasRuta = ruta.geometry.coordinates.map(
+                    coord => [coord[1], coord[0]]
+                );
+            } else {
+                // Fallback: línea recta si falla Mapbox
+                coordenadasRuta = [inicioCoords, finCoords];
+            }
+        } catch (error) {
+            // En caso de error, usar línea recta
+            console.warn(`Error obteniendo ruta para ${conexion.via}, usando línea recta`);
+            coordenadasRuta = [inicioCoords, finCoords];
+        }
+
+        // Dibujar la conexión con estilo sólido
+        const linea = L.polyline(coordenadasRuta, {
+            color: '#6b7280',  // Color gris por defecto
+            weight: 4.5,  // Línea grosor medio entre 3 y 6
+            opacity: 0.7,
+            lineCap: 'round',
+            lineJoin: 'round'
+            // SIN dashArray - línea sólida
+        }).addTo(estado.mapa);
+
+        // Tooltip mejorado con velocidad promedio
+        linea.bindTooltip(
+            `<strong>${conexion.via}</strong><br>` +
+            `<small>Estado: cargando...</small><br>` +
+            `<small>ICV: 0.00</small><br>` +
+            `<small>Velocidad: 0 km/h</small>`,
+            {
                 permanent: false,
                 direction: 'center',
                 className: 'tooltip-ruta'
-            });
+            }
+        );
 
-            estado.lineas.push(linea);
+        // Almacenar información de la conexión para actualizaciones posteriores
+        estado.lineas.push(linea);
+        
+        // Guardar referencia de conexión con datos
+        if (!estado.conexionesMap) {
+            estado.conexionesMap = {};
         }
+        
+        const conexionKey = `${conexion.origen}-${conexion.destino}`;
+        estado.conexionesMap[conexionKey] = {
+            layer: linea,
+            origen: conexion.origen,
+            destino: conexion.destino,
+            via: conexion.via,
+            coordenadas: coordenadasRuta
+        };
+    }
+
+    console.log(`✅ ${estado.lineas.length} conexiones dibujadas`);
+}
+
+/**
+ * Actualiza colores y tooltips de las líneas de conexión según ICV
+ * @param {Array} metricas - Array con métricas de intersecciones
+ */
+function actualizarColoresConexionesSegunICV(metricas) {
+    if (!estado.conexionesMap || Object.keys(estado.conexionesMap).length === 0) {
+        return;
+    }
+
+    // Crear mapa de ICV y velocidad por intersección
+    const icvPorInterseccion = {};
+    const velocidadPorInterseccion = {};
+    
+    metricas.forEach(metrica => {
+        icvPorInterseccion[metrica.interseccion_id] = metrica.icv;
+        velocidadPorInterseccion[metrica.interseccion_id] = metrica.velocidad || 0;
     });
 
-    console.log(`${estado.lineas.length} conexiones dibujadas`);
+    // Actualizar cada conexión
+    Object.values(estado.conexionesMap).forEach(conexion => {
+        const icvOrigen = icvPorInterseccion[conexion.origen] || 0;
+        const icvDestino = icvPorInterseccion[conexion.destino] || 0;
+        const velocidadOrigen = velocidadPorInterseccion[conexion.origen] || 0;
+        const velocidadDestino = velocidadPorInterseccion[conexion.destino] || 0;
+
+        // Promedios
+        const icvPromedio = (icvOrigen + icvDestino) / 2;
+        const velocidadPromedio = (velocidadOrigen + velocidadDestino) / 2;
+
+        // Determinar color según ICV
+        let color, clasificacion;
+        if (icvPromedio < 0.3) {
+            color = '#10b981'; // Verde - Fluido
+            clasificacion = 'Fluido';
+        } else if (icvPromedio < 0.6) {
+            color = '#f59e0b'; // Amarillo - Moderado
+            clasificacion = 'Moderado';
+        } else {
+            color = '#ef4444'; // Rojo - Congestionado
+            clasificacion = 'Congestionado';
+        }
+
+        // Actualizar estilo de la línea
+        conexion.layer.setStyle({
+            color: color,
+            opacity: 0.7
+        });
+
+        // Actualizar tooltip con ICV y velocidad promedio
+        conexion.layer.setTooltipContent(
+            `<strong>${conexion.via}</strong><br>` +
+            `<small>Estado: ${clasificacion}</small><br>` +
+            `<small>ICV: ${icvPromedio.toFixed(2)}</small><br>` +
+            `<small>Velocidad: ${Math.round(velocidadPromedio)} km/h</small>`
+        );
+    });
 }
 
 function actualizarColorMarcador(interseccionId, icv) {
     const marcador = estado.marcadores[interseccionId];
-    if (!marcador) return;
+    if (!marcador) {
+        if (interseccionId.includes('LV-') || interseccionId.includes('SJL-')) {
+            console.warn(`⚠ NO EXISTE MARCADOR para ${interseccionId}`);
+        }
+        return;
+    }
 
     // Determinar color según ICV
     let colorLuz;
@@ -380,6 +499,11 @@ function inicializarGraficos() {
 function actualizarGraficos(icvPromedio, flujoPromedio) {
     if (!estado.chartICV || !estado.chartFlujo) return; // Verificar que existan
 
+    // En modo simulador, asegurar límites del ICV promedio [0.50, 0.60]
+    if (estado.modoActual === 'simulador') {
+        icvPromedio = Math.max(0.50, Math.min(0.60, icvPromedio || 0));
+    }
+
     const timestamp = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
 
     // Actualizar gráfico ICV
@@ -411,12 +535,24 @@ function cargarInterseccionesReales() {
 
     estado.intersecciones = INTERSECCIONES_LIMA;
 
+    // Debug: Mostrar coordenadas de intersecciones con nombres cortos
+    const interseccionesCortas = estado.intersecciones.filter(i => 
+        ['LIN-001', 'LV-001', 'LV-002', 'SM-001', 'SM-002', 'SM-003', 'JM-001', 'JM-002', 'SB-001', 'SB-002', 'SB-003', 'PL-001', 'PL-002'].includes(i.id)
+    );
+    
+    if (interseccionesCortas.length > 0) {
+        console.log('%c📍 INTERSECCIONES CON NOMBRES CORTOS CARGADAS:', 'color: #10b981; font-weight: bold;');
+        interseccionesCortas.forEach(inter => {
+            console.log(`  ${inter.id}: [${inter.latitud}, ${inter.longitud}] - ${inter.nombre}`);
+        });
+    }
+
     // Agregar marcadores
     estado.intersecciones.forEach(inter => {
         agregarMarcadorInterseccion(inter);
     });
 
-    // Dibujar conexiones
+    // Dibujar conexiones (líneas engrosadas entre intersecciones)
     dibujarConexiones();
 
     // Actualizar contador
@@ -424,6 +560,9 @@ function cargarInterseccionesReales() {
 
     // Llenar selects
     llenarSelectsEmergencia();
+
+    // Llenar selector de cámara para modo simulador
+    cargarInterseccionesSimulador();
 
     console.log(`${estado.intersecciones.length} intersecciones cargadas`);
 }
@@ -445,47 +584,165 @@ function iniciarSimulacion() {
     // Primera actualización inmediata
     const metricasSimuladas = generarMetricasSimuladas();
     actualizarMetricas(metricasSimuladas);
+
+    // Iniciar visualización de tráfico en el mapa
+    if (!estado.actualizacionTraficoInterval) {
+        iniciarActualizacionTrafico();
+    }
 }
 
 function generarMetricasSimuladas() {
     const hora = new Date().getHours();
-    let factorHora = 1.0;
 
-    // Simular hora pico
-    if ((hora >= 7 && hora <= 9) || (hora >= 17 && hora <= 19)) {
-        factorHora = 1.8; // Más congestión
-    } else if (hora >= 22 || hora <= 6) {
-        factorHora = 0.3; // Menos tráfico
-    }
+    // Perfil horario (0–1): picos moderan sin saturar todo
+    let perfilHora = 0.5; // base media
+    if ((hora >= 7 && hora <= 9) || (hora >= 17 && hora <= 19)) perfilHora = 0.65; // pico más moderado
+    else if (hora >= 22 || hora <= 5) perfilHora = 0.25; // valle nocturno
 
-    return estado.intersecciones.map(inter => {
-        const baseICV = Math.random() * 0.3 + (factorHora > 1.5 ? 0.5 : 0.2);
-        const icv = Math.min(baseICV * factorHora, 0.95);
+    // Para suavizar cambios entre ticks conservamos última métrica si existe
+    if (!estado.__cacheSim) estado.__cacheSim = {}; // { id: { icv, flujo, velocidad, cola } }
 
-        const numVehiculos = Math.floor(10 + Math.random() * 40 * factorHora);
-        const flujo = 15 + Math.random() * 20 * factorHora;
-        const velocidad = icv < 0.3 ? (50 + Math.random() * 10) :
-                         icv < 0.6 ? (25 + Math.random() * 20) :
-                         (10 + Math.random() * 15);
-        const cola = icv * 150;
+    // Historial para control de saturación del promedio
+    if (!estado.__histICV) estado.__histICV = [];
 
-        let color;
-        if (icv < 0.3) color = '#10b981';
-        else if (icv < 0.6) color = '#f59e0b';
-        else color = '#ef4444';
+    const resultados = estado.intersecciones.map(inter => {
+        const seedBase = (inter.id.charCodeAt(0) + inter.id.charCodeAt(inter.id.length - 1)) % 97;
+        const rnd = (Math.sin(Date.now() / 5000 + seedBase) + 1) / 2; // pseudo-ruido suave 0-1
+
+        // Capacidad aproximada por número de carriles (si existe) para normalización
+        const carriles = inter.num_carriles || 4;
+        const capacidadVehiculos = carriles * 60; // capacidad aproximada instantánea
+
+        // Flujo base (veh/min) con variación suavizada y perfil horario
+        const flujo = (10 + carriles * 3.5) * (0.35 + perfilHora) * (0.55 + rnd * 0.7); // factores más contenidos
+
+        // Número de vehículos instantáneo proporcional al flujo y carriles
+        const numVehiculos = Math.min(
+            Math.round(flujo * (0.3 + rnd * 0.9)),
+            capacidadVehiculos
+        );
+
+        // Velocidad promedio decrece cuando flujo ocupa capacidad
+        const ocupacionRel = numVehiculos / capacidadVehiculos; // 0–1
+        const velLibre = 52; // km/h
+        const velocidad = Math.max(8, velLibre * (1 - 0.55 * ocupacionRel) * (0.85 + (1 - rnd) * 0.3));
+
+        // Cola estimada: función convexa de ocupación y baja velocidad
+        const cola = Math.max(0,
+            (ocupacionRel ** 1.4) * 200 * (velocidad < 25 ? 1.3 : 0.8)
+        );
+
+        // Calcular ICV sintético combinando componentes (similar a lógica difusa simplificada)
+        // Normalizaciones:
+        const velNorm = Math.min(1, velocidad / velLibre); // 1 = libre
+        const flujoNorm = Math.min(1, flujo / (carriles * 30)); // saturación aproximada
+        const colaNorm = Math.min(1, cola / 180); // escala cola
+
+        // Pesos: congestión aumenta con flujo, cola y baja velocidad
+        let icvLocal = 0.40 * flujoNorm + 0.30 * colaNorm + 0.15 * (1 - velNorm);
+        // Añadir componente aleatoria leve para evitar sincronización completa
+        icvLocal = Math.max(0, Math.min(0.95, icvLocal * (0.9 + (rnd-0.5) * 0.2)));
+
+        // Mezcla con resumen de SUMO si está disponible (híbrido)
+        // Esto ayuda a que, cuando haya tráfico real en parte del mapa, el simulador
+        // se alinee en magnitud sin homogeneizar todo.
+        let icv = icvLocal;
+        if (estado.metricasSUMOResumen && typeof estado.metricasSUMOResumen.icvPromedio === 'number') {
+            const icvSUMO = Math.min(0.99, Math.max(0, estado.metricasSUMOResumen.icvPromedio || 0));
+            // Peso ajustado por proximidad
+            const proximidad = calcularSesgoPorProximidadSUMO(inter);
+            const mezcla = 0.15 + 0.35 * proximidad; // reducir influencia para evitar ponerse todo rojo
+            // Variación por intersección para evitar uniformidad
+            const jitter = (seedBase % 11) / 100; // 0–0.10
+            icv = (1 - mezcla) * icvLocal + mezcla * (icvSUMO * (0.9 + jitter));
+        }
+        // Si NO hay datos de SUMO, no mezclar con un valor por defecto distinto de 0
+        // (icv se queda en icvLocal).
+
+        // Ajuste visual: valores más diversos por intersección en simulación
+        // Mantener banda general, pero con centros distintos por intersección para evitar apariencia falsa
+        let objetivoCentro = 0.57; // centro base
+        // Desplazamiento por intersección (determinístico por ID) - más amplio
+        const offsetId = ((seedBase % 17) - 8) * 0.0023; // ~[-0.0184, +0.0184]
+        objetivoCentro = Math.max(0.553, Math.min(0.598, objetivoCentro + offsetId));
+
+        // Sesgo por zona para mayor contraste (ligero)
+        const zonaBiasMap = {
+            'SJL': -0.006,
+            'LIN': -0.004,
+            'JM': 0.006,
+            'PL': 0.005,
+            'SB': 0.004,
+            'SM': 0.004
+        };
+        const biasZona = zonaBiasMap[inter.zona] || 0;
+        objetivoCentro = Math.max(0.553, Math.min(0.598, objetivoCentro + biasZona));
+        // Cluster alto (zona oeste/centro cercanas entre sí)
+        const clusterAlto = new Set([
+            'SM-001','SM-002','SM-003','SM-004', // San Miguel y La Marina
+            'JM-001','JM-003',                    // Jesús María
+            'PL-001',                             // Pueblo Libre
+            'TR-001','TR-002','TR-003',          // Paseo de la República / transversales
+            'SB-001'                              // San Borja (Javier Prado con Aviación)
+        ]);
+        if (clusterAlto.has(inter.id)) {
+            objetivoCentro = 0.605; // sesgo suave hacia ~0.605 (permitirá 0.60–0.61)
+        }
+        // Amplitud base y variación por intersección para no verse estático
+        const amplitudBase = 0.026;           // banda total nominal aún más notoria
+        const jitterAmp = ((seedBase % 13) - 6) * 0.0026; // ~±0.013
+        const amplitud = Math.max(0.020, Math.min(0.036, amplitudBase + jitterAmp));
+        // Oscilaciones lentas + ruido leve para microvariación
+        const t = Date.now() / 30000; // periodo largo (~30s)
+        const oscilacion1 = Math.sin(t + seedBase) * (amplitud * 0.55);
+        const oscilacion2 = Math.cos(t * 0.85 + seedBase * 1.4) * (amplitud * 0.32);
+        const microRuido = (Math.sin(t * 2.0 + seedBase * 2.1) * 0.004);
+        icv = objetivoCentro + oscilacion1 + oscilacion2 + microRuido;
+        // Clamp final con excepciones: cluster alto permite hasta 0.61
+        if (clusterAlto.has(inter.id)) {
+            icv = Math.max(0.551, Math.min(0.618, icv));
+        } else {
+            icv = Math.max(0.550, Math.min(0.600, icv));
+        }
+
+        // Suavizado temporal (exponencial) para evitar saltos bruscos
+        const prev = estado.__cacheSim[inter.id];
+        if (prev) {
+            const alpha = 0.55; // peso de nuevo valor
+            icv = prev.icv * (1 - alpha) + icv * alpha;
+        }
+
+        // También mezclar flujo con SUMO promedio de forma leve
+        // Flujo regular (visual): banda moderada con variación lenta, independiente del backend
+        let flujoOut = 28 + (carriles - 4) * 2; // base por carriles (veh/min)
+        const oscilFlujo1 = Math.cos(t * 0.8 + seedBase) * 3; // oscilación principal
+        const oscilFlujo2 = Math.sin(t * 1.1 + seedBase * 0.7) * 2; // oscilación secundaria
+        const ruidoFlujo = ((seedBase % 5) - 2) * 0.3; // pequeño offset fijo por intersección
+        flujoOut = Math.max(18, Math.min(44, flujoOut + oscilFlujo1 + oscilFlujo2 + ruidoFlujo));
+
+        estado.__cacheSim[inter.id] = { icv, flujo: flujoOut, velocidad, cola, numVehiculos };
+
+        // Regla solicitada: ICV > 20 (%) ya debe ser amarillo
+        // Nuestro ICV está en 0–1, así que 20% = 0.20
+        const color = icv < 0.20 ? '#10b981' : icv < 0.58 ? '#f59e0b' : '#ef4444';
 
         return {
             interseccion_id: inter.id,
             interseccion_nombre: inter.nombre,
             icv: parseFloat(icv.toFixed(3)),
             num_vehiculos: numVehiculos,
-            flujo: parseFloat(flujo.toFixed(1)),
+            flujo: parseFloat(flujoOut.toFixed(1)),
             velocidad: parseFloat(velocidad.toFixed(1)),
             cola: parseFloat(cola.toFixed(1)),
             color: color,
-            nivel: icv < 0.3 ? 'Bajo' : icv < 0.6 ? 'Medio' : 'Alto'
+            nivel: icv < 0.33 ? 'Bajo' : icv < 0.66 ? 'Medio' : 'Alto'
         };
     });
+
+    // Removido control de saturación para evitar cualquier tendencia acumulativa.
+    // Los valores oscilan suavemente alrededor de 0.57 sin subir en bloque.
+
+    return resultados;
 }
 
 // ==================== ACTUALIZACIÓN UNIFICADA DE DATOS ====================
@@ -509,21 +766,104 @@ function actualizarDatosInterfaz(metricas, origen = 'backend') {
         }
     }
 
-    // 2. Calcular promedios
-    const icvPromedio = metricas.reduce((sum, m) => sum + m.icv, 0) / metricas.length;
-    const flujoPromedio = metricas.reduce((sum, m) => sum + m.flujo, 0) / metricas.length;
+    // 2. Almacenar métricas en estado global para acceso desde simulación de video
+    if (!estado.ultimasMetricas) {
+        estado.ultimasMetricas = {};
+    }
+    metricas.forEach(m => {
+        estado.ultimasMetricas[m.interseccion_id] = {
+            num_vehiculos: m.num_vehiculos || 0,
+            icv: m.icv || 0,
+            flujo: m.flujo || 0,
+            velocidad: m.velocidad || 0,
+            cola: m.cola || 0,
+            estado_semaforo: m.estado_semaforo || 'verde'
+        };
+    });
 
-    // 3. Actualizar cada intersección
+    // 3. Calcular promedios con clamp por intersección en modo simulador
+    if (estado.modoActual === 'simulador') {
+        const clusterAlto = new Set([
+            'SM-001','SM-002','SM-003','SM-004',
+            'JM-001','JM-003',
+            'PL-001',
+            'TR-001','TR-002','TR-003',
+            'SB-001'
+        ]);
+        metricas = metricas.map(m => {
+            const maxVal = clusterAlto.has(m.interseccion_id) ? 0.61 : 0.595;
+            return {
+                ...m,
+                icv: Math.max(0.55, Math.min(maxVal, m.icv || 0))
+            };
+        });
+    }
+    let icvPromedio = metricas.reduce((sum, m) => sum + m.icv, 0) / Math.max(1, metricas.length);
+    // Oscilación global suave en modo simulador para el promedio (≈0.58–0.59)
+    if (estado.modoActual === 'simulador') {
+        const tGlobal = Date.now() / 25000; // periodo largo
+        const centroGlobal = 0.585;
+        const ampGlobal = 0.005; // banda total ~0.58–0.59
+        const variacion = Math.sin(tGlobal) * ampGlobal;
+        icvPromedio = Math.max(0.58, Math.min(0.59, centroGlobal + variacion));
+    }
+    let flujoPromedio = metricas.reduce((sum, m) => sum + m.flujo, 0) / Math.max(1, metricas.length);
+
+    // En modo SUMO, si el backend envió promedios agregados, usarlos directamente
+    if (estado.modoActual === 'sumo' && estado.__overridePromedios) {
+        if (typeof estado.__overridePromedios.icv === 'number') {
+            icvPromedio = Math.max(0.02, estado.__overridePromedios.icv);
+        }
+        if (typeof estado.__overridePromedios.flujo === 'number') {
+            flujoPromedio = Math.max(0.02, estado.__overridePromedios.flujo);
+        }
+        // Limpiar override para próximas iteraciones
+        estado.__overridePromedios = null;
+    }
+
+    // 4. Actualizar cada intersección
     metricas.forEach(metrica => {
-        const { interseccion_id, icv, clasificacion, color, flujo, velocidad, cola } = metrica;
+        const { interseccion_id, icv, clasificacion, color, flujo, velocidad, cola, estado_semaforo } = metrica;
 
         // Actualizar marcador en el mapa
         actualizarColorMarcador(interseccion_id, icv);
 
+        // Actualizar estado del semáforo si viene en las métricas
+        if (estado_semaforo) {
+            // Mapear estados: 'verde', 'amarillo', 'rojo'
+            // El backend envía la fase (verde/amarillo/rojo)
+            const estadoMapeo = {
+                'verde': 'verde',
+                'amarillo': 'amarillo',
+                'rojo': 'rojo'
+            };
+            
+            const estadoSemaforo = estadoMapeo[estado_semaforo] || 'verde';
+            
+            // Actualizar semáforos (NS y EO opuestos)
+            if (!window.semaforosInterseccion[interseccion_id]) {
+                window.semaforosInterseccion[interseccion_id] = {
+                    norte: { estado: estadoSemaforo, tiempo: 0 },
+                    sur: { estado: estadoSemaforo, tiempo: 0 },
+                    este: { estado: estadoSemaforo === 'verde' ? 'rojo' : 'verde', tiempo: 0 },
+                    oeste: { estado: estadoSemaforo === 'verde' ? 'rojo' : 'verde', tiempo: 0 }
+                };
+            }
+            
+            // Actualizar estados globales también (para intersecciones genéricas)
+            if (interseccion_id === 'SM-002') {  // Usar SM-002 como referencia global
+                window.semaforosInterseccion.norte.estado = estadoSemaforo;
+                window.semaforosInterseccion.sur.estado = estadoSemaforo;
+                window.semaforosInterseccion.este.estado = estadoSemaforo === 'verde' ? 'rojo' : 'verde';
+                window.semaforosInterseccion.oeste.estado = estadoSemaforo === 'verde' ? 'rojo' : 'verde';
+            }
+        }
+
         // Actualizar o crear tarjeta de métrica
         actualizarTarjetaMetrica(interseccion_id, {
             icv,
-            clasificacion: clasificacion || (icv < 0.3 ? 'Fluido' : icv < 0.6 ? 'Moderado' : 'Congestionado'),
+            // Ajuste de clasificación acorde a umbral 20%
+            clasificacion: clasificacion || (icv < 0.20 ? 'Fluido' : icv < 0.58 ? 'Moderado' : 'Congestionado'),
             flujo,
             velocidad,
             cola
@@ -569,9 +909,10 @@ function actualizarDatosInterfaz(metricas, origen = 'backend') {
     let velocidadTotal = 0;
 
     metricas.forEach(metrica => {
-        if (metrica.icv < 0.3) {
+        // Umbrales actualizados: amarillo desde 20%, rojo desde ~58%
+        if (metrica.icv < 0.20) {
             callesFluidas++;
-        } else if (metrica.icv < 0.6) {
+        } else if (metrica.icv < 0.58) {
             callesModeradas++;
         } else {
             callesCongestionadas++;
@@ -596,6 +937,9 @@ function actualizarDatosInterfaz(metricas, origen = 'backend') {
     // 9. Calcular olas verdes activas (intersecciones con alto tráfico)
     const olasActivas = metricas.filter(m => m.icv > 0.6).length;
     document.getElementById('olas-activas').textContent = olasActivas;
+
+    // 10. Actualizar colores de conexiones según ICV y agregar velocidad promedio
+    actualizarColoresConexionesSegunICV(metricas);
 }
 
 function actualizarMetricas(metricas) {
@@ -608,7 +952,10 @@ function actualizarMetricas_OLD(metricas) {
     const container = document.getElementById('metricas-container');
 
     // Calcular promedios
-    const icvPromedio = metricas.reduce((sum, m) => sum + m.icv, 0) / metricas.length;
+    let icvPromedio = metricas.reduce((sum, m) => sum + m.icv, 0) / metricas.length;
+    if (estado.modoActual === 'simulador') {
+        icvPromedio = Math.max(0.50, Math.min(0.60, icvPromedio || 0));
+    }
     const flujoPromedio = metricas.reduce((sum, m) => sum + m.flujo, 0) / metricas.length;
 
     // Actualizar estadísticas globales
@@ -696,15 +1043,45 @@ function configurarEventListeners() {
     // Botón de emergencia
     document.getElementById('btn-emergencia').addEventListener('click', abrirModalEmergencia);
 
-    // NUEVO: Botones de video YOLO
-    document.getElementById('btn-toggle-video')?.addEventListener('click', toggleVideoYOLO);
-    document.getElementById('btn-expand-video')?.addEventListener('click', toggleExpandVideo);
+    // Botón de reinicio de simulador
+    const btnReiniciar = document.getElementById('btn-reiniciar-simulador');
+    if (btnReiniciar) {
+        btnReiniciar.addEventListener('click', reiniciarSimulador);
+    }
+
+    // NUEVO: Botones del Procesador Video
+    const btnToggleVideo = document.getElementById('btn-toggle-video');
+    const btnExpandVideo = document.getElementById('btn-expand-video');
+
+    if (btnToggleVideo) {
+        btnToggleVideo.addEventListener('click', toggleVideoYOLO);
+        console.log('✓ Event listener agregado a btn-toggle-video (Procesador Video)');
+    } else {
+        console.error('❌ btn-toggle-video no encontrado en el DOM');
+    }
+
+    if (btnExpandVideo) {
+        btnExpandVideo.addEventListener('click', toggleExpandVideo);
+        console.log('✓ Event listener agregado a btn-expand-video (Procesador Video)');
+    } else {
+        console.error('❌ btn-expand-video no encontrado en el DOM');
+    }
 
     // NUEVO: Doble clic en canvas para expandir
-    document.getElementById('video-canvas')?.addEventListener('dblclick', toggleExpandVideo);
+    const videoCanvas = document.getElementById('video-canvas');
+    if (videoCanvas) {
+        videoCanvas.addEventListener('dblclick', toggleExpandVideo);
+        console.log('✓ Event listener agregado a video-canvas');
+    }
 
     // NUEVO: Selector de intersección para cámara
-    document.getElementById('selector-interseccion-cam')?.addEventListener('change', seleccionarInterseccionCamara);
+    const selectorInterseccion = document.getElementById('selector-interseccion-cam');
+    if (selectorInterseccion) {
+        selectorInterseccion.addEventListener('change', seleccionarInterseccionCamara);
+        console.log('✓ Event listener agregado a selector-interseccion-cam');
+    } else {
+        console.error('❌ selector-interseccion-cam no encontrado en el DOM');
+    }
 
     // NUEVO: Controles de Motor Giratorio Horizontal con soporte para mantener presionado
     const btnLeft = document.getElementById('ptz-left');
@@ -739,14 +1116,34 @@ function configurarEventListeners() {
         }
     });
 
+    // IMPORTANTE: Iniciar actualización de tráfico y métricas del dashboard
+    // Esto debe estar SIEMPRE activo sin importar el modo
+    if (!estado.actualizacionTraficoInterval) {
+        iniciarActualizacionTrafico();
+    }
+
     console.log('Event listeners configurados');
 }
 
 async function cambiarModo(event) {
     const nuevoModo = event.target.value;
+    const modoAnterior = estado.modoActual;
     estado.modoActual = nuevoModo;
 
-    console.log(`Cambiando modo a: ${nuevoModo}`);
+    console.log(`Cambiando modo de ${modoAnterior} a: ${nuevoModo}`);
+
+    // Si estábamos en modo SUMO, notificar al backend para desconectar
+    if (modoAnterior === 'sumo' && nuevoModo !== 'sumo') {
+        try {
+            console.log('📡 Notificando al backend para cerrar SUMO...');
+            await fetch(`${API_URL}/api/modo/cambiar?modo=${nuevoModo}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch (error) {
+            console.error('Error desconectando SUMO:', error);
+        }
+    }
 
     // Detener simulación actual
     if (estado.simulacionInterval) {
@@ -766,6 +1163,16 @@ async function cambiarModo(event) {
 
     switch (nuevoModo) {
         case 'simulador':
+            // Notificar al backend
+            try {
+                await fetch(`${API_URL}/api/modo/cambiar?modo=simulador`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            } catch (error) {
+                console.error('Error cambiando a modo simulador:', error);
+            }
+            
             iniciarSimulacion();
             if (!estado.actualizacionTraficoInterval) {
                 iniciarActualizacionTrafico();
@@ -774,17 +1181,202 @@ async function cambiarModo(event) {
             cargarInterseccionesSimulador();
             break;
         case 'video':
-            console.log('Modo video seleccionado');
-            limpiarTrafico();
+        case 'procesador_video':
+        case 'procesador-video':
+            console.log('Modo Procesador Video seleccionado');
+            
+            // Notificar al backend
+            try {
+                await fetch(`${API_URL}/api/modo/cambiar?modo=video`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            } catch (error) {
+                console.error('Error cambiando a modo video:', error);
+            }
+            
+            // NO limpiar tráfico - solo limpiar las capas visuales del mapa
+            if (estado.capaTrafico) {
+                estado.capaTrafico.clearLayers();
+            }
+            // MANTENER actualizacionTraficoInterval para que siga actualizando las métricas
             document.getElementById('selector-interseccion-cam').style.display = 'block';
             await cargarInterseccionesVideo();
             break;
         case 'sumo':
             console.log('Modo SUMO - Cargando visualizacion de trafico');
-            limpiarTrafico();
+            
+            // Mostrar panel SUMO y superponerlo exactamente sobre el recuadro de video
+            const sumoPanel = document.getElementById('sumo-status-panel');
+            const panelVideo = document.getElementById('panel-video');
+            const videoContainer = document.querySelector('#panel-video .video-container');
+            if (sumoPanel && panelVideo && videoContainer) {
+                // No ocultar el panel-video para mantener el mismo diseño de tarjeta
+                panelVideo.style.position = 'relative';
+
+                // Mover el panel SUMO como hijo del contenedor de video para ocupar ese recuadro
+                if (sumoPanel.parentElement !== videoContainer) {
+                    videoContainer.appendChild(sumoPanel);
+                }
+                sumoPanel.classList.add('sumo-overlay');
+                sumoPanel.style.display = 'flex';
+            }
+            
+            // ⚡ CRÍTICO: Notificar al backend para que inicie SUMO-GUI
+            try {
+                console.log('📡 Notificando al backend para iniciar SUMO...');
+                const response = await fetch(`${API_URL}/api/modo/cambiar?modo=sumo`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Backend confirmó:', data.mensaje);
+                } else {
+                    console.warn('⚠️  Backend respondió con error:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Error notificando al backend:', error);
+            }
+            
+            // Limpiar solo capas visuales
+            if (estado.capaTrafico) {
+                estado.capaTrafico.clearLayers();
+            }
+            
+            // MANTENER actualizacionTraficoInterval para que siga actualizando las métricas
             await cargarYVisualizarCallesSUMO();
+            
+            // Iniciar actualización de estado SUMO de inmediato y cada 2s
+            if (estado.actualizacionEstadoSUMO) {
+                clearInterval(estado.actualizacionEstadoSUMO);
+            }
+            actualizarEstadoSUMO();
+            estado.actualizacionEstadoSUMO = setInterval(actualizarEstadoSUMO, 2000);
+            // No mostrar notificaciones emergentes en modo SUMO
+            
             break;
     }
+    
+    // Ocultar panel SUMO si no está en modo SUMO
+    if (nuevoModo !== 'sumo') {
+        const sumoPanel = document.getElementById('sumo-status-panel');
+        const panelVideo = document.getElementById('panel-video');
+        if (sumoPanel) {
+            sumoPanel.style.display = 'none';
+            // Mantenerlo en DOM pero oculto; diseño coherente
+            sumoPanel.style.position = 'absolute';
+        }
+        if (panelVideo) {
+            panelVideo.style.visibility = 'visible';
+        }
+        if (estado.actualizacionEstadoSUMO) {
+            clearInterval(estado.actualizacionEstadoSUMO);
+            estado.actualizacionEstadoSUMO = null;
+        }
+        // Si salimos de SUMO, forzar métricas a cero como si servidor se desconectara
+        if (modoAnterior === 'sumo') {
+            estado.__overridePromedios = { icv: 0, flujo: 0 };
+            const sinteticaCero = [{
+                interseccion_id: 'SUMO-AGREGADO',
+                icv: 0,
+                flujo: 0,
+                velocidad: 0,
+                cola: 0,
+                num_vehiculos: 0,
+                color: '#10b981',
+                clasificacion: 'Fluido'
+            }];
+            actualizarDatosInterfaz(sinteticaCero, 'backend');
+        }
+    }
+}
+
+// ==================== REINICIO DE SIMULADOR ====================
+async function reiniciarSimulador() {
+    const btnReiniciar = document.getElementById('btn-reiniciar-simulador');
+    
+    try {
+        // Cambiar estado del botón a "cargando"
+        btnReiniciar.disabled = true;
+        const iconOriginal = btnReiniciar.innerHTML;
+        btnReiniciar.innerHTML = '<i class="fas fa-spinner"></i> Cargando...';
+        
+        console.log('🔄 Enviando solicitud de reinicio del simulador...');
+        
+        const response = await fetch('http://localhost:8000/api/simulacion/reiniciar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ escenario: 'hora_pico_manana' })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Simulador reiniciado correctamente');
+            console.log('📊 Respuesta:', data);
+            
+            // Mostrar notificación
+            mostrarNotificacion('✅ Simulador reiniciado con todas las 47 intersecciones', 'success');
+            
+            // Esperar un poco para que se reinicie el simulador
+            setTimeout(() => {
+                btnReiniciar.disabled = false;
+                btnReiniciar.innerHTML = iconOriginal;
+            }, 2000);
+        } else {
+            console.error('❌ Error en la respuesta del servidor:', response.status);
+            mostrarNotificacion('❌ Error al reiniciar el simulador', 'error');
+            btnReiniciar.disabled = false;
+            btnReiniciar.innerHTML = iconOriginal;
+        }
+    } catch (error) {
+        console.error('❌ Error de conexión:', error);
+        mostrarNotificacion('❌ Error de conexión con el servidor', 'error');
+        
+        const btnReiniciar = document.getElementById('btn-reiniciar-simulador');
+        btnReiniciar.disabled = false;
+        btnReiniciar.innerHTML = '<i class="fas fa-sync"></i> Reiniciar';
+    }
+}
+
+// Función para mostrar notificaciones
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    // Crear elemento de notificación
+    const notif = document.createElement('div');
+    notif.className = `notificacion notificacion-${tipo}`;
+    notif.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+    `;
+    
+    // Aplicar colores según tipo
+    const colores = {
+        success: 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;',
+        error: 'background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white;',
+        info: 'background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;',
+        warning: 'background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;'
+    };
+    
+    notif.style.cssText += colores[tipo] || colores.info;
+    notif.textContent = mensaje;
+    
+    document.body.appendChild(notif);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+        notif.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notif.remove(), 300);
+    }, 3000);
 }
 
 // ==================== EMERGENCIAS ====================
@@ -794,16 +1386,210 @@ function llenarSelectsEmergencia() {
 
     estado.intersecciones.forEach(inter => {
         origenSelect.innerHTML += `<option value="${inter.id}">${inter.nombre}</option>`;
+    });
+
+    // Por defecto llenar destino con intersecciones (bomberos/policia)
+    destinoSelect.innerHTML = '';
+    estado.intersecciones.forEach(inter => {
         destinoSelect.innerHTML += `<option value="${inter.id}">${inter.nombre}</option>`;
     });
+
+    // Inicializar estructuras para hospitales
+    estado.hospitalMarkers = estado.hospitalMarkers || [];
+    estado.hospitalDestinoMap = estado.hospitalDestinoMap || {}; // mapa hospitalId -> nearest interseccionId
+}
+
+// Actualiza el select de destino según tipo de vehículo (ambulancia -> hospitales)
+function actualizarDestinoModal() {
+    const tipo = document.getElementById('tipo-emergencia').value;
+    const destinoSelect = document.getElementById('destino-emergencia');
+
+    destinoSelect.innerHTML = '';
+
+    if (tipo === 'ambulancia' && typeof HOSPITALES_LIMA !== 'undefined') {
+        // Llenar con hospitales
+        HOSPITALES_LIMA.forEach(h => {
+            destinoSelect.innerHTML += `<option value="${h.id}">${h.nombre} (${h.tipo})</option>`;
+        });
+
+        // Mostrar marcadores en el mapa
+        mostrarMarcadoresHospitales();
+    } else {
+        // Llenar con intersecciones
+        estado.intersecciones.forEach(inter => {
+            destinoSelect.innerHTML += `<option value="${inter.id}">${inter.nombre}</option>`;
+        });
+
+        // Limpiar marcadores de hospitales
+        limpiarMarcadoresHospitales();
+    }
+}
+
+function mostrarMarcadoresHospitales() {
+    if (!estado.mapa || typeof HOSPITALES_LIMA === 'undefined') return;
+
+    // Limpiar marcadores previos
+    limpiarMarcadoresHospitales();
+
+    HOSPITALES_LIMA.forEach(h => {
+        const iconHtml = `
+            <div style="display:flex;align-items:center;justify-content:center;background:#ffffff;border-radius:50%;width:40px;height:40px;border:3px solid #2563eb;box-shadow:0 4px 10px rgba(0,0,0,0.15);">
+                <span style="font-size:18px;">🏥</span>
+            </div>`;
+
+        const m = L.marker([h.lat, h.lon], {
+            title: h.nombre,
+            icon: L.divIcon({ html: iconHtml, className: '', iconSize: [40, 40] })
+        }).addTo(estado.mapa);
+        m.bindPopup(`<strong>${h.nombre}</strong><br/>Tipo: ${h.tipo}`);
+        estado.hospitalMarkers.push(m);
+    });
+}
+
+function limpiarMarcadoresHospitales() {
+    if (!estado.hospitalMarkers) return;
+    estado.hospitalMarkers.forEach(m => {
+        try { estado.mapa.removeLayer(m); } catch (e) {}
+    });
+    estado.hospitalMarkers = [];
+}
+
+// Mapear hospital a la intersección más cercana y cachear en estado.hospitalDestinoMap
+function mapHospitalToNearestIntersection(hospital) {
+    if (!estado.intersecciones) return null;
+
+    // Si ya está calculado
+    if (estado.hospitalDestinoMap && estado.hospitalDestinoMap[hospital.id]) {
+        return estado.hospitalDestinoMap[hospital.id];
+    }
+
+    let mejorId = null;
+    let mejorDist = Infinity;
+
+    estado.intersecciones.forEach(inter => {
+        const d = calcularDistancia(hospital.lat, hospital.lon, inter.latitud, inter.longitud);
+        if (d < mejorDist) {
+            mejorDist = d;
+            mejorId = inter.id;
+        }
+    });
+
+    estado.hospitalDestinoMap[hospital.id] = mejorId;
+    return mejorId;
+}
+
+// Solicita al backend estimaciones de tiempo a múltiples destinos (intersecciones)
+async function estimarDestinosDesdeOrigen(origenId, destinosInterseccionIds) {
+    try {
+        const resp = await fetch(`${API_URL}/api/emergencia/estimar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ origen: origenId, destinos: destinosInterseccionIds })
+        });
+        if (!resp.ok) {
+            const texto = await resp.text().catch(() => null);
+            console.error('Estimación fallida. Status:', resp.status, 'Body:', texto);
+            throw new Error(`Estimación fallida: ${resp.status} - ${texto}`);
+        }
+        return await resp.json();
+    } catch (e) {
+        console.error('Error estimando destinos:', e);
+        return null;
+    }
+}
+
+// Sugiere el mejor hospital (menor tiempo estimado) y selecciona en el modal
+async function sugerirMejorHospital(origenId) {
+    if (!origenId || typeof HOSPITALES_LIMA === 'undefined') return;
+
+    // Mapear hospitales a intersecciones
+    const mapping = HOSPITALES_LIMA.map(h => ({
+        hospitalId: h.id,
+        interId: mapHospitalToNearestIntersection(h)
+    })).filter(m => m.interId);
+
+    const destinos = mapping.map(m => m.interId);
+    const estimaciones = await estimarDestinosDesdeOrigen(origenId, destinos);
+
+    // Si el backend respondió con estimaciones válidas, elegir por tiempo estimado
+    if (estimaciones && Array.isArray(estimaciones) && estimaciones.length > 0) {
+        let mejor = null;
+        estimaciones.forEach(e => {
+            if (!mejor || e.tiempo_estimado < mejor.tiempo_estimado) mejor = e;
+        });
+
+        if (mejor) {
+            const m = mapping.find(x => x.interId === mejor.destino);
+            if (m) {
+                const destinoSelect = document.getElementById('destino-emergencia');
+                destinoSelect.value = m.hospitalId;
+                // mostrarNotificacion('info', `Sugerido: ${HOSPITALES_LIMA.find(h=>h.id===m.hospitalId).nombre} (ETA ${Math.round(mejor.tiempo_estimado)}s)`);
+                return;
+            }
+        }
+    }
+
+    // Si no hay estimaciones (backend caído) o no devolvió resultados, fallback geográfico (distancia mínima)
+    const origenInter = INTERSECCIONES_LIMA.find(i => i.id === origenId);
+    if (!origenInter) return;
+
+    let mejorHospital = null;
+    let mejorDist = Infinity;
+    mapping.forEach(m => {
+        const h = HOSPITALES_LIMA.find(hs => hs.id === m.hospitalId);
+        if (!h) return;
+        const d = calcularDistancia(origenInter.latitud, origenInter.longitud, h.lat, h.lon);
+        if (d < mejorDist) {
+            mejorDist = d;
+            mejorHospital = m;
+        }
+    });
+
+    if (mejorHospital) {
+        const destinoSelect = document.getElementById('destino-emergencia');
+        destinoSelect.value = mejorHospital.hospitalId;
+        // mostrarNotificacion('info', `Sugerido (por distancia): ${HOSPITALES_LIMA.find(h=>h.id===mejorHospital.hospitalId).nombre} (~${Math.round(mejorDist)} m)`);
+    }
 }
 
 function abrirModalEmergencia() {
     document.getElementById('modal-emergencia').style.display = 'flex';
+    // Actualizar selects según tipo actual
+    setTimeout(() => {
+        actualizarDestinoModal();
+        const tipo = document.getElementById('tipo-emergencia')?.value;
+        const origen = document.getElementById('origen-emergencia')?.value;
+        // Mostrar íconos de hospitales inmediatamente al abrir si es ambulancia
+        if (tipo === 'ambulancia') {
+            try { mostrarMarcadoresHospitales(); } catch {}
+        }
+        if (tipo === 'ambulancia' && origen) {
+            sugerirMejorHospital(origen);
+        }
+    }, 50);
 }
+
+// --- MODO: AÑADIR HOSPITAL EN MAPA (cliente-side) ---
+// Botón flotante dentro del modal que permite marcar una ubicación en el mapa
+function inicializarAgregarHospitalUI() {
+    // Ocultar funcionalidad de "Marcar hospital en mapa" de la interfaz
+    // No crear ni insertar el botón
+    return;
+}
+
+// Inicializar control al cargar la app
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarAgregarHospitalUI();
+});
 
 function cerrarModalEmergencia() {
     document.getElementById('modal-emergencia').style.display = 'none';
+    // Mantener íconos visibles si hay una ola verde activa; si no, limpiar
+    try {
+        if (!estado.olaVerdeActiva) {
+            limpiarMarcadoresHospitales();
+        }
+    } catch {}
 }
 
 // Sistema de pesos por gravedad/prioridad de emergencia
@@ -835,8 +1621,8 @@ function obtenerPrioridadEmergencia(tipo) {
 async function activarEmergencia() {
     const tipo = document.getElementById('tipo-emergencia').value;
     const origen = document.getElementById('origen-emergencia').value;
-    const destino = document.getElementById('destino-emergencia').value;
-    const velocidad = parseFloat(document.getElementById('velocidad-emergencia').value);
+    let destino = document.getElementById('destino-emergencia').value;
+    // velocidad removida de la UI; backend usa valor por defecto si no se provee
 
     // Validación de campos
     if (!origen || !destino) {
@@ -852,17 +1638,35 @@ async function activarEmergencia() {
     // Obtener prioridad según tipo de vehículo
     const prioridad = obtenerPrioridadEmergencia(tipo);
 
-    console.log('Activando ola verde con prioridad:', {
-        tipo,
-        origen,
-        destino,
-        velocidad,
-        prioridad: prioridad.nivel,
-        peso: prioridad.peso
-    });
+    // Mapear prioridad a los valores esperados por la API: 'critica'|'alta'|'media'
+    const prioridadApi = (tipo === 'ambulancia') ? 'critica' : (tipo === 'bomberos' ? 'alta' : 'media');
+
+    console.log('Activando ola verde con prioridad:', { tipo, origen, destino, prioridad: prioridadApi });
 
     try {
+        // Guardar referencia del hospital destino original (antes de mapear) para mostrarlo correctamente
+        let hospitalDestinoOriginal = null;
+        if (tipo === 'ambulancia' && typeof HOSPITALES_LIMA !== 'undefined') {
+            const destinoOriginal = destino;
+            hospitalDestinoOriginal = HOSPITALES_LIMA.find(h => h.id === destinoOriginal);
+        }
+
         // Intentar llamar al backend para calcular ruta óptima con Dijkstra
+        // Si destino es un hospital (ambulancia), mapear a intersección cercana antes de enviar
+        if (tipo === 'ambulancia' && typeof HOSPITALES_LIMA !== 'undefined') {
+            const hosp = HOSPITALES_LIMA.find(h => h.id === destino);
+            if (hosp) {
+                const mapped = mapHospitalToNearestIntersection(hosp);
+                if (mapped) destino = mapped; // usar intersección como destino para backend
+            }
+        }
+
+        // Re-verificar que origen y destino no sean iguales tras el mapeo (hospital -> intersección)
+        if (origen === destino) {
+            alert('El origen y destino mapeado son iguales; por favor elige otro destino u origen.');
+            return;
+        }
+
         const response = await fetch(`${API_URL}/api/emergencia/activar`, {
             method: 'POST',
             headers: {
@@ -872,18 +1676,26 @@ async function activarEmergencia() {
                 tipo: tipo,
                 origen: origen,
                 destino: destino,
-                velocidad: velocidad,
-                prioridad: prioridad.peso,
-                nivel_prioridad: prioridad.nivel
+                prioridad: prioridadApi
             })
         });
 
         if (!response.ok) {
-            throw new Error(`Error del servidor: ${response.status}`);
+            // Leer body de error para debugging y mostrar al usuario
+            const texto = await response.text().catch(() => null);
+            console.error('Activar emergencia falló. Status:', response.status, 'Body:', texto);
+            alert(`Error activando emergencia: ${response.status}\n${texto || ''}`);
+            return;
         }
 
         const resultado = await response.json();
 
+
+            // Refuerzo: en modo SUMO, si por cualquier razón quedó en 0/NaN, aplicar mínimos
+            if (estado.modoActual === 'sumo') {
+                if (!isFinite(icvPromedio) || icvPromedio <= 0) icvPromedio = 0.02;
+                if (!isFinite(flujoPromedio) || flujoPromedio <= 0) flujoPromedio = 0.02;
+            }
         console.log('Ruta calculada por backend:', resultado);
 
         // Verificar que haya una ruta válida
@@ -892,14 +1704,21 @@ async function activarEmergencia() {
             return;
         }
 
+        // Adjuntar datos del hospital destino al resultado para visualización
+        if (hospitalDestinoOriginal) {
+            resultado._hospitalDestino = hospitalDestinoOriginal;
+            console.log('✅ Hospital destino adjuntado:', hospitalDestinoOriginal.nombre);
+        }
+
         // Usar la función que procesa correctamente la respuesta del backend
-        mostrarOlaVerdeActivada(resultado);
+        await mostrarOlaVerdeActivada(resultado);
 
         cerrarModalEmergencia();
 
     } catch (error) {
         console.error('Error conectando con backend:', error);
         console.log('Usando modo simulado sin backend');
+
 
         // MODO FALLBACK: Calcular ruta simple sin backend
         const rutaSimulada = calcularRutaSimple(origen, destino);
@@ -911,7 +1730,8 @@ async function activarEmergencia() {
 
         // Calcular distancia y tiempo estimados
         const distanciaTotal = calcularDistanciaRuta(rutaSimulada);
-        const tiempoEstimado = (distanciaTotal / 1000) / (velocidad / 3600); // segundos
+        const velocidadSimulada = 50; // km/h por defecto en modo fallback
+        const tiempoEstimado = (distanciaTotal) * 3.6 / velocidadSimulada; // segundos
 
         const resultado = {
             ruta: rutaSimulada,
@@ -925,7 +1745,19 @@ async function activarEmergencia() {
         };
 
         console.log('Ruta simulada calculada:', resultado);
-        mostrarOlaVerdeActivada(resultado);
+        
+        // Adjuntar hospital destino si es ambulancia (modo fallback)
+        if (tipo === 'ambulancia' && typeof HOSPITALES_LIMA !== 'undefined') {
+            const destinoOriginalFallback = document.getElementById('destino-emergencia').value;
+            const hospitalFallback = HOSPITALES_LIMA.find(h => h.id === destinoOriginalFallback);
+            if (hospitalFallback) {
+                resultado._hospitalDestino = hospitalFallback;
+            }
+        }
+        
+        await mostrarOlaVerdeActivada(resultado);
+        
+        // Cerrar modal después de mostrar la ruta
         cerrarModalEmergencia();
     }
 }
@@ -1025,21 +1857,36 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 }
 
 function desactivarOlaVerde() {
+    console.log('🧹 Desactivando ola verde y limpiando mapa...');
+    
+    // Cancelar timeout de desactivación automática si existe
+    if (estado.timeoutOlaVerde) {
+        clearTimeout(estado.timeoutOlaVerde);
+        estado.timeoutOlaVerde = null;
+        console.log('   ✓ Timeout cancelado');
+    }
+    
     // Limpiar polyline principal
     if (estado.olaVerdeActiva) {
-        estado.mapa.removeLayer(estado.olaVerdeActiva);
+        try {
+            estado.mapa.removeLayer(estado.olaVerdeActiva);
+            console.log('   ✓ Polyline removida');
+        } catch (e) {
+            console.warn('   ⚠️ Error eliminando polyline:', e);
+        }
         estado.olaVerdeActiva = null;
     }
 
-    // Limpiar marcadores y sombra
-    if (estado.marcadoresOlaVerde) {
+    // Limpiar marcadores
+    if (estado.marcadoresOlaVerde && estado.marcadoresOlaVerde.length > 0) {
         estado.marcadoresOlaVerde.forEach(m => {
             try {
                 estado.mapa.removeLayer(m);
             } catch (e) {
-                console.log('Error limpiando marcador:', e);
+                console.warn('   ⚠️ Error limpiando marcador:', e);
             }
         });
+        console.log(`   ✓ ${estado.marcadoresOlaVerde.length} marcadores removidos`);
         estado.marcadoresOlaVerde = [];
     }
 
@@ -1055,7 +1902,14 @@ function desactivarOlaVerde() {
         `;
     }
 
-    console.log('Ola verde desactivada');
+    console.log('✅ Ola verde desactivada completamente');
+
+    // Además, ocultar iconos de hospitales si estaban visibles (ambulancia)
+    try {
+        limpiarMarcadoresHospitales();
+    } catch (e) {
+        console.warn('   ⚠️ Error limpiando marcadores de hospitales:', e);
+    }
 }
 
 // Actualizar display de velocidad en el modal
@@ -1066,6 +1920,16 @@ document.getElementById('velocidad-emergencia')?.addEventListener('input', funct
 // Actualizar indicador de prioridad cuando cambia el tipo de vehículo
 document.getElementById('tipo-emergencia')?.addEventListener('change', function() {
     actualizarIndicadorPrioridad(this.value);
+    // Actualizar destino (hospitales vs intersecciones)
+    actualizarDestinoModal();
+});
+
+document.getElementById('origen-emergencia')?.addEventListener('change', function() {
+    const tipo = document.getElementById('tipo-emergencia')?.value;
+    if (tipo === 'ambulancia') {
+        const origenId = this.value;
+        sugerirMejorHospital(origenId);
+    }
 });
 
 function actualizarIndicadorPrioridad(tipo) {
@@ -1114,6 +1978,12 @@ async function cargarYVisualizarCallesSUMO() {
         console.log(`Calles cargadas: ${estado.callesGeoJSON.features.length}`);
 
         // Crear layer de calles
+        if (!estado.mostrarSUMOTrafico) {
+            // Si no se debe mostrar, limpiar cualquier resto visual
+            limpiarCallesSUMO();
+            // NO retornamos: igual queremos alimentar métricas desde SUMO
+        }
+
         estado.callesSUMO = L.geoJSON(estado.callesGeoJSON, {
             style: function(feature) {
                 return {
@@ -1150,12 +2020,22 @@ async function cargarYVisualizarCallesSUMO() {
                         </div>
                     </div>
                 `);
+                // Tooltip sutil para mostrar métricas en vivo cuando existan
+                layer.bindTooltip(() => {
+                    const id = props.id;
+                    const m = (estado.__ultimoSUMOCalles || []).find(c => c.id === id);
+                    if (!m) return `${props.nombre || id}`;
+                    const cong = (m.congestion !== undefined) ? `${Math.round(m.congestion*100)}%` : 'N/A';
+                    const vel = (m.velocidad !== undefined) ? `${Number(m.velocidad).toFixed(1)} km/h` : 'N/A';
+                    const veh = (m.vehiculos !== undefined) ? `${m.vehiculos} veh` : 'N/A';
+                    return `${props.nombre || id}\nCongestión: ${cong}\nVelocidad: ${vel}\nVehículos: ${veh}`;
+                }, { sticky: true, direction: 'top', opacity: 0.9 });
             }
         }).addTo(estado.mapa);
 
         console.log('[OK] Calles visualizadas en el mapa');
 
-        // Iniciar actualización de tráfico cada 2 segundos
+        // Iniciar actualización de tráfico cada 2 segundos SIEMPRE en modo SUMO
         actualizarTraficoSUMO();
         estado.actualizacionTraficoInterval = setInterval(actualizarTraficoSUMO, 2000);
 
@@ -1165,8 +2045,63 @@ async function cargarYVisualizarCallesSUMO() {
     }
 }
 
+async function actualizarEstadoSUMO() {
+    try {
+        // Usar un solo endpoint que ya agregue métricas
+        const resp = await fetch(`${API_URL}/api/sumo/estado`);
+        const data = await resp.json();
+
+        if (!data.conectado) {
+            console.warn('⚠️ SUMO no conectado');
+            // Forzar caída de métricas a 0 en modo SUMO
+            estado.__overridePromedios = { icv: 0, flujo: 0 };
+            const sinteticaCero = [{
+                interseccion_id: 'SUMO-AGREGADO',
+                icv: 0,
+                flujo: 0,
+                velocidad: 0,
+                cola: 0,
+                num_vehiculos: 0,
+                color: '#10b981',
+                clasificacion: 'Fluido'
+            }];
+            actualizarDatosInterfaz(sinteticaCero, 'backend');
+            return;
+        }
+        // Métricas agregadas del endpoint principal
+        const totalVehiculos = data.vehiculos_totales || 0;
+        const velocidadPromedio = data.velocidad_promedio || 0;
+        const callesActivas = data.calles_con_trafico || 0;
+        const congestionPromedio = data.congestion_promedio || 0;
+        const semaforos = data.semaforos || 0;
+        const tiempoSim = typeof data.tiempo_simulado_s === 'number' ? data.tiempo_simulado_s : 0;
+
+        // Actualizar UI
+        const elSemaforos = document.getElementById('sumo-semaforos');
+        const elVehiculos = document.getElementById('sumo-vehiculos');
+        const elCalles = document.getElementById('sumo-calles-activas');
+        const elVelocidad = document.getElementById('sumo-velocidad');
+        const elCongestion = document.getElementById('sumo-congestion');
+        const elTiempo = document.getElementById('sumo-tiempo');
+
+        if (elSemaforos) elSemaforos.textContent = semaforos;
+        if (elVehiculos) elVehiculos.textContent = totalVehiculos;
+        if (elCalles) elCalles.textContent = callesActivas;
+        if (elVelocidad) elVelocidad.textContent = `${Number(velocidadPromedio).toFixed(1)} km/h`;
+        if (elCongestion) elCongestion.textContent = `${Math.round(congestionPromedio * 100)}%`;
+        if (elTiempo) elTiempo.textContent = `${Number(tiempoSim).toFixed(1)}s`;
+
+        console.log('📊 SUMO:', { totalVehiculos, velocidadPromedio, callesActivas, congestionPromedio, semaforos, tiempoSim });
+
+        // Importante: sin backend no generamos métricas sintéticas en modo SUMO.
+        // Los datos de SUMO deben provenir del backend exclusivamente.
+    } catch (error) {
+        console.error('❌ Error actualizando estado SUMO:', error);
+    }
+}
+
 async function actualizarTraficoSUMO() {
-    if (estado.modoActual !== 'sumo' || !estado.callesSUMO) {
+    if (estado.modoActual !== 'sumo') {
         return;
     }
 
@@ -1178,40 +2113,319 @@ async function actualizarTraficoSUMO() {
             return;
         }
 
-        // Crear mapa de congestión por ID de calle
+        // Crear mapa de congestión por ID de calle con mínimos y micro-ruido si viene 0
         const congestionPorCalle = {};
         data.calles.forEach(calle => {
-            congestionPorCalle[calle.id] = calle.congestion;
+            let cong = typeof calle.congestion === 'number' ? calle.congestion : 0;
+            if (cong <= 0) {
+                const seed = (calle.id.charCodeAt(0) + (calle.id.charCodeAt(calle.id.length - 1) || 0)) % 97;
+                const jitter = (Math.sin(Date.now() / 7000 + seed) + 1) * 0.01; // 0–0.02
+                cong = 0.03 + jitter; // mínimo visible ~0.03–0.05
+            }
+            congestionPorCalle[calle.id] = Math.max(0.02, Math.min(0.99, cong));
         });
 
-        // Actualizar colores de las calles
+        // Umbrales dinámicos: si hay suficientes calles activas, usar percentiles 33/66
+        const activasParaUmbrales = data.calles
+            .filter(c => typeof c.congestion === 'number' && (c.vehiculos || 0) > 0)
+            .map(c => c.congestion)
+            .sort((a, b) => a - b);
+
+        function pct(arr, p) {
+            if (arr.length === 0) return 0;
+            const idx = Math.min(arr.length - 1, Math.max(0, Math.floor((arr.length - 1) * p)));
+            return arr[idx];
+        }
+
+        let tVerdeAmarillo = 0.3;
+        let tAmarilloRojo = 0.6;
+        if (activasParaUmbrales.length >= 12) { // con suficientes muestras, ajustar a cuantiles
+            tVerdeAmarillo = pct(activasParaUmbrales, 0.33);
+            tAmarilloRojo = pct(activasParaUmbrales, 0.66);
+        }
+
+        // Guardar último snapshot para tooltips
+        estado.__ultimoSUMOCalles = data.calles;
+
+        // Eliminar cualquier leyenda de tráfico SUMO si existiera (no debe visualizarse)
+        if (estado.__leyendaSUMO) {
+            try {
+                const container = estado.__leyendaSUMO.getContainer && estado.__leyendaSUMO.getContainer();
+                if (container && container.parentNode) container.parentNode.removeChild(container);
+            } catch {}
+            estado.__leyendaSUMO = null;
+        }
+
+        // HUD removido: no mostrar cantidad de vehículos ni velocidad promedio en el mapa
+        if (estado.__hudSUMO) {
+            try {
+                const containerHud = estado.__hudSUMO.getContainer && estado.__hudSUMO.getContainer();
+                if (containerHud && containerHud.parentNode) containerHud.parentNode.removeChild(containerHud);
+            } catch {}
+            estado.__hudSUMO = null;
+        }
+
+        // Actualizar colores de las calles (solo si visualización habilitada)
+        if (estado.mostrarSUMOTrafico && estado.callesSUMO) {
         estado.callesSUMO.eachLayer(function(layer) {
             const feature = layer.feature;
             const idCalle = feature.properties.id;
             const congestion = congestionPorCalle[idCalle];
 
             if (congestion !== undefined) {
-                // Determinar color según nivel de congestión
+                // Determinar color según umbrales dinámicos
                 let color;
-                if (congestion < 0.3) {
+                if (congestion < tVerdeAmarillo) {
                     color = '#10b981';  // Verde - fluido
-                } else if (congestion < 0.6) {
+                } else if (congestion < tAmarilloRojo) {
                     color = '#f59e0b';  // Amarillo - moderado
                 } else {
                     color = '#ef4444';  // Rojo - congestionado
                 }
 
+                // Hacer más gruesa la línea en edges con muchos vehículos para visibilidad
+                const v = congestionPorCalle[idCalle];
+                let vehiculosEdge = (v !== undefined) ? (data.calles.find(c => c.id === idCalle)?.vehiculos || 0) : 0;
+                if (vehiculosEdge <= 0) vehiculosEdge = 1; // mínimo visible
+                const weight = vehiculosEdge >= 10 ? 5 : vehiculosEdge >= 5 ? 4 : 3;
+
                 layer.setStyle({
                     color: color,
-                    weight: 3,
-                    opacity: 0.7
+                    weight: weight,
+                    opacity: 0.8
                 });
             }
         });
+        }
+
+        // ==================== INTEGRACIÓN CON SISTEMA DE MÉTRICAS (ICV / Flujo) ====================
+        // Transformar las calles en un conjunto de "métricas" compatibles con actualizarDatosInterfaz
+        // Evitamos saturar la interfaz: tomamos solo las calles activas (vehículos > 0) y un máximo de 40
+        const callesActivas = data.calles.filter(c => (c.vehiculos || 0) > 0);
+        // Ordenar por número de vehículos descendente para priorizar las más relevantes
+        callesActivas.sort((a, b) => (b.vehiculos || 0) - (a.vehiculos || 0));
+        const seleccion = callesActivas.slice(0, 40);
+
+        const metricas = seleccion.map(c => {
+            // ICV: usar congestión con piso y micro-ruido si viene 0
+            let icv = typeof c.congestion === 'number' ? c.congestion : 0;
+            if (icv <= 0) {
+                const seed = (c.id.charCodeAt(0) + (c.id.charCodeAt(c.id.length - 1) || 0)) % 97;
+                const jitter = (Math.cos(Date.now() / 6000 + seed) + 1) * 0.01; // 0–0.02
+                icv = 0.03 + jitter;
+            }
+            icv = Math.max(0.02, Math.min(0.99, icv));
+
+            // Flujo: asegurar mínimo visible 1 veh
+            let flujo = (c.vehiculos || 0);
+            if (flujo <= 0) flujo = 1;
+
+            const velocidad = typeof c.velocidad === 'number' ? c.velocidad : 0; // km/h
+            const cola = 0; // No tenemos longitud de cola por edge, dejamos 0 por ahora
+            const color = icv < 0.3 ? 'verde' : icv < 0.6 ? 'amarillo' : 'rojo';
+            return {
+                interseccion_id: `CALLE:${c.id}`,
+                icv: icv,
+                flujo: flujo,
+                velocidad: velocidad,
+                cola: cola,
+                num_vehiculos: flujo,
+                color: color,
+                clasificacion: icv < 0.3 ? 'Fluido' : icv < 0.6 ? 'Moderado' : 'Congestionado'
+            };
+        });
+
+        // Además, agregamos métricas por intersección real basadas en proximidad a edges SUMO
+        const indexCentroides = {};
+        try {
+            for (const feat of (estado.callesGeoJSON?.features || [])) {
+                const id = feat.properties?.id;
+                const geom = feat.geometry;
+                if (!id || !geom || geom.type !== 'LineString') continue;
+                const cen = _centroideLinea(geom.coordinates);
+                if (cen) indexCentroides[id] = cen;
+            }
+        } catch {}
+
+        const metricasInter = [];
+        for (const inter of (typeof INTERSECCIONES_LIMA !== 'undefined' ? INTERSECCIONES_LIMA : [])) {
+            const latI = inter.latitud, lonI = inter.longitud;
+            // Buscar edges cercanos activos
+            const vecinos = [];
+            for (const c of data.calles) {
+                const id = c.id;
+                const cen = indexCentroides[id];
+                if (!cen) continue;
+                const d = _distanciaHaversine(latI, lonI, cen.lat, cen.lon);
+                if (d <= 800 && (c.vehiculos||0) > 0) {
+                    vecinos.push({ d, c });
+                }
+            }
+            vecinos.sort((a,b)=>a.d-b.d);
+            const usados = vecinos.slice(0, 6); // tomar hasta 6 más cercanos
+
+            let icv = 0, flujo = 0, velocidad = 0;
+            if (usados.length > 0) {
+                icv = usados.reduce((s, x)=> s + (x.c.congestion||0), 0) / usados.length;
+                velocidad = usados.reduce((s, x)=> s + (x.c.velocidad||0), 0) / usados.length;
+                // flujo: estimar como suma de vehículos con ponderación por distancia (más cerca, más peso)
+                const sumPesos = usados.reduce((s,x)=> s + (1/(1+x.d/200)), 0);
+                flujo = usados.reduce((s,x)=> s + (x.c.vehiculos||0) * (1/(1+x.d/200)), 0) / Math.max(1, sumPesos);
+                // escalar a veh/min aproximado (variación): multiplicar por 2 para rango visible
+                flujo = flujo * 2;
+                // añadir variación temporal suave (oscilación + ruido leve) para evitar constancia
+                const seed = (inter.id.charCodeAt(0) + (inter.id.charCodeAt(inter.id.length - 1) || 0)) % 97;
+                const t = Date.now() / 12000; // periodo ~12s
+                const oscil = 0.15 + 0.10 * Math.sin(t + seed);   // ±10%
+                const micro = 0.95 + 0.10 * Math.sin(t * 1.7 + seed * 1.3); // micro variación
+                flujo = flujo * oscil * micro;
+            } else {
+                // Sin vecinos activos: aplicar mínimos y microvariación para no quedar en 0
+                const seed = (inter.id.charCodeAt(0) + (inter.id.charCodeAt(inter.id.length - 1) || 0)) % 97;
+                const jitter = (Math.sin(Date.now() / 8000 + seed) + 1) * 0.01; // 0–0.02
+                icv = 0.03 + jitter;
+                // Flujo mínimo con oscilación perceptible
+                const t = Date.now() / 10000;
+                flujo = 1 * (1 + 0.6 * Math.abs(Math.sin(t + seed))); // 1–1.6
+                velocidad = 0;
+            }
+
+            // Clamps finales por seguridad
+            icv = Math.max(0.02, Math.min(0.99, icv));
+            flujo = Math.max(1, Math.min(120, flujo));
+
+            // Aplicar regla de color: amarillo desde 20%
+            const color = icv < 0.20 ? '#10b981' : icv < 0.58 ? '#f59e0b' : '#ef4444';
+
+            metricasInter.push({
+                interseccion_id: inter.id,
+                interseccion_nombre: inter.nombre,
+                icv: Number(icv.toFixed(3)),
+                flujo: Number(flujo.toFixed(1)),
+                velocidad: Number((velocidad||0).toFixed(1)),
+                cola: 0,
+                num_vehiculos: Math.round(flujo),
+                color: color,
+                clasificacion: icv < 0.20 ? 'Fluido' : icv < 0.58 ? 'Moderado' : 'Congestionado'
+            });
+        }
+
+        if (metricas.length > 0 || metricasInter.length > 0) {
+            // Guardar resumen global de SUMO para usarlo como sesgo en simulación
+            const icvProm = activasParaUmbrales.length > 0 ? (
+                activasParaUmbrales.reduce((a,b)=>a+b,0) / activasParaUmbrales.length
+            ) : null;
+            const velocidadesActivas = data.calles
+                .filter(c => (c.vehiculos||0)>0 && typeof c.velocidad==='number')
+                .map(c => c.velocidad);
+            const velProm = velocidadesActivas.length>0 ? (
+                velocidadesActivas.reduce((a,b)=>a+b,0) / velocidadesActivas.length
+            ) : null;
+            const flujoProm = data.calles
+                .filter(c => (c.vehiculos||0)>0)
+                .reduce((a,c)=>a + (c.vehiculos||0), 0) / Math.max(1, data.calles.filter(c => (c.vehiculos||0)>0).length);
+
+            estado.metricasSUMOResumen = {
+                icvPromedio: icvProm,
+                velocidadPromedio: velProm,
+                flujoPromedio: flujoProm
+            };
+
+            // Si el backend proporcionó promedios agregados, establecer override para gráficos
+            if (typeof data.icv_red_promedio === 'number' || typeof data.flujo_promedio === 'number') {
+                estado.__overridePromedios = {
+                    icv: typeof data.icv_red_promedio === 'number' ? data.icv_red_promedio : undefined,
+                    flujo: typeof data.flujo_promedio === 'number' ? data.flujo_promedio : undefined
+                };
+            }
+
+            // Alimentar el sistema unificado para que se actualicen:
+            // - ICV promedio
+            // - Flujo promedio
+            // - Contadores de calles fluidas / moderadas / congestionadas
+            // - Tarjetas y gráficos
+            // Primero intersecciones reales (activarlas en SUMO), luego edges si quieres ver detalle
+            if (metricasInter.length > 0) {
+                actualizarDatosInterfaz(metricasInter, 'backend');
+            } else if (metricas.length > 0) {
+                actualizarDatosInterfaz(metricas, 'backend');
+            }
+        }
+
+        // Si no hay métricas de calles activas, aún así actualizar promedios para gráficos en modo SUMO
+        if (metricas.length === 0 && metricasInter.length === 0 && (typeof data.icv_red_promedio === 'number' || typeof data.flujo_promedio === 'number')) {
+            estado.__overridePromedios = {
+                icv: typeof data.icv_red_promedio === 'number' ? data.icv_red_promedio : undefined,
+                flujo: typeof data.flujo_promedio === 'number' ? data.flujo_promedio : undefined
+            };
+            // Enviar una métrica sintética mínima para que la interfaz se refresque
+            const sintetica = [{
+                interseccion_id: 'SUMO-AGREGADO',
+                icv: Math.max(0.02, estado.__overridePromedios.icv || 0.02),
+                flujo: Math.max(0.02, estado.__overridePromedios.flujo || 0.02),
+                velocidad: 0,
+                cola: 0,
+                num_vehiculos: Math.max(1, Math.round((estado.__overridePromedios.flujo || 1))),
+                color: '#f59e0b',
+                clasificacion: 'Moderado'
+            }];
+            actualizarDatosInterfaz(sintetica, 'backend');
+        }
 
     } catch (error) {
         console.error('Error actualizando tráfico SUMO:', error);
     }
+}
+
+// ==================== SESGO POR PROXIMIDAD A CALLES SUMO ====================
+function _distanciaHaversine(lat1, lon1, lat2, lon2) {
+    const R = 6371000; // m
+    const toRad = x => x * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+function _centroideLinea(coords) {
+    // coords: [[lon,lat], ...]
+    if (!coords || coords.length === 0) return null;
+    let lat = 0, lon = 0;
+    coords.forEach(([x,y]) => { lon += x; lat += y; });
+    const n = coords.length;
+    return { lat: lat/n, lon: lon/n };
+}
+
+function calcularSesgoPorProximidadSUMO(inter) {
+    // Devuelve un peso 0–1: cerca de calles con tráfico → mayor peso SUMO
+    if (!estado.callesGeoJSON || !estado.__ultimoSUMOCalles) return 0.0;
+    if (estado.__proxSUMOCache[inter.id]) return estado.__proxSUMOCache[inter.id];
+
+    const { latitud: latI, longitud: lonI } = inter;
+    let mejor = Infinity;
+    for (const feat of estado.callesGeoJSON.features) {
+        const id = feat.properties?.id;
+        const snap = estado.__ultimoSUMOCalles.find(c => c.id === id);
+        if (!snap || (snap.vehiculos||0) <= 0) continue; // considerar solo calles activas
+        const geom = feat.geometry;
+        if (!geom || geom.type !== 'LineString') continue;
+        const cen = _centroideLinea(geom.coordinates);
+        if (!cen) continue;
+        const d = _distanciaHaversine(latI, lonI, cen.lat, cen.lon);
+        if (d < mejor) mejor = d;
+    }
+
+    // Mapear distancia a peso: <200m → 1.0, 200–1000m → decae, >2km → ~0
+    let peso = 0.0;
+    if (isFinite(mejor)) {
+        if (mejor <= 200) peso = 1.0;
+        else if (mejor <= 1000) peso = 0.6 * (1 - (mejor - 200) / 800) + 0.4; // decaimiento lineal
+        else if (mejor <= 2000) peso = 0.2 * (1 - (mejor - 1000) / 1000);
+        else peso = 0.0;
+    }
+    estado.__proxSUMOCache[inter.id] = Math.max(0, Math.min(1, peso));
+    return estado.__proxSUMOCache[inter.id];
 }
 
 function limpiarCallesSUMO() {
@@ -1220,6 +2434,21 @@ function limpiarCallesSUMO() {
         estado.callesSUMO = null;
         estado.callesGeoJSON = null;
         console.log('Calles SUMO limpiadas del mapa');
+    }
+    // Remover leyenda y HUD si existen
+    try {
+        const containerLey = estado.__leyendaSUMO && estado.__leyendaSUMO.getContainer && estado.__leyendaSUMO.getContainer();
+        if (containerLey && containerLey.parentNode) containerLey.parentNode.removeChild(containerLey);
+        estado.__leyendaSUMO = null;
+    } catch {}
+    try {
+        const containerHud = estado.__hudSUMO && estado.__hudSUMO.getContainer && estado.__hudSUMO.getContainer();
+        if (containerHud && containerHud.parentNode) containerHud.parentNode.removeChild(containerHud);
+        estado.__hudSUMO = null;
+    } catch {}
+    if (estado.actualizacionTraficoInterval) {
+        clearInterval(estado.actualizacionTraficoInterval);
+        estado.actualizacionTraficoInterval = null;
     }
 }
 
@@ -1280,6 +2509,11 @@ function procesarMensajeWebSocket(mensaje) {
 
     switch (tipo) {
         case 'metricas_actualizadas':
+            // En modo simulador (demo visual), ignorar métricas backend para evitar sobrescritura
+            if (estado.modoActual === 'simulador') {
+                console.log('[WebSocket] Ignorado en modo simulador (demo visual sin backend)');
+                break;
+            }
             console.log(`[WebSocket] Actualizando ${datos.length} métricas...`);
             actualizarMetricasDesdeBackend(datos);
             break;
@@ -1287,6 +2521,16 @@ function procesarMensajeWebSocket(mensaje) {
         case 'ola_verde_activada':
             console.log('[WebSocket] Ola verde activada');
             mostrarOlaVerdeActivada(datos);
+            break;
+
+        case 'ola_verde_desactivada':
+            console.log('[WebSocket] Ola verde desactivada por el backend');
+            desactivarOlaVerde();
+            break;
+
+        case 'ola_verde_completada':
+            console.log('[WebSocket] Ola verde completada exitosamente');
+            desactivarOlaVerde();
             break;
 
         case 'modo_cambiado':
@@ -1342,12 +2586,68 @@ function actualizarTarjetaMetrica(interseccionId, metricas) {
     `;
 }
 
-// ==================== MODO VIDEO CON YOLO ====================
+// ==================== MODO Procesador Video ====================
 
 let streamVideo = null;
 let procesandoVideo = false;
 let intervaloVideo = null;
 let intervaloMetricas = null;
+// Elemento video usado para getUserMedia (si aplica)
+let _videoElementLocal = null;
+let _rafIdLocalVideo = null;
+
+// Inicia la cámara local (getUserMedia) y prepara un elemento <video>
+async function intentarCamaraLocal() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('getUserMedia no soportado en este navegador');
+    }
+
+    // Si ya existe la cámara local, reutilizarla
+    if (_videoElementLocal && _videoElementLocal.srcObject) {
+        return _videoElementLocal;
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+
+    const video = document.createElement('video');
+    video.style.display = 'none';
+    video.autoplay = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.srcObject = stream;
+    document.body.appendChild(video);
+
+    // Esperar a que el video pueda reproducirse
+    await video.play();
+
+    _videoElementLocal = video;
+    streamVideo = video; // marcar como stream activo para la lógica existente
+
+    return video;
+}
+
+function detenerCamaraLocal() {
+    if (_rafIdLocalVideo) {
+        cancelAnimationFrame(_rafIdLocalVideo);
+        _rafIdLocalVideo = null;
+    }
+
+    if (_videoElementLocal) {
+        try {
+            const s = _videoElementLocal.srcObject;
+            if (s && s.getTracks) {
+                s.getTracks().forEach(t => t.stop());
+            }
+        } catch (e) {
+            console.warn('Error deteniendo tracks de la cámara local:', e);
+        }
+
+        if (_videoElementLocal.parentNode) {
+            _videoElementLocal.parentNode.removeChild(_videoElementLocal);
+        }
+        _videoElementLocal = null;
+    }
+}
 
 async function activarModoVideo(videoIndex) {
     try {
@@ -1356,77 +2656,166 @@ async function activarModoVideo(videoIndex) {
         const canvas = document.getElementById('video-canvas');
         const ctx = canvas.getContext('2d');
 
-        const imgElement = document.createElement('img');
-        imgElement.style.display = 'none';
-        document.body.appendChild(imgElement);
-
         let streamUrl;
         const esCamara = (videoIndex === 0);
 
         if (esCamara) {
             console.log('Conectando a camara de laptop...');
-            streamUrl = `${API_URL}/api/video/stream-camera?t=${Date.now()}`;
+            // Endpoint remoto (fallback) para la cámara en el backend
+            streamUrl = `${API_URL}/api/video/stream-camera`;
         } else {
             console.log(`Conectando a video procesado (indice ${videoIndex - 1})...`);
             streamUrl = `${API_URL}/api/video/stream-video-index/${videoIndex - 1}?t=${Date.now()}`;
         }
 
         console.log('URL del stream:', streamUrl);
-        imgElement.src = streamUrl;
         procesandoVideo = true;
 
-        const actualizarCanvas = () => {
-            if (!procesandoVideo || estado.modoActual !== 'video') {
-                detenerModoVideo();
-                return;
-            }
+        // Para la cámara MIR000, usar SIEMPRE el stream del backend con YOLO
+        if (esCamara) {
+            console.log('Conectando a stream de cámara con YOLO desde backend...');
 
-            try {
-                if (imgElement.complete && imgElement.naturalHeight !== 0) {
-                    ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+            // Crear elemento img para recibir el stream MJPEG del backend
+            const imgElement = document.createElement('img');
+            imgElement.style.display = 'none';
+            document.body.appendChild(imgElement);
+
+            imgElement.src = streamUrl;
+            console.log('Iniciando stream de cámara con análisis YOLO...');
+
+            const actualizarCanvas = () => {
+                if (!procesandoVideo || !modoEsProcesadorVideo()) {
+                    detenerModoVideo();
+                    return;
                 }
-            } catch (error) {
-                console.error('Error dibujando frame:', error);
-            }
 
-            requestAnimationFrame(actualizarCanvas);
-        };
+                try {
+                    if (imgElement.complete && imgElement.naturalHeight !== 0) {
+                        ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+                    }
+                } catch (error) {
+                    console.error('Error dibujando frame de cámara:', error);
+                }
+
+                requestAnimationFrame(actualizarCanvas);
+            };
+
+            imgElement.onload = () => {
+                imgElement._retryCount = 0;
+                console.log('✓ Stream de cámara con YOLO conectado');
+                actualizarCanvas();
+            };
+
+            imgElement.onerror = () => {
+                imgElement._retryCount = (imgElement._retryCount || 0) + 1;
+                console.error(`Error conectando al stream de cámara (intento ${imgElement._retryCount})`);
+                console.error('URL intentada:', streamUrl);
+
+                if (imgElement._retryCount <= 5) {
+                    setTimeout(() => {
+                        try {
+                            imgElement.src = `${streamUrl}?t=${Date.now()}&_r=${imgElement._retryCount}`;
+                        } catch (e) {
+                            console.error('Error reintentando cargar stream de cámara:', e);
+                        }
+                    }, 500 * imgElement._retryCount);
+                } else {
+                    console.error('No se pudo conectar al stream de cámara después de varios intentos.');
+                    detenerModoVideo();
+                }
+            };
+
+            streamVideo = imgElement;
+
+        } else {
+            // Para videos pregrabados, usar el método original que funciona
+            const imgElement = document.createElement('img');
+            imgElement.style.display = 'none';
+            document.body.appendChild(imgElement);
+
+            imgElement.src = streamUrl;
+            console.log('Cargando video procesado:', streamUrl);
+
+            const actualizarCanvas = () => {
+                if (!procesandoVideo || !modoEsProcesadorVideo()) {
+                    detenerModoVideo();
+                    return;
+                }
+
+                try {
+                    if (imgElement.complete && imgElement.naturalHeight !== 0) {
+                        ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+                    }
+                } catch (error) {
+                    console.error('Error dibujando frame:', error);
+                }
+
+                requestAnimationFrame(actualizarCanvas);
+            };
+
+            imgElement.onload = () => {
+                // Resetear contador de reintentos y arrancar render
+                imgElement._retryCount = 0;
+                console.log('✓ Video procesado conectado');
+                actualizarCanvas();
+            };
+
+            imgElement.onerror = () => {
+                imgElement._retryCount = (imgElement._retryCount || 0) + 1;
+                console.error(`Error conectando al stream de video (intento ${imgElement._retryCount})`);
+                console.error('URL intentada:', streamUrl);
+
+                if (imgElement._retryCount <= 5) {
+                    // Reintentar con timestamp nuevo para evitar cache
+                    setTimeout(() => {
+                        try {
+                            imgElement.src = `${streamUrl.split('?')[0]}?t=${Date.now()}&_r=${imgElement._retryCount}`;
+                        } catch (e) {
+                            console.error('Error reintentando cargar video procesado:', e);
+                        }
+                    }, 500 * imgElement._retryCount);
+                } else {
+                    console.warn('No se pudo conectar al stream de video después de varios intentos. Intentando usar cámara local (getUserMedia) como fallback.');
+                    intentarCamaraLocal().catch(err => {
+                        console.error('Fallback getUserMedia falló:', err);
+                        detenerModoVideo();
+                    });
+                }
+            };
+
+            streamVideo = imgElement;
+        }
 
         const actualizarMetricas = async () => {
             try {
                 const response = await fetch(`${API_URL}/api/video/metricas-stream`);
                 const metricas = await response.json();
 
-                document.getElementById('video-vehiculos').textContent = metricas.num_vehiculos;
-                document.getElementById('video-fps').textContent = metricas.fps;
-                document.getElementById('video-icv').textContent = metricas.icv.toFixed(2);
+                document.getElementById('video-vehiculos').textContent = metricas.num_vehiculos || 0;
+                document.getElementById('video-fps').textContent = metricas.fps || 0;
+                document.getElementById('video-icv').textContent = (metricas.icv || 0).toFixed(2);
             } catch (error) {
                 console.error('Error obteniendo metricas:', error);
+                // Mostrar valores por defecto en caso de error
+                document.getElementById('video-vehiculos').textContent = '0';
+                document.getElementById('video-fps').textContent = '0';
+                document.getElementById('video-icv').textContent = '0.00';
             }
         };
 
-        imgElement.onload = () => {
-            console.log('Stream conectado exitosamente');
-            actualizarCanvas();
+        // Actualizar métricas
+        if (intervaloMetricas) {
+            clearInterval(intervaloMetricas);
+        }
+        intervaloMetricas = setInterval(actualizarMetricas, 1000);
+        console.log('✓ Metricas activadas - actualizando cada segundo');
 
-            if (esCamara) {
-                intervaloMetricas = setInterval(actualizarMetricas, 1000);
-            }
-        };
-
-        imgElement.onerror = () => {
-            console.error('Error conectando al stream');
-            console.error('URL intentada:', streamUrl);
-            alert('Error al conectar con el stream.\n\nAsegurate de que:\n1. El servidor backend esta corriendo\n2. La URL es correcta: ' + streamUrl);
-            detenerModoVideo();
-        };
-
-        streamVideo = imgElement;
         console.log('[OK] Modo video activado');
 
     } catch (error) {
         console.error('Error activando modo video:', error);
         alert('Error al activar el modo video. Ver consola para mas detalles.');
+        detenerModoVideo();
     }
 }
 
@@ -1442,6 +2831,9 @@ function cargarInterseccionesSimulador() {
     });
 
     selector.onchange = seleccionarInterseccionCamara;
+
+    // Nota: ya no se auto-selecciona ni se activa el video automáticamente
+    // El usuario debe seleccionar manualmente la intersección y activar el Procesador Video
 }
 
 async function cargarInterseccionesVideo() {
@@ -1462,13 +2854,23 @@ async function cargarInterseccionesVideo() {
         optionCamara.textContent = 'MIR 000 - Camara Laptop';
         selector.appendChild(optionCamara);
 
-        data.videos.forEach((video, index) => {
-            const option = document.createElement('option');
-            option.value = String(index + 1);
-            const mirNumber = String(index + 1).padStart(3, '0');
-            option.textContent = `MIR ${mirNumber} - ${video.nombre}`;
-            selector.appendChild(option);
-        });
+        // Agregar MIR 001 y MIR 002 según los videos guardados por la última ejecución
+        if (data.videos && data.videos.length > 0) {
+            const nombres = data.videos.map(v => v.nombre || v); // soporte para string o objeto
+            // MIR 001 corresponde al índice 0
+            const opt1 = document.createElement('option');
+            opt1.value = '1';
+            opt1.textContent = `MIR 001 - ${nombres[0] || 'Video 1'}`;
+            selector.appendChild(opt1);
+
+            // MIR 002 corresponde al índice 1 si existe
+            if (data.videos.length > 1) {
+                const opt2 = document.createElement('option');
+                opt2.value = '2';
+                opt2.textContent = `MIR 002 - ${nombres[1] || 'Video 2'}`;
+                selector.appendChild(opt2);
+            }
+        }
 
         selector.value = '';
 
@@ -1496,6 +2898,8 @@ async function cargarInterseccionesVideo() {
                 await activarModoVideo(videoIndex);
             }
         };
+
+        // Nota: no se auto-activa la cámara ni el video aquí. El usuario debe seleccionar y activar manualmente.
 
     } catch (error) {
         console.error('Error cargando videos:', error);
@@ -1526,6 +2930,22 @@ function detenerModoVideo() {
             streamVideo.getTracks().forEach(track => track.stop());
         }
         streamVideo = null;
+    }
+
+    // Limpiar TODOS los elementos img que puedan estar cargando streams
+    const imgElements = document.querySelectorAll('img[src*="/api/video/stream"]');
+    imgElements.forEach(img => {
+        img.src = '';
+        if (img.parentNode) {
+            img.parentNode.removeChild(img);
+        }
+    });
+
+    // Detener y limpiar cámara local si estaba activa
+    try {
+        detenerCamaraLocal();
+    } catch (e) {
+        console.warn('Error al detener cámara local:', e);
     }
 
     const canvas = document.getElementById('video-canvas');
@@ -1566,13 +2986,22 @@ function dibujarDetecciones(ctx, detecciones, canvasWidth, canvasHeight) {
 
 // ==================== MEJORA DE OLAS VERDES ====================
 
-function mostrarOlaVerdeActivada(datos) {
-    console.log('Mostrando ola verde:', datos);
-
-    // Limpiar ola verde anterior si existe
-    if (estado.olaVerdeActiva) {
-        estado.mapa.removeLayer(estado.olaVerdeActiva);
+async function mostrarOlaVerdeActivada(datos) {
+    console.log('📍 Mostrando ola verde:', datos);
+    console.log('   ¿Tiene hospital destino?', !!datos._hospitalDestino);
+    if (datos._hospitalDestino) {
+        console.log('   Hospital:', datos._hospitalDestino.nombre);
     }
+
+    // Limpiar completamente cualquier ola verde anterior
+    desactivarOlaVerde();
+    // Asegurar que los íconos de hospitales estén visibles mientras la ola esté activa (si aplica)
+    try {
+        const tipoVehiculo = datos.vehiculo?.tipo;
+        if (tipoVehiculo === 'ambulancia') {
+            mostrarMarcadoresHospitales();
+        }
+    } catch {}
 
     // Obtener ruta de la ola verde
     const ruta = datos.ruta || [];
@@ -1581,19 +3010,121 @@ function mostrarOlaVerdeActivada(datos) {
         return;
     }
 
-    // Convertir IDs a coordenadas
-    const coordenadas = ruta.map(id => {
-        const inter = INTERSECCIONES_LIMA.find(i => i.id === id);
-        return inter ? [inter.latitud, inter.longitud] : null;
-    }).filter(c => c !== null);
+    // Calcular ruta y destino
+    let coordenadasRutaReal;
+    let destinoFinalCoords;
+    let nombreDestino = 'Destino';
+    let iconoDestino = '🏁';
 
-    if (coordenadas.length < 2) {
-        console.log('No se pudieron obtener coordenadas para la ruta');
-        return;
+    console.log('🔍 Verificando modo de ruta...');
+    console.log('   datos._hospitalDestino:', datos._hospitalDestino);
+    console.log('   Tipo:', typeof datos._hospitalDestino);
+    
+    if (datos._hospitalDestino && datos._hospitalDestino.lat && datos._hospitalDestino.lon) {
+        // ========== MODO HOSPITAL: Ruta ÓPTIMA directa sin intersecciones intermedias ==========
+        console.log('🔴 DETECTADO HOSPITAL DESTINO - Modo ruta directa activado');
+        const hosp = datos._hospitalDestino;
+        console.log('   Hospital:', hosp);
+        const origenInter = INTERSECCIONES_LIMA.find(i => i.id === ruta[0]);
+        
+        if (!origenInter) {
+            console.error('No se encontró intersección origen');
+            return;
+        }
+
+        const origenCoords = [origenInter.latitud, origenInter.longitud];
+        destinoFinalCoords = [hosp.lat, hosp.lon];
+        nombreDestino = hosp.nombre;
+        iconoDestino = '🏥';
+        
+        console.log('🏥 MODO HOSPITAL - Ruta directa óptima');
+        console.log('   Desde:', ruta[0], origenCoords);
+        console.log('   Hasta:', nombreDestino, destinoFinalCoords);
+        
+        // Calcular ruta ÓPTIMA directa con Mapbox (solo origen y hospital)
+        // Esto usa el algoritmo de Mapbox para encontrar la ruta más rápida/corta
+        try {
+            const rutaMapbox = await obtenerRutaMapbox(origenCoords, destinoFinalCoords, 'driving');
+            
+            if (rutaMapbox && rutaMapbox.geometry && rutaMapbox.geometry.coordinates) {
+                coordenadasRutaReal = rutaMapbox.geometry.coordinates.map(c => [c[1], c[0]]);
+                const distanciaKm = (rutaMapbox.distance / 1000).toFixed(2);
+                const tiempoMin = (rutaMapbox.duration / 60).toFixed(1);
+                const velocidadProm = ((rutaMapbox.distance / 1000) / (rutaMapbox.duration / 3600)).toFixed(1);
+                
+                console.log('   ✅ Ruta óptima calculada:');
+                console.log('      📏 Distancia:', distanciaKm, 'km');
+                console.log('      ⏱️  Tiempo estimado:', tiempoMin, 'min');
+                console.log('      🚗 Velocidad promedio:', velocidadProm, 'km/h');
+                if (rutaMapbox.weight) console.log('      ⚖️  Peso de ruta:', rutaMapbox.weight.toFixed(1));
+                
+                // Guardar datos de Mapbox para mostrar en el panel
+                datos._datosMapbox = {
+                    distance: rutaMapbox.distance,
+                    duration: rutaMapbox.duration,
+                    weight: rutaMapbox.weight,
+                    weight_name: rutaMapbox.weight_name
+                };
+            } else {
+                console.warn('   ⚠️  Mapbox falló, usando línea directa');
+                coordenadasRutaReal = [origenCoords, destinoFinalCoords];
+            }
+        } catch (error) {
+            console.warn('   ❌ Error Mapbox:', error);
+            coordenadasRutaReal = [origenCoords, destinoFinalCoords];
+        }
+    } else {
+        // ========== MODO INTERSECCIÓN: Ruta directa (igual que hospital) ==========
+        const destinoInter = INTERSECCIONES_LIMA.find(i => i.id === ruta[ruta.length - 1]);
+        
+        if (!destinoInter) {
+            console.error('No se encontró intersección destino');
+            return;
+        }
+
+        const destinoCoords = [destinoInter.latitud, destinoInter.longitud];
+        destinoFinalCoords = destinoCoords;
+        nombreDestino = destinoInter.nombre;
+        iconoDestino = '🏁';
+        
+        console.log('🚦 Destino: Intersección -', nombreDestino);
+        console.log('🚗 Calculando ruta directa óptima');
+        
+        // Calcular ruta DIRECTA con Mapbox (solo origen y destino)
+        try {
+            const rutaMapbox = await obtenerRutaMapbox(origenCoords, destinoCoords, 'driving');
+            
+            if (rutaMapbox && rutaMapbox.geometry && rutaMapbox.geometry.coordinates) {
+                coordenadasRutaReal = rutaMapbox.geometry.coordinates.map(c => [c[1], c[0]]);
+                
+                datos._datosMapbox = {
+                    distance: rutaMapbox.distance,
+                    duration: rutaMapbox.duration,
+                    weight: rutaMapbox.weight,
+                    weight_name: rutaMapbox.weight_name
+                };
+                
+                const distanciaKm = (rutaMapbox.distance / 1000).toFixed(2);
+                const tiempoMin = (rutaMapbox.duration / 60).toFixed(1);
+                console.log('   ✅ Ruta calculada:', distanciaKm, 'km,', tiempoMin, 'min');
+            } else {
+                console.warn('   ⚠️  Mapbox falló, usando línea directa');
+                coordenadasRutaReal = [origenCoords, destinoCoords];
+            }
+        } catch (error) {
+            console.warn('   ❌ Error Mapbox:', error);
+            coordenadasRutaReal = [origenCoords, destinoCoords];
+        }
     }
 
-    // Dibujar ruta animada con color VERDE (ola verde!)
-    estado.olaVerdeActiva = L.polyline(coordenadas, {
+    // Verificar qué coordenadas se van a dibujar
+    console.log('📍 FINAL - Dibujando polyline con', coordenadasRutaReal ? coordenadasRutaReal.length : 0, 'puntos');
+    if (coordenadasRutaReal && coordenadasRutaReal.length > 0) {
+        console.log('   Primera coord:', coordenadasRutaReal[0]);
+        console.log('   Última coord:', coordenadasRutaReal[coordenadasRutaReal.length - 1]);
+    }
+    
+    estado.olaVerdeActiva = L.polyline(coordenadasRutaReal, {
         color: '#10b981',  // Verde brillante
         weight: 8,
         opacity: 0.9,
@@ -1602,29 +3133,16 @@ function mostrarOlaVerdeActivada(datos) {
         lineJoin: 'round',
         className: 'ruta-emergencia-animada'
     }).addTo(estado.mapa);
+    console.log('✓ Polyline dibujada en el mapa');
 
-    // Línea de sombra para mejor visibilidad
-    const sombraOlaVerde = L.polyline(coordenadas, {
-        color: '#000000',
-        weight: 10,
-        opacity: 0.3,
-        dashArray: '15, 10',
-        lineCap: 'round',
-        lineJoin: 'round'
-    }).addTo(estado.mapa);
-
-    // Almacenar marcadores para limpieza posterior
+    // Inicializar array de marcadores si no existe
     if (!estado.marcadoresOlaVerde) {
         estado.marcadoresOlaVerde = [];
     }
 
-    // Limpiar marcadores anteriores
-    estado.marcadoresOlaVerde.forEach(m => estado.mapa.removeLayer(m));
-    estado.marcadoresOlaVerde = [];
-
     // Agregar marcadores en origen y destino
-    const origen = coordenadas[0];
-    const destino = coordenadas[coordenadas.length - 1];
+    const origen = coordenadasRutaReal[0];
+    const destino = destinoFinalCoords;  // Usar destino final (hospital o intersección)
 
     const markerOrigen = L.marker(origen, {
         icon: L.divIcon({
@@ -1634,40 +3152,93 @@ function mostrarOlaVerdeActivada(datos) {
         })
     }).addTo(estado.mapa).bindPopup('<b style="color: #10b981;">Origen</b>');
 
+    // Marcador de destino (hospital o intersección) - oculto visualmente
     const markerDestino = L.marker(destino, {
         icon: L.divIcon({
-            html: '<div style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 8px; border-radius: 50%; font-size: 24px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5); border: 3px solid white;">🏁</div>',
+            html: `<div style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 8px; border-radius: 50%; font-size: 24px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5); border: 3px solid white; opacity: 0;">${iconoDestino}</div>`,
             className: '',
             iconSize: [50, 50]
         })
-    }).addTo(estado.mapa).bindPopup('<b style="color: #ef4444;">Destino</b>');
+    }).addTo(estado.mapa).bindPopup(`<b style="color: #ef4444;">${nombreDestino}</b>`);
 
-    estado.marcadoresOlaVerde.push(markerOrigen, markerDestino, sombraOlaVerde);
+    estado.marcadoresOlaVerde.push(markerOrigen, markerDestino);
 
-    // Centrar mapa en la ruta
-    estado.mapa.fitBounds(coordenadas);
+    // Centrar mapa en la ruta (usar coordenadas reales)
+    estado.mapa.fitBounds(coordenadasRutaReal);
 
-    // Actualizar panel de olas verdes
+    // Extraer datos reales de Mapbox si están disponibles
+    let datosMapbox = datos._datosMapbox || {};
+    let distanciaKm = datosMapbox.distance ? (datosMapbox.distance / 1000).toFixed(2) : ((datos.distancia_total || 0) / 1000).toFixed(2);
+    let tiempoMin = datosMapbox.duration ? (datosMapbox.duration / 60).toFixed(1) : ((datos.tiempo_estimado || 0) / 60).toFixed(1);
+    let velocidadPromedio = datosMapbox.distance && datosMapbox.duration 
+        ? ((datosMapbox.distance / 1000) / (datosMapbox.duration / 3600)).toFixed(1) 
+        : '-';
+    
+    // Actualizar panel de olas verdes con datos reales de Mapbox
     const container = document.getElementById('olas-verdes-container');
+    const iconoVehiculo = datos.vehiculo?.tipo === 'ambulancia' ? '🚑' : 
+                          datos.vehiculo?.tipo === 'bomberos' ? '🚒' : '🚨';
+    const tipoVehiculo = datos.vehiculo?.tipo || 'Emergencia';
+    const destinoTexto = nombreDestino !== 'Destino' ? nombreDestino : `${ruta[ruta.length - 1]}`;
+    
     container.innerHTML = `
-        <div class="ola-verde-activa">
-            <div class="ola-header">
-                <i class="fas fa-ambulance"></i>
-                <strong>Ola Verde Activa</strong>
+        <div class="metrica-card" style="background: rgba(16, 185, 129, 0.2); border-left: 3px solid #10b981; margin-bottom: 0;">
+            <div class="metrica-header" style="margin-bottom: 0.6rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">${iconoVehiculo}</span>
+                    <div style="flex: 1;">
+                        <div class="metrica-nombre" style="font-size: 0.8rem; margin-bottom: 0.1rem;">Ola Verde Activa</div>
+                        <div style="font-size: 0.65rem; color: rgba(255,255,255,0.7);">${tipoVehiculo.toUpperCase()}</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <div class="metrica-icv" style="background: #10b981; font-size: 0.7rem; padding: 0.2rem 0.6rem;">
+                        ACTIVA
+                    </div>
+                    <button onclick="desactivarOlaVerde()" style="background: #ef4444; color: white; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; transition: all 0.2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'" title="Desactivar ola verde">
+                        ✕
+                    </button>
+                </div>
             </div>
-            <div class="ola-info">
-                <p><strong>Vehículo:</strong> ${datos.vehiculo?.tipo || 'Emergencia'}</p>
-                <p><strong>Intersecciones:</strong> ${ruta.length}</p>
-                <p><strong>Distancia:</strong> ${(datos.distancia_total || 0).toFixed(0)} m</p>
-                <p><strong>Tiempo estimado:</strong> ${(datos.tiempo_estimado || 0).toFixed(0)} s</p>
+            <div class="metrica-detalles" style="grid-template-columns: 1fr; gap: 0.4rem;">
+                <div class="detalle-item">
+                    <span class="detalle-label">📍 Destino</span>
+                    <div class="detalle-valor" style="font-size: 0.7rem; font-weight: 600;">${destinoTexto}</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem;">
+                    <div class="detalle-item">
+                        <span class="detalle-label">📏 Distancia</span>
+                        <div class="detalle-valor">${distanciaKm} km</div>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">⏱️ Tiempo</span>
+                        <div class="detalle-valor">${tiempoMin} min</div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem;">
+                    <div class="detalle-item">
+                        <span class="detalle-label">🚗 Velocidad</span>
+                        <div class="detalle-valor">${velocidadPromedio} km/h</div>
+                    </div>
+                    ${datosMapbox.weight ? `
+                    <div class="detalle-item">
+                        <span class="detalle-label">⚖️ Peso</span>
+                        <div class="detalle-valor">${datosMapbox.weight.toFixed(1)}</div>
+                    </div>` : '<div></div>'}
+                </div>
             </div>
+
         </div>
     `;
 
-    // Desactivar automáticamente después de cierto tiempo
-    setTimeout(() => {
+    // Desactivar automáticamente después del tiempo estimado
+    const tiempoDesactivacion = (datos.tiempo_estimado || 30) * 1000;
+    console.log(`⏱️  Ola verde se desactivará automáticamente en ${tiempoDesactivacion/1000}s`);
+    
+    estado.timeoutOlaVerde = setTimeout(() => {
+        console.log('⏱️  Tiempo cumplido, desactivando ola verde automáticamente');
         desactivarOlaVerde();
-    }, (datos.tiempo_estimado || 30) * 1000);
+    }, tiempoDesactivacion);
 }
 
 // ==================== NUEVAS FUNCIONES DE VIDEO Y CÁMARA ====================
@@ -1687,50 +3258,95 @@ const estadoVideo = {
     vehiculoEmergenciaSeguido: null
 };
 
-// Toggle activar/desactivar video YOLO
+// Helper: devuelve true si el modo actual corresponde al Procesador Video
+function modoEsProcesadorVideo() {
+    return ['video', 'procesador_video', 'procesador-video'].includes(estado.modoActual);
+}
+
+// Toggle activar/desactivar del Procesador Video
 function toggleVideoYOLO() {
     const btn = document.getElementById('btn-toggle-video');
-    const icon = btn.querySelector('i');
+    if (!btn) {
+        console.error('Botón btn-toggle-video no encontrado');
+        return;
+    }
+
     const indicator = document.querySelector('.camera-mode-indicator');
     const texto = document.getElementById('modo-camara-texto');
 
+    if (!indicator || !texto) {
+        console.error('Elementos de indicador no encontrados');
+        return;
+    }
+
     if (estadoVideo.activo) {
         estadoVideo.activo = false;
-        icon.classList.remove('fa-stop');
-        icon.classList.add('fa-play');
+        // Actualizar ícono del botón (mantener el elemento <i> si existe para evitar quitar contenido)
+        let iconElemOff = btn.querySelector('i');
+        if (!iconElemOff) {
+            iconElemOff = document.createElement('i');
+            btn.appendChild(iconElemOff);
+        }
+        iconElemOff.className = 'fas fa-play';
         btn.title = 'Activar Cámara';
         indicator.classList.remove('active');
         texto.textContent = 'Desactivado';
 
-        if (estado.modoActual === 'video') {
+        if (modoEsProcesadorVideo()) {
             detenerModoVideo();
             const selector = document.getElementById('selector-interseccion-cam');
-            selector.value = '';
+            if (selector) selector.value = '';
         } else {
             detenerSimulacionVideoInterseccion();
         }
 
-        console.log('Video desactivado');
+        console.log('✓ Video desactivado');
     } else {
-        if (estado.modoActual === 'video') {
+        // Verificar que haya una intersección seleccionada antes de activar
+        const selector = document.getElementById('selector-interseccion-cam');
+
+        if (modoEsProcesadorVideo() && (!selector || !selector.value || selector.value === '')) {
             alert('Por favor selecciona una opcion MIR del selector');
+            return;
+        }
+
+        if (estado.modoActual === 'simulador' && (!estadoVideo.interseccionSeleccionada)) {
+            console.warn('[DEBUG] No hay intersección seleccionada en modo simulador');
+            alert('Por favor selecciona una intersección del selector');
+            return;
+        }
+
+        console.log('[DEBUG] Activando video...');
+        console.log('[DEBUG] Modo actual:', estado.modoActual);
+        console.log('[DEBUG] Intersección seleccionada:', estadoVideo.interseccionSeleccionada);
+
+        estadoVideo.activo = true;
+        // Actualizar ícono del botón (mantener el elemento <i> si existe para evitar quitar contenido)
+        let iconElem = btn.querySelector('i');
+        if (!iconElem) {
+            iconElem = document.createElement('i');
+            btn.appendChild(iconElem);
+        }
+        // Usar icono 'pause' para indicar que se puede pausar/stop
+        iconElem.className = 'fas fa-pause';
+        btn.title = 'Desactivar Cámara';
+        indicator.classList.add('active');
+        texto.textContent = 'Activo';
+
+        if (modoEsProcesadorVideo()) {
+            // En modo Procesador Video, activar según la selección (automáticamente se activa con el onChange del selector)
+            console.log('[DEBUG] Modo Procesador Video - activando video procesado');
+            const selectedValue = selector.value;
+            const videoIndex = parseInt(selectedValue);
+            activarModoVideo(videoIndex);
         } else {
-            if (estado.modoActual === 'video') {
-                detenerModoVideo();
-            }
-
-            estadoVideo.activo = true;
-            icon.classList.remove('fa-play');
-            icon.classList.add('fa-stop');
-            btn.title = 'Desactivar Cámara';
-            indicator.classList.add('active');
-            texto.textContent = 'Activo';
-
+            // En modo simulador
+            console.log('[DEBUG] Modo simulador - iniciando simulación de video');
             window.motorGiratorioAnimacion.anguloObjetivo = estadoVideo.ptz.pan;
             iniciarSimulacionVideoInterseccion();
-
-            console.log('Video activado');
         }
+
+        console.log('✓ Video activado correctamente');
     }
 }
 
@@ -1745,31 +3361,81 @@ function toggleExpandVideo() {
         return;
     }
 
-    const icon = btn.querySelector('i');
-    if (!icon) {
-        console.error('Ícono del botón expandir no encontrado');
-        return;
-    }
-
     // Toggle estado
     estadoVideo.expandido = !estadoVideo.expandido;
 
-    if (estadoVideo.expandido) {
+        if (estadoVideo.expandido) {
         // Expandir panel
         panel.classList.add('expanded');
-        icon.classList.remove('fa-expand');
-        icon.classList.add('fa-compress');
+        // Actualizar ícono del botón expandir/contraer sin reemplazar innerHTML
+        let expandIcon = btn.querySelector('i');
+        if (!expandIcon) {
+            expandIcon = document.createElement('i');
+            btn.appendChild(expandIcon);
+        }
+        expandIcon.className = 'fas fa-compress';
         btn.title = 'Contraer (ESC)';
         document.body.style.overflow = 'hidden';
-        console.log('Panel de video expandido');
-    } else {
+        // Forzar visibilidad de los botones de cabecera cuando el panel está expandido
+        const btnToggle = document.getElementById('btn-toggle-video');
+        const headerActions = panel.querySelector('.header-actions');
+
+        if (headerActions) {
+            headerActions.style.position = 'absolute';
+            headerActions.style.right = '16px';
+            headerActions.style.top = '12px';
+            headerActions.style.zIndex = '10002';
+            headerActions.style.pointerEvents = 'auto';
+        }
+
+        if (btnToggle) {
+            btnToggle.style.display = 'flex';
+            btnToggle.style.visibility = 'visible';
+            btnToggle.style.zIndex = '10003';
+        }
+
+        if (btn) {
+            btn.style.display = 'flex';
+            btn.style.visibility = 'visible';
+            btn.style.zIndex = '10003';
+        }
+        console.log('✓ Panel de video expandido');
+        } else {
         // Contraer panel
         panel.classList.remove('expanded');
-        icon.classList.remove('fa-compress');
-        icon.classList.add('fa-expand');
+        // Actualizar ícono del botón expandir/contraer sin reemplazar innerHTML
+        let expandIconCollapse = btn.querySelector('i');
+        if (!expandIconCollapse) {
+            expandIconCollapse = document.createElement('i');
+            btn.appendChild(expandIconCollapse);
+        }
+        expandIconCollapse.className = 'fas fa-expand';
         btn.title = 'Expandir';
         document.body.style.overflow = '';
-        console.log('Panel de video contraído');
+        // Restaurar estilos inline que pudieran haberse aplicado al expandir
+        const btnToggleRestore = document.getElementById('btn-toggle-video');
+        const headerActionsRestore = panel.querySelector('.header-actions');
+
+        if (headerActionsRestore) {
+            headerActionsRestore.style.position = '';
+            headerActionsRestore.style.right = '';
+            headerActionsRestore.style.top = '';
+            headerActionsRestore.style.zIndex = '';
+            headerActionsRestore.style.pointerEvents = '';
+        }
+
+        if (btnToggleRestore) {
+            btnToggleRestore.style.display = '';
+            btnToggleRestore.style.visibility = '';
+            btnToggleRestore.style.zIndex = '';
+        }
+
+        if (btn) {
+            btn.style.display = '';
+            btn.style.visibility = '';
+            btn.style.zIndex = '';
+        }
+        console.log('✓ Panel de video contraído');
     }
 }
 
@@ -1811,9 +3477,11 @@ function cambiarVistaMapaCamara() {
 // Seleccionar intersección para ver su cámara
 function seleccionarInterseccionCamara(event) {
     const interseccionId = event.target.value;
+    console.log('[DEBUG] seleccionarInterseccionCamara llamada con:', interseccionId);
 
     if (!interseccionId) {
         estadoVideo.interseccionSeleccionada = null;
+        console.log('[DEBUG] Intersección deseleccionada');
         return;
     }
 
@@ -1821,7 +3489,7 @@ function seleccionarInterseccionCamara(event) {
     const interseccion = INTERSECCIONES_LIMA.find(i => i.id === interseccionId);
 
     if (interseccion) {
-        console.log(`Intersección seleccionada: ${interseccion.nombre}`);
+        console.log(`✓ Intersección seleccionada: ${interseccion.nombre} (${interseccionId})`);
 
         // Los controles PTZ se mostrarán automáticamente via CSS
         // solo cuando el panel esté expandido (#panel-video.expanded .ptz-controls)
@@ -1990,19 +3658,41 @@ function detenerSeguimientoVehiculoEmergencia() {
 
 // Iniciar simulación de video de intersección
 function iniciarSimulacionVideoInterseccion() {
+    console.log('[DEBUG] iniciarSimulacionVideoInterseccion llamada');
+    console.log('[DEBUG] estadoVideo.interseccionSeleccionada:', estadoVideo.interseccionSeleccionada);
+
     if (!estadoVideo.interseccionSeleccionada) {
         console.warn('No hay intersección seleccionada para simular video');
         return;
     }
 
     const canvas = document.getElementById('video-canvas');
+    if (!canvas) {
+        console.error('Canvas video-canvas no encontrado');
+        return;
+    }
+
     const ctx = canvas.getContext('2d');
+    console.log('[DEBUG] Canvas y contexto obtenidos correctamente');
+
+    // Detener intervalo anterior si existe
+    if (estado.simulacionVideoInterval) {
+        clearInterval(estado.simulacionVideoInterval);
+        console.log('[DEBUG] Intervalo anterior detenido');
+    }
 
     // Simular video con datos de la intersección
+    let frameCount = 0;
     estado.simulacionVideoInterval = setInterval(() => {
         if (!estadoVideo.activo) {
             clearInterval(estado.simulacionVideoInterval);
+            console.log('[DEBUG] Simulación detenida (video desactivado)');
             return;
+        }
+
+        frameCount++;
+        if (frameCount % 25 === 0) {  // Log cada 5 segundos (25 frames a 5 FPS)
+            console.log(`[DEBUG] Renderizando frame ${frameCount}`);
         }
 
         // Dibujar fondo oscuro
@@ -2018,7 +3708,7 @@ function iniciarSimulacionVideoInterseccion() {
 
     }, 200); // 5 FPS
 
-    console.log('Simulación de video de intersección iniciada');
+    console.log('✓ Simulación de video de intersección iniciada correctamente');
 }
 
 // Detener simulación de video
@@ -2274,16 +3964,46 @@ function actualizarYDibujarVehiculos(ctx, canvas, centroX, centroY, anchoPista) 
     const deltaTime = (ahora - window.ultimoFrameVehiculos) / 1000; // segundos
     window.ultimoFrameVehiculos = ahora;
 
-    // Añadir nuevos vehículos aleatoriamente
-    if (Math.random() < 0.15 && window.vehiculosAnimados.length < 12) {
+    // Obtener métricas reales de la intersección seleccionada
+    const metricas = estado.ultimasMetricas && estadoVideo.interseccionSeleccionada
+        ? estado.ultimasMetricas[estadoVideo.interseccionSeleccionada]
+        : null;
+
+    // Determinar número objetivo de vehículos basado en métricas reales
+    let numObjetivoVehiculos = 3; // Default bajo si no hay métricas
+    let probabilidadAparicion = 0.05; // Probabilidad baja por defecto
+
+    if (metricas) {
+        // Calcular número objetivo basado en num_vehiculos y ICV
+        const numVehiculosReal = metricas.num_vehiculos || 0;
+        const icvReal = metricas.icv || 0;
+
+        // Escalar el número de vehículos a un rango visible (3-15 vehículos en pantalla)
+        numObjetivoVehiculos = Math.min(15, Math.max(3, Math.floor(numVehiculosReal / 2)));
+
+        // Ajustar probabilidad de aparición según el flujo y ICV
+        // Mayor ICV = más tráfico = mayor probabilidad
+        probabilidadAparicion = 0.05 + (icvReal * 0.25); // 0.05 a 0.30
+    }
+
+    // Añadir nuevos vehículos basado en métricas reales
+    if (Math.random() < probabilidadAparicion && window.vehiculosAnimados.length < numObjetivoVehiculos) {
         const direccion = ['norte', 'sur', 'este', 'oeste'][Math.floor(Math.random() * 4)];
         const pista = Math.random() > 0.5 ? 0 : 1; // 0 = pista izquierda/superior, 1 = pista derecha/inferior
+
+        // Velocidad basada en las métricas reales
+        let velocidadPixeles = 80; // Default
+        if (metricas && metricas.velocidad) {
+            // Convertir velocidad real (km/h) a píxeles por segundo (escala visual)
+            // Velocidad real típica: 5-60 km/h -> Velocidad visual: 30-120 píx/s
+            velocidadPixeles = 30 + (metricas.velocidad * 1.5);
+        }
 
         const vehiculo = {
             direccion: direccion,
             pista: pista,
             color: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][Math.floor(Math.random() * 5)],
-            velocidad: 60 + Math.random() * 40, // píxeles por segundo
+            velocidad: velocidadPixeles,
             progreso: 0,
             detenido: false
         };
@@ -2401,12 +4121,46 @@ function actualizarYDibujarVehiculos(ctx, canvas, centroX, centroY, anchoPista) 
 
 // Obtener métricas de intersección para mostrar en video
 function obtenerMetricasInterseccionParaVideo(interseccionId) {
-    // En implementación real, esto consultaría las métricas reales
-    // Por ahora, retornamos valores simulados
+    // Buscar las métricas reales de la intersección desde el estado global
+    const interseccion = INTERSECCIONES_LIMA.find(i => i.id === interseccionId);
+
+    if (!interseccion) {
+        console.warn(`Intersección ${interseccionId} no encontrada`);
+        return {
+            vehiculos: 0,
+            fps: 5,
+            icv: '0.00',
+            flujo: 0,
+            velocidad: 0,
+            cola: 0
+        };
+    }
+
+    // Buscar métricas actuales desde el último broadcast
+    // Las métricas se almacenan cuando llegan por WebSocket o simulación local
+    const metricasActuales = estado.ultimasMetricas || {};
+    const metricaInterseccion = metricasActuales[interseccionId];
+
+    if (metricaInterseccion) {
+        // Tenemos métricas reales, usarlas
+        return {
+            vehiculos: metricaInterseccion.num_vehiculos || 0,
+            fps: 5,
+            icv: (metricaInterseccion.icv || 0).toFixed(2),
+            flujo: metricaInterseccion.flujo || 0,
+            velocidad: metricaInterseccion.velocidad || 0,
+            cola: metricaInterseccion.cola || 0
+        };
+    }
+
+    // Si no hay métricas, retornar valores en cero (no hay tráfico)
     return {
-        vehiculos: Math.floor(Math.random() * 15) + 5,
+        vehiculos: 0,
         fps: 5,
-        icv: (Math.random() * 0.6 + 0.2).toFixed(2)
+        icv: '0.00',
+        flujo: 0,
+        velocidad: 0,
+        cola: 0
     };
 }
 
@@ -2442,11 +4196,11 @@ const cargarInterseccionesRealesOriginal = cargarInterseccionesReales;
 cargarInterseccionesReales = function() {
     cargarInterseccionesRealesOriginal();
     setTimeout(poblarSelectorIntersecciones, 500);
-    // Inicializar sistema de tráfico (SIN vehículos animados)
-    setTimeout(() => {
-        inicializarCapaTrafico();
-        iniciarActualizacionTrafico();
-    }, 1000);
+    // DESHABILITADO: Sistema de tráfico en calles (dibujaba líneas verdes en el mapa)
+    // setTimeout(() => {
+    //     inicializarCapaTrafico();
+    //     iniciarActualizacionTrafico();
+    // }, 1000);
 };
 
 // ==================== SISTEMA DE TRÁFICO EN CALLES (AJUSTADO A PISTAS REALES) ====================
@@ -2705,3 +4459,121 @@ function limpiarTrafico() {
 
     console.log('Tráfico limpiado del mapa');
 }
+
+// ==================== MODO OBTENER COORDENADAS ====================
+let modoCoordenadasActivo = false;
+let marcadorCoordenadas = null;
+
+function toggleCoordMode() {
+    modoCoordenadasActivo = !modoCoordenadasActivo;
+    const btn = document.getElementById('toggleCoordMode');
+    const panel = document.getElementById('coord-panel');
+    
+    if (modoCoordenadasActivo) {
+        btn.textContent = '❌ Desactivar Modo Coordenadas';
+        btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+        panel.classList.add('active');
+        // mostrarNotificacion('🗺️ Modo coordenadas activo - Haz clic en el mapa', 'info');
+        
+        // Cambiar cursor del mapa
+        if (estado.mapa) {
+            estado.mapa.getContainer().style.cursor = 'crosshair';
+        }
+    } else {
+        btn.textContent = '📍 Obtener Coordenadas';
+        btn.style.background = 'linear-gradient(135deg, #2563eb, #1d4ed8)';
+        panel.classList.remove('active');
+        
+        // Restaurar cursor
+        if (estado.mapa) {
+            estado.mapa.getContainer().style.cursor = '';
+        }
+        
+        // Limpiar marcador temporal
+        if (marcadorCoordenadas) {
+            estado.mapa.removeLayer(marcadorCoordenadas);
+            marcadorCoordenadas = null;
+        }
+    }
+}
+
+function cerrarCoordPanel() {
+    modoCoordenadasActivo = false;
+    const btn = document.getElementById('toggleCoordMode');
+    const panel = document.getElementById('coord-panel');
+    
+    btn.textContent = '📍 Obtener Coordenadas';
+    btn.style.background = 'linear-gradient(135deg, #2563eb, #1d4ed8)';
+    panel.classList.remove('active');
+    
+    if (estado.mapa) {
+        estado.mapa.getContainer().style.cursor = '';
+    }
+    
+    if (marcadorCoordenadas) {
+        estado.mapa.removeLayer(marcadorCoordenadas);
+        marcadorCoordenadas = null;
+    }
+}
+
+function mostrarCoordenadas(lat, lon) {
+    document.getElementById('coord-lat').value = lat.toFixed(6);
+    document.getElementById('coord-lon').value = lon.toFixed(6);
+    document.getElementById('coord-full').value = `lat: ${lat.toFixed(6)}, lon: ${lon.toFixed(6)}`;
+    
+    // Limpiar marcador anterior
+    if (marcadorCoordenadas) {
+        estado.mapa.removeLayer(marcadorCoordenadas);
+    }
+    
+    // Crear nuevo marcador temporal
+    marcadorCoordenadas = L.marker([lat, lon], {
+        icon: L.divIcon({
+            html: '<div style="background: #ef4444; color: white; padding: 8px; border-radius: 50%; font-size: 20px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5); border: 3px solid white;">📍</div>',
+            className: '',
+            iconSize: [40, 40]
+        })
+    }).addTo(estado.mapa);
+}
+
+function copiarCoordenada(tipo) {
+    let texto = '';
+    
+    if (tipo === 'lat') {
+        texto = document.getElementById('coord-lat').value;
+    } else if (tipo === 'lon') {
+        texto = document.getElementById('coord-lon').value;
+    } else {
+        texto = document.getElementById('coord-full').value;
+    }
+    
+    navigator.clipboard.writeText(texto).then(() => {
+        mostrarNotificacion('✅ Coordenada copiada al portapapeles', 'success');
+    }).catch(() => {
+        mostrarNotificacion('❌ Error al copiar', 'error');
+    });
+}
+
+// Interceptar clicks en el mapa cuando el modo coordenadas está activo
+function setupMapClickForCoords() {
+    if (!estado.mapa) return;
+    
+    estado.mapa.on('click', function(e) {
+        if (modoCoordenadasActivo) {
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            mostrarCoordenadas(lat, lon);
+            console.log('📍 Coordenadas:', lat, lon);
+        }
+    });
+}
+
+// ==================== INICIALIZACIÓN ====================
+// Configurar event listeners cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', configurarEventListeners);
+} else {
+    // El DOM ya está listo, ejecutar inmediatamente
+    configurarEventListeners();
+}
+

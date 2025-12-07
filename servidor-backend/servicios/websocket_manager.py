@@ -66,16 +66,20 @@ class WebSocketManager:
         """
         conexiones_cerradas = []
 
-        for conexion_id, websocket in cls._conexiones.items():
+        # Iterar sobre una copia segura para evitar 'dictionary changed size during iteration'
+        for conexion_id, websocket in list(cls._conexiones.items()):
             try:
                 await websocket.send_json(mensaje)
             except Exception as e:
                 logger.warning(f"Error enviando mensaje a {conexion_id}: {e}")
                 conexiones_cerradas.append(conexion_id)
 
-        # Limpiar conexiones cerradas
+        # Limpiar conexiones cerradas fuera del bucle
         for conexion_id in conexiones_cerradas:
-            cls.remover_conexion(conexion_id)
+            try:
+                cls.remover_conexion(conexion_id)
+            except Exception as e:
+                logger.warning(f"No se pudo remover conexión {conexion_id}: {e}")
 
     @classmethod
     async def enviar_a_suscriptores(cls, interseccion_id: str, mensaje: Dict[str, Any]):
@@ -88,7 +92,8 @@ class WebSocketManager:
         """
         conexiones_cerradas = []
 
-        for conexion_id, websocket in cls._conexiones.items():
+        # Copia segura para evitar errores por modificación concurrente
+        for conexion_id, websocket in list(cls._conexiones.items()):
             # Verificar si está suscrito a esta intersección
             if interseccion_id in cls._suscripciones.get(conexion_id, set()):
                 try:
@@ -97,9 +102,12 @@ class WebSocketManager:
                     logger.warning(f"Error enviando a {conexion_id}: {e}")
                     conexiones_cerradas.append(conexion_id)
 
-        # Limpiar
+        # Limpiar conexiones cerradas fuera del bucle
         for conexion_id in conexiones_cerradas:
-            cls.remover_conexion(conexion_id)
+            try:
+                cls.remover_conexion(conexion_id)
+            except Exception as e:
+                logger.warning(f"No se pudo remover conexión {conexion_id}: {e}")
 
     @classmethod
     def total_conexiones(cls) -> int:

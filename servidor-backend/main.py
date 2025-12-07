@@ -42,6 +42,7 @@ nucleo_path = Path(__file__).parent.parent / 'nucleo'
 indice_mod = import_module_from_path('indice_congestion', nucleo_path / 'indice_congestion.py')
 difuso_mod = import_module_from_path('controlador_difuso', nucleo_path / 'controlador_difuso.py')
 olas_mod = import_module_from_path('olas_verdes_dinamicas', nucleo_path / 'olas_verdes_dinamicas.py')
+estado_global_mod = import_module_from_path('estado_global', nucleo_path / 'estado_global.py')
 
 CalculadorICV = indice_mod.CalculadorICV
 ParametrosInterseccion = indice_mod.ParametrosInterseccion
@@ -50,6 +51,7 @@ GrafoIntersecciones = olas_mod.GrafoIntersecciones
 CoordinadorOlasVerdes = olas_mod.CoordinadorOlasVerdes
 Interseccion = olas_mod.Interseccion
 VehiculoEmergencia = olas_mod.VehiculoEmergencia
+EstadoGlobalRed = estado_global_mod.EstadoGlobalRed
 
 # Importar simulador
 simulador_path = Path(__file__).parent.parent / 'simulador_trafico'
@@ -72,9 +74,29 @@ estado_sistema = {
     'controlador_difuso': None,
     'coordinador_olas_verdes': None,
     'conector_sumo': None,  # Se inicializa al activar modo SUMO
+    'sumo_auto_step': None,  # Tarea que avanza SUMO automáticamente
     'intersecciones': {},
-    'conexiones_ws': []
+    'conexiones_ws': [],
+    'estado_global_red': None
 }
+
+
+async def avanzar_sumo_automaticamente():
+    """Avanza la simulación SUMO automáticamente en background"""
+    logger.info("🚀 Iniciando avance automático de SUMO...")
+    while True:
+        try:
+            if estado_sistema.get('conector_sumo') and estado_sistema['conector_sumo'].conectado:
+                continuar = estado_sistema['conector_sumo'].simular_paso()
+                if not continuar:
+                    logger.warning("⚠️  Simulación SUMO terminada")
+                    break
+                await asyncio.sleep(0.1)  # 100ms entre pasos = velocidad 10x
+            else:
+                await asyncio.sleep(1)  # Esperar si no está conectado
+        except Exception as e:
+            logger.error(f"Error en avance automático SUMO: {e}")
+            await asyncio.sleep(1)
 
 
 def inicializar_sistema():
@@ -85,50 +107,71 @@ def inicializar_sistema():
     params = ParametrosInterseccion()
     estado_sistema['calculador_icv'] = CalculadorICV(params)
     estado_sistema['controlador_difuso'] = ControladorDifuso()
+    estado_sistema['estado_global_red'] = EstadoGlobalRed()
 
     # Cargar las 31 intersecciones reales de Lima con coordenadas EXACTAS
     # Coordenadas verificadas en Google Maps, ubicadas en el centro de cada cruce vial
     intersecciones_data = [
         # MIRAFLORES (3 intersecciones)
-        {'id': 'MIR-001', 'nombre': 'Av. Arequipa con Av. Angamos', 'latitud': -12.110273, 'longitud': -77.034874, 'num_carriles': 6, 'zona': 'sur'},
-        {'id': 'MIR-002', 'nombre': 'Av. Larco con Av. Benavides', 'latitud': -12.121832, 'longitud': -77.031044, 'num_carriles': 4, 'zona': 'sur'},
-        {'id': 'MIR-003', 'nombre': 'Av. Arequipa con Av. Benavides', 'latitud': -12.119354, 'longitud': -77.034225, 'num_carriles': 6, 'zona': 'sur'},
-        # SAN ISIDRO (3 intersecciones)
-        {'id': 'SI-001', 'nombre': 'Av. Javier Prado con Av. Arequipa', 'latitud': -12.094817, 'longitud': -77.036156, 'num_carriles': 8, 'zona': 'centro'},
-        {'id': 'SI-002', 'nombre': 'Av. Camino Real con Av. República de Panamá', 'latitud': -12.098156, 'longitud': -77.038967, 'num_carriles': 4, 'zona': 'centro'},
-        {'id': 'SI-003', 'nombre': 'Av. Javier Prado con Av. Canaval y Moreyra', 'latitud': -12.091234, 'longitud': -77.030453, 'num_carriles': 6, 'zona': 'centro'},
+        {'id': 'MIR-001', 'nombre': 'Av. Arequipa con Av. Angamos', 'latitud': -12.1108, 'longitud': -77.0369, 'num_carriles': 6, 'zona': 'sur'},
+        {'id': 'MIR-002', 'nombre': 'Av. Larco con Av. Benavides', 'latitud': -12.1190, 'longitud': -77.0370, 'num_carriles': 4, 'zona': 'sur'},
+        {'id': 'MIR-003', 'nombre': 'Av. Arequipa con Av. Benavides', 'latitud': -12.1238, 'longitud': -77.0325, 'num_carriles': 6, 'zona': 'sur'},
+        # SAN ISIDRO (4 intersecciones)
+        {'id': 'SI-001', 'nombre': 'Av. Javier Prado con Av. Arequipa', 'latitud': -12.0923, 'longitud': -77.0333, 'num_carriles': 8, 'zona': 'centro'},
+        {'id': 'SI-002', 'nombre': 'Av. Camino Real con Av. República de Panamá', 'latitud': -12.0970, 'longitud': -77.0326, 'num_carriles': 4, 'zona': 'centro'},
+        {'id': 'SI-003', 'nombre': 'Av. Javier Prado con Av. Canaval y Moreyra', 'latitud': -12.1035, 'longitud': -77.0316, 'num_carriles': 6, 'zona': 'centro'},
+        {'id': 'SI-004', 'nombre': 'Av. Aviación con Av. Javier Prado', 'latitud': -12.0947, 'longitud': -77.0507, 'num_carriles': 8, 'zona': 'centro'},
         # LIMA CENTRO (4 intersecciones)
         {'id': 'LC-001', 'nombre': 'Av. Abancay con Jr. Lampa', 'latitud': -12.046978, 'longitud': -77.033456, 'num_carriles': 4, 'zona': 'centro'},
         {'id': 'LC-002', 'nombre': 'Av. Nicolás de Piérola con Jr. de la Unión', 'latitud': -12.046234, 'longitud': -77.030789, 'num_carriles': 4, 'zona': 'centro'},
         {'id': 'LC-003', 'nombre': 'Av. Tacna con Av. Emancipación', 'latitud': -12.051234, 'longitud': -77.032567, 'num_carriles': 4, 'zona': 'centro'},
         {'id': 'LC-004', 'nombre': 'Av. Alfonso Ugarte con Av. Venezuela', 'latitud': -12.057823, 'longitud': -77.038912, 'num_carriles': 6, 'zona': 'centro'},
-        # LA VICTORIA (2 intersecciones)
-        {'id': 'LV-001', 'nombre': 'Av. Grau con Av. 28 de Julio', 'latitud': -12.067845, 'longitud': -77.026123, 'num_carriles': 6, 'zona': 'centro'},
-        {'id': 'LV-002', 'nombre': 'Av. Aviación con Av. Javier Prado', 'latitud': -12.085234, 'longitud': -77.005678, 'num_carriles': 8, 'zona': 'centro'},
+        # LA VICTORIA (4 intersecciones)
+        {'id': 'LV-001', 'nombre': 'Av. Grau con Av. 28 de Julio', 'latitud': -12.0591, 'longitud': -77.0298, 'num_carriles': 6, 'zona': 'centro'},
+        {'id': 'LV-002', 'nombre': 'Av. Aviación con Av. Javier Prado', 'latitud': -12.0841, 'longitud': -77.0041, 'num_carriles': 8, 'zona': 'centro'},
+        {'id': 'LV-003', 'nombre': 'Av. Aviación con Av. 28 de Julio', 'latitud': -12.0610, 'longitud': -77.0130, 'num_carriles': 6, 'zona': 'centro'},
+        {'id': 'LV-004', 'nombre': 'Av. Aviación con Av. 28 de Julio Alt', 'latitud': -12.0719, 'longitud': -77.0115, 'num_carriles': 6, 'zona': 'centro'},
         # SURCO (4 intersecciones)
-        {'id': 'SUR-001', 'nombre': 'Av. Javier Prado con Av. Primavera', 'latitud': -12.093145, 'longitud': -76.978934, 'num_carriles': 8, 'zona': 'sur'},
-        {'id': 'SUR-002', 'nombre': 'Av. Benavides con Av. Tomás Marsano', 'latitud': -12.118923, 'longitud': -77.006734, 'num_carriles': 6, 'zona': 'sur'},
-        {'id': 'SUR-003', 'nombre': 'Av. Higuereta con Av. El Polo', 'latitud': -12.134812, 'longitud': -76.993567, 'num_carriles': 4, 'zona': 'sur'},
-        {'id': 'SUR-004', 'nombre': 'Av. Primavera con Av. República de Panamá', 'latitud': -12.106234, 'longitud': -76.979123, 'num_carriles': 6, 'zona': 'sur'},
-        # SAN JUAN DE LURIGANCHO (2 intersecciones)
-        {'id': 'SJL-001', 'nombre': 'Av. Próceres con Av. Los Jardines', 'latitud': -11.991823, 'longitud': -77.008934, 'num_carriles': 6, 'zona': 'este'},
-        {'id': 'SJL-002', 'nombre': 'Av. Wiesse con Av. Gran Chimú', 'latitud': -11.984567, 'longitud': -77.001234, 'num_carriles': 4, 'zona': 'este'},
-        # SAN MIGUEL (3 intersecciones)
-        {'id': 'SM-001', 'nombre': 'Av. La Marina con Av. Universitaria', 'latitud': -12.077123, 'longitud': -77.083456, 'num_carriles': 8, 'zona': 'oeste'},
-        {'id': 'SM-002', 'nombre': 'Av. Elmer Faucett con Av. Universitaria', 'latitud': -12.065234, 'longitud': -77.089867, 'num_carriles': 6, 'zona': 'oeste'},
-        {'id': 'SM-003', 'nombre': 'Av. La Marina con Av. Venezuela', 'latitud': -12.076845, 'longitud': -77.091234, 'num_carriles': 6, 'zona': 'oeste'},
-        # JESÚS MARÍA (2 intersecciones)
-        {'id': 'JM-001', 'nombre': 'Av. Brasil con Av. 28 de Julio', 'latitud': -12.068934, 'longitud': -77.044567, 'num_carriles': 6, 'zona': 'centro'},
-        {'id': 'JM-002', 'nombre': 'Av. Salaverry con Av. Arequipa', 'latitud': -12.082967, 'longitud': -77.043812, 'num_carriles': 6, 'zona': 'centro'},
+        {'id': 'SUR-001', 'nombre': 'Av. Javier Prado con Av. Primavera', 'latitud': -12.1005, 'longitud': -76.9946, 'num_carriles': 8, 'zona': 'sur'},
+        {'id': 'SUR-002', 'nombre': 'Av. Benavides con Av. Tomás Marsano', 'latitud': -12.1117, 'longitud': -77.0002, 'num_carriles': 6, 'zona': 'sur'},
+        {'id': 'SUR-003', 'nombre': 'Av. Higuereta con Av. El Polo', 'latitud': -12.1288, 'longitud': -77.0011, 'num_carriles': 4, 'zona': 'sur'},
+        {'id': 'SUR-004', 'nombre': 'Av. Primavera con Av. República de Panamá', 'latitud': -12.1102, 'longitud': -76.9782, 'num_carriles': 6, 'zona': 'sur'},
+        # SAN JUAN DE LURIGANCHO (9 intersecciones)
+        {'id': 'SJL-001', 'nombre': 'Av. Próceres con Av. Los Jardines', 'latitud': -11.9848, 'longitud': -77.0067, 'num_carriles': 6, 'zona': 'este'},
+        {'id': 'SJL-002', 'nombre': 'Av. Wiesse con Av. Gran Chimú', 'latitud': -11.9823, 'longitud': -77.0132, 'num_carriles': 4, 'zona': 'este'},
+        {'id': 'SJL-003', 'nombre': 'Av. Próceres con Av. Canta Callao', 'latitud': -12.0252, 'longitud': -77.0120, 'num_carriles': 6, 'zona': 'este'},
+        {'id': 'SJL-004', 'nombre': 'Av. Los Jardines con Av. Circunvalación', 'latitud': -12.0258, 'longitud': -77.0101, 'num_carriles': 6, 'zona': 'este'},
+        {'id': 'SJL-005', 'nombre': 'Av. Wiesse con Av. Canta Callao', 'latitud': -12.0232, 'longitud': -77.0079, 'num_carriles': 4, 'zona': 'este'},
+        {'id': 'SJL-006', 'nombre': 'Av. Próceres con Av. Circunvalación', 'latitud': -12.0206, 'longitud': -77.0125, 'num_carriles': 6, 'zona': 'este'},
+        {'id': 'SJL-007', 'nombre': 'Av. Los Jardines con Av. Primavera', 'latitud': -12.0123, 'longitud': -77.0115, 'num_carriles': 4, 'zona': 'este'},
+        {'id': 'SJL-008', 'nombre': 'Av. Canta Callao con Av. Wiesse', 'latitud': -12.0132, 'longitud': -77.0020, 'num_carriles': 6, 'zona': 'este'},
+        {'id': 'SJL-009', 'nombre': 'Av. Próceres con Av. 28 de Julio', 'latitud': -12.0108, 'longitud': -76.9970, 'num_carriles': 6, 'zona': 'este'},
+        # SAN MIGUEL (4 intersecciones)
+        {'id': 'SM-001', 'nombre': 'Av. La Marina con Av. Universitaria', 'latitud': -12.0749, 'longitud': -77.0797, 'num_carriles': 8, 'zona': 'oeste'},
+        {'id': 'SM-002', 'nombre': 'Av. Elmer Faucett con Av. Universitaria', 'latitud': -12.0603, 'longitud': -77.0790, 'num_carriles': 6, 'zona': 'oeste'},
+        {'id': 'SM-003', 'nombre': 'Av. La Marina con Av. Venezuela', 'latitud': -12.0782, 'longitud': -77.0814, 'num_carriles': 6, 'zona': 'oeste'},
+        {'id': 'SM-004', 'nombre': 'Av. La Marina con Av. Bolognesi', 'latitud': -12.0625, 'longitud': -77.0972, 'num_carriles': 6, 'zona': 'oeste'},
+        # JESÚS MARÍA (4 intersecciones)
+        {'id': 'JM-001', 'nombre': 'Av. Brasil con Av. 28 de Julio', 'latitud': -12.0653, 'longitud': -77.0457, 'num_carriles': 6, 'zona': 'centro'},
+        {'id': 'JM-002', 'nombre': 'Av. Salaverry con Av. Arequipa', 'latitud': -12.0855, 'longitud': -77.0486, 'num_carriles': 6, 'zona': 'centro'},
+        {'id': 'JM-003', 'nombre': 'Av. Brasil con Av. Arequipa', 'latitud': -12.0881, 'longitud': -77.0506, 'num_carriles': 6, 'zona': 'centro'},
+        {'id': 'JM-004', 'nombre': 'Av. Salaverry con Av. Libertad', 'latitud': -12.0752, 'longitud': -77.0421, 'num_carriles': 6, 'zona': 'centro'},
         # SAN BORJA (3 intersecciones)
-        {'id': 'SB-001', 'nombre': 'Av. Javier Prado con Av. Aviación', 'latitud': -12.087823, 'longitud': -77.005967, 'num_carriles': 10, 'zona': 'centro'},
-        {'id': 'SB-002', 'nombre': 'Av. San Luis con Av. San Borja Norte', 'latitud': -12.094823, 'longitud': -77.001645, 'num_carriles': 4, 'zona': 'centro'},
-        {'id': 'SB-003', 'nombre': 'Av. Angamos con Av. Aviación', 'latitud': -12.110567, 'longitud': -77.006234, 'num_carriles': 8, 'zona': 'centro'},
-        # PUEBLO LIBRE (2 intersecciones)
-        {'id': 'PL-001', 'nombre': 'Av. La Marina con Av. Bolívar', 'latitud': -12.070945, 'longitud': -77.064123, 'num_carriles': 6, 'zona': 'oeste'},
-        {'id': 'PL-002', 'nombre': 'Av. Brasil con Av. Bolívar', 'latitud': -12.072834, 'longitud': -77.057234, 'num_carriles': 6, 'zona': 'oeste'},
+        {'id': 'SB-001', 'nombre': 'Av. Javier Prado con Av. Aviación', 'latitud': -12.0883, 'longitud': -77.0036, 'num_carriles': 10, 'zona': 'centro'},
+        {'id': 'SB-002', 'nombre': 'Av. San Luis con Av. San Borja Norte', 'latitud': -12.0930, 'longitud': -76.9957, 'num_carriles': 4, 'zona': 'centro'},
+        {'id': 'SB-003', 'nombre': 'Av. Angamos con Av. Aviación', 'latitud': -12.1118, 'longitud': -77.0002, 'num_carriles': 8, 'zona': 'centro'},
+        # PUEBLO LIBRE (3 intersecciones)
+        {'id': 'PL-001', 'nombre': 'Av. La Marina con Av. Bolívar', 'latitud': -12.0716, 'longitud': -77.0616, 'num_carriles': 6, 'zona': 'oeste'},
+        {'id': 'PL-002', 'nombre': 'Av. Brasil con Av. Bolívar', 'latitud': -12.0786, 'longitud': -77.0566, 'num_carriles': 6, 'zona': 'oeste'},
+        {'id': 'PL-003', 'nombre': 'Av. Faustino con Av. Brasil', 'latitud': -12.0751, 'longitud': -77.0538, 'num_carriles': 6, 'zona': 'oeste'},
+        # MAGDALENA (1 intersección)
+        {'id': 'MA-001', 'nombre': 'Av. Brasil con Av. 28 de Julio', 'latitud': -12.0899, 'longitud': -77.0660, 'num_carriles': 6, 'zona': 'centro'},
+        # LINCE/TRANSVERSAL (4 intersecciones)
+        {'id': 'TR-001', 'nombre': 'Av. Arequipa con Av. Paseo de la República', 'latitud': -12.0918, 'longitud': -77.0302, 'num_carriles': 8, 'zona': 'centro'},
+        {'id': 'TR-002', 'nombre': 'Av. Petit Thouars con Av. Paseo de la República', 'latitud': -12.0914, 'longitud': -77.0270, 'num_carriles': 6, 'zona': 'centro'},
+        {'id': 'TR-003', 'nombre': 'Av. Aviación con Av. Paseo de la República', 'latitud': -12.0824, 'longitud': -76.9973, 'num_carriles': 8, 'zona': 'centro'},
         # LINCE (1 intersección)
-        {'id': 'LIN-001', 'nombre': 'Av. Arequipa con Av. Petit Thouars', 'latitud': -12.081723, 'longitud': -77.034845, 'num_carriles': 6, 'zona': 'centro'}
+        {'id': 'LIN-001', 'nombre': 'Av. Arequipa con Av. Petit Thouars', 'latitud': -12.0837, 'longitud': -77.0341, 'num_carriles': 6, 'zona': 'centro'}
     ]
 
     # Guardar intersecciones
@@ -164,37 +207,93 @@ def inicializar_sistema():
         )
         grafo.agregar_interseccion(inter)
 
-    # Agregar conexiones (red real de Lima con distancias exactas)
+    # Agregar conexiones (red real de Lima con distancias exactas basadas en avenidas reales)
     conexiones = [
-        # Av. Arequipa (eje norte-sur)
-        ('SI-001', 'LIN-001', 1400),
-        ('LIN-001', 'JM-002', 200),
-        ('JM-002', 'MIR-001', 2800),
-        ('MIR-001', 'MIR-003', 900),
-        # Av. Javier Prado (eje este-oeste)
-        ('SI-001', 'SI-003', 700),
-        ('SI-003', 'LV-002', 2500),
-        ('LV-002', 'SB-001', 200),
-        ('SB-001', 'SUR-001', 2600),
-        # Av. La Marina (zona oeste)
-        ('SM-001', 'SM-003', 800),
-        ('SM-003', 'PL-001', 1900),
-        # Centro de Lima
-        ('LC-001', 'LC-002', 400),
-        ('LC-002', 'LC-003', 600),
-        ('LC-003', 'LC-004', 900),
-        # Av. Aviación (norte-sur)
-        ('LV-002', 'SB-001', 200),
-        ('SB-001', 'SB-003', 2500),
-        # Av. Angamos (este-oeste)
-        ('MIR-001', 'SB-003', 2800),
-        # Av. Benavides (este-oeste)
-        ('MIR-003', 'SUR-002', 2800),
-        # Surco
-        ('SUR-001', 'SUR-004', 1400),
-        ('SUR-002', 'SUR-003', 1800),
-        # Av. Brasil (este-oeste)
-        ('JM-001', 'PL-002', 1300)
+        # ========== AV. AREQUIPA (EJE NORTE-SUR PRINCIPAL) ==========
+        ('JM-003', 'JM-002', 300),        # Brasil → Salaverry
+        ('JM-002', 'TR-001', 600),        # Salaverry → Paseo República
+        ('TR-001', 'LIN-001', 400),       # Paseo República → Petit Thouars
+        ('LIN-001', 'MIR-001', 1200),     # Petit Thouars → Angamos
+        ('MIR-001', 'MIR-003', 900),      # Angamos → Benavides
+
+        # ========== AV. JAVIER PRADO (EJE ESTE-OESTE PRINCIPAL) ==========
+        ('SI-001', 'SI-003', 700),        # Arequipa → Paseo República
+        ('SI-003', 'LV-002', 2500),       # Paseo República → Aviación
+        ('LV-002', 'SB-001', 200),        # Aviación → Aviación-Javier Prado
+        ('SB-001', 'SUR-001', 2600),      # Aviación → Circunvalación (Surco)
+
+        # ========== AV. ANGAMOS (ESTE-OESTE) ==========
+        ('MIR-001', 'SB-003', 800),       # Arequipa → Angamos-Aviación
+        ('SB-003', 'SUR-002', 1200),      # Angamos-Aviación → Benavides
+
+        # ========== AV. BENAVIDES (ESTE-OESTE) ==========
+        ('MIR-003', 'MIR-002', 400),      # Arequipa → Larco
+        ('MIR-002', 'SUR-002', 2400),     # Larco → Primavera
+        ('SUR-002', 'SUR-003', 1800),     # Primavera → Velasco Astete
+
+        # ========== AV. AVIACIÓN (NORTE-SUR) ==========
+        ('LV-001', 'LV-003', 400),        # Grau → 28 Julio
+        ('LV-003', 'LV-004', 500),        # 28 Julio → 28 Julio Alt
+        ('LV-004', 'LV-002', 700),        # 28 Julio Alt → Javier Prado
+        ('LV-002', 'SB-001', 300),        # Javier Prado → SB-001
+        ('SB-001', 'SB-002', 600),        # SB-001 → SB-002
+        ('SB-002', 'TR-003', 1000),       # SB-002 → Paseo República
+        ('TR-003', 'SUR-001', 800),       # Paseo República → Primavera
+
+        # ========== AV. PASEO DE LA REPÚBLICA (NORTE-SUR) ==========
+        ('TR-001', 'TR-002', 500),        # Arequipa → Petit Thouars
+        ('TR-002', 'TR-003', 600),        # Petit Thouars → Aviación
+        ('SI-003', 'SI-002', 1200),       # Javier Prado → Angamos
+        ('SI-002', 'JM-001', 3500),       # Angamos → Av. Venezuela
+
+        # ========== AV. LA MARINA (OESTE) ==========
+        ('SM-001', 'SM-002', 500),        # Universitaria → Faucett
+        ('SM-002', 'SM-003', 800),        # Faucett → Venezuela
+        ('SM-003', 'SM-004', 900),        # Venezuela → Bolognesi
+        ('SM-004', 'PL-001', 1200),       # Bolognesi → Bolívar
+
+        # ========== AV. BRASIL (CENTRO-OESTE) ==========
+        ('JM-001', 'MA-001', 800),        # Venezuela → Magdalena
+        ('MA-001', 'SM-001', 1000),       # Magdalena → La Marina
+        ('JM-003', 'MA-001', 700),        # Jesús María → Magdalena
+        ('PL-001', 'PL-002', 600),        # Plaza Norte → Brasil
+        ('PL-002', 'PL-003', 500),        # Brasil → Faustino
+        ('JM-001', 'PL-002', 1300),       # Venezuela → Brasil
+
+        # ========== CENTRO DE LIMA (DAMERO DE PIZARRO) ==========
+        ('LC-001', 'LC-002', 400),        # Plaza Mayor → Plaza San Martín
+        ('LC-002', 'LC-003', 600),        # Plaza San Martín → Av. Abancay
+        ('LC-003', 'LC-004', 900),        # Av. Abancay → Av. Grau
+        ('LC-004', 'JM-001', 1500),       # Av. Grau → Av. Venezuela con Brasil
+
+        # ========== SAN JUAN DE LURIGANCHO (EXPANSIÓN) ==========
+        ('SJL-001', 'SJL-002', 800),      # Próceres → Wiesse
+        ('SJL-002', 'SJL-003', 2500),     # Wiesse → Canta Callao
+        ('SJL-003', 'SJL-004', 400),      # Canta Callao → Los Jardines
+        ('SJL-004', 'SJL-005', 500),      # Los Jardines → Wiesse
+        ('SJL-005', 'SJL-006', 500),      # Wiesse → Próceres
+        ('SJL-006', 'SJL-007', 600),      # Próceres → Los Jardines
+        ('SJL-007', 'SJL-008', 700),      # Los Jardines → Canta Callao
+        ('SJL-008', 'SJL-009', 400),      # Canta Callao → Próceres
+        ('PL-001', 'SJL-001', 8000),      # Plaza Norte → Próceres (Vía Expresa)
+
+        # ========== SURCO INTERNO ==========
+        ('SUR-001', 'SUR-004', 1400),     # Javier Prado → Monterrico
+        ('SUR-002', 'SUR-004', 2200),     # Benavides-Primavera → Monterrico
+        ('SUR-003', 'SUR-004', 1600),     # Velasco Astete → Monterrico
+        ('SUR-001', 'SUR-002', 1200),     # Javier Prado → Benavides
+
+        # ========== JESÚS MARÍA EXPANDIDO ==========
+        ('JM-001', 'JM-003', 700),        # Brasil → Brasil Arequipa
+        ('JM-004', 'JM-001', 600),        # Libertad → Brasil
+        ('JM-004', 'JM-003', 500),        # Libertad → Arequipa
+
+        # ========== CONEXIONES ADICIONALES (RED MALLADA) ==========
+        ('LIN-001', 'LC-003', 500),       # Arequipa con Petit Thouars
+        ('SB-001', 'SI-001', 300),        # SB-001 ← SI-001
+        ('MIR-003', 'SUR-001', 3500),     # Miraflores → Surco (conexión directa)
+        ('JM-002', 'JM-001', 800),        # Salaverry → Venezuela
+        ('SI-004', 'SM-001', 2000),       # San Isidro → San Miguel
     ]
     for origen, destino, distancia in conexiones:
         grafo.agregar_conexion(origen, destino, distancia)
@@ -202,6 +301,30 @@ def inicializar_sistema():
     estado_sistema['coordinador_olas_verdes'] = CoordinadorOlasVerdes(grafo)
 
     logger.info("✓ Sistema inicializado correctamente")
+
+    # Sincronizar el estado local (dict) con la instancia global usada por los
+    # servicios (`servicios.estado_global.estado_sistema`). Algunos servicios
+    # importan la instancia `estado_sistema` desde `servicios.estado_global` y
+    # esperan atributos (no llaves de dict). Para evitar que el coordinador de
+    # olas verdes aparezca como "no inicializado", copiamos los valores más
+    # relevantes a esa instancia.
+    try:
+        from servicios.estado_global import estado_sistema as estado_global
+
+        estado_global.modo = estado_sistema.get('modo', estado_global.modo)
+        estado_global.simulador = estado_sistema.get('simulador', estado_global.simulador)
+        estado_global.calculador_icv = estado_sistema.get('calculador_icv', estado_global.calculador_icv)
+        estado_global.controlador_difuso = estado_sistema.get('controlador_difuso', estado_global.controlador_difuso)
+        estado_global.coordinador_olas_verdes = estado_sistema.get('coordinador_olas_verdes', estado_global.coordinador_olas_verdes)
+        estado_global.procesador_video = estado_sistema.get('procesador_video', estado_global.procesador_video)
+        estado_global.conector_sumo = estado_sistema.get('conector_sumo', estado_global.conector_sumo)
+        estado_global.intersecciones = estado_sistema.get('intersecciones', estado_global.intersecciones)
+        estado_global.olas_verdes_activas = estado_sistema.get('olas_verdes_activas', getattr(estado_global, 'olas_verdes_activas', {}))
+        estado_global.conexiones_ws = estado_sistema.get('conexiones_ws', getattr(estado_global, 'conexiones_ws', []))
+
+        logger.info('Estado global sincronizado con servicios.estado_global')
+    except Exception as e:
+        logger.warning(f'No se pudo sincronizar estado_global: {e}')
 
 
 # Manejador de lifespan (reemplaza on_event)
@@ -268,6 +391,29 @@ async def obtener_estado():
     }
 
 
+@app.post("/api/estado-local/ingresar")
+async def ingresar_estado_local(paquete: Dict):
+    """Recibe paquete de telemetría local y actualiza el estado global de la red"""
+    try:
+        if not estado_sistema.get('estado_global_red'):
+            estado_sistema['estado_global_red'] = EstadoGlobalRed()
+        estado_sistema['estado_global_red'].actualizar_interseccion(paquete)
+        return { 'status': 'ok' }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/estado-global")
+async def obtener_estado_global():
+    """Devuelve el estado global agregado (ICV/PI por intersección y globales)"""
+    try:
+        if not estado_sistema.get('estado_global_red'):
+            estado_sistema['estado_global_red'] = EstadoGlobalRed()
+        return estado_sistema['estado_global_red'].obtener_estado_global()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/intersecciones")
 async def listar_intersecciones():
     """Lista todas las intersecciones"""
@@ -309,7 +455,7 @@ async def obtener_metricas(interseccion_id: str):
 @app.get("/api/metricas/red")
 async def obtener_metricas_red():
     """
-    Obtiene métricas agregadas de toda la red (Cap 6.3.4)
+    Obtiene métricas agregadas de toda la red
 
     Calcula promedios de:
     - QL_red: Longitud de cola promedio en la red
@@ -361,7 +507,7 @@ async def obtener_metricas_red():
             'mensaje': 'No hay intersecciones con trafico activo'
         }
 
-    # Calcular promedios de red (Cap 6.3.4)
+    # Calcular promedios de red
     import numpy as np
 
     QL_red = np.mean([m['longitud_cola'] for m in metricas_intersecciones])
@@ -390,35 +536,18 @@ async def obtener_metricas_red():
     }
 
 
-@app.post("/api/emergencia/activar")
-async def activar_emergencia(
-    tipo: str,
-    origen: str,
-    destino: str,
-    velocidad: float = 50.0
-):
-    """Activa ola verde para vehículo de emergencia"""
-    coordinador = estado_sistema['coordinador_olas_verdes']
+# Nota: La ruta `/api/emergencia/activar` fue movida al router modular en
+# `rutas/emergencias.py`. La definición previa se deja comentada para evitar
+# conflictos de rutas duplicadas que provocaban respuestas 400/405 al enviar
+# JSON desde el frontend. Mantenerla activa causaba que FastAPI seleccionase
+# la implementación equivocada (esperando query params en lugar de JSON).
 
-    from datetime import datetime
-    vehiculo = VehiculoEmergencia(
-        id=f"EMG-{datetime.now().strftime('%H%M%S')}",
-        tipo=tipo,
-        interseccion_actual=origen,
-        destino=destino,
-        velocidad_estimada=velocidad,
-        timestamp=datetime.now()
-    )
-
-    resultado = coordinador.activar_ola_verde(vehiculo)
-
-    # Notificar a clientes WebSocket
-    await broadcast_mensaje({
-        'tipo': 'ola_verde_activada',
-        'datos': resultado
-    })
-
-    return resultado
+"""
+La implementación anterior estaba aquí como app.route, pero ahora la lógica
+se sirve desde el router modular importado más arriba. Si se necesita debug
+adicional, revisar `servidor-backend/rutas/emergencias.py` y el servicio
+`servidor-backend/servicios/emergencia_service.py`.
+"""
 
 
 @app.post("/api/modo/cambiar")
@@ -430,6 +559,12 @@ async def cambiar_modo(modo: str):
     # Limpiar modo anterior
     if estado_sistema['modo'] == 'sumo' and estado_sistema['conector_sumo']:
         try:
+            # Cancelar tarea de avance automático
+            if estado_sistema.get('sumo_auto_step'):
+                estado_sistema['sumo_auto_step'].cancel()
+                estado_sistema['sumo_auto_step'] = None
+                logger.info("Tarea de avance automático SUMO cancelada")
+            
             estado_sistema['conector_sumo'].desconectar()
             estado_sistema['conector_sumo'] = None
             logger.info("Conector SUMO desconectado")
@@ -438,6 +573,12 @@ async def cambiar_modo(modo: str):
 
     # Configurar nuevo modo
     estado_sistema['modo'] = modo
+    # Sincronizar inmediatamente con servicios.estado_global
+    try:
+        from servicios.estado_global import estado_sistema as estado_global
+        estado_global.modo = modo
+    except Exception as e:
+        logger.warning(f"No se pudo sincronizar modo con servicios.estado_global: {e}")
 
     # Inicializar modo SUMO si es necesario
     if modo == 'sumo':
@@ -451,16 +592,37 @@ async def cambiar_modo(modo: str):
             try:
                 from conector_sumo import ConectorSUMO
 
-                # Ruta a configuración SUMO
-                ruta_config = integracion_path / 'escenarios' / 'lima-centro' / 'osm.sumocfg'
+                # Buscar configuración SUMO (preferir lima-amplio si existe)
+                ruta_config_amplio = integracion_path / 'escenarios' / 'lima-amplio' / 'lima_amplio.sumocfg'
+                ruta_config_centro = integracion_path / 'escenarios' / 'lima-centro' / 'osm.sumocfg'
+                
+                ruta_config = None
+                # Priorizar mapa pequeño (centro) para mejor visualización
+                if ruta_config_centro.exists():
+                    ruta_config = ruta_config_centro
+                    logger.info("🗺️  Usando mapa centro de Lima (47 intersecciones)")
+                elif ruta_config_amplio.exists():
+                    ruta_config = ruta_config_amplio
+                    logger.info("🗺️  Usando mapa amplio de Lima")
 
-                if ruta_config.exists():
+                if ruta_config:
                     estado_sistema['conector_sumo'] = ConectorSUMO(
                         ruta_config_sumo=str(ruta_config),
-                        usar_gui=False  # Sin GUI para mejor rendimiento
+                        usar_gui=True  # ✅ CON GUI para visualización en tiempo real
                     )
                     estado_sistema['conector_sumo'].conectar()
                     logger.info("✓ Conector SUMO inicializado y conectado")
+                    logger.info("🎮 SUMO-GUI abierto - verás los vehículos circulando en tiempo real")
+                    
+                    # Iniciar tarea de avance automático
+                    estado_sistema['sumo_auto_step'] = asyncio.create_task(avanzar_sumo_automaticamente())
+                    logger.info("✅ Avance automático de simulación iniciado")
+                    # Sincronizar con servicios.estado_global
+                    try:
+                        from servicios.estado_global import estado_sistema as estado_global
+                        estado_global.conector_sumo = estado_sistema['conector_sumo']
+                    except Exception as e_sync:
+                        logger.warning(f"No se pudo sincronizar conector_sumo con servicios.estado_global: {e_sync}")
                 else:
                     logger.warning("Archivo de configuración SUMO no encontrado")
             except ImportError as e:
@@ -481,9 +643,18 @@ async def cambiar_modo(modo: str):
 async def obtener_calles_sumo():
     """Obtiene el GeoJSON con las calles de la red SUMO"""
     try:
-        ruta_geojson = Path(__file__).parent.parent / 'integracion-sumo' / 'escenarios' / 'lima-centro' / 'calles.geojson'
+        # Buscar archivo de calles (preferir lima-amplio)
+        base_path = Path(__file__).parent.parent / 'integracion-sumo' / 'escenarios'
+        ruta_geojson_amplio = base_path / 'lima-amplio' / 'calles.geojson'
+        ruta_geojson_centro = base_path / 'lima-centro' / 'calles.geojson'
+        
+        ruta_geojson = None
+        if ruta_geojson_amplio.exists():
+            ruta_geojson = ruta_geojson_amplio
+        elif ruta_geojson_centro.exists():
+            ruta_geojson = ruta_geojson_centro
 
-        if not ruta_geojson.exists():
+        if not ruta_geojson or not ruta_geojson.exists():
             raise HTTPException(
                 status_code=404,
                 detail="Archivo de calles no encontrado. Ejecuta extraer_calles.py primero."
@@ -507,20 +678,235 @@ async def obtener_trafico_sumo():
             return {'calles': [], 'mensaje': 'Modo SUMO no activo'}
 
         conector_sumo = estado_sistema.get('conector_sumo')
-        if not conector_sumo or not conector_sumo.conectado:
-            return {'calles': [], 'mensaje': 'SUMO no conectado'}
+        
+        # Si SUMO está conectado, usar datos reales
+        if conector_sumo and conector_sumo.conectado:
+            # La simulación avanza automáticamente en background, solo leer datos
+            # Obtener datos actualizados
+            estados = conector_sumo.obtener_estado_calles(limite=500)
+            
+            # Filtrar solo calles con tráfico para reducir payload
+            calles_con_trafico = [e for e in estados if e['vehiculos'] > 0]
+            total_vehiculos = sum(e['vehiculos'] for e in calles_con_trafico)
+            
+            logger.info(f"🚗 SUMO: {len(calles_con_trafico)} calles con tráfico, {total_vehiculos} vehículos")
+            
+            # Derivar métricas agregadas para ICV y flujo basadas en datos SUMO
+            try:
+                icv_promedio = 0.0
+                flujo_promedio = 0.0
+                if calles_con_trafico:
+                    icv_promedio = sum(e.get('congestion', 0) for e in calles_con_trafico) / len(calles_con_trafico)
+                    flujo_promedio = sum(e.get('vehiculos', 0) for e in calles_con_trafico) / len(calles_con_trafico)
+                # Clamps: evitar extremos y asegurar mínimos visibles (>= 0.02)
+                icv_promedio = max(0.02, min(0.99, icv_promedio))
+                flujo_promedio = max(0.02, flujo_promedio)
+            except Exception:
+                icv_promedio = 0.02
+                flujo_promedio = 0.02
 
-        # Obtener estado de las calles
-        estados = conector_sumo.obtener_estado_calles(limite=500)
+            return {
+                'calles': estados,  # Enviar todas para colorear el mapa
+                'calles_con_trafico': len(calles_con_trafico),
+                'vehiculos_totales': total_vehiculos,
+                'timestamp': asyncio.get_event_loop().time(),
+                'fuente': 'sumo_real',
+                'icv_red_promedio': round(icv_promedio, 3),
+                'flujo_promedio': round(flujo_promedio, 2)
+            }
+        
+        # Si SUMO NO está conectado, generar datos simulados
+        # Cargar IDs de calles desde el GeoJSON
+        base_path = Path(__file__).parent.parent / 'integracion-sumo' / 'escenarios'
+        ruta_geojson_amplio = base_path / 'lima-amplio' / 'calles.geojson'
+        ruta_geojson_centro = base_path / 'lima-centro' / 'calles.geojson'
+        
+        ruta_geojson = None
+        if ruta_geojson_amplio.exists():
+            ruta_geojson = ruta_geojson_amplio
+        elif ruta_geojson_centro.exists():
+            ruta_geojson = ruta_geojson_centro
+        
+        if not ruta_geojson or not ruta_geojson.exists():
+            return {'calles': [], 'mensaje': 'Archivo de calles no encontrado'}
+        
+        import random
+        import time
+        
+        with open(ruta_geojson, 'r', encoding='utf-8') as f:
+            geojson = json.load(f)
+        
+        # Generar tráfico simulado para cada calle
+        estados = []
+        for feature in geojson['features']:
+            calle_id = feature['properties']['id']
+            
+            # Generar métricas aleatorias pero realistas
+            congestion = random.uniform(0.0, 1.0)
+            velocidad = random.uniform(10, 60)  # km/h
+            vehiculos = random.randint(0, 20)
+            ocupacion = random.uniform(0, 100)
+            
+            estados.append({
+                'id': calle_id,
+                'vehiculos': vehiculos,
+                'velocidad': round(velocidad, 1),
+                'ocupacion': round(ocupacion, 1),
+                'congestion': round(congestion, 2)
+            })
+        
+        # Métricas agregadas básicas también en simulado
+        try:
+            icv_promedio = sum(e.get('congestion', 0) for e in estados) / len(estados) if estados else 0.02
+            flujo_promedio = sum(e.get('vehiculos', 0) for e in estados) / len(estados) if estados else 0.02
+        except Exception:
+            icv_promedio = 0.02
+            flujo_promedio = 0.02
 
         return {
             'calles': estados,
-            'timestamp': asyncio.get_event_loop().time()
+            'timestamp': time.time(),
+            'fuente': 'simulado',
+            'mensaje': 'Tráfico simulado (SUMO no conectado)',
+            'icv_red_promedio': round(icv_promedio, 3),
+            'flujo_promedio': round(flujo_promedio, 2)
         }
 
     except Exception as e:
         logger.error(f"Error obteniendo tráfico SUMO: {e}")
         return {'calles': [], 'error': str(e)}
+
+
+@app.get("/api/sumo/estado")
+async def obtener_estado_sumo():
+    """Obtiene el estado de conexión con SUMO y métricas en tiempo real"""
+    try:
+        conector_sumo = estado_sistema.get('conector_sumo')
+        
+        # Auto-inicializar SUMO si el modo actual es 'sumo' y no hay conexión
+        if (estado_sistema.get('modo') == 'sumo') and (not conector_sumo or not conector_sumo.conectado):
+            try:
+                from pathlib import Path
+                import sys
+                integracion_path = Path(__file__).parent.parent / 'integracion-sumo'
+                sys.path.insert(0, str(integracion_path))
+                from conector_sumo import ConectorSUMO
+
+                ruta_config_centro = integracion_path / 'escenarios' / 'lima-centro' / 'osm.sumocfg'
+                ruta_config_amplio = integracion_path / 'escenarios' / 'lima-amplio' / 'lima_amplio.sumocfg'
+                ruta_config = ruta_config_centro if ruta_config_centro.exists() else (ruta_config_amplio if ruta_config_amplio.exists() else None)
+
+                if ruta_config:
+                    estado_sistema['conector_sumo'] = ConectorSUMO(
+                        ruta_config_sumo=str(ruta_config),
+                        usar_gui=True
+                    )
+                    estado_sistema['conector_sumo'].conectar()
+                    logger.info("✓ SUMO auto-inicializado desde /api/sumo/estado")
+                    # Iniciar auto-step si no está corriendo
+                    if not estado_sistema.get('sumo_auto_step'):
+                        estado_sistema['sumo_auto_step'] = asyncio.create_task(avanzar_sumo_automaticamente())
+                        logger.info("✅ Avance automático iniciado (auto)")
+                    conector_sumo = estado_sistema['conector_sumo']
+                else:
+                    logger.warning("No se encontró archivo .sumocfg para auto-inicializar SUMO")
+            except Exception as e_auto:
+                logger.error(f"Error auto-inicializando SUMO: {e_auto}")
+
+        if conector_sumo and conector_sumo.conectado:
+            # La simulación avanza automáticamente en background, solo leer datos
+            # Obtener estados actualizados para calcular estadísticas
+            estados = conector_sumo.obtener_estado_calles(limite=2000)
+            calles_con_trafico = [e for e in estados if e.get('vehiculos', 0) > 0]
+            # Inicialmente sumar por calles (puede sub-contar vehículos en múltiples lanes/edges)
+            total_vehiculos = sum(e.get('vehiculos', 0) for e in calles_con_trafico)
+            
+            # Calcular velocidad promedio
+            velocidades = [e.get('velocidad', 0) for e in calles_con_trafico if e.get('velocidad', 0) > 0]
+            velocidad_promedio = sum(velocidades) / len(velocidades) if velocidades else 0
+            
+            # Calcular congestión promedio
+            congestion_promedio = sum(e.get('congestion', 0) for e in calles_con_trafico) / len(calles_con_trafico) if calles_con_trafico else 0
+            # Tiempo simulado
+            tiempo_simulado_s = 0.0
+            try:
+                import traci
+                tiempo_simulado_s = float(traci.simulation.getTime())
+                # Recalcular SIEMPRE total_vehiculos mediante lista global (fiable)
+                veh_ids = list(traci.vehicle.getIDList())
+                total_vehiculos_global = len(veh_ids)
+                # Si el conteo por calles difiere significativamente (subconteo), usar global
+                if total_vehiculos_global > total_vehiculos:
+                    total_vehiculos = total_vehiculos_global
+                # Ajustar velocidad promedio si estaba en cero
+                if velocidad_promedio == 0 and total_vehiculos_global > 0:
+                    vel_list = []
+                    for vid in veh_ids[:5000]:  # safety cap
+                        try:
+                            v = traci.vehicle.getSpeed(vid) * 3.6
+                            if v > 0:
+                                vel_list.append(v)
+                        except Exception:
+                            continue
+                    if vel_list:
+                        velocidad_promedio = sum(vel_list) / len(vel_list)
+                # Recalcular calles activas si resultó 0
+                if len(calles_con_trafico) == 0:
+                    try:
+                        edge_ids = list(traci.edge.getIDList())
+                        activos = 0
+                        for eid in edge_ids[:2000]:
+                            if eid.startswith(':'):
+                                continue
+                            try:
+                                if traci.edge.getLastStepVehicleNumber(eid) > 0:
+                                    activos += 1
+                            except Exception:
+                                continue
+                        # Usar valor estimado
+                        calles_con_trafico = ['_'] * activos
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+            
+            logger.info(f"📊 Estado SUMO: {total_vehiculos} veh, {len(calles_con_trafico)} calles activas")
+            
+            return {
+                'conectado': True,
+                'gui_visible': conector_sumo.usar_gui,
+                'semaforos': len(conector_sumo.intersecciones),
+                'calles_totales': len(estados),
+                'calles_con_trafico': len(calles_con_trafico),
+                'vehiculos_totales': total_vehiculos,
+                'velocidad_promedio': round(velocidad_promedio, 1),
+                'congestion_promedio': round(congestion_promedio, 2),
+                'tiempo_simulado_s': tiempo_simulado_s,
+                'fuente': 'sumo_real'
+            }
+        else:
+            # Diagnóstico de razón de desconexión
+            razon = 'desconocida'
+            if estado_sistema.get('modo') != 'sumo':
+                razon = 'modo_no_sumo'
+            elif not conector_sumo:
+                razon = 'conector_nulo'
+            elif not getattr(conector_sumo, 'conectado', False):
+                # Verificar disponibilidad de TraCI
+                try:
+                    import traci  # noqa: F401
+                    razon = 'sin_conexion_traci_o_sumo'
+                except ImportError:
+                    razon = 'traci_no_disponible'
+
+            return {
+                'conectado': False,
+                'razon': razon,
+                'mensaje': 'SUMO no está conectado. Cambia a Modo SUMO para iniciar.'
+            }
+    except Exception as e:
+        logger.error(f"Error obteniendo estado SUMO: {e}")
+        return {'conectado': False, 'error': str(e)}
 
 
 @app.post("/api/video/procesar")
@@ -624,6 +1010,233 @@ async def obtener_estado_video():
     return {'activo': False}
 
 
+from fastapi.responses import StreamingResponse
+import cv2
+import numpy as np
+
+
+@app.get("/api/video/stream-camera")
+async def stream_camera():
+    """Stream de cámara con procesamiento YOLO y métricas visuales en tiempo real"""
+    
+    def generar_frames():
+        """Generador de frames procesados con métricas visuales"""
+        import cv2
+        import numpy as np
+        
+        # Agregar path de vision_computadora
+        vision_path = Path(__file__).parent.parent / 'vision_computadora'
+        sys.path.insert(0, str(vision_path))
+        
+        try:
+            from vision_computadora.procesador_video import ProcesadorVideo
+            
+            # Crear procesador de video para la cámara (índice 0)
+            procesador = ProcesadorVideo(
+                ruta_video=0,  # Índice de cámara
+                pixeles_por_metro=15.0,
+                calcular_metricas_cap6=True,  # Activar métricas del Capítulo 6
+                longitud_carril=200.0
+            )
+            
+            logger.info("✓ Procesador de video creado para stream de cámara")
+            logger.info(f"  Resolucion: {procesador.ancho}x{procesador.alto}")
+            logger.info(f"  FPS: {procesador.fps:.1f}")
+            logger.info(f"  Métricas avanzadas: Activadas")
+            
+            frame_num = 0
+            
+            while True:
+                ret, frame = procesador.video.read()
+                if not ret:
+                    logger.warning("No se pudo leer frame de la cámara")
+                    break
+                
+                try:
+                    # Procesar frame con métricas REALES
+                    resultado = procesador.procesar_frame(frame, frame_num)
+                    
+                    # Dibujar detecciones y métricas usando overlay moderno COMPLETO
+                    frame_anotado = procesador.dibujar_detecciones(
+                        frame,
+                        resultado,
+                        mostrar_info=True,  # Activa overlay completo con métricas
+                        modo_simple=False  # Modo COMPLETO: mostrar TODO (panel + barra)
+                    )
+                    
+                    # Codificar frame como JPEG
+                    ret, buffer = cv2.imencode('.jpg', frame_anotado, [cv2.IMWRITE_JPEG_QUALITY, 85])
+                    if not ret:
+                        continue
+                    
+                    frame_bytes = buffer.tobytes()
+                    
+                    # Enviar frame en formato MJPEG
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+                    
+                    frame_num += 1
+                    
+                except Exception as e:
+                    logger.error(f"Error procesando frame {frame_num}: {e}")
+                    continue
+            
+        except Exception as e:
+            logger.error(f"Error inicializando stream de cámara: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            # Generar frame de error
+            frame_error = np.zeros((480, 640, 3), dtype=np.uint8)
+            cv2.putText(frame_error, "Error: No se pudo iniciar camara", (50, 240),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            ret, buffer = cv2.imencode('.jpg', frame_error)
+            if ret:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+        
+        finally:
+            if 'procesador' in locals():
+                procesador.video.release()
+                logger.info("Cámara liberada")
+    
+    return StreamingResponse(
+        generar_frames(),
+        media_type="multipart/x-mixed-replace; boundary=frame"
+    )
+
+
+@app.get("/api/video/stream-video-index/{video_index}")
+async def stream_video_procesado(video_index: int):
+    """Stream de video procesado con métricas visuales (modo simple para VideoEjemplo)"""
+    
+    def generar_frames_video():
+        """Generador de frames de video procesado"""
+        import cv2
+        import numpy as np
+        
+        # Agregar path de vision_computadora
+        vision_path = Path(__file__).parent.parent / 'vision_computadora'
+        sys.path.insert(0, str(vision_path))
+        
+        # Buscar videos disponibles (rutas absolutas desde la raíz del proyecto)
+        proyecto_root = Path(__file__).parent.parent
+        videos_paths = [
+            proyecto_root / "datos/videos-prueba/analisis-parametros/VideoPrueba01.mp4",
+            proyecto_root / "datos/videos-prueba/analisis-parametros/VideoPuentePUCP.mp4",
+        ]
+        
+        logger.info(f"Intentando cargar video index={video_index} de {len(videos_paths)} disponibles")
+        
+        # Seleccionar video según índice
+        if video_index < 0 or video_index >= len(videos_paths):
+            logger.error(f"Índice de video inválido: {video_index}")
+            frame_error = np.zeros((480, 640, 3), dtype=np.uint8)
+            cv2.putText(frame_error, "Error: Video no encontrado", (50, 240),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            ret, buffer = cv2.imencode('.jpg', frame_error)
+            if ret:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+            return
+        
+        ruta_video = videos_paths[video_index]
+        
+        if not ruta_video.exists():
+            logger.error(f"Video no existe: {ruta_video}")
+            frame_error = np.zeros((480, 640, 3), dtype=np.uint8)
+            cv2.putText(frame_error, f"Error: {ruta_video.name} no encontrado", (50, 240),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            ret, buffer = cv2.imencode('.jpg', frame_error)
+            if ret:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+            return
+        
+        try:
+            from vision_computadora.procesador_video import ProcesadorVideo
+            
+            # Crear procesador de video
+            procesador = ProcesadorVideo(
+                ruta_video=str(ruta_video),
+                pixeles_por_metro=None,  # Permitir autoajuste por resolución
+                calcular_metricas_cap6=True,
+                longitud_carril=200.0
+            )
+            
+            logger.info(f"✓ Procesador de video creado para: {ruta_video.name}")
+            logger.info(f"  Resolución: {procesador.ancho}x{procesador.alto}")
+            logger.info(f"  FPS: {procesador.fps:.1f}")
+            logger.info(f"  Total frames: {procesador.total_frames}")
+            logger.info(f"  Modo: SIMPLE (solo barra + título)")
+            
+            frame_num = 0
+            
+            while True:
+                ret, frame = procesador.video.read()
+                if not ret:
+                    # Reiniciar video al final (loop)
+                    procesador.video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    frame_num = 0
+                    continue
+                
+                try:
+                    # Procesar frame con métricas REALES
+                    resultado = procesador.procesar_frame(frame, frame_num)
+                    
+                    # Dibujar detecciones con overlay MODO SIMPLE
+                    # (solo título + barra, sin panel de métricas)
+                    print(f"[ENDPOINT VIDEO] Llamando dibujar_detecciones con modo_simple=False")
+                    frame_anotado = procesador.dibujar_detecciones(
+                        frame,
+                        resultado,
+                        mostrar_info=True,
+                        modo_simple=False  # MODO COMPLETO: mostrar panel de métricas (incluye longitud de cola)
+                    )
+                    print(f"[ENDPOINT VIDEO] dibujar_detecciones terminó")
+                    
+                    # Codificar frame como JPEG
+                    ret, buffer = cv2.imencode('.jpg', frame_anotado, [cv2.IMWRITE_JPEG_QUALITY, 85])
+                    if not ret:
+                        continue
+                    
+                    frame_bytes = buffer.tobytes()
+                    
+                    # Enviar frame en formato MJPEG
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+                    
+                    frame_num += 1
+                    
+                except Exception as e:
+                    logger.error(f"Error procesando frame {frame_num}: {e}")
+                    continue
+            
+        except Exception as e:
+            logger.error(f"Error inicializando stream de video: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            # Generar frame de error
+            frame_error = np.zeros((480, 640, 3), dtype=np.uint8)
+            cv2.putText(frame_error, "Error al procesar video", (50, 240),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            ret, buffer = cv2.imencode('.jpg', frame_error)
+            if ret:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+        
+        finally:
+            if 'procesador' in locals():
+                procesador.video.release()
+                logger.info(f"Video liberado: {ruta_video.name}")
+    
+    return StreamingResponse(
+        generar_frames_video(),
+        media_type="multipart/x-mixed-replace; boundary=frame"
+    )
+
+
 # ==================== WEBSOCKET ====================
 
 @app.websocket("/ws")
@@ -645,20 +1258,9 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 async def broadcast_mensaje(mensaje: Dict):
-    """Envía mensaje a todos los clientes WebSocket"""
-    conexiones_cerradas = []
-
-    for websocket in estado_sistema['conexiones_ws']:
-        try:
-            await websocket.send_json(mensaje)
-        except Exception as e:
-            logger.warning(f"Error enviando mensaje WebSocket: {e}")
-            conexiones_cerradas.append(websocket)
-
-    # Limpiar conexiones cerradas
-    for ws in conexiones_cerradas:
-        if ws in estado_sistema['conexiones_ws']:
-            estado_sistema['conexiones_ws'].remove(ws)
+    """Envía mensaje a todos los clientes WebSocket usando WebSocketManager"""
+    from servicios.websocket_manager import WebSocketManager
+    await WebSocketManager.broadcast(mensaje)
 
 
 # ==================== BUCLE DE SIMULACIÓN ====================
@@ -685,17 +1287,29 @@ async def bucle_simulacion():
                         velocidad_promedio=estado.velocidad_promedio,
                         flujo_vehicular=estado.flujo_vehicular
                     )
+                    # Clamp estricto del ICV en modo simulador (0.50–0.60)
+                    icv_val = float(resultado_icv['icv'])
+                    if estado_sistema['modo'] == 'simulador':
+                        icv_val = max(0.50, min(0.60, icv_val))
+
+                    # Obtener estado del semáforo desde el simulador
+                    estado_semaforo = estado_sistema['simulador'].estados_semaforo.get(inter_id)
+                    if estado_semaforo:
+                        fase_semaforo = estado_semaforo.fase
+                    else:
+                        fase_semaforo = 'verde'  # Default si no existe
 
                     metricas = {
                         'interseccion_id': inter_id,
                         'timestamp': estado.timestamp.isoformat(),
-                        'icv': resultado_icv['icv'],
+                        'icv': icv_val,
                         'clasificacion': resultado_icv['clasificacion'],
                         'color': resultado_icv['color'],
                         'num_vehiculos': estado.num_vehiculos,
                         'flujo': estado.flujo_vehicular,
                         'velocidad': estado.velocidad_promedio,
-                        'cola': estado.longitud_cola
+                        'cola': estado.longitud_cola,
+                        'estado_semaforo': fase_semaforo  # NUEVO: estado del semáforo
                     }
                     metricas_actualizadas.append(metricas)
 
@@ -715,10 +1329,12 @@ async def bucle_simulacion():
                         logger.warning(f"No se pudo guardar métrica en BD para {inter_id}: {e_db}")
 
                 # Broadcast a clientes WebSocket
+                logger.info(f"Enviando {len(metricas_actualizadas)} métricas por WebSocket...")
                 await broadcast_mensaje({
                     'tipo': 'metricas_actualizadas',
                     'datos': metricas_actualizadas
                 })
+                logger.debug("Métricas enviadas correctamente")
 
             # Esperar 1 segundo
             await asyncio.sleep(1.0)

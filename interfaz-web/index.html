@@ -4,14 +4,175 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Control Semafórico Adaptativo Inteligente</title>
-    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="estilos.css?v=4.1">
     <!-- Librerías locales (instaladas con npm) -->
-    <link rel="stylesheet" href="libs/leaflet/leaflet.css" />
-    <link rel="stylesheet" href="libs/fontawesome/all.min.css" />
+    <link rel="stylesheet" href="libs/leaflet/leaflet.css?v=3" />
+    <!-- Favicon embebido para evitar 404 al pedir /favicon.ico en desarrollo -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232563eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='10' font-family='Arial,Helvetica,sans-serif' fill='white'%3EPUCP%3C/text%3E%3C/svg%3E">
+    <style>
+        /* Ocultar iconos de FontAwesome fallidos mientras cargan los SVG */
+        i.fas::before, i.far::before, i.fab::before {
+            content: '' !important;
+        }
+        /* Estilos para iconos SVG */
+        .svg-icon svg {
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.125em;
+        }
+        /* Panel de coordenadas flotante */
+        #coord-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            z-index: 10000;
+            min-width: 320px;
+            display: none;
+            border-left: 4px solid #2563eb;
+        }
+        
+        #coord-panel.active {
+            display: block;
+            animation: slideInUp 0.3s ease;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #coord-panel h3 {
+            margin: 0 0 15px 0;
+            color: #1e293b;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .coord-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .coord-item label {
+            font-weight: 600;
+            color: #64748b;
+            min-width: 70px;
+        }
+        
+        .coord-item input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            background: #f8fafc;
+        }
+        
+        .coord-item button {
+            padding: 8px 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .coord-item button:hover {
+            background: #1d4ed8;
+            transform: scale(1.05);
+        }
+        
+        #coord-panel .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+        
+        #coord-panel .close-btn:hover {
+            background: #dc2626;
+            transform: rotate(90deg);
+        }
+        
+        .toggle-coord-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s;
+        }
+        
+        .toggle-coord-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+        }
+    </style>
 </head>
 <body>
     <!-- Partículas de fondo -->
     <div id="particles-js"></div>
+    
+    <!-- Botón para activar modo coordenadas (oculto) -->
+    <button class="toggle-coord-btn" id="toggleCoordMode" onclick="toggleCoordMode()" style="display: none;">
+        📍 Obtener Coordenadas
+    </button>
+    
+    <!-- Panel de coordenadas -->
+    <div id="coord-panel">
+        <button class="close-btn" onclick="cerrarCoordPanel()">✕</button>
+        <h3>📍 Coordenadas del Mapa</h3>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 15px;">Haz clic en el mapa para obtener coordenadas</p>
+        <div class="coord-item">
+            <label>Latitud:</label>
+            <input type="text" id="coord-lat" readonly />
+            <button onclick="copiarCoordenada('lat')">📋</button>
+        </div>
+        <div class="coord-item">
+            <label>Longitud:</label>
+            <input type="text" id="coord-lon" readonly />
+            <button onclick="copiarCoordenada('lon')">📋</button>
+        </div>
+        <div class="coord-item">
+            <label>Formato:</label>
+            <input type="text" id="coord-full" readonly style="font-size: 12px;" />
+            <button onclick="copiarCoordenada('full')">📋</button>
+        </div>
+    </div>
 
     <!-- Header Profesional -->
     <header class="header-pro">
@@ -41,11 +202,66 @@
                     <option value="sumo">SUMO</option>
                 </select>
             </div>
+            <button id="btn-reiniciar-simulador" class="btn-control" title="Reiniciar simulador con todas las intersecciones">
+                <i class="fas fa-sync"></i> Reiniciar
+            </button>
             <button id="btn-emergencia" class="btn-emergency">
                 <i class="fas fa-ambulance"></i> Emergencia
             </button>
         </div>
     </header>
+
+    <!-- Panel SUMO En Vivo (se superpone al recuadro de video en modo SUMO) -->
+    <div id="sumo-status-panel" class="sumo-overlay" style="display: none;">
+        <div class="card-header">
+            <i class="fas fa-broadcast-tower"></i>
+            <h3>SUMO en Tiempo Real</h3>
+        </div>
+        <div class="video-stats" style="padding: 12px 16px;">
+            <div class="video-stat">
+                <i class="fas fa-traffic-light"></i>
+                <div class="stat-content">
+                    <span class="stat-value" id="sumo-semaforos">0</span>
+                    <span class="stat-label">semáforos</span>
+                </div>
+            </div>
+            <div class="video-stat">
+                <i class="fas fa-car"></i>
+                <div class="stat-content">
+                    <span class="stat-value" id="sumo-vehiculos">0</span>
+                    <span class="stat-label">vehículos</span>
+                </div>
+            </div>
+            <div class="video-stat">
+                <i class="fas fa-road"></i>
+                <div class="stat-content">
+                    <span class="stat-value" id="sumo-calles-activas">0</span>
+                    <span class="stat-label">calles activas</span>
+                </div>
+            </div>
+            <div class="video-stat">
+                <i class="fas fa-tachometer-alt"></i>
+                <div class="stat-content">
+                    <span class="stat-value" id="sumo-velocidad">0</span>
+                    <span class="stat-label">km/h</span>
+                </div>
+            </div>
+            <div class="video-stat">
+                <i class="fas fa-signal"></i>
+                <div class="stat-content">
+                    <span class="stat-value" id="sumo-congestion">0%</span>
+                    <span class="stat-label">congestión</span>
+                </div>
+            </div>
+            <div class="video-stat">
+                <i class="fas fa-clock"></i>
+                <div class="stat-content">
+                    <span class="stat-value" id="sumo-tiempo">0.0s</span>
+                    <span class="stat-label">Tiempo simulado</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Dashboard Principal -->
     <div class="dashboard-container">
@@ -101,22 +317,22 @@
                 <!-- Mini Stats Split -->
                 <div class="mini-stats-split">
                     <div class="mini-stat-card success">
-                        <span class="mini-stat-icon">🟢</span>
+                        <span class="mini-stat-icon"><i class="fas fa-check-circle"></i></span>
                         <span class="mini-stat-value" id="calles-fluidas">0</span>
                         <span class="mini-stat-label">Fluidas</span>
                     </div>
                     <div class="mini-stat-card warning">
-                        <span class="mini-stat-icon">🟡</span>
+                        <span class="mini-stat-icon"><i class="fas fa-exclamation-circle"></i></span>
                         <span class="mini-stat-value" id="calles-moderadas">0</span>
                         <span class="mini-stat-label">Moderadas</span>
                     </div>
                     <div class="mini-stat-card danger">
-                        <span class="mini-stat-icon">🔴</span>
+                        <span class="mini-stat-icon"><i class="fas fa-times-circle"></i></span>
                         <span class="mini-stat-value" id="calles-congestionadas">0</span>
                         <span class="mini-stat-label">Congestionadas</span>
                     </div>
                     <div class="mini-stat-card info">
-                        <span class="mini-stat-icon">⚡</span>
+                        <span class="mini-stat-icon"><i class="fas fa-bolt"></i></span>
                         <span class="mini-stat-value" id="velocidad-promedio">0</span>
                         <span class="mini-stat-label">km/h Prom.</span>
                     </div>
@@ -155,8 +371,8 @@
 
         <!-- Sidebar Derecha: Métricas e Información -->
         <aside class="sidebar-right">
-            <!-- Panel de Video con YOLO -->
-            <div class="card glass-card" id="panel-video">
+            <!-- Panel Procesador Video -->
+            <div class="card glass-card" id="panel-video" style="display: block;">
                 <div class="card-header">
                     <i class="fas fa-video"></i>
                     <h3>Detección en Tiempo Real</h3>
@@ -223,15 +439,24 @@
                     <div class="video-stats">
                         <div class="video-stat">
                             <i class="fas fa-car"></i>
-                            <span id="video-vehiculos">0</span> vehículos
+                            <div class="stat-content">
+                                <span class="stat-value" id="video-vehiculos">0</span>
+                                <span class="stat-label">vehículos</span>
+                            </div>
                         </div>
                         <div class="video-stat">
                             <i class="fas fa-tachometer-alt"></i>
-                            <span id="video-fps">0</span> FPS
+                            <div class="stat-content">
+                                <span class="stat-value" id="video-fps">0</span>
+                                <span class="stat-label">FPS</span>
+                            </div>
                         </div>
                         <div class="video-stat">
                             <i class="fas fa-signal"></i>
-                            ICV: <span id="video-icv">0.00</span>
+                            <div class="stat-content">
+                                <span class="stat-value" id="video-icv">0.00</span>
+                                <span class="stat-label">ICV</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -297,7 +522,7 @@
                     <p>Configure los parámetros del vehículo de emergencia</p>
                 </div>
                 <button class="modal-close-btn" onclick="cerrarModalEmergencia()">
-                    <i class="fas fa-times"></i>
+                    ✕
                 </button>
             </div>
 
@@ -308,7 +533,6 @@
                         <select id="tipo-emergencia" class="input-pro">
                             <option value="ambulancia">🚑 Ambulancia</option>
                             <option value="bomberos">🚒 Bomberos</option>
-                            <option value="policia">🚓 Policía</option>
                         </select>
                     </div>
                 </div>
@@ -334,32 +558,7 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group-pro">
-                        <label>
-                            <i class="fas fa-tachometer-alt"></i> Velocidad Estimada
-                            <span class="info-tooltip">
-                                <i class="fas fa-info-circle"></i>
-                                <span class="tooltip-text">
-                                    <strong>¿Qué es la Velocidad Estimada?</strong><br><br>
-                                    Es la velocidad promedio a la que el vehículo de emergencia se desplazará por la ruta.
-                                    Este valor se usa para:<br>
-                                    • Calcular el tiempo de llegada<br>
-                                    • Sincronizar los semáforos en verde<br>
-                                    • Optimizar la coordinación de la ola verde<br><br>
-                                    <em>Rango típico: Ambulancias 50-70 km/h en ciudad</em>
-                                </span>
-                            </span>
-                        </label>
-                        <input type="range" id="velocidad-emergencia" class="range-pro"
-                               min="20" max="80" value="50" step="5">
-                        <div class="range-labels">
-                            <span>20 km/h</span>
-                            <span id="velocidad-display" class="range-value">50 km/h</span>
-                            <span>80 km/h</span>
-                        </div>
-                    </div>
-                </div>
+                <!-- Velocidad estimada removida: se usa valor por defecto en backend si es necesario -->
             </div>
 
             <div class="modal-footer-pro">
@@ -374,10 +573,11 @@
     </div>
 
     <!-- Scripts -->
-    <script src="libs/chart/chart.umd.min.js"></script>
-    <script src="libs/leaflet/leaflet.js"></script>
-    <script src="libs/particles/particles.min.js"></script>
-    <script src="intersecciones_lima.js"></script>
+    <script src="libs/chart/chart.umd.min.js?v=3"></script>
+    <script src="libs/leaflet/leaflet.js?v=3"></script>
+    <script src="libs/particles/particles.min.js?v=3"></script>
+    <script src="intersecciones_lima.js?v=3"></script>
+    <script src="hospitals_lima.js?v=1"></script>
     <script>
         // Debug: Verificar que todas las librerías se cargaron
         console.log('=== VERIFICACIÓN DE LIBRERÍAS ===');
@@ -388,6 +588,10 @@
         console.log('ZONAS_LIMA:', typeof ZONAS_LIMA !== 'undefined' ? 'OK' : 'FALTA');
         console.log('===================================');
     </script>
-    <script src="app_mejorado.js"></script>
+    <script src="iconos-svg.js?v=3"></script>
+    <!-- Configuración y utilidades de ruteo -->
+    <script src="config.js?v=9"></script>
+    <script src="routing-utils.js?v=9"></script>
+    <script src="app_mejorado.js?v=10"></script>
 </body>
 </html>

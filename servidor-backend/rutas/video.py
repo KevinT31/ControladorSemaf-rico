@@ -11,10 +11,13 @@ import logging
 import numpy as np
 import time
 from pathlib import Path
+import sys
+import io
 
 from modelos.trafico import ResultadoVideo
 from modelos.respuestas import MensajeResponse
 
+# NO importar ProcesadorVideo aquí - se hace lazy loading dentro de las funciones
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
@@ -177,16 +180,76 @@ async def obtener_metricas_stream():
     return metricas_stream_actual
 
 
+@router.get("/frame-camera")
+async def frame_camera():
+    """
+    Devuelve un único frame JPEG de la cámara con anotaciones YOLO y actualiza métricas.
+
+    Uso pensado para polling desde el frontend.
+    """
+    # Fix para ultralytics - agregar encoding a stdout si no existe
+    if not hasattr(sys.stdout, 'encoding'):
+        sys.stdout.encoding = 'utf-8'
+    if not hasattr(sys.stderr, 'encoding'):
+        sys.stderr.encoding = 'utf-8'
+
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from vision_computadora.procesador_video import ProcesadorVideo
+
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        raise HTTPException(status_code=503, detail="Cámara no disponible")
+
+    try:
+        ret, frame = cap.read()
+        if not ret:
+            raise HTTPException(status_code=500, detail="No se pudo leer frame de la cámara")
+
+        # Procesar un único frame. Se crea el procesador con el mismo parámetro que el stream.
+        procesador = ProcesadorVideo(
+            ruta_video=0,
+            pixeles_por_metro=15.0,
+            calcular_metricas_cap6=True
+        )
+
+        resultado = procesador.procesar_frame(frame, 0)
+        frame_anotado = procesador.dibujar_detecciones(frame, resultado, mostrar_info=True)
+
+        # Actualizar métricas globales para que /metricas-stream refleje el último cálculo
+        global metricas_stream_actual
+        metricas_stream_actual = {
+            'num_vehiculos': resultado.num_vehiculos,
+            'fps': 0,
+            'icv': round(resultado.icv, 3),
+            'velocidad': round(resultado.velocidad_promedio, 1),
+            'flujo': round(resultado.flujo_vehicular, 1)
+        }
+
+        ret, buffer = cv2.imencode('.jpg', frame_anotado, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        if not ret:
+            raise HTTPException(status_code=500, detail="Fallo al codificar JPEG")
+
+        # Responder como imagen/jpeg de un único frame
+        bytes_io = io.BytesIO(buffer.tobytes())
+        return StreamingResponse(bytes_io, media_type="image/jpeg")
+    finally:
+        cap.release()
+
+
 @router.get("/stream-camera")
 async def stream_camera():
     """
     Stream de cámara en tiempo real con detección y métricas
     """
-    import sys
+    # Fix para ultralytics - agregar encoding a stdout si no existe
+    if not hasattr(sys.stdout, 'encoding'):
+        sys.stdout.encoding = 'utf-8'
+    if not hasattr(sys.stderr, 'encoding'):
+        sys.stderr.encoding = 'utf-8'
+    
     sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
     from vision_computadora.procesador_video import ProcesadorVideo
-
+    
     async def generate_frames():
         global metricas_stream_actual
         procesador = None
@@ -194,12 +257,20 @@ async def stream_camera():
             logger.info("Iniciando stream de camara...")
             procesador = ProcesadorVideo(
                 ruta_video=0,
-                pixeles_por_metro=15.0
+                pixeles_por_metro=15.0,
+                calcular_metricas_cap6=True  # FORZAR métricas avanzadas para consistencia
             )
 
             if not procesador.video.isOpened():
                 logger.error("No se pudo abrir la camara")
                 raise Exception("No se pudo abrir la camara")
+            
+            # Configurar resolución de la cámara para que las métricas se vean bien
+            procesador.video.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+            procesador.video.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+            actual_width = int(procesador.video.get(cv2.CAP_PROP_FRAME_WIDTH))
+            actual_height = int(procesador.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            logger.info(f"Resolución de cámara configurada: {actual_width}x{actual_height}")
 
             frame_num = 0
             fps_counter = 0
@@ -212,13 +283,25 @@ async def stream_camera():
                     logger.warning("No se pudo leer frame de la camara")
                     break
 
+                # Log para verificar que estamos procesando
+                if frame_num == 0:
+                    logger.info(f"Procesando primer frame - Shape: {frame.shape}, Dtype: {frame.dtype}")
+
                 resultado = procesador.procesar_frame(frame, frame_num)
+
+                # Log cada 30 frames para ver que las métricas se están calculando
+                if frame_num % 30 == 0:
+                    logger.info(f"Frame {frame_num}: Vehículos={resultado.num_vehiculos}, ICV={resultado.icv:.3f}, metricas_cap6={resultado.metricas_cap6 is not None}")
 
                 frame_anotado = procesador.dibujar_detecciones(
                     frame,
                     resultado,
                     mostrar_info=True
                 )
+                
+                # Verificar que el frame anotado tiene contenido
+                if frame_num == 0:
+                    logger.info(f"Frame anotado - Shape: {frame_anotado.shape}, Min: {frame_anotado.min()}, Max: {frame_anotado.max()}")
 
                 fps_counter += 1
                 elapsed = time.time() - fps_start_time
@@ -294,40 +377,132 @@ async def listar_videos_procesados():
 @router.get("/stream-video-index/{video_index}")
 async def stream_video_index(video_index: int):
     """
-    Stream de un video procesado específico por índice en bucle
+    Stream de un video procesado específico por índice en bucle con análisis en tiempo real
+    Videos 1 y 3: Empiezan análisis YOLO desde segundo 30, pero video se muestra desde segundo 0
     """
-    videos_path = Path(__file__).parent.parent.parent / "datos" / "resultados-video" / "videos-procesados"
+    # Fix para ultralytics - agregar encoding a stdout si no existe
+    if not hasattr(sys.stdout, 'encoding'):
+        sys.stdout.encoding = 'utf-8'
+    if not hasattr(sys.stderr, 'encoding'):
+        sys.stderr.encoding = 'utf-8'
+    
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from vision_computadora.procesador_video import ProcesadorVideo
+    
+    videos_path = Path(__file__).parent.parent.parent / "datos" / "videos-prueba"
 
     videos_encontrados = []
-    for carpeta in ['basico', 'completo', 'emergencias']:
-        carpeta_path = videos_path / carpeta
-        if carpeta_path.exists():
-            videos_encontrados.extend(sorted(carpeta_path.glob('*.mp4')))
+    if videos_path.exists():
+        # Buscar videos en todas las subcarpetas recursivamente
+        videos_encontrados = sorted(videos_path.glob('**/*.mp4'))
 
     if video_index < 0 or video_index >= len(videos_encontrados):
-        raise HTTPException(status_code=404, detail="Video no encontrado")
+        raise HTTPException(status_code=404, detail=f"Video no encontrado. Index: {video_index}, Total videos: {len(videos_encontrados)}")
 
     video_path = videos_encontrados[video_index]
 
     async def generate_frames():
+        global metricas_stream_actual
+        procesador = None
         try:
-            logger.info(f"Reproduciendo video: {video_path.name}")
+            logger.info(f"Analizando video: {video_path.name}")
+
+            # Determinar si este video requiere saltar 30 segundos para análisis
+            nombre_video = video_path.stem.lower()
+            segundos_saltar_analisis = 0
+            if 'video1' in nombre_video or 'video3' in nombre_video or 'video_1' in nombre_video or 'video_3' in nombre_video:
+                segundos_saltar_analisis = 30
+                logger.info(f"⏩ Video {video_index + 1}: Análisis YOLO iniciará desde segundo {segundos_saltar_analisis}")
+                logger.info(f"📹 Video mostrado: desde segundo 0 (completo)")
 
             while True:
-                cap = cv2.VideoCapture(str(video_path))
-                if not cap.isOpened():
+                procesador = ProcesadorVideo(
+                    ruta_video=str(video_path),
+                    pixeles_por_metro=None,  # Autoajuste ppm por resolución
+                    calcular_metricas_cap6=True  # FORZAR métricas avanzadas para todos los videos
+                )
+
+                if not procesador.video.isOpened():
                     logger.warning(f"No se pudo abrir: {video_path.name}")
                     break
 
-                fps = cap.get(cv2.CAP_PROP_FPS) or 30
+                fps = procesador.video.get(cv2.CAP_PROP_FPS) or 30
+                frame_inicio_analisis = int(segundos_saltar_analisis * fps)
                 delay = 1.0 / fps
 
+                frame_num = 0
+                fps_counter = 0
+                fps_start_time = time.time()
+                logger.info(f"Inicio de stream - FPS: {fps}")
+
                 while True:
-                    ret, frame = cap.read()
+                    ret, frame = procesador.video.read()
                     if not ret:
                         break
 
-                    ret, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+                    # ANÁLISIS: Solo hacer detección YOLO después del segundo 30 (videos 1 y 3)
+                    if frame_num >= frame_inicio_analisis:
+                        resultado = procesador.procesar_frame(frame, frame_num)
+                        frame_anotado = procesador.dibujar_detecciones(
+                            frame,
+                            resultado,
+                            mostrar_info=True,
+                            modo_simple=False  # Mostrar panel de métricas para ver longitud de cola
+                        )
+
+                        # Actualizar métricas solo cuando hay análisis
+                        fps_counter += 1
+                        elapsed = time.time() - fps_start_time
+                        if elapsed >= 1.0:
+                            fps_actual = fps_counter / elapsed
+                            metricas_stream_actual = {
+                                'num_vehiculos': resultado.num_vehiculos,
+                                'fps': int(fps_actual),
+                                'icv': round(resultado.icv, 3),
+                                'velocidad': round(resultado.velocidad_promedio, 1),
+                                'flujo': round(resultado.flujo_vehicular, 1)
+                            }
+                            fps_counter = 0
+                            fps_start_time = time.time()
+                    else:
+                        # ANTES del segundo 30: Mostrar frame SIN overlay ni análisis
+                        frame_anotado = frame.copy()
+                        
+                        # Panel superior simple con mensaje
+                        overlay = frame_anotado.copy()
+                        cv2.rectangle(overlay, (0, 0), (frame.shape[1], 60), (35, 30, 40), -1)
+                        frame_anotado = cv2.addWeighted(overlay, 0.85, frame_anotado, 0.15, 0)
+                        
+                        segundos_restantes = int((frame_inicio_analisis - frame_num) / fps)
+                        cv2.putText(
+                            frame_anotado,
+                            f"Esperando estabilizacion del video...",
+                            (20, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.7,
+                            (255, 255, 255),
+                            1
+                        )
+                        cv2.putText(
+                            frame_anotado,
+                            f"Analisis YOLO inicia en {segundos_restantes} segundos",
+                            (20, 50),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.5,
+                            (246, 92, 139),
+                            1
+                        )
+                        
+                        # Métricas en 0 mientras no hay análisis
+                        metricas_stream_actual = {
+                            'num_vehiculos': 0,
+                            'fps': 0,
+                            'icv': 0.0,
+                            'velocidad': 0.0,
+                            'flujo': 0.0
+                        }
+
+                    ret, buffer = cv2.imencode('.jpg', frame_anotado, [cv2.IMWRITE_JPEG_QUALITY, 85])
                     if not ret:
                         continue
 
@@ -336,17 +511,25 @@ async def stream_video_index(video_index: int):
                     yield (b'--frame\r\n'
                            b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
+                    frame_num += 1
                     await asyncio.sleep(delay)
 
-                cap.release()
+                procesador.video.release()
 
         except asyncio.CancelledError:
             logger.info("Stream cancelado por cliente")
         except Exception as e:
-            logger.error(f"Error en stream de video: {e}")
+            logger.error(f"Error en stream de video: {e}", exc_info=True)
         finally:
-            if 'cap' in locals():
-                cap.release()
+            if procesador is not None:
+                procesador.video.release()
+                metricas_stream_actual = {
+                    'num_vehiculos': 0,
+                    'fps': 0,
+                    'icv': 0.0,
+                    'velocidad': 0.0,
+                    'flujo': 0.0
+                }
 
     return StreamingResponse(
         generate_frames(),

@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import logging
 import sys
+import torch
 
 # Importar módulos del proyecto
 sys.path.append(str(Path(__file__).parent.parent))
@@ -25,6 +26,12 @@ sys.path.append(str(Path(__file__).parent.parent))
 from vision_computadora.tracking_vehicular import TrackerVehicular
 from vision_computadora.detector_emergencia import DetectorEmergencia
 from nucleo.indice_congestion import CalculadorICV, ParametrosInterseccion
+
+# Fix para PyTorch 2.6+ - Suprimir warnings sobre weights_only
+# El fix real se aplica en _cargar_modelo_yolo_con_fallback()
+import warnings
+warnings.filterwarnings('ignore', message='.*weights_only.*')
+warnings.filterwarnings('ignore', message='.*safe_globals.*')
 
 try:
     from ultralytics import YOLO
@@ -47,6 +54,7 @@ class ResultadoFrame:
     flujo_vehicular: float  # veh/min - Basado en tracking
     velocidad_promedio: float  # km/h - Basado en tracking REAL
     longitud_cola: float  # metros - Basado en detecciones
+    cola_vehiculos_count: int  # conteo de vehículos en fila (colas por vehículos)
 
     # ICV REAL (calculado por nucleo/)
     icv: float
@@ -57,8 +65,8 @@ class ResultadoFrame:
     hay_emergencia: bool
     detecciones_emergencia: List  # DeteccionEmergencia objects
 
-    # Métricas del Capítulo 6 (NUEVAS)
-    metricas_cap6: Optional[Dict] = None  # Contiene todas las métricas del Cap 6.2.2, 6.2.3, 6.2.4
+    # Métricas avanzadas (NUEVAS)
+    metricas_cap6: Optional[Dict] = None  # Contiene métricas avanzadas
 
 
 class ProcesadorVideo:
@@ -80,8 +88,9 @@ class ProcesadorVideo:
         roi: Optional[Tuple[int, int, int, int]] = None,
         pixeles_por_metro: float = 15.0,  # Calibración espacial
         parametros_icv: Optional[ParametrosInterseccion] = None,
-        calcular_metricas_cap6: bool = True,  # Activar métricas del Capítulo 6
-        longitud_carril: float = 200.0  # Longitud efectiva del carril para Cap 6
+        calcular_metricas_cap6: bool = True,  # Activar métricas avanzadas
+        longitud_carril: float = 200.0,  # Longitud efectiva del carril
+        epsilon_velocidad_kmh: Optional[float] = None  # Umbral global detenido/movimiento (km/h)
     ):
         """
         Args:
@@ -91,8 +100,8 @@ class ProcesadorVideo:
             roi: Región de interés (x, y, w, h) o None
             pixeles_por_metro: Calibración espacial para velocidad
             parametros_icv: Parámetros para cálculo ICV
-            calcular_metricas_cap6: Si calcular métricas completas del Capítulo 6
-            longitud_carril: Longitud efectiva del carril en metros (para densidad Cap 6)
+            calcular_metricas_cap6: Si calcular métricas avanzadas
+            longitud_carril: Longitud efectiva del carril en metros
         """
         # Cargar video
         if isinstance(ruta_video, int):
@@ -111,7 +120,16 @@ class ProcesadorVideo:
         self.ancho = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.alto = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.roi = roi
-        self.pixeles_por_metro = pixeles_por_metro
+        # Calibración espacial: adaptar ppm según resolución para videos con distintas dimensiones
+        # Usamos un ppm base asumido para una resolución de referencia (ej. ancho 640)
+        referencia_ancho = 640.0
+        ppm_base = float(pixeles_por_metro) if pixeles_por_metro else 15.0
+        if self.ancho > 0:
+            escala_ancho = self.ancho / referencia_ancho
+            self.pixeles_por_metro = ppm_base * escala_ancho
+        else:
+            self.pixeles_por_metro = ppm_base
+        logger.info(f"Calibracion ppm ajustada por resolucion: {self.pixeles_por_metro:.2f} px/m (ancho={self.ancho})")
 
         # Cargar modelo YOLO con soporte YOLO11 y fallback a YOLO8
         if YOLO is not None:
@@ -123,11 +141,22 @@ class ProcesadorVideo:
         # Clases de vehículos (COCO dataset)
         self.clases_vehiculos = [2, 3, 5, 7]  # car, motorcycle, bus, truck
 
-        # Inicializar tracker (para velocidad REAL)
+        # Preparar parámetros ICV y epsilon global (fuente de verdad)
+        parametros_icv_local = parametros_icv or ParametrosInterseccion()
+        # Usar epsilon explícito si se pasa; si no, intentar tomar de parametros_icv_local
+        # y si no existe el atributo, caer a 5.0 km/h por defecto
+        self.epsilon_velocidad_kmh = (
+            epsilon_velocidad_kmh if epsilon_velocidad_kmh is not None else getattr(parametros_icv_local, 'EPSILON_VELOCIDAD', 5.0)
+        )
+
+        # Inicializar tracker (para velocidad REAL) con epsilon unificado
         self.tracker = TrackerVehicular(
             fps=self.fps,
             pixeles_por_metro=pixeles_por_metro,
-            usar_deepsort=True  # Preferir DeepSORT si está disponible
+            usar_deepsort=True,  # Fallback si ByteTrack no está disponible
+            preferir_bytetrack=True,
+            velocidad_max_kmh=60.0,  # Ciudad: limitar a 60 km/h
+            epsilon_motion_kmh=self.epsilon_velocidad_kmh
         )
 
         # Inicializar detector de emergencias (modo silencioso)
@@ -137,15 +166,13 @@ class ProcesadorVideo:
         )
 
         # Inicializar calculador ICV REAL
-        if parametros_icv is None:
-            parametros_icv = ParametrosInterseccion()  # Usar parámetros por defecto
-        self.calculador_icv = CalculadorICV(parametros_icv)
+        self.calculador_icv = CalculadorICV(parametros_icv_local)
 
-        # Configuración de métricas del Capítulo 6
+        # Configuración de métricas avanzadas
         self.calcular_metricas_cap6 = calcular_metricas_cap6
         self.longitud_carril = longitud_carril
 
-        # Historial para cálculo de flujo (Cap 6)
+        # Historial para cálculo de flujo
         self.vehiculos_cruzaron = 0  # Contador de vehículos que cruzaron
         self.tiempo_inicio_ventana = 0.0  # Timestamp de inicio de ventana
         self.ids_vehiculos_vistos = set()  # IDs de vehículos ya contados
@@ -156,7 +183,7 @@ class ProcesadorVideo:
         logger.info(f"  Frames totales: {self.total_frames}")
         logger.info(f"  Tracker: {self.tracker.tipo_tracker}")
         logger.info(f"  Detector emergencia: {'OK' if self.detector_emergencia.modelo_disponible else 'No disponible'}")
-        logger.info(f"  Metricas Cap 6: {'OK Activadas' if self.calcular_metricas_cap6 else 'Desactivadas'}")
+        logger.info(f"  Métricas avanzadas: {'OK Activadas' if self.calcular_metricas_cap6 else 'Desactivadas'}")
 
     def _cargar_modelo_yolo_con_fallback(self, modelo_especificado: str) -> Tuple:
         """
@@ -199,12 +226,34 @@ class ProcesadorVideo:
         for ruta_modelo, version in modelos_intentar:
             try:
                 logger.info(f"Intentando cargar {version}: {ruta_modelo}...")
-                modelo = YOLO(ruta_modelo)
-                logger.info(f"OK - {version} cargado exitosamente: {ruta_modelo}")
-                return modelo, f"{version} ({ruta_modelo})"
+
+                # Parche especial para PyTorch 2.6+
+                # Usar weights_only=False temporalmente durante la carga del modelo
+                import torch
+                original_load = torch.load
+
+                def safe_load(*args, **kwargs):
+                    kwargs['weights_only'] = False
+                    return original_load(*args, **kwargs)
+
+                # Aplicar patch temporal
+                torch.load = safe_load
+
+                try:
+                    modelo = YOLO(ruta_modelo)
+                    logger.info(f"✓ {version} cargado exitosamente: {ruta_modelo}")
+                    return modelo, f"{version} ({ruta_modelo})"
+                finally:
+                    # Restaurar torch.load original
+                    torch.load = original_load
+
             except Exception as e:
-                errores.append(f"{version} ({ruta_modelo}): {str(e)}")
-                logger.warning(f"No se pudo cargar {version}: {e}")
+                error_str = str(e)
+                # Acortar mensajes de error muy largos
+                if len(error_str) > 200:
+                    error_str = error_str[:200] + "..."
+                errores.append(f"{version} ({ruta_modelo}): {error_str}")
+                logger.warning(f"No se pudo cargar {version}: {error_str}")
                 continue
 
         # Si llegamos aquí, todos los intentos fallaron
@@ -272,7 +321,7 @@ class ProcesadorVideo:
             frame_num: Número de frame
 
         Returns:
-            ResultadoFrame con métricas REALES y métricas del Capítulo 6
+            ResultadoFrame con métricas REALES y métricas avanzadas
         """
         timestamp = frame_num / self.fps
 
@@ -290,11 +339,28 @@ class ProcesadorVideo:
         # 2. Actualizar tracker (velocidad REAL) - pasar frame para DeepSORT
         vehiculos_trackeados = self.tracker.actualizar(vehiculos_detectados, timestamp, frame_roi)
 
+        # Asociar velocidades desde tracking a las detecciones para visualización
+        if vehiculos_trackeados:
+            for v in vehiculos_detectados:
+                cx, cy = v['centroide']
+                # Encontrar track más cercano
+                mejor_track = None
+                mejor_dist = 1e9
+                for t in vehiculos_trackeados:
+                    tx, ty = t.centroide
+                    dist = ((cx - tx)**2 + (cy - ty)**2) ** 0.5
+                    if dist < mejor_dist:
+                        mejor_dist = dist
+                        mejor_track = t
+                if mejor_track is not None and mejor_dist < 50.0:
+                    v['velocidad'] = float(mejor_track.velocidad_promedio)
+
         # 3. Calcular métricas REALES
         num_vehiculos = len(vehiculos_detectados)
         flujo_vehicular = self._calcular_flujo_real(vehiculos_trackeados, timestamp)
         velocidad_promedio = self.tracker.obtener_velocidad_promedio_general()  # REAL
         longitud_cola = self._medir_longitud_cola_real(vehiculos_detectados, frame_roi.shape)
+        cola_vehiculos_count = self._contar_cola_por_vehiculos(vehiculos_detectados, frame_roi.shape)
 
         # 4. Detectar emergencias (REAL con modelo custom)
         detecciones_emergencia = self.detector_emergencia.detectar(frame_roi, frame_num, datetime.now())
@@ -307,7 +373,7 @@ class ProcesadorVideo:
             flujo_vehicular=flujo_vehicular
         )
 
-        # 6. Calcular métricas del Capítulo 6 (si está habilitado)
+        # 6. Calcular métricas avanzadas (si está habilitado)
         metricas_cap6 = None
         if self.calcular_metricas_cap6:
             metricas_cap6 = self._calcular_metricas_cap6(
@@ -323,6 +389,7 @@ class ProcesadorVideo:
             flujo_vehicular=flujo_vehicular,
             velocidad_promedio=velocidad_promedio,
             longitud_cola=longitud_cola,
+            cola_vehiculos_count=cola_vehiculos_count,
             icv=resultado_icv['icv'],
             clasificacion_icv=resultado_icv['clasificacion'],
             color_icv=resultado_icv['color'],
@@ -332,25 +399,119 @@ class ProcesadorVideo:
         )
 
     def _extraer_vehiculos_yolo(self, resultados) -> List[Dict]:
-        """Extrae vehículos de resultados YOLO (REAL)"""
+        """Extrae vehículos de resultados YOLO (REAL) con NMS para evitar múltiples cajas por vehículo"""
         vehiculos = []
 
-        for deteccion in resultados.boxes:
-            clase = int(deteccion.cls[0])
+        if resultados is None or resultados.boxes is None:
+            return vehiculos
 
-            # Filtrar solo vehículos
+        # Recoger todas las cajas de clases vehiculares
+        bboxes = []  # [x1,y1,x2,y2]
+        scores = []  # confianza
+        clases = []  # clase
+
+        for box in resultados.boxes:
+            clase = int(box.cls[0])
             if clase in self.clases_vehiculos:
-                x1, y1, x2, y2 = deteccion.xyxy[0].cpu().numpy()
-                confianza = float(deteccion.conf[0])
+                x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                conf = float(box.conf[0])
+                bboxes.append([float(x1), float(y1), float(x2), float(y2)])
+                scores.append(conf)
+                clases.append(clase)
 
+        if not bboxes:
+            return vehiculos
+
+        # Aplicar NMS por clase para suprimir cajas superpuestas del mismo objeto
+        try:
+            import torch
+            import torchvision
+
+            bboxes_t = torch.tensor(bboxes, dtype=torch.float32)
+            scores_t = torch.tensor(scores, dtype=torch.float32)
+            clases_t = torch.tensor(clases, dtype=torch.int64)
+
+            keep_indices = []
+            iou_thresh = 0.5
+
+            # NMS por clase
+            for c in set(clases):
+                idxs = (clases_t == c).nonzero(as_tuple=True)[0]
+                if idxs.numel() == 0:
+                    continue
+                kept = torchvision.ops.nms(bboxes_t[idxs], scores_t[idxs], iou_thresh)
+                keep_indices.extend(idxs[kept].tolist())
+
+            # Reconstruir vehículos con índices mantenidos
+            for i in keep_indices:
+                x1, y1, x2, y2 = bboxes[i]
+                confianza = scores[i]
+                clase = clases[i]
                 vehiculos.append({
-                    'bbox': [float(x1), float(y1), float(x2), float(y2)],
+                    'bbox': [x1, y1, x2, y2],
                     'clase': clase,
                     'confianza': confianza,
-                    'centroide': ((x1+x2)/2, (y1+y2)/2)
+                    'centroide': ((x1 + x2) / 2.0, (y1 + y2) / 2.0)
                 })
+        except Exception:
+            # Fallback: NMS manual simple basado en IoU
+            def iou(a, b):
+                ax1, ay1, ax2, ay2 = a
+                bx1, by1, bx2, by2 = b
+                inter_x1 = max(ax1, bx1)
+                inter_y1 = max(ay1, by1)
+                inter_x2 = min(ax2, bx2)
+                inter_y2 = min(ay2, by2)
+                inter_w = max(0.0, inter_x2 - inter_x1)
+                inter_h = max(0.0, inter_y2 - inter_y1)
+                inter = inter_w * inter_h
+                area_a = max(0.0, (ax2 - ax1)) * max(0.0, (ay2 - ay1))
+                area_b = max(0.0, (bx2 - bx1)) * max(0.0, (by2 - by1))
+                union = area_a + area_b - inter + 1e-6
+                return inter / union
+
+            iou_thresh = 0.5
+            # Ordenar por confianza descendente
+            indices = sorted(range(len(bboxes)), key=lambda i: scores[i], reverse=True)
+            suprimidos = set()
+
+            for i in indices:
+                if i in suprimidos:
+                    continue
+                x1, y1, x2, y2 = bboxes[i]
+                confianza = scores[i]
+                clase_i = clases[i]
+                vehiculos.append({
+                    'bbox': [x1, y1, x2, y2],
+                    'clase': clase_i,
+                    'confianza': confianza,
+                    'centroide': ((x1 + x2) / 2.0, (y1 + y2) / 2.0)
+                })
+                for j in indices:
+                    if j == i or j in suprimidos:
+                        continue
+                    if clases[j] != clase_i:
+                        continue
+                    if iou(bboxes[i], bboxes[j]) >= iou_thresh:
+                        suprimidos.add(j)
 
         return vehiculos
+
+    def _construir_tracks_dict(self, vehiculos_trackeados: List[Dict]) -> List[Dict]:
+        """Construye una lista de dicts de tracks para alimentar el estado local"""
+        tracks = []
+        for t in vehiculos_trackeados:
+            tracks.append({
+                'id': getattr(t, 'id', -1),
+                'clase': getattr(t, 'clase', 2),
+                'confianza': getattr(t, 'confianza', 0.0),
+                'bbox': getattr(t, 'bbox', [0, 0, 0, 0]),
+                'centroide': getattr(t, 'centroide', (0.0, 0.0)),
+                'velocidad_promedio': float(getattr(t, 'velocidad_promedio', 0.0)),
+                # Aproximación: derivar velocidad_xy a partir de últimas posiciones si existen
+                'velocidad_xy': None
+            })
+        return tracks
 
     def _calcular_flujo_real(
         self,
@@ -410,22 +571,22 @@ class ProcesadorVideo:
         timestamp: float
     ) -> Dict:
         """
-        Calcula métricas completas del Capítulo 6
+        Calcula métricas completas avanzadas
 
-        Implementa fórmulas exactas de Cap 6.2.2, 6.2.3, 6.2.4:
-        - StoppedCount (Cap 6.2.2)
-        - Vavg solo de vehículos en movimiento (Cap 6.2.2)
-        - Flujo q (Cap 6.2.2)
-        - Densidad k (Cap 6.2.2)
-        - Parámetro de Intensidad PI (Cap 6.2.4)
-        - ICV según fórmula exacta (Cap 6.2.3)
+        Implementa fórmulas exactas:
+        - StoppedCount
+        - Vavg solo de vehículos en movimiento
+        - Flujo q
+        - Densidad k
+        - Parámetro de Intensidad PI
+        - ICV según fórmula exacta
 
         Args:
             vehiculos_trackeados: Lista de vehículos con tracking activo
             timestamp: Timestamp actual en segundos
 
         Returns:
-            Dict con todas las métricas del Capítulo 6
+            Dict con todas las métricas avanzadas
         """
         # Inicializar ventana de tiempo si es necesario
         if self.tiempo_inicio_ventana == 0.0:
@@ -450,7 +611,7 @@ class ProcesadorVideo:
         if tiempo_ventana <= 0:
             tiempo_ventana = 1.0  # Evitar división por cero
 
-        # 4. Llamar al calculador del Capítulo 6
+        # 4. Llamar al calculador avanzado
         try:
             metricas = self.calculador_icv.calcular_metricas_completas_cap6(
                 velocidades=velocidades if velocidades else [0.0],
@@ -472,12 +633,37 @@ class ProcesadorVideo:
             logger.warning(f"Error calculando métricas Cap 6: {e}")
             return None
 
+    def _contar_cola_por_vehiculos(
+        self,
+        vehiculos: List[Dict],
+        shape: Tuple
+    ) -> int:
+        """
+        Conteo de vehículos detenidos (cola) según función indicadora:
+        v = 1 si velocidad(v) < epsilon; 0 caso contrario.
+
+        Usa velocidad de ByteTrack/DeepSORT ya anotada en vehiculos_detectados.
+        Si no hay velocidad disponible, asume no detenido.
+        """
+        if not vehiculos:
+            return 0
+
+        epsilon = self.epsilon_velocidad_kmh
+        detenidos = 0
+        for v in vehiculos:
+            vel = v.get('velocidad', 0.0)
+            if vel < epsilon:
+                detenidos += 1
+
+        return detenidos
+
     def dibujar_detecciones(
         self,
         frame: np.ndarray,
         resultado: ResultadoFrame,
         mostrar_info: bool = True,
-        mostrar_tracking_ids: bool = True
+        mostrar_tracking_ids: bool = True,
+        modo_simple: bool = False
     ) -> np.ndarray:
         """
         Dibuja detecciones en el frame
@@ -487,12 +673,54 @@ class ProcesadorVideo:
             resultado: Resultado del análisis
             mostrar_info: Si mostrar panel de información
             mostrar_tracking_ids: Si mostrar IDs de tracking
+            modo_simple: Si True, solo muestra título y barra (sin panel de métricas)
 
         Returns:
             Frame con detecciones
         """
         frame_anotado = frame.copy()
 
+        # Si mostrar_info=True, usar overlay moderno completo
+        if mostrar_info:
+            try:
+                from vision_computadora.overlay_visual_mejorado import OverlayVisualModerno, convertir_resultado_a_dict
+
+                # Crear overlay si no existe
+                if not hasattr(self, '_overlay_moderno'):
+                    self._overlay_moderno = OverlayVisualModerno()
+                    logger.info("OverlayVisualModerno inicializado")
+
+                # Convertir resultado a dict
+                resultado_dict = convertir_resultado_a_dict(resultado)
+
+                # Debug: verificar parámetro modo_simple RECIBIDO
+                print(f"[PROCESADOR] dibujar_detecciones recibió modo_simple={modo_simple}")
+                print(f"[PROCESADOR] Tipo: {type(modo_simple)}")
+                
+                # Usar visualización completa (incluye vehículos, métricas y barra ICV)
+                print(f"[PROCESADOR] Llamando crear_visualizacion_completa con modo_simple={modo_simple}")
+                frame_anotado = self._overlay_moderno.crear_visualizacion_completa(
+                    frame_anotado,
+                    resultado_dict,
+                    mostrar_barra=True,
+                    modo_simple=modo_simple
+                )
+
+                # Dibujar emergencias encima si las hay
+                if resultado.hay_emergencia:
+                    frame_anotado = self.detector_emergencia.dibujar_detecciones(
+                        frame_anotado,
+                        resultado.detecciones_emergencia,
+                        mostrar_alerta=True
+                    )
+
+                return frame_anotado
+
+            except Exception as e:
+                logger.warning(f"Error con overlay moderno, usando método legacy: {e}")
+                # Si falla, continuar con el método legacy abajo
+
+        # Método legacy: dibujar manualmente (cuando mostrar_info=False o hay error)
         # Offset si hay ROI
         if self.roi:
             x_offset, y_offset = self.roi[0], self.roi[1]
@@ -522,18 +750,47 @@ class ProcesadorVideo:
                 mostrar_alerta=True
             )
 
-        # Panel de información
-        if mostrar_info:
-            self._dibujar_panel_info(frame_anotado, resultado)
-
         return frame_anotado
 
     def _dibujar_panel_info(self, frame: np.ndarray, resultado: ResultadoFrame):
-        """Dibuja panel de información con métricas REALES y métricas del Capítulo 6"""
-        # Fondo semi-transparente (más alto si hay métricas Cap 6)
+        """Dibuja panel de información con métricas REALES usando overlay moderno"""
+        try:
+            from vision_computadora.overlay_visual_mejorado import OverlayVisualModerno, convertir_resultado_a_dict
+
+            # Crear overlay si no existe
+            if not hasattr(self, '_overlay_moderno'):
+                self._overlay_moderno = OverlayVisualModerno()
+                logger.info("OverlayVisualModerno creado")
+
+            # Convertir resultado a dict
+            resultado_dict = convertir_resultado_a_dict(resultado)
+
+            # Usar overlay moderno completo que retorna el frame modificado
+            # NO necesitamos llamar funciones individuales - usar crear_visualizacion_completa
+            frame_con_overlay = self._overlay_moderno.crear_visualizacion_completa(
+                frame,
+                resultado_dict,
+                mostrar_barra=True
+            )
+            
+            # Copiar el resultado al frame original (modificación in-place)
+            frame[:] = frame_con_overlay
+
+        except ImportError as e:
+            logger.warning(f"No se pudo importar overlay moderno: {e}")
+            # Fallback al método antiguo si no se puede importar
+            self._dibujar_panel_info_legacy(frame, resultado)
+        except Exception as e:
+            logger.error(f"Error en overlay moderno: {e}")
+            # Fallback al método antiguo si hay error
+            self._dibujar_panel_info_legacy(frame, resultado)
+
+    def _dibujar_panel_info_legacy(self, frame: np.ndarray, resultado: ResultadoFrame):
+        """Método legacy de dibujo de panel (fallback)"""
+        # Fondo semi-transparente
         overlay = frame.copy()
-        panel_height = 280 if resultado.metricas_cap6 else 180
-        panel_width = 550 if resultado.metricas_cap6 else 450
+        panel_height = 180
+        panel_width = 450
         cv2.rectangle(overlay, (0, 0), (panel_width, panel_height), (0, 0, 0), -1)
         cv2.addWeighted(overlay, 0.7, frame, 0.3, 0, frame)
 
@@ -545,15 +802,15 @@ class ProcesadorVideo:
         else:
             icv_color = (0, 0, 255)  # Rojo
 
-        # Información básica
+        # Información básica con métricas REALES
         y_pos = 25
         info_lines = [
             f"Frame: {resultado.numero_frame} | Tiempo: {resultado.timestamp:.1f}s",
             f"Vehiculos: {resultado.num_vehiculos}",
             f"Flujo: {resultado.flujo_vehicular:.1f} veh/min",
-            f"Velocidad: {resultado.velocidad_promedio:.1f} km/h [REAL]",
+            f"Velocidad: {resultado.velocidad_promedio:.1f} km/h",
             f"Cola: {resultado.longitud_cola:.1f} m",
-            f"ICV: {resultado.icv:.3f} - {resultado.clasificacion_icv.upper()} [REAL]",
+            f"ICV: {resultado.icv:.3f} - {resultado.clasificacion_icv.upper()}",
             f"Emergencia: {'SI' if resultado.hay_emergencia else 'NO'}"
         ]
 

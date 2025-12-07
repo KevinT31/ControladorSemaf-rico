@@ -90,11 +90,27 @@ class CalculadorICV:
                 - clasificacion: 'bajo', 'medio', 'alto'
         """
 
+        # CASO ESPECIAL: Sin vehículos o sin movimiento = ICV mínimo
+        if (num_vehiculos is not None and num_vehiculos == 0) or (velocidad_promedio == 0 and flujo_vehicular == 0 and longitud_cola == 0):
+            return {
+                'icv': 0.0,
+                'componente_longitud': 0.0,
+                'componente_velocidad': 0.0,
+                'componente_flujo': 0.0,
+                'componente_densidad': 0.0,
+                'clasificacion': 'bajo',
+                'color': self._obtener_color('bajo')
+            }
+
         # 1. Normalizar longitud de cola
         L_norm = min(longitud_cola / self.params.longitud_maxima_cola, 1.0)
 
         # 2. Normalizar velocidad (invertida: menor velocidad = mayor congestión)
-        V_norm = 1.0 - min(velocidad_promedio / self.params.velocidad_maxima, 1.0)
+        # Si velocidad es 0 pero hay vehículos, es atasco
+        if velocidad_promedio > 0:
+            V_norm = 1.0 - min(velocidad_promedio / self.params.velocidad_maxima, 1.0)
+        else:
+            V_norm = 1.0  # Velocidad 0 = máxima congestión
 
         # 3. Normalizar flujo
         F_norm = min(flujo_vehicular / self.params.flujo_saturacion, 1.0)
@@ -111,7 +127,7 @@ class CalculadorICV:
                 densidad = (flujo_vehicular * 60) / (velocidad_promedio * 1000)
                 D_norm = min(densidad / self.params.densidad_atasco, 1.0)
             else:
-                D_norm = 1.0  # Atasco total
+                D_norm = 0.0  # Sin datos de densidad
 
         # 5. Calcular componentes ponderadas
         comp_longitud = self.params.peso_longitud * L_norm
@@ -142,7 +158,10 @@ class CalculadorICV:
 
     def _clasificar_icv(self, icv: float) -> str:
         """Clasifica el ICV en bajo, medio o alto"""
-        if icv < 0.3:
+        # Caso especial: ICV = 0 o cercano a 0 significa SIN DATOS = BAJO
+        if icv <= 0.05:  # Umbral pequeño para considerar sin datos
+            return 'bajo'
+        elif icv < 0.3:
             return 'bajo'
         elif icv < 0.6:
             return 'medio'

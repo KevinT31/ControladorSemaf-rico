@@ -64,7 +64,8 @@ class DetectorEmergencia:
         modelo_path: Optional[str] = None,
         confianza_minima: float = 0.5,
         usar_fallback: bool = True,
-        silencioso: bool = True  # Por defecto silencioso
+        silencioso: bool = True,  # Por defecto silencioso
+        incluir_policia: bool = False  # Requerimiento: solo ambulancia y bomberos como emergencias
     ):
         """
         Args:
@@ -77,6 +78,7 @@ class DetectorEmergencia:
         self.confianza_minima = confianza_minima
         self.usar_fallback = usar_fallback
         self.silencioso = silencioso
+        self.incluir_policia = incluir_policia
 
         # Buscar modelo custom
         if modelo_path is None:
@@ -129,7 +131,7 @@ class DetectorEmergencia:
 
         return None
 
-    def _cargar_modelo(self, modelo_path: Optional[str]) -> Optional[YOLO]:
+    def _cargar_modelo(self, modelo_path: Optional[str]) -> Optional[object]:
         """
         Carga el modelo YOLO custom
 
@@ -218,8 +220,11 @@ class DetectorEmergencia:
                 # Verificar que sea una clase de emergencia
                 if clase_id not in self.CLASES_EMERGENCIA:
                     continue
-
                 tipo = self.CLASES_EMERGENCIA[clase_id]
+
+                # Cumplir requerimiento: excluir 'policia' si no está permitido
+                if tipo == 'policia' and not self.incluir_policia:
+                    continue
 
                 # Extraer bounding box
                 x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
@@ -245,6 +250,39 @@ class DetectorEmergencia:
                 self.detecciones_por_tipo[tipo] += 1
 
                 logger.info(f"🚨 {tipo.upper()} detectado (confianza: {confianza:.2f})")
+
+        # Si no hay modelo y usar_fallback, intentar detección por color (heurística)
+        if not self.modelo_disponible and self.usar_fallback:
+            try:
+                if detectar_emergencia_por_color(frame):
+                    # Heurística simple: si hay predominancia de rojo, bomberos; en otro caso, ambulancia
+                    # Reconstruir en HSV para decidir
+                    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+                    rojo_bajo1 = np.array([0, 100, 100]); rojo_alto1 = np.array([10, 255, 255])
+                    rojo_bajo2 = np.array([160, 100, 100]); rojo_alto2 = np.array([180, 255, 255])
+                    mask_rojo = cv2.bitwise_or(
+                        cv2.inRange(hsv, rojo_bajo1, rojo_alto1),
+                        cv2.inRange(hsv, rojo_bajo2, rojo_alto2)
+                    )
+                    pixeles_rojo = cv2.countNonZero(mask_rojo)
+                    total_pixeles = frame.shape[0] * frame.shape[1]
+                    porcentaje_rojo = pixeles_rojo / total_pixeles
+
+                    tipo_fallback = 'bomberos' if porcentaje_rojo > 0.05 else 'ambulancia'
+
+                    # Usar bbox completo del frame como placeholder
+                    h, w = frame.shape[:2]
+                    bbox = [0.0, 0.0, float(w), float(h)]
+                    detecciones.append(DeteccionEmergencia(
+                        tipo=tipo_fallback,
+                        bbox=bbox,
+                        confianza=0.6,
+                        timestamp=timestamp,
+                        frame_numero=frame_numero,
+                        centroide=(w/2.0, h/2.0)
+                    ))
+            except Exception:
+                pass
 
         return detecciones
 
