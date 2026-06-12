@@ -1,0 +1,10 @@
+Parametro,Valor,Unidad
+Longitud Máxima de Cola (L_max),150,metros
+Velocidad Libre de Flujo (V_max),60,km/h
+Flujo de Saturación (F_sat),30,veh/min
+Longitud del Carril (L_carril),300,metros
+Densidad de Atasco (ρ_jam),0.2,veh/m
+Peso - Longitud de Cola (w₁),0.35,-
+Peso - Velocidad (w₂),0.25,-
+Peso - Flujo (w₃),0.25,-
+Peso - Densidad (w₄),0.15,-
