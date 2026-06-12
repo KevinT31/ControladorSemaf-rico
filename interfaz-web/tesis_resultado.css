@@ -1,0 +1,818 @@
+/* Resultado visible de tesis: consola operacional sobria */
+:root {
+    --primary: #38bdf8;
+    --primary-dark: #0284c7;
+    --secondary: #14b8a6;
+    --accent: #f59e0b;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #38bdf8;
+    --bg-primary: #0b1120;
+    --bg-secondary: #111827;
+    --bg-tertiary: #1f2937;
+    --glass-bg: rgba(15, 23, 42, 0.92);
+    --glass-border: rgba(148, 163, 184, 0.22);
+    --text-primary: #e5e7eb;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+}
+
+body {
+    background: #0b1120;
+}
+
+#particles-js {
+    display: none;
+}
+
+.header-pro {
+    background: rgba(17, 24, 39, 0.96);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.24);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    padding: 0.75rem 1.25rem;
+}
+
+.logo-icon {
+    color: var(--primary);
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    animation: none;
+}
+
+.logo-text h1 {
+    color: var(--text-primary);
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    font-size: 1.15rem;
+    letter-spacing: 0;
+}
+
+.subtitle {
+    color: var(--text-muted);
+}
+
+.dashboard-container {
+    grid-template-columns: 380px minmax(620px, 1fr) 340px;
+    gap: 0.85rem;
+    padding: 0.85rem;
+    height: calc(100vh - 78px);
+    min-height: 720px;
+}
+
+.sidebar-left,
+.sidebar-right {
+    height: 100%;
+    max-height: 100%;
+    gap: 0.65rem;
+    padding-right: 0.35rem;
+}
+
+.main-content {
+    min-width: 0;
+}
+
+.full-height {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.glass-card {
+    border-radius: 8px;
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+}
+
+.glass-card:hover,
+.stat-item:hover,
+.metrica-card:hover,
+.mini-stat-card:hover {
+    transform: none;
+}
+
+.card-header {
+    background: rgba(15, 23, 42, 0.72);
+}
+
+.select-pro {
+    min-width: 160px;
+    border-radius: 6px;
+    border: 1px solid rgba(56, 189, 248, 0.55);
+    background: rgba(15, 23, 42, 0.96);
+    box-shadow: none;
+}
+
+.select-pro:hover,
+.select-pro:focus {
+    background: rgba(15, 23, 42, 1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+    transform: none;
+}
+
+#selector-interseccion-cam {
+    min-width: 0;
+    width: 100%;
+    font-size: 0.78rem;
+}
+
+.btn-control,
+.btn-emergency,
+.btn-primary-pro,
+.btn-secondary-pro {
+    border-radius: 6px;
+}
+
+.stat-icon {
+    background: rgba(56, 189, 248, 0.16) !important;
+    color: var(--primary);
+    box-shadow: none;
+}
+
+.map-container {
+    flex: 1 1 auto;
+    min-height: 420px;
+    height: auto;
+    border-radius: 0 0 8px 8px;
+}
+
+.tesis-flow {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.45rem;
+    padding: 0.65rem 0.7rem 0.45rem;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(2, 6, 23, 0.35);
+}
+
+.tesis-flow-step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-height: 48px;
+    padding: 0.48rem 0.55rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.76);
+}
+
+.tesis-overview {
+    display: grid;
+    grid-template-columns: 1.25fr repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding: 0.65rem 0.7rem;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(15, 23, 42, 0.78);
+}
+
+.tesis-overview-item {
+    min-width: 0;
+    padding: 0.52rem 0.6rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 6px;
+    background: rgba(2, 6, 23, 0.32);
+}
+
+.tesis-overview-main {
+    border-color: rgba(56, 189, 248, 0.34);
+    background: rgba(14, 116, 144, 0.16);
+}
+
+.tesis-overview-item span,
+.tesis-overview-item small {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.58rem;
+    line-height: 1.2;
+}
+
+.tesis-overview-item span {
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.tesis-overview-item strong {
+    display: block;
+    margin: 0.12rem 0;
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tesis-flow-step strong {
+    font-size: 0.72rem;
+    color: #f8fafc;
+    line-height: 1.15;
+}
+
+.tesis-flow-step span {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    line-height: 1.2;
+}
+
+.tesis-card {
+    flex-shrink: 0;
+}
+
+.tesis-card-body {
+    padding: 0.75rem;
+}
+
+.tesis-focus {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 6px;
+    background: rgba(2, 6, 23, 0.28);
+    margin-bottom: 0.65rem;
+}
+
+.tesis-focus strong {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--text-primary);
+}
+
+.tesis-focus span {
+    display: block;
+    margin-top: 0.12rem;
+    font-size: 0.64rem;
+    color: var(--text-muted);
+}
+
+.tesis-badge {
+    border-radius: 999px;
+    border: 1px solid rgba(56, 189, 248, 0.38);
+    background: rgba(56, 189, 248, 0.12);
+    color: #bae6fd;
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 0.24rem 0.48rem;
+    white-space: nowrap;
+}
+
+.tesis-formula {
+    padding: 0.55rem 0.65rem;
+    margin-bottom: 0.65rem;
+    border-left: 3px solid var(--primary);
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.78);
+    color: #dbeafe;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.66rem;
+    line-height: 1.35;
+}
+
+.tesis-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+}
+
+.tesis-kv {
+    padding: 0.5rem;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.55);
+}
+
+.tesis-kv span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.tesis-kv span.tesis-keepcase {
+    text-transform: none;
+}
+
+.tesis-log-row .tesis-log-time {
+    white-space: nowrap;
+}
+
+.tesis-kv strong {
+    display: block;
+    margin-top: 0.18rem;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.tesis-components {
+    display: grid;
+    gap: 0.38rem;
+    margin-top: 0.65rem;
+}
+
+.tesis-component {
+    display: grid;
+    grid-template-columns: 56px 1fr 44px;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.62rem;
+    color: var(--text-secondary);
+}
+
+.tesis-bar {
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.18);
+    overflow: hidden;
+}
+
+.tesis-bar > i {
+    display: block;
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+}
+
+.tesis-control-main {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin-bottom: 0.65rem;
+}
+
+.tesis-control-main .tesis-kv strong {
+    font-size: 1rem;
+}
+
+.tesis-membership {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.55rem;
+}
+
+.tesis-chip {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 999px;
+    padding: 0.22rem 0.42rem;
+    background: rgba(15, 23, 42, 0.64);
+    color: var(--text-secondary);
+    font-size: 0.58rem;
+}
+
+.tesis-security {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.tesis-security-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.58);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    font-size: 0.66rem;
+}
+
+.tesis-security-row strong {
+    color: var(--text-primary);
+}
+
+.tesis-security-row span {
+    color: var(--success);
+    font-weight: 700;
+}
+
+#tesis-metricas-panel,
+#tesis-olas-lista-panel,
+#panel-video,
+#tesis-difuso-legacy,
+#tesis-security-panel {
+    flex-shrink: 0;
+}
+
+#tesis-telemetry-panel .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0.62rem;
+}
+
+#tesis-telemetry-panel .stat-item {
+    min-height: 44px;
+    padding: 0.45rem 0.5rem;
+    gap: 0.45rem;
+    border-radius: 6px;
+}
+
+#tesis-telemetry-panel .stat-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+}
+
+#tesis-telemetry-panel .stat-value {
+    font-size: 0.98rem;
+}
+
+#tesis-telemetry-panel .mini-stats-split {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.35rem;
+    padding: 0 0.62rem 0.62rem;
+}
+
+#tesis-telemetry-panel .mini-stat-card {
+    min-height: 54px;
+    padding: 0.45rem 0.35rem;
+    border-radius: 6px;
+}
+
+#tesis-telemetry-panel .mini-stat-value {
+    font-size: 0.9rem;
+}
+
+#tesis-telemetry-panel .mini-stat-label {
+    font-size: 0.54rem;
+}
+
+#tesis-metricas-panel .metricas-scroll {
+    max-height: 260px;
+}
+
+#tesis-olas-lista-panel .olas-container {
+    max-height: 160px;
+}
+
+.tesis-chart-card canvas {
+    height: 118px !important;
+}
+
+#panel-video.tesis-video-compact .video-container {
+    padding: 0.55rem;
+    border-radius: 8px;
+    border-color: rgba(56, 189, 248, 0.22);
+    box-shadow: none;
+}
+
+#panel-video.tesis-video-compact #video-canvas {
+    max-height: 118px;
+    border-width: 1px;
+    border-radius: 6px;
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .video-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.45rem;
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .camera-mode-indicator {
+    white-space: nowrap;
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .video-stats {
+    gap: 0.35rem;
+    margin-top: 0.45rem;
+    padding: 0.45rem;
+    border-top: 1px solid rgba(56, 189, 248, 0.45);
+    background: rgba(15, 23, 42, 0.6);
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .video-stat {
+    gap: 0.32rem;
+    padding: 0.35rem 0.4rem;
+    border-radius: 6px;
+    border-color: rgba(148, 163, 184, 0.18);
+    background: rgba(2, 6, 23, 0.28);
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .video-stat i {
+    font-size: 0.78rem;
+    color: var(--primary);
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .video-stat .stat-value {
+    font-size: 0.76rem;
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .video-stat .stat-label {
+    font-size: 0.55rem;
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .ptz-controls {
+    display: none !important;
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .video-container.inactive {
+    min-height: 160px;
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .video-container.inactive::before {
+    font-size: 2.5rem;
+}
+
+#panel-video.tesis-video-compact:not(.expanded) .video-container.inactive::after {
+    display: none;
+}
+
+#tesis-difuso-legacy .diffuse-info {
+    padding: 0.6rem;
+}
+
+#tesis-difuso-legacy .diffuse-row {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.68rem;
+}
+
+#tesis-control-panel .tesis-formula,
+#tesis-ola-panel .tesis-formula,
+#tesis-icv-panel .tesis-formula {
+    margin-bottom: 0.55rem;
+}
+
+#tesis-control-panel .tesis-card-body,
+#tesis-ola-panel .tesis-card-body,
+#tesis-icv-panel .tesis-card-body {
+    padding: 0.68rem;
+}
+
+/* ---------- nota dentro de fórmulas ---------- */
+.tesis-formula-note {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--text-muted);
+    font-size: 0.58rem;
+    font-family: inherit;
+}
+
+.tesis-formula-sub {
+    margin-top: 0.55rem;
+    margin-bottom: 0;
+    border-left-color: var(--secondary);
+}
+
+.tesis-kv-strong {
+    border-color: rgba(56, 189, 248, 0.4);
+    background: rgba(14, 116, 144, 0.18);
+}
+
+/* ---------- estado de la recomendación ---------- */
+.tesis-badge-estado {
+    margin-left: auto;
+}
+
+.tesis-reco-ok {
+    border-color: rgba(34, 197, 94, 0.45);
+    background: rgba(34, 197, 94, 0.14);
+    color: #bbf7d0;
+}
+
+.tesis-reco-recortada {
+    border-color: rgba(245, 158, 11, 0.5);
+    background: rgba(245, 158, 11, 0.14);
+    color: #fde68a;
+}
+
+.tesis-reco-ev {
+    border-color: rgba(239, 68, 68, 0.5);
+    background: rgba(239, 68, 68, 0.14);
+    color: #fecaca;
+}
+
+.tesis-reco-pendiente {
+    border-color: rgba(148, 163, 184, 0.4);
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--text-secondary);
+}
+
+/* ---------- reglas difusas activas ---------- */
+.tesis-rules-list {
+    display: grid;
+    gap: 0.32rem;
+    margin-bottom: 0.45rem;
+}
+
+.tesis-rule-row {
+    display: grid;
+    grid-template-columns: 30px 96px 1fr 36px;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+}
+
+.tesis-rule-id {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.tesis-rule-out {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tesis-rule-bar > i {
+    background: linear-gradient(90deg, #38bdf8, #14b8a6);
+}
+
+.tesis-rule-row strong {
+    color: var(--text-primary);
+    text-align: right;
+}
+
+/* ---------- pills de estado (seguridad / enlace) ---------- */
+.tesis-pill {
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    color: var(--text-secondary);
+    background: rgba(148, 163, 184, 0.1);
+}
+
+.tesis-pill-ok {
+    border-color: rgba(34, 197, 94, 0.4);
+    background: rgba(34, 197, 94, 0.12);
+    color: #bbf7d0;
+}
+
+.tesis-pill-warn {
+    border-color: rgba(245, 158, 11, 0.45);
+    background: rgba(245, 158, 11, 0.12);
+    color: #fde68a;
+}
+
+.tesis-pill-bad {
+    border-color: rgba(239, 68, 68, 0.45);
+    background: rgba(239, 68, 68, 0.12);
+    color: #fecaca;
+}
+
+.tesis-pill-info {
+    border-color: rgba(56, 189, 248, 0.45);
+    background: rgba(56, 189, 248, 0.12);
+    color: #bae6fd;
+}
+
+.tesis-pill-neutral {
+    border-color: rgba(148, 163, 184, 0.25);
+    background: rgba(148, 163, 184, 0.08);
+    color: var(--text-secondary);
+}
+
+/* ---------- registro de eventos ---------- */
+#tesis-log-panel {
+    flex-shrink: 0;
+}
+
+.tesis-log-list {
+    display: grid;
+    gap: 0.3rem;
+    max-height: 168px;
+    overflow-y: auto;
+}
+
+.tesis-log-row {
+    display: grid;
+    grid-template-columns: 58px 1fr;
+    gap: 0.45rem;
+    align-items: baseline;
+    padding: 0.32rem 0.45rem;
+    border-radius: 5px;
+    border-left: 2px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.55);
+    font-size: 0.62rem;
+    line-height: 1.3;
+}
+
+.tesis-log-ok { border-left-color: var(--success); }
+.tesis-log-warn { border-left-color: var(--warning); }
+.tesis-log-info { border-left-color: var(--info); }
+
+.tesis-log-time {
+    color: var(--text-muted);
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 0.56rem;
+}
+
+.tesis-log-msg {
+    color: var(--text-secondary);
+}
+
+.tesis-log-empty {
+    padding: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.62rem;
+    text-align: center;
+}
+
+/* ---------- laptop 1366x768: compactar verticalmente ---------- */
+@media (max-height: 820px) {
+    .dashboard-container {
+        height: calc(100vh - 64px);
+        min-height: 600px;
+        padding: 0.6rem;
+        gap: 0.6rem;
+    }
+
+    .header-pro {
+        padding: 0.45rem 1rem;
+    }
+
+    .logo-text h1 {
+        font-size: 1rem;
+    }
+
+    .subtitle {
+        font-size: 0.66rem;
+    }
+
+    .tesis-flow {
+        padding: 0.45rem 0.6rem 0.35rem;
+        gap: 0.35rem;
+    }
+
+    .tesis-flow-step {
+        min-height: 40px;
+        padding: 0.32rem 0.45rem;
+    }
+
+    .tesis-overview {
+        padding: 0.45rem 0.6rem;
+        gap: 0.4rem;
+    }
+
+    .tesis-overview-item {
+        padding: 0.38rem 0.5rem;
+    }
+
+    .tesis-card-body {
+        padding: 0.55rem;
+    }
+
+    .tesis-chart-card canvas {
+        height: 96px !important;
+    }
+
+    #tesis-metricas-panel .metricas-scroll {
+        max-height: 200px;
+    }
+
+    #tesis-olas-lista-panel .olas-container {
+        max-height: 120px;
+    }
+
+    .tesis-log-list {
+        max-height: 130px;
+    }
+
+    .map-container {
+        min-height: 340px;
+    }
+}
+
+@media (max-width: 1400px) {
+    .dashboard-container {
+        grid-template-columns: 360px minmax(560px, 1fr) 320px;
+    }
+
+    .tesis-flow {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .tesis-overview {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1200px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 0;
+    }
+
+    .tesis-flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tesis-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .map-container {
+        min-height: 520px;
+    }
+}

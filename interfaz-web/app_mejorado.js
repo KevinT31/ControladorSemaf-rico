@@ -2821,7 +2821,7 @@ async function activarModoVideo(videoIndex) {
 
 function cargarInterseccionesSimulador() {
     const selector = document.getElementById('selector-interseccion-cam');
-    selector.innerHTML = '<option value="">Selecciona interseccion...</option>';
+    selector.innerHTML = '<option value="">Intersección</option>';
 
     estado.intersecciones.forEach(inter => {
         const option = document.createElement('option');
@@ -2846,7 +2846,7 @@ async function cargarInterseccionesVideo() {
 
         const optionSelecciona = document.createElement('option');
         optionSelecciona.value = '';
-        optionSelecciona.textContent = 'Selecciona MIR...';
+        optionSelecciona.textContent = 'Intersección';
         selector.appendChild(optionSelecciona);
 
         const optionCamara = document.createElement('option');
@@ -3010,6 +3010,13 @@ async function mostrarOlaVerdeActivada(datos) {
         return;
     }
 
+    const origenInterBase = INTERSECCIONES_LIMA.find(i => i.id === ruta[0]);
+    if (!origenInterBase) {
+        console.error('No se encontró intersección origen');
+        return;
+    }
+    const origenCoordsBase = [origenInterBase.latitud, origenInterBase.longitud];
+
     // Calcular ruta y destino
     let coordenadasRutaReal;
     let destinoFinalCoords;
@@ -3025,14 +3032,8 @@ async function mostrarOlaVerdeActivada(datos) {
         console.log('🔴 DETECTADO HOSPITAL DESTINO - Modo ruta directa activado');
         const hosp = datos._hospitalDestino;
         console.log('   Hospital:', hosp);
-        const origenInter = INTERSECCIONES_LIMA.find(i => i.id === ruta[0]);
-        
-        if (!origenInter) {
-            console.error('No se encontró intersección origen');
-            return;
-        }
 
-        const origenCoords = [origenInter.latitud, origenInter.longitud];
+        const origenCoords = origenCoordsBase;
         destinoFinalCoords = [hosp.lat, hosp.lon];
         nombreDestino = hosp.nombre;
         iconoDestino = '🏥';
@@ -3092,7 +3093,7 @@ async function mostrarOlaVerdeActivada(datos) {
         
         // Calcular ruta DIRECTA con Mapbox (solo origen y destino)
         try {
-            const rutaMapbox = await obtenerRutaMapbox(origenCoords, destinoCoords, 'driving');
+            const rutaMapbox = await obtenerRutaMapbox(origenCoordsBase, destinoCoords, 'driving');
             
             if (rutaMapbox && rutaMapbox.geometry && rutaMapbox.geometry.coordinates) {
                 coordenadasRutaReal = rutaMapbox.geometry.coordinates.map(c => [c[1], c[0]]);
@@ -3109,11 +3110,11 @@ async function mostrarOlaVerdeActivada(datos) {
                 console.log('   ✅ Ruta calculada:', distanciaKm, 'km,', tiempoMin, 'min');
             } else {
                 console.warn('   ⚠️  Mapbox falló, usando línea directa');
-                coordenadasRutaReal = [origenCoords, destinoCoords];
+                coordenadasRutaReal = [origenCoordsBase, destinoCoords];
             }
         } catch (error) {
             console.warn('   ❌ Error Mapbox:', error);
-            coordenadasRutaReal = [origenCoords, destinoCoords];
+            coordenadasRutaReal = [origenCoordsBase, destinoCoords];
         }
     }
 
@@ -4178,7 +4179,7 @@ function poblarSelectorIntersecciones() {
     if (!selector || !INTERSECCIONES_LIMA) return;
 
     // Limpiar opciones existentes (excepto la primera)
-    selector.innerHTML = '<option value="">Selecciona intersección...</option>';
+    selector.innerHTML = '<option value="">Intersección</option>';
 
     // Agregar todas las intersecciones
     INTERSECCIONES_LIMA.forEach(inter => {
