@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OverLeaf Local</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">OL</span>
+          <span>OverLeaf Local</span>
+        </div>
+
+        <label class="main-select">
+          <span>Main</span>
+          <select id="mainFile"></select>
+        </label>
+
+        <button class="button primary" id="compileBtn" type="button">
+          <i data-lucide="play"></i>
+          <span>Compilar</span>
+        </button>
+
+        <label class="toggle">
+          <input id="autoCompile" type="checkbox">
+          <span>Auto</span>
+        </label>
+
+        <button class="icon-button" id="saveBtn" type="button" title="Guardar">
+          <i data-lucide="save"></i>
+        </button>
+        <button class="icon-button" id="newFileBtn" type="button" title="Nuevo archivo">
+          <i data-lucide="file-plus-2"></i>
+        </button>
+        <button class="icon-button" id="newDirBtn" type="button" title="Nueva carpeta">
+          <i data-lucide="folder-plus"></i>
+        </button>
+        <button class="icon-button" id="uploadBtn" type="button" title="Subir archivos">
+          <i data-lucide="upload"></i>
+        </button>
+        <button class="icon-button" id="zipBtn" type="button" title="Importar ZIP">
+          <i data-lucide="archive"></i>
+        </button>
+        <button class="icon-button danger" id="deleteBtn" type="button" title="Borrar seleccionado">
+          <i data-lucide="trash-2"></i>
+        </button>
+
+        <div class="status-pill" id="statusPill">Conectando</div>
+      </header>
+
+      <main class="main-grid">
+        <aside class="file-panel">
+          <div class="panel-title">
+            <span>Archivos</span>
+            <button class="icon-button mini" id="refreshBtn" type="button" title="Actualizar">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+          </div>
+          <div id="fileTree" class="file-tree"></div>
+        </aside>
+
+        <section class="editor-panel">
+          <div class="file-strip">
+            <span id="currentFile">workspace</span>
+            <span id="saveState">Sin cambios</span>
+          </div>
+          <div id="editor"></div>
+        </section>
+
+        <section class="preview-panel">
+          <div class="preview-toolbar">
+            <div class="segmented">
+              <button id="previewTab" class="active" type="button">PDF</button>
+              <button id="logTab" type="button">Log</button>
+            </div>
+            <button class="icon-button mini" id="openPdfBtn" type="button" title="Abrir PDF">
+              <i data-lucide="external-link"></i>
+            </button>
+          </div>
+          <iframe id="pdfFrame" title="Preview PDF"></iframe>
+          <pre id="logView" class="hidden"></pre>
+        </section>
+      </main>
+    </div>
+
+    <input id="fileInput" type="file" multiple hidden>
+    <input id="zipInput" type="file" accept=".zip,application/zip" hidden>
+
+    <script src="/ace/ace.js"></script>
+    <script src="/ace/ext-language_tools.js"></script>
+    <script src="/lucide/lucide.js"></script>
+    <script src="/app.js?v=20260612-2"></script>
+  </body>
+</html>

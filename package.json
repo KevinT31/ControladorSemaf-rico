@@ -1,0 +1,19 @@
+{
+  "name": "overleaf-local",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Editor LaTeX local tipo Overleaf con preview PDF.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "install-tectonic": "powershell -ExecutionPolicy Bypass -File scripts/install-tectonic.ps1"
+  },
+  "dependencies": {
+    "ace-builds": "^1.43.3",
+    "adm-zip": "^0.5.16",
+    "express": "^5.1.0",
+    "lucide": "^0.468.0",
+    "multer": "^2.0.2"
+  }
+}
