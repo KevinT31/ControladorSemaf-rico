@@ -174,13 +174,60 @@ function inicializarMapa() {
     };
     // Por defecto: claro-gris (calles tenues, el tráfico resalta)
     basesMapa['Claro (gris)'].addTo(estado.mapa);
-    // Selector de estilo de mapa (3 versiones)
-    L.control.layers(basesMapa, null, { position: 'topright', collapsed: true }).addTo(estado.mapa);
+
+    // Capa de TRÁFICO REAL (HERE) como overlay encendible (independiente de SUMO).
+    // Solo consulta a HERE cuando se activa, para no gastar la cuota gratuita.
+    estado.capaTraficoReal = L.layerGroup();
+    L.control.layers(
+        basesMapa,
+        { 'Tráfico real (HERE)': estado.capaTraficoReal },
+        { position: 'topright', collapsed: true }
+    ).addTo(estado.mapa);
+
+    estado.mapa.on('overlayadd', function (ev) {
+        if (ev.layer === estado.capaTraficoReal) {
+            actualizarTraficoReal();
+            if (estado.intervalTraficoReal) clearInterval(estado.intervalTraficoReal);
+            estado.intervalTraficoReal = setInterval(actualizarTraficoReal, 90000); // 90s
+        }
+    });
+    estado.mapa.on('overlayremove', function (ev) {
+        if (ev.layer === estado.capaTraficoReal && estado.intervalTraficoReal) {
+            clearInterval(estado.intervalTraficoReal);
+            estado.intervalTraficoReal = null;
+        }
+    });
 
     // Configurar modo de obtener coordenadas
     setupMapClickForCoords();
 
     console.log('Mapa inicializado');
+}
+
+// Dibuja la capa de TRÁFICO REAL (HERE). Independiente del tráfico SUMO.
+async function actualizarTraficoReal() {
+    if (!estado.capaTraficoReal) return;
+    try {
+        const resp = await fetch(`${API_URL}/api/trafico-real`);
+        const data = await resp.json();
+        estado.capaTraficoReal.clearLayers();
+        if (!data.disponible) {
+            console.warn('Tráfico real (HERE) no disponible:', data.mensaje);
+            if (!estado.__avisoTraficoReal) {
+                estado.__avisoTraficoReal = true;
+                alert('Tráfico real (HERE) no disponible:\n' + (data.mensaje || ''));
+            }
+            return;
+        }
+        (data.segmentos || []).forEach(function (s) {
+            L.polyline(s.coords, { color: s.color, weight: 5, opacity: 0.9 })
+                .bindTooltip(`Tráfico real · jam ${s.jam != null ? s.jam : 'N/A'} · ${s.velocidad != null ? s.velocidad : '?'} km/h`, { sticky: true })
+                .addTo(estado.capaTraficoReal);
+        });
+        console.log(`🌎 Tráfico real HERE: ${data.num_segmentos} segmentos`);
+    } catch (e) {
+        console.warn('Error obteniendo tráfico real:', e);
+    }
 }
 
 function agregarMarcadorInterseccion(interseccion) {

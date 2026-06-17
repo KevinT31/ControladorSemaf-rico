@@ -376,7 +376,7 @@ app.add_middleware(
 
 # Registrar routers modulares
 try:
-    from rutas import emergencias, simulacion, intersecciones, sumo, video, websocket
+    from rutas import emergencias, simulacion, intersecciones, sumo, video, websocket, trafico_real
 
     app.include_router(emergencias.router)
     app.include_router(simulacion.router)
@@ -384,6 +384,7 @@ try:
     app.include_router(sumo.router)
     app.include_router(video.router)
     app.include_router(websocket.router)
+    app.include_router(trafico_real.router)
 
     logger.info("Routers modulares registrados correctamente")
 except ImportError as e:
