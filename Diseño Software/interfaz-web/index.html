@@ -198,9 +198,9 @@
             <div class="control-group">
                 <label><i class="fas fa-cog"></i> Modo</label>
                 <select id="modo-operacion" class="select-pro">
-                    <option value="simulador" selected>Simulador</option>
+                    <option value="simulador">Simulador</option>
                     <option value="video">Procesador Video</option>
-                    <option value="sumo">SUMO</option>
+                    <option value="sumo" selected>SUMO</option>
                 </select>
             </div>
             <button id="btn-reiniciar-simulador" class="btn-control" title="Reiniciar simulador con todas las intersecciones">
@@ -593,78 +593,7 @@
     <!-- Configuración y utilidades de ruteo -->
     <script src="config.js?v=9"></script>
     <script src="routing-utils.js?v=10"></script>
-    <script src="app_mejorado.js?v=13"></script>
+    <script src="app_mejorado.js?v=15"></script>
     <script src="tesis_resultado.js?v=3"></script>
-    <script>
-    // Panel de CAPAS: Tráfico (calles) / Controladores (semáforos) / Ruta emergencia.
-    // Cada capa es independiente y se puede encender/apagar.
-    (function () {
-        function setVis(layer, vis) {
-            if (!layer || typeof estado === 'undefined' || !estado.mapa) return;
-            try {
-                if (vis) { if (!estado.mapa.hasLayer(layer)) layer.addTo(estado.mapa); }
-                else { if (estado.mapa.hasLayer(layer)) estado.mapa.removeLayer(layer); }
-            } catch (e) {}
-        }
-        function toggleCapa(capa, btn) {
-            if (typeof estado === 'undefined') return;
-            const activa = btn.classList.toggle('activa');
-            if (capa === 'trafico') {
-                estado.mostrarSUMOTrafico = activa;
-                setVis(estado.callesSUMO, activa);
-            } else if (capa === 'controladores') {
-                Object.values(estado.marcadores || {}).forEach(m => setVis(m, activa));
-            } else if (capa === 'ruta') {
-                setVis(estado.olaVerdeActiva, activa);
-                (estado.marcadoresOlaVerde || []).forEach(m => setVis(m, activa));
-            }
-        }
-        function crearPanelCapas() {
-            if (document.getElementById('panel-capas')) return;
-            const cont = document.createElement('div');
-            cont.id = 'panel-capas';
-            [
-                { id: 'trafico', txt: '🚗 Tráfico' },
-                { id: 'controladores', txt: '🚦 Controladores' },
-                { id: 'ruta', txt: '🚑 Ruta emergencia' }
-            ].forEach(c => {
-                const b = document.createElement('button');
-                b.className = 'btn-capa activa';
-                b.textContent = c.txt;
-                b.onclick = () => toggleCapa(c.id, b);
-                cont.appendChild(b);
-            });
-            document.body.appendChild(cont);
-        }
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', crearPanelCapas);
-        else crearPanelCapas();
-    })();
-
-    // Botón para proyectar el mapa a pantalla completa
-    (function () {
-        function crearBoton() {
-            if (document.getElementById('btn-mapa-grande')) return;
-            const btn = document.createElement('button');
-            btn.id = 'btn-mapa-grande';
-            btn.textContent = '⛶ Mapa grande';
-            btn.onclick = function () {
-                const m = document.getElementById('mapa');
-                if (!m) return;
-                const grande = m.classList.toggle('mapa-grande');
-                btn.textContent = grande ? '✕ Salir de pantalla completa' : '⛶ Mapa grande';
-                // Leaflet necesita recalcular tamaño tras el cambio
-                setTimeout(function () {
-                    try { if (typeof estado !== 'undefined' && estado.mapa) estado.mapa.invalidateSize(); } catch (e) {}
-                }, 250);
-            };
-            document.body.appendChild(btn);
-        }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', crearBoton);
-        } else {
-            crearBoton();
-        }
-    })();
-    </script>
 </body>
 </html>
