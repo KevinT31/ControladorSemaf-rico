@@ -541,57 +541,6 @@ canvas {
     height: 100%;
 }
 
-/* Mapa a pantalla completa (toggle con el botón "Mapa grande") */
-#mapa.mapa-grande {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 9999 !important;
-    border-radius: 0 !important;
-}
-
-#btn-mapa-grande {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 10001;
-    background: #1e293b;
-    color: #fff;
-    border: 1px solid #475569;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-#btn-mapa-grande:hover { background: #334155; }
-
-/* Panel de capas (Tráfico / Controladores / Ruta emergencia) */
-#panel-capas {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    z-index: 10001;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-.btn-capa {
-    background: #1e293b;
-    color: #94a3b8;
-    border: 1px solid #475569;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 12px;
-    text-align: left;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    transition: all 0.15s ease;
-}
-.btn-capa.activa { color: #fff; border-color: #10b981; }
-.btn-capa:not(.activa) { opacity: 0.6; }
 
 /* Sidebar Right - Ultra Optimizado para evitar superposiciones */
 .sidebar-right {

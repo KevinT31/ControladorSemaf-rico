@@ -73,15 +73,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Conectando WebSocket...');
         conectarWebSocket();  // CRITICO: Conectar WebSocket para recibir actualizaciones
 
-        // Importante: NO iniciar simulación local automáticamente.
-        // La simulación solo debe correr cuando el usuario elija modo 'simulador'.
+        // Arrancar en modo SUMO por defecto (tráfico real de la simulación).
+        // Se selecciona el modo en el selector y se dispara su lógica de carga,
+        // que trae y colorea las calles desde SUMO.
+        const selModo = document.getElementById('modo-operacion');
+        if (selModo) {
+            selModo.value = 'sumo';
+            selModo.dispatchEvent(new Event('change'));
+        } else {
+            estado.modoActual = 'sumo';
+            cargarYVisualizarCallesSUMO();
+        }
 
-        // DEMO RÁPIDA: iniciar simulación local inmediata en modo simulador
-        // para asegurar que "prenda" incluso sin backend.
-        estado.modoActual = 'simulador';
-        iniciarSimulacion();
-
-        console.log('%c✓ Sistema inicializado correctamente', 'color: #10b981; font-weight: bold;');
+        console.log('%c✓ Sistema inicializado correctamente (modo SUMO)', 'color: #10b981; font-weight: bold;');
     } catch (error) {
         console.error('%c❌ ERROR en la inicialización:', 'color: #ef4444; font-weight: bold;', error);
         alert('Error al inicializar el sistema. Revisa la consola del navegador (F12) para más detalles.');
@@ -155,11 +159,23 @@ function inicializarMapa() {
         attributionControl: false
     }).setView(centroLima, 13);
 
-    // Mapa claro estándar
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
-    }).addTo(estado.mapa);
+    // Mapas base apagados (estilo Google/inDrive) para que el tráfico
+    // rojo/amarillo/verde resalte por contraste. Todos gratis, sin token.
+    const basesMapa = {
+        'Claro (gris)': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            subdomains: 'abcd', maxZoom: 20, attribution: '© OpenStreetMap © CARTO'
+        }),
+        'Oscuro': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+            subdomains: 'abcd', maxZoom: 20, attribution: '© OpenStreetMap © CARTO'
+        }),
+        'Estándar': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, attribution: '© OpenStreetMap contributors'
+        })
+    };
+    // Por defecto: claro-gris (calles tenues, el tráfico resalta)
+    basesMapa['Claro (gris)'].addTo(estado.mapa);
+    // Selector de estilo de mapa (3 versiones)
+    L.control.layers(basesMapa, null, { position: 'topright', collapsed: true }).addTo(estado.mapa);
 
     // Configurar modo de obtener coordenadas
     setupMapClickForCoords();
@@ -1986,10 +2002,11 @@ async function cargarYVisualizarCallesSUMO() {
 
         estado.callesSUMO = L.geoJSON(estado.callesGeoJSON, {
             style: function(feature) {
+                // Calles base muy tenues: así solo el tráfico coloreado resalta
                 return {
-                    color: '#4a5568',
-                    weight: 3,
-                    opacity: 0.6
+                    color: '#94a3b8',
+                    weight: 1.5,
+                    opacity: 0.25
                 };
             },
             onEachFeature: function(feature, layer) {
@@ -2195,12 +2212,12 @@ async function actualizarTraficoSUMO() {
                 const v = congestionPorCalle[idCalle];
                 let vehiculosEdge = (v !== undefined) ? (data.calles.find(c => c.id === idCalle)?.vehiculos || 0) : 0;
                 if (vehiculosEdge <= 0) vehiculosEdge = 1; // mínimo visible
-                const weight = vehiculosEdge >= 10 ? 5 : vehiculosEdge >= 5 ? 4 : 3;
+                const weight = vehiculosEdge >= 10 ? 7 : vehiculosEdge >= 5 ? 5 : 4;
 
                 layer.setStyle({
                     color: color,
                     weight: weight,
-                    opacity: 0.8
+                    opacity: 0.95
                 });
             }
         });
