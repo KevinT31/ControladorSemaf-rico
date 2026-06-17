@@ -66,9 +66,21 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+def _get_traci():
+    """Módulo de conexión SUMO activo (libsumo in-process o traci socket), el
+    mismo que usa ConectorSUMO. Un 'import traci' suelto no vería la simulación
+    cuando el conector corre sobre libsumo."""
+    import sys
+    integracion_path = Path(__file__).parent.parent / 'integracion-sumo'
+    if str(integracion_path) not in sys.path:
+        sys.path.insert(0, str(integracion_path))
+    from conector_sumo import traci as _t
+    return _t
+
+
 # Estado global
 estado_sistema = {
-    'modo': 'simulador',  # 'simulador', 'video', 'sumo'
+    'modo': 'sumo',  # 'simulador', 'video', 'sumo' — arranca en SUMO (data real)
     'simulador': None,
     'calculador_icv': None,
     'controlador_difuso': None,
@@ -715,61 +727,16 @@ async def obtener_trafico_sumo():
                 'flujo_promedio': round(flujo_promedio, 2)
             }
         
-        # Si SUMO NO está conectado, generar datos simulados
-        # Cargar IDs de calles desde el GeoJSON
-        base_path = Path(__file__).parent.parent / 'integracion-sumo' / 'escenarios'
-        ruta_geojson_amplio = base_path / 'lima-amplio' / 'calles.geojson'
-        ruta_geojson_centro = base_path / 'lima-centro' / 'calles.geojson'
-        
-        ruta_geojson = None
-        if ruta_geojson_amplio.exists():
-            ruta_geojson = ruta_geojson_amplio
-        elif ruta_geojson_centro.exists():
-            ruta_geojson = ruta_geojson_centro
-        
-        if not ruta_geojson or not ruta_geojson.exists():
-            return {'calles': [], 'mensaje': 'Archivo de calles no encontrado'}
-        
-        import random
+        # SUMO no conectado: NO se generan datos sintéticos (tesis exige data real).
+        # Se devuelve vacío con la razón; el frontend mostrará "esperando SUMO".
         import time
-        
-        with open(ruta_geojson, 'r', encoding='utf-8') as f:
-            geojson = json.load(f)
-        
-        # Generar tráfico simulado para cada calle
-        estados = []
-        for feature in geojson['features']:
-            calle_id = feature['properties']['id']
-            
-            # Generar métricas aleatorias pero realistas
-            congestion = random.uniform(0.0, 1.0)
-            velocidad = random.uniform(10, 60)  # km/h
-            vehiculos = random.randint(0, 20)
-            ocupacion = random.uniform(0, 100)
-            
-            estados.append({
-                'id': calle_id,
-                'vehiculos': vehiculos,
-                'velocidad': round(velocidad, 1),
-                'ocupacion': round(ocupacion, 1),
-                'congestion': round(congestion, 2)
-            })
-        
-        # Métricas agregadas básicas también en simulado
-        try:
-            icv_promedio = sum(e.get('congestion', 0) for e in estados) / len(estados) if estados else 0.02
-            flujo_promedio = sum(e.get('vehiculos', 0) for e in estados) / len(estados) if estados else 0.02
-        except Exception:
-            icv_promedio = 0.02
-            flujo_promedio = 0.02
-
         return {
-            'calles': estados,
+            'calles': [],
             'timestamp': time.time(),
-            'fuente': 'simulado',
-            'mensaje': 'Tráfico simulado (SUMO no conectado)',
-            'icv_red_promedio': round(icv_promedio, 3),
-            'flujo_promedio': round(flujo_promedio, 2)
+            'fuente': 'sin_datos',
+            'mensaje': 'SUMO no conectado: sin datos de tráfico (no se simula sintéticamente).',
+            'icv_red_promedio': 0.0,
+            'flujo_promedio': 0.0
         }
 
     except Exception as e:
@@ -830,7 +797,7 @@ async def obtener_estado_sumo():
             # Tiempo simulado
             tiempo_simulado_s = 0.0
             try:
-                import traci
+                traci = _get_traci()
                 tiempo_simulado_s = float(traci.simulation.getTime())
                 # Recalcular SIEMPRE total_vehiculos mediante lista global (fiable)
                 veh_ids = list(traci.vehicle.getIDList())
@@ -892,9 +859,9 @@ async def obtener_estado_sumo():
             elif not conector_sumo:
                 razon = 'conector_nulo'
             elif not getattr(conector_sumo, 'conectado', False):
-                # Verificar disponibilidad de TraCI
+                # Verificar disponibilidad del motor SUMO (libsumo/traci)
                 try:
-                    import traci  # noqa: F401
+                    _get_traci()  # noqa: F841
                     razon = 'sin_conexion_traci_o_sumo'
                 except ImportError:
                     razon = 'traci_no_disponible'

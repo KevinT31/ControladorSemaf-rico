@@ -18,6 +18,32 @@ router = APIRouter(
 )
 
 
+@router.get("/ruta-optima")
+async def ruta_optima_emergencia(
+    origen_lat: float = Query(...), origen_lon: float = Query(...),
+    destino_lat: float = Query(...), destino_lon: float = Query(...)
+):
+    """Ruta de emergencia CONSCIENTE DE LA CONGESTIÓN sobre la red SUMO.
+
+    Devuelve la geometría (siguiendo calles) por el camino más despejado dado el
+    tráfico actual, y los semáforos (controladores) que quedan en la ruta para
+    abrirles la ola verde.
+    """
+    from servicios.ruta_emergencia import calcular_ruta_emergencia
+
+    try:
+        resultado = calcular_ruta_emergencia(
+            (origen_lon, origen_lat), (destino_lon, destino_lat)
+        )
+        if not resultado:
+            raise HTTPException(status_code=503, detail="SUMO no conectado o sin ruta")
+        return resultado
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error calculando ruta: {str(e)}")
+
+
 @router.post("/activar", response_model=OlaVerdeResponse)
 async def activar_ola_verde(request: VehiculoEmergenciaRequest):
     """

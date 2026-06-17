@@ -5,3 +5,26 @@ tools/tectonic/
 .server*.log
 .playwright-*.png
 npm-debug.log*
+
+# === Artefactos pesados / regenerables del proyecto de tesis (SUMO/visión) ===
+# Redes y fuentes OSM (regenerables con osmGet.py + netconvert; >40-80 MB)
+*.osm.xml
+*.osm.xml.gz
+*.net.xml
+*.trips.xml
+# Pesos de randomTrips (regenerables con generar_pesos_corredores.py)
+*.src.xml
+*.dst.xml
+# Modelos YOLO (descargables)
+*.pt
+# Videos (pesados; descargables/propios)
+*.mp4
+*.avi
+*.mov
+*.mkv
+# Salidas de procesamiento de video y outputs misc
+/datos/
+Diseño Software/datos/resultados-video/
+# Logs temporales del dashboard
+_dashboard*.log
+_srv*.log

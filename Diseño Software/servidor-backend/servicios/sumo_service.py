@@ -13,23 +13,71 @@ from .estado_global import estado_sistema
 logger = logging.getLogger(__name__)
 
 
+def _get_traci():
+    """Devuelve el módulo de conexión SUMO activo (libsumo o traci), el mismo
+    que usa ConectorSUMO. Necesario porque el conector puede usar libsumo
+    (in-process) y un 'import traci' suelto no vería la simulación en curso."""
+    import sys
+    integracion_path = Path(__file__).parent.parent.parent / 'integracion-sumo'
+    if str(integracion_path) not in sys.path:
+        sys.path.insert(0, str(integracion_path))
+    from conector_sumo import traci as _t
+    return _t
+
+
+def _escenarios_dir() -> Path:
+    return Path(__file__).parent.parent.parent / 'integracion-sumo' / 'escenarios'
+
+
+# Preferencia de escenario para el DASHBOARD. Cada entrada empareja el .sumocfg
+# con SU calles.geojson (deben venir de la MISMA red para que casen los IDs).
+# Orden: hora punta densa (lima-amplio) > alta demanda centro > centro normal.
+_PREFERENCIA_ESCENARIOS = [
+    ('lima-metropolitano', 'horapico.sumocfg'),
+    ('lima-amplio', 'horapico.sumocfg'),
+    ('lima-centro', 'comparacion.sumocfg'),
+    ('lima-centro', 'osm.sumocfg'),
+    ('lima-amplio', 'lima_amplio.sumocfg'),
+]
+
+
+def _config_y_geojson_preferidos():
+    """Devuelve (ruta_sumocfg, ruta_calles_geojson) del primer escenario
+    disponible según _PREFERENCIA_ESCENARIOS, o (None, None)."""
+    base = _escenarios_dir()
+    for carpeta, cfg in _PREFERENCIA_ESCENARIOS:
+        ruta_cfg = base / carpeta / cfg
+        ruta_geo = base / carpeta / 'calles.geojson'
+        if ruta_cfg.exists() and ruta_geo.exists():
+            return ruta_cfg, ruta_geo
+    return None, None
+
+
 class SumoService:
     """Servicio para operaciones con SUMO"""
 
     @staticmethod
     def obtener_calles_geojson() -> Dict:
-        """Obtiene el GeoJSON de las calles SUMO"""
-        ruta_geojson = Path(__file__).parent.parent.parent / 'integracion-sumo' / 'escenarios' / 'lima-centro' / 'calles.geojson'
-
-        if not ruta_geojson.exists():
+        """Obtiene el GeoJSON de calles del escenario preferido (el mismo cuya
+        red corre en SUMO), para que la geometría case con la congestión."""
+        _, ruta_geojson = _config_y_geojson_preferidos()
+        if not ruta_geojson or not ruta_geojson.exists():
             raise FileNotFoundError("Archivo calles.geojson no encontrado")
 
         with open(ruta_geojson, 'r', encoding='utf-8') as f:
             return json.load(f)
 
+    # Pasos de simulación a avanzar por cada poll del dashboard. El frontend
+    # consulta /api/sumo/trafico cada ~2s, así la simulación corre ~6x tiempo real.
+    PASOS_POR_POLL = 12
+
     @staticmethod
     def obtener_estado_trafico() -> Dict:
-        """Obtiene el estado actual del tráfico en SUMO"""
+        """Obtiene el estado actual del tráfico en SUMO, AVANZANDO la simulación.
+
+        Cada llamada (poll del dashboard) hace avanzar SUMO unos pasos para que
+        el tráfico evolucione y los colores reflejen congestión real cambiante.
+        """
         if estado_sistema.modo != 'sumo':
             return {'calles': [], 'mensaje': 'Modo SUMO no activo'}
 
@@ -38,9 +86,20 @@ class SumoService:
             return {'calles': [], 'mensaje': 'SUMO no conectado'}
 
         try:
-            estados = conector.obtener_estado_calles(limite=500)
+            # Avanzar la simulación (libsumo es in-process; este endpoint es
+            # async -> corre en el hilo del event loop, sin condición de carrera).
+            for _ in range(SumoService.PASOS_POR_POLL):
+                if not conector.simular_paso():
+                    break
+
+            estados = conector.obtener_estado_calles(limite=2000)
+            activas = [e for e in estados if e.get('vehiculos', 0) > 0]
+            icv_prom = (sum(e.get('congestion', 0) for e in activas) / len(activas)) if activas else 0.0
             return {
                 'calles': estados,
+                'fuente': 'sumo_real',
+                'calles_con_trafico': len(activas),
+                'icv_red_promedio': round(icv_prom, 3),
                 'timestamp': datetime.now().isoformat()
             }
         except Exception as e:
@@ -129,8 +188,8 @@ class SumoService:
             }
 
         try:
-            # Obtener métricas reales desde TraCI
-            import traci
+            # Obtener métricas reales desde la simulación activa (libsumo/traci)
+            traci = _get_traci()
             vehiculos = traci.vehicle.getIDList()
             total_vehiculos = len(vehiculos)
 
@@ -178,9 +237,7 @@ class SumoService:
                         sys.path.insert(0, str(integracion_path))
                         from conector_sumo import ConectorSUMO
 
-                        ruta_centro = integracion_path / 'escenarios' / 'lima-centro' / 'osm.sumocfg'
-                        ruta_amplio = integracion_path / 'escenarios' / 'lima-amplio' / 'lima_amplio.sumocfg'
-                        ruta_cfg = ruta_centro if ruta_centro.exists() else (ruta_amplio if ruta_amplio.exists() else None)
+                        ruta_cfg, _ = _config_y_geojson_preferidos()
 
                         if ruta_cfg:
                             estado_sistema.conector_sumo = ConectorSUMO(
@@ -208,7 +265,7 @@ class SumoService:
                 calles_totales = 0
                 metricas_intersecciones = []
                 try:
-                    import traci
+                    traci = _get_traci()
                     tiempo_simulado_s = float(traci.simulation.getTime())
 
                     # Intentar por edges
@@ -264,7 +321,7 @@ class SumoService:
 
                     try:
                         con = estado_sistema.conector_sumo
-                        import traci
+                        traci = _get_traci()
                         ids_semaforos = traci.trafficlight.getIDList()
                         for idx, sid in enumerate(ids_semaforos):
                             try:
@@ -274,12 +331,8 @@ class SumoService:
                                     velocidad_promedio=m.get('velocidad_promedio', 0.0),
                                     flujo_vehicular=m.get('flujo_vehicular', 0.0)
                                 )
-                                # Reducir volatilidad y acotar ICV a [0.40, 0.60]
+                                # ICV REAL calculado por el núcleo (sin clamp ni jitter)
                                 icv_val = float(res.get('icv', 0.0))
-                                # Jitter leve por intersección para valores distintos
-                                jitter = ((idx % 7) - 3) * 0.005  # ±1.5%
-                                icv_val = icv_val * (1.0 + jitter)
-                                icv_val = max(0.40, min(0.60, icv_val))
 
                                 metricas_intersecciones.append({
                                     'interseccion_id': sid,
@@ -321,7 +374,7 @@ class SumoService:
                 razon = 'conector_nulo'
             elif not getattr(conector, 'conectado', False):
                 try:
-                    import traci  # noqa: F401
+                    _get_traci()  # noqa: F841
                     razon = 'sin_conexion_traci_o_sumo'
                 except ImportError:
                     razon = 'traci_no_disponible'
@@ -358,11 +411,11 @@ class SumoService:
     def inicializar_modo_sumo():
         """Inicializa el modo SUMO automáticamente"""
         try:
-            ruta_config = Path(__file__).parent.parent.parent / 'integracion-sumo' / 'escenarios' / 'lima-centro' / 'osm.sumocfg'
+            ruta_config, _ = _config_y_geojson_preferidos()
 
-            if ruta_config.exists():
+            if ruta_config and ruta_config.exists():
                 SumoService.conectar(str(ruta_config), usar_gui=False)
-                logger.info("Modo SUMO inicializado correctamente")
+                logger.info(f"Modo SUMO inicializado: {ruta_config.parent.name}/{ruta_config.name}")
             else:
                 logger.warning("Archivo de configuración SUMO no encontrado")
         except ImportError:

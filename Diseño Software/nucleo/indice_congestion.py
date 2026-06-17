@@ -259,11 +259,18 @@ class CalculadorICV:
         if delta_t <= 0:
             return 0.0
 
+        # Ventana mínima de estimación: al inicio de cada ventana delta_t es ~0
+        # y q = N/delta_t explota (valores absurdos tipo miles de veh/min).
+        # Acotamos delta_t a un mínimo razonable; cuando la ventana ya es grande
+        # se usa el delta_t real (la fórmula no cambia en régimen estable).
+        VENTANA_MIN_S = 10.0
+        delta_t_efectivo = max(delta_t, VENTANA_MIN_S)
+
         # Calcular flujo en vehículos por minuto
-        flujo_por_segundo = num_vehiculos_cruzaron / delta_t
+        flujo_por_segundo = num_vehiculos_cruzaron / delta_t_efectivo
         flujo_por_minuto = flujo_por_segundo * 60.0
 
-        logger.debug(f"Flujo: {num_vehiculos_cruzaron} veh / {delta_t:.1f}s = {flujo_por_minuto:.2f} veh/min")
+        logger.debug(f"Flujo: {num_vehiculos_cruzaron} veh / {delta_t_efectivo:.1f}s = {flujo_por_minuto:.2f} veh/min")
 
         return flujo_por_minuto
 

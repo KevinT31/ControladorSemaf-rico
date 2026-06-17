@@ -11,13 +11,30 @@ import numpy as np
 from typing import Dict, List, Tuple
 import logging
 
-# Importar TraCI si está disponible
+# Conexión con SUMO.
+# Preferimos libsumo (SUMO embebido en el proceso Python, SIN socket TCP):
+# es más rápido y evita que el Firewall de Windows bloquee el socket de
+# escucha de sumo.exe. Si libsumo no está, usamos traci (socket clásico).
+# Ambos exponen la misma API, por lo que el resto del código no cambia.
+USANDO_LIBSUMO = False
 try:
-    import traci
+    import libsumo as traci
+    USANDO_LIBSUMO = True
     TRACI_DISPONIBLE = True
 except ImportError:
-    TRACI_DISPONIBLE = False
-    logging.warning("TraCI no disponible. Instalar SUMO y agregar tools al PYTHONPATH")
+    try:
+        import traci
+        TRACI_DISPONIBLE = True
+    except ImportError:
+        TRACI_DISPONIBLE = False
+        logging.warning("Ni libsumo ni traci disponibles. Instalar 'eclipse-sumo' y 'libsumo'.")
+
+# sumolib para localizar los binarios (sumo / sumo-gui) de forma robusta
+try:
+    import sumolib
+    SUMOLIB_DISPONIBLE = True
+except ImportError:
+    SUMOLIB_DISPONIBLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +74,17 @@ class ConectorSUMO:
         self.intersecciones: Dict[str, Dict] = {}
 
     def conectar(self):
-        """Inicia SUMO y conecta vía TraCI"""
-        comando_sumo = 'sumo-gui' if self.usar_gui else 'sumo'
+        """Inicia SUMO y conecta (libsumo si está disponible, si no traci)"""
+        # libsumo es headless: no soporta GUI. Si se pide GUI pero estamos en
+        # libsumo, caemos a 'sumo' headless (el dashboard web es la visualización).
+        usar_gui_efectivo = self.usar_gui and not USANDO_LIBSUMO
+        nombre_binario = 'sumo-gui' if usar_gui_efectivo else 'sumo'
+
+        # Localizar el binario de forma robusta (eclipse-sumo vía pip)
+        if SUMOLIB_DISPONIBLE:
+            comando_sumo = sumolib.checkBinary(nombre_binario)
+        else:
+            comando_sumo = nombre_binario
 
         opciones = [
             comando_sumo,
@@ -68,9 +94,14 @@ class ConectorSUMO:
         ]
 
         try:
-            traci.start(opciones, port=self.puerto)
+            # libsumo.start() no acepta el argumento 'port'
+            if USANDO_LIBSUMO:
+                traci.start(opciones)
+            else:
+                traci.start(opciones, port=self.puerto)
             self.conectado = True
-            logger.info(f"✓ Conectado a SUMO (GUI: {self.usar_gui})")
+            motor = 'libsumo (sin socket)' if USANDO_LIBSUMO else 'traci (socket)'
+            logger.info(f"[OK] Conectado a SUMO vía {motor} (GUI: {usar_gui_efectivo})")
 
             # Obtener información de semáforos
             self._inicializar_semaforos()
@@ -205,86 +236,63 @@ class ConectorSUMO:
 
         estados = []
 
-        # Perfil horario: picos 9:00, 13:00, 18-20:00
         try:
-            from datetime import datetime
-            hora = datetime.now().hour
-        except Exception:
-            hora = 12
+            # Velocidad de referencia para normalizar (50 km/h urbano típico)
+            vel_max = 13.89  # m/s
 
-        def perfil_hora(h: int) -> float:
-            # Multiplicador de flujo/ocupación (0.7–1.3)
-            if h == 9:
-                return 1.3
-            if h == 13:
-                return 1.2
-            if 18 <= h <= 20:
-                return 1.25
-            if 7 <= h <= 8 or 12 <= h <= 14 or 17 <= h <= 21:
-                return 1.1
-            if 0 <= h <= 5:
-                return 0.75
-            return 0.9
+            # Calles ACTIVAS: derivar de los vehículos presentes (O(vehículos)).
+            # En redes grandes (p.ej. lima-amplio, 15k edges) iterar todos los
+            # edges es lento y, peor, un corte por los primeros N deja fuera los
+            # corredores con tráfico. Con la lista de vehículos obtenemos justo
+            # las calles donde HAY tráfico, sin importar el tamaño de la red.
+            edges_activos = []
+            vistos = set()
+            try:
+                for vid in traci.vehicle.getIDList():
+                    try:
+                        eid = traci.vehicle.getRoadID(vid)
+                    except Exception:
+                        continue
+                    if not eid or eid.startswith(':') or eid in vistos:
+                        continue
+                    vistos.add(eid)
+                    edges_activos.append(eid)
+                    if len(edges_activos) >= limite:
+                        break
+            except Exception:
+                pass
 
-        mult_hora = perfil_hora(hora)
+            # Fallback (sin vehículos o API no disponible): primeros edges
+            if not edges_activos:
+                edges_activos = [e for e in traci.edge.getIDList()[:limite]
+                                 if not e.startswith(':')]
 
-        try:
-            # Obtener todos los edges
-            edge_ids = traci.edge.getIDList()
-
-            for idx, edge_id in enumerate(edge_ids[:limite]):
-                # Filtrar edges internos
-                if edge_id.startswith(':'):
-                    continue
-
+            for edge_id in edges_activos:
                 try:
-                    # Obtener métricas del edge
+                    # Métricas REALES del edge (directo de SUMO, sin ajustes sintéticos)
                     num_vehiculos = traci.edge.getLastStepVehicleNumber(edge_id)
                     velocidad_promedio = traci.edge.getLastStepMeanSpeed(edge_id)  # m/s
-                    ocupacion = traci.edge.getLastStepOccupancy(edge_id)  # %
+                    ocupacion = traci.edge.getLastStepOccupancy(edge_id) * 100.0   # 0..1 -> %
 
-                    # Ajustar ocupación y flujo con perfil horario
-                    ocupacion_aj = min(100.0, ocupacion * mult_hora)
-
-                    # Estimar flujo relativo (veh/min) según paso de simulación
-                    paso_sim_s = max(1.0, traci.simulation.getDeltaT() / 1000.0)
-                    flujo_rel = (num_vehiculos / paso_sim_s) * 60.0  # veh/min
-                    # Normalizar flujo por capacidad simple (veh/min); supongamos 30 como saturación base
-                    flujo_norm = min(1.0, (flujo_rel * mult_hora) / 30.0)
-
-                    # Calcular nivel de congestión (0-1) con no linealidades suaves
-                    vel_max = 13.89  # ~50 km/h típico urbano
-                    ratio_velocidad = max(0.0, min(1.0, velocidad_promedio / vel_max))
-                    ratio_ocupacion = max(0.0, min(1.0, ocupacion_aj / 100.0))
-
-                    # Ocupación con realce cerca de 0.6–0.8
-                    import math
-                    ocup_boost = 1.0 / (1.0 + math.exp(-10 * (ratio_ocupacion - 0.65)))  # sigmoide
-                    ocup_term = 0.5 * ratio_ocupacion + 0.5 * ocup_boost
-
-                    # Velocidad penaliza más cuando ya hay ocupación
-                    vel_term = (1.0 - ratio_velocidad) * (0.4 + 0.4 * ratio_ocupacion)
-
-                    # Flujo aporta presión adicional
-                    flujo_term = 0.35 * flujo_norm
-
-                    congestion = ocup_term * 0.45 + vel_term * 0.35 + flujo_term
-
-                    # Variabilidad espacial no uniforme: solo en ~30% de edges aplicar un pequeño jitter
-                    if (idx % 10) in (1, 4, 7):
-                        jitter = ((idx % 7) - 3) * 0.02  # ±6%
-                        congestion = congestion * (1.0 + jitter)
-
-                    congestion = min(max(congestion, 0.0), 1.0)
+                    # Congestión derivada de ocupación y velocidad reales.
+                    # Edge vacío => congestión 0. Con vehículos: combina ocupación
+                    # (cuánto del carril está usado) y caída de velocidad respecto a la libre.
+                    if num_vehiculos == 0:
+                        congestion = 0.0
+                    else:
+                        ratio_ocupacion = max(0.0, min(1.0, ocupacion / 100.0))
+                        ratio_velocidad = max(0.0, min(1.0, velocidad_promedio / vel_max))
+                        congestion = 0.5 * ratio_ocupacion + 0.5 * (1.0 - ratio_velocidad)
+                        congestion = min(max(congestion, 0.0), 1.0)
 
                     estados.append({
                         'id': edge_id,
                         'vehiculos': num_vehiculos,
                         'velocidad': round(velocidad_promedio * 3.6, 1),  # km/h
-                        'ocupacion': round(ocupacion_aj, 1),
+                        'ocupacion': round(ocupacion, 1),
                         'congestion': round(congestion, 2)
                     })
-                except:
+                except Exception:
                     continue
 
         except Exception as e:

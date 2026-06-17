@@ -28,7 +28,13 @@
       "PowerShell(Set-Location \"C:\\\\Users\\\\P5PractTI\\\\Desktop\\\\OverLeaf_Local\\\\Diseño Software\\\\interfaz-web\"; node --check tesis_resultado.js; if\\($?\\){ \"sintaxis OK\" }; $edge = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft\\\\Edge\\\\Application\\\\msedge.exe\"; if\\(-not \\(Test-Path $edge\\)\\){ $edge = \"C:\\\\Program Files\\\\Microsoft\\\\Edge\\\\Application\\\\msedge.exe\" }; & $edge --headless --disable-gpu --hide-scrollbars --window-size=1440,2100 --virtual-time-budget=9000 --screenshot=\"capturas\\\\dash_final.png\" \"http://localhost:8765/index.html?nocache=1\" 2>$null; Start-Sleep 6; Get-Item \"capturas\\\\dash_final.png\" | Select-Object Length)",
       "PowerShell(Start-Sleep 8; Add-Type -AssemblyName System.Drawing; $p=\"C:\\\\Users\\\\P5PractTI\\\\Desktop\\\\OverLeaf_Local\\\\Diseño Software\\\\interfaz-web\\\\capturas\\\\dash_final.png\"; if\\(Test-Path $p\\){ $src=[System.Drawing.Image]::FromFile\\($p\\); function Crop\\($x,$y,$w,$h,$name\\){ $bmp=New-Object System.Drawing.Bitmap $w,$h; $g=[System.Drawing.Graphics]::FromImage\\($bmp\\); $g.DrawImage\\($src,\\(New-Object System.Drawing.Rectangle 0,0,$w,$h\\),\\(New-Object System.Drawing.Rectangle $x,$y,$w,$h\\),[System.Drawing.GraphicsUnit]::Pixel\\); $bmp.Save\\(\"C:\\\\Users\\\\P5PractTI\\\\Desktop\\\\OverLeaf_Local\\\\Diseño Software\\\\interfaz-web\\\\capturas\\\\$name\"\\); $g.Dispose\\(\\); $bmp.Dispose\\(\\) }; Crop 0 1180 420 480 \"crop_ola_final.png\"; Crop 1020 1480 420 620 \"crop_logs_final.png\"; $src.Dispose\\(\\); \"crops ok\" } else { \"captura no generada\" })",
       "PowerShell($edge = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft\\\\Edge\\\\Application\\\\msedge.exe\"; if\\(-not \\(Test-Path $edge\\)\\){ $edge = \"C:\\\\Program Files\\\\Microsoft\\\\Edge\\\\Application\\\\msedge.exe\" }; Start-Process -FilePath $edge -ArgumentList '--headless','--disable-gpu','--hide-scrollbars','--window-size=1440,2100','--virtual-time-budget=9000','--screenshot=\"C:\\\\Users\\\\P5PractTI\\\\Desktop\\\\OverLeaf_Local\\\\Diseño Software\\\\interfaz-web\\\\capturas\\\\dash_final.png\"','\"http://localhost:8765/index.html\"' -Wait -WindowStyle Hidden; Start-Sleep 2; Get-ChildItem \"C:\\\\Users\\\\P5PractTI\\\\Desktop\\\\OverLeaf_Local\\\\Diseño Software\\\\interfaz-web\\\\capturas\\\\dash_final.png\" -ErrorAction SilentlyContinue | Select-Object Length)",
-      "PowerShell(Get-Process *)"
+      "PowerShell(Get-Process *)",
+      "Bash(python -c 'import importlib; *)",
+      "Bash(pip index *)",
+      "Bash(python -m pip install eclipse-sumo traci sumolib scikit-fuzzy ultralytics)",
+      "Bash(curl -s -m 15 -o /dev/null -w \"overpass-api.de: HTTP %{http_code} en %{time_total}s\\\\n\" \"https://overpass-api.de/api/status\")",
+      "Bash(curl -s -m 15 -o /dev/null -w \"api.openstreetmap.org: HTTP %{http_code}\\\\n\" \"https://api.openstreetmap.org/api/0.6/map?bbox=-77.04,-12.05,-77.03,-12.04\")",
+      "Bash(python *)"
     ]
   }
 }
