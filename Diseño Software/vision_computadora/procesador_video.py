@@ -693,12 +693,7 @@ class ProcesadorVideo:
                 # Convertir resultado a dict
                 resultado_dict = convertir_resultado_a_dict(resultado)
 
-                # Debug: verificar parámetro modo_simple RECIBIDO
-                print(f"[PROCESADOR] dibujar_detecciones recibió modo_simple={modo_simple}")
-                print(f"[PROCESADOR] Tipo: {type(modo_simple)}")
-                
                 # Usar visualización completa (incluye vehículos, métricas y barra ICV)
-                print(f"[PROCESADOR] Llamando crear_visualizacion_completa con modo_simple={modo_simple}")
                 frame_anotado = self._overlay_moderno.crear_visualizacion_completa(
                     frame_anotado,
                     resultado_dict,

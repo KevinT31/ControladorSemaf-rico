@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Escenario HORA PUNTA vespertina (18:00-20:00) sobre lima-amplio.
+     Demanda concentrada en corredores reales más congestionados de Lima:
+     Javier Prado, Av. Arequipa, Angamos, Benavides, Salaverry, Canaval.
+     Caso realista para demostrar el beneficio del control adaptativo. -->
+<sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="lima_amplio.net.xml"/>
+        <route-files value="horapico.rou.xml"/>
+    </input>
+
+    <time>
+        <begin value="0"/>
+        <end value="3600"/>
+        <step-length value="1.0"/>
+    </time>
+
+    <processing>
+        <time-to-teleport value="-1"/>
+        <ignore-route-errors value="true"/>
+    </processing>
+
+    <report>
+        <verbose value="false"/>
+        <no-step-log value="true"/>
+        <no-warnings value="true"/>
+    </report>
+
+</sumoConfiguration>

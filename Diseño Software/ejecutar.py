@@ -209,19 +209,24 @@ def procesar_video():
     print("  • Detección de emergencias (ambulancias, bomberos)")
     print("  • Todas las métricas del Capítulo 6")
 
-    # Buscar videos
+    # Buscar videos (incluye videos-prueba/ y sus subcarpetas, recursivo)
+    base_videos = Path(__file__).parent / 'datos' / 'videos-prueba'
     carpetas_prueba = [
-        Path(__file__).parent / 'datos' / 'videos-prueba' / 'deteccion-basica',
-        Path(__file__).parent / 'datos' / 'videos-prueba' / 'analisis-parametros',
-        Path(__file__).parent / 'datos' / 'videos-prueba' / 'deteccion-emergencia',
+        base_videos,
         Path(__file__).parent / 'datos',
     ]
 
     videos_encontrados = []
-    for carpeta in carpetas_prueba:
-        if carpeta.exists():
-            for ext in ['*.mp4', '*.avi', '*.mov', '*.mkv']:
-                videos_encontrados.extend(carpeta.glob(ext))
+    exts = ['*.mp4', '*.avi', '*.mov', '*.mkv']
+    # Búsqueda recursiva dentro de videos-prueba (donde se guardan los videos)
+    if base_videos.exists():
+        for ext in exts:
+            videos_encontrados.extend(base_videos.rglob(ext))
+    # Y videos sueltos en datos/
+    for ext in exts:
+        videos_encontrados.extend((Path(__file__).parent / 'datos').glob(ext))
+    # Eliminar duplicados preservando orden
+    videos_encontrados = list(dict.fromkeys(videos_encontrados))
 
     if not videos_encontrados:
         print("\n⚠️ No se encontraron videos.")
@@ -326,9 +331,16 @@ def conectar_sumo():
     def abrir_sumo(cfg_path: Path):
         try:
             print(f"\n🚀 Abriendo SUMO-GUI: {cfg_path.name}")
-            subprocess.Popen(['sumo-gui', '-c', str(cfg_path)], shell=True)
+            # Resolver el binario de forma robusta (sumo-gui no suele estar en PATH).
+            try:
+                import sumolib
+                binario = sumolib.checkBinary('sumo-gui')
+            except Exception:
+                binario = 'sumo-gui'
+            subprocess.Popen([binario, '-c', str(cfg_path), '--start'])
         except Exception as e:
             print(f"❌ Error al abrir SUMO-GUI: {e}")
+            print("   Verifica que SUMO esté instalado y SUMO_HOME configurado.")
 
     if eleccion == '3':
         abrir_sumo(disponibles[0][2])
@@ -356,48 +368,45 @@ def comparar_sistemas():
 
     try:
         from nucleo.sistema_comparacion import (
-            SistemaComparacion, TipoControl, ConfiguracionInterseccion, MetricasRed
+            SistemaComparacion, TipoControl, ConfiguracionInterseccion
         )
-        import numpy as np
-        from datetime import datetime, timedelta
 
         print("\n🔧 Inicializando comparador...")
 
-        configuraciones = [
-            ConfiguracionInterseccion(id="I001", nombre="Av. Arequipa - Javier Prado", peso=1.5, es_critica=True),
-            ConfiguracionInterseccion(id="I002", nombre="Av. Brasil - Venezuela", peso=1.2),
-            ConfiguracionInterseccion(id="I003", nombre="Av. La Marina - Universitaria", peso=1.0),
-        ]
+        # Localizar escenario SUMO real. Preferir el caso HORA PUNTA realista
+        # (corredores reales de Lima: Javier Prado, Arequipa, Angamos...),
+        # luego alta demanda en lima-centro, luego escenarios normales.
+        integ = Path(__file__).parent / 'integracion-sumo'
+        cfg_horapico = integ / 'escenarios' / 'lima-amplio' / 'horapico.sumocfg'
+        cfg_comp = integ / 'escenarios' / 'lima-centro' / 'comparacion.sumocfg'
+        cfg_centro = integ / 'escenarios' / 'lima-centro' / 'osm.sumocfg'
+        cfg_amplio = integ / 'escenarios' / 'lima-amplio' / 'lima_amplio.sumocfg'
+        ruta_cfg = next((c for c in (cfg_horapico, cfg_comp, cfg_centro, cfg_amplio) if c.exists()), None)
 
-        sistema = SistemaComparacion(configuraciones_intersecciones=configuraciones)
+        if ruta_cfg is None:
+            print("\n❌ No se encontró un escenario SUMO (.sumocfg) construido.")
+            print("   Construye la red real primero (Fase 1).")
+            input("\n\nPresiona ENTER para continuar...")
+            return
 
-        # Ejecutar comparación: 300 pasos (~5 min)
-        print("\n⏳ Ejecutando simulación de 5 minutos (300 pasos)...")
-        print("   Esto tomará unos segundos...\n")
+        # El análisis trabaja sobre las métricas de red; no requiere configs aquí
+        sistema = SistemaComparacion([])
+        sys.path.insert(0, str(integ))
 
-        # Simular métricas para Tiempo Fijo (base) y Adaptativo (propuesto)
-        metricas_fijo = []
-        metricas_adapt = []
-        ahora = datetime.now()
-        for i in range(300):
-            ts = ahora + timedelta(seconds=i)
-            icv_fijo = np.clip(0.55 + np.sin(i*0.03)*0.08 + np.random.uniform(-0.05, 0.10), 0.0, 1.0)
-            icv_adapt = np.clip(0.40 + np.sin(i*0.03)*0.06 + np.random.uniform(-0.04, 0.06), 0.0, 1.0)
-            vavg_fijo = 28.0 + np.random.uniform(-8, 8)
-            vavg_adapt = 34.0 + np.random.uniform(-6, 6)
-            q_fijo = 16.0 + np.random.uniform(-5, 5)
-            q_adapt = 20.0 + np.random.uniform(-4, 4)
-            ql_fijo = 0.65 + np.random.uniform(-0.15, 0.20)
-            ql_adapt = 0.45 + np.random.uniform(-0.15, 0.15)
+        # Ejecutar DOS simulaciones REALES de SUMO (sin datos sintéticos):
+        #   - Tiempo fijo: semáforos estáticos con verde fijo
+        #   - Adaptativo: control ICV + difusa Mamdani (Cap. 6) por dirección.
+        # Palancas afinadas: gamma=5 (agresividad), alpha=0.35 (suavizado),
+        # intervalo=25s. Óptimo hallado en lima-amplio hora punta.
+        pasos = 700
+        print(f"\n⏳ Ejecutando 2 simulaciones SUMO reales de {pasos} pasos sobre:")
+        print(f"   {ruta_cfg.parent.name} ({ruta_cfg.name})")
+        print("   (puede tardar ~1-2 min; los datos provienen de SUMO, no son sintéticos)...\n")
 
-            metricas_fijo.append(MetricasRed(
-                timestamp=ts, ICV_red=float(icv_fijo), Vavg_red=float(vavg_fijo), q_red=float(q_fijo), QL_red=float(ql_fijo),
-                num_intersecciones=len(configuraciones)
-            ))
-            metricas_adapt.append(MetricasRed(
-                timestamp=ts, ICV_red=float(icv_adapt), Vavg_red=float(vavg_adapt), q_red=float(q_adapt), QL_red=float(ql_adapt),
-                num_intersecciones=len(configuraciones)
-            ))
+        from comparacion_sumo import ejecutar_comparacion_real
+        metricas_fijo, metricas_adapt, resumen = ejecutar_comparacion_real(
+            str(ruta_cfg), pasos=pasos, intervalo_control=25, gamma=5.0, alpha=0.35
+        )
 
         res_fijo = sistema.analizar_resultados(metricas_fijo, TipoControl.TIEMPO_FIJO, "sim_tiempo_fijo")
         res_adapt = sistema.analizar_resultados(metricas_adapt, TipoControl.ADAPTATIVO, "sim_adaptativo")
@@ -421,10 +430,19 @@ def comparar_sistemas():
         print(f"  {'Flujo (veh/min)':<25} {res_fijo.q_promedio:<15.3f} {res_adapt.q_promedio:<15.3f} {pct(informe.mejora_flujo)}")
         print(f"  {'Saturación Cola':<25} {res_fijo.porcentaje_tiempo_congestionado:<15.3f} {res_adapt.porcentaje_tiempo_congestionado:<15.3f} ")
 
+        # Métricas de desempeño global (las más representativas para semáforos)
+        rf, ra = resumen['fijo'], resumen['adaptativo']
+        thr_mej = ((ra['throughput'] - rf['throughput']) / rf['throughput'] * 100) if rf['throughput'] else 0.0
+        dem_mej = ((rf['demora_media_s'] - ra['demora_media_s']) / rf['demora_media_s'] * 100) if rf['demora_media_s'] else 0.0
+        print(f"\n  {'Throughput (veh)':<25} {rf['throughput']:<15d} {ra['throughput']:<15d} {pct(thr_mej)}")
+        print(f"  {'Demora media (s/veh)':<25} {rf['demora_media_s']:<15.2f} {ra['demora_media_s']:<15.2f} {pct(dem_mej)}")
+
         print(f"\n📈 Resumen:")
         print(f"  • Reducción de congestión: {pct(informe.mejora_icv)}")
         print(f"  • Aumento de velocidad: {pct(informe.mejora_velocidad)}")
         print(f"  • Mejora de flujo: {pct(informe.mejora_flujo)}")
+        print(f"  • Más vehículos procesados (throughput): {pct(thr_mej)}")
+        print(f"  • Reducción de demora por vehículo: {pct(dem_mej)}")
 
     except Exception as e:
         print(f"\n❌ Error: {e}")
@@ -478,14 +496,13 @@ def ejecutar_pruebas():
 
             controlador = ControladorDifusoCapitulo6()
 
-            resultado = controlador.calcular_ajuste_tiempo_verde(
-                icv_ns=0.6, icv_eo=0.4,
-                pi_ns=0.3, pi_eo=0.5,
-                ev_ns=0, ev_eo=0
+            resultado = controlador.calcular_control_completo(
+                icv_ns=0.6, pi_ns=0.3, ev_ns=0,
+                icv_eo=0.4, pi_eo=0.5, ev_eo=0
             )
 
-            print(f"  T_verde_NS: {resultado['T_verde_ns']:.1f}s")
-            print(f"  T_verde_EO: {resultado['T_verde_eo']:.1f}s")
+            print(f"  T_verde_NS: {resultado['NS']['T_verde']:.1f}s")
+            print(f"  T_verde_EO: {resultado['EO']['T_verde']:.1f}s")
 
         if opcion in ['3', '5']:
             print("\n=== PRUEBA 3: ESTADO LOCAL ===")

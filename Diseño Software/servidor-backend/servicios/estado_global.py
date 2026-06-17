@@ -15,7 +15,10 @@ class EstadoSistema:
     """Clase para gestionar el estado global del sistema"""
 
     def __init__(self):
-        self.modo: str = 'simulador'  # 'simulador', 'video', 'sumo'
+        # Arranca en 'sumo' para mostrar data real por defecto (alineado con
+        # main.py estado_sistema['modo']='sumo'). main.py también sincroniza
+        # este singleton en inicializar_sistema y al cambiar de modo.
+        self.modo: str = 'sumo'  # 'simulador', 'video', 'sumo'
         self.simulador: Optional[Any] = None
         self.calculador_icv: Optional[Any] = None
         self.controlador_difuso: Optional[Any] = None

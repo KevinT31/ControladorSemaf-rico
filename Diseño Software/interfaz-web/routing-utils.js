@@ -29,10 +29,44 @@ function generarClaveRuta(inicio, fin, profile) {
  * @param {string} profile - Perfil de ruta: 'driving', 'walking', 'cycling'
  * @returns {Promise<Object>} Ruta con geometría GeoJSON
  */
-async function obtenerRutaMapbox(inicio, fin, profile = 'driving') {
-    // Verificar si el token está configurado
-    if (CONFIG.MAPBOX_TOKEN === 'TU_TOKEN_MAPBOX_AQUI') {
+// Router gratuito OSRM (sin token). Devuelve geometría que SIGUE LAS CALLES,
+// en el mismo formato que la respuesta de Mapbox para no romper el resto.
+async function obtenerRutaOSRM(inicio, fin) {
+    const claveCache = generarClaveRuta(inicio, fin, 'osrm');
+    if (cacheRutas.has(claveCache)) return cacheRutas.get(claveCache);
+    try {
+        // OSRM espera lon,lat
+        const c1 = `${inicio[1]},${inicio[0]}`;
+        const c2 = `${fin[1]},${fin[0]}`;
+        const url = `https://router.project-osrm.org/route/v1/driving/${c1};${c2}` +
+                    `?overview=full&geometries=geojson`;
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`OSRM HTTP ${resp.status}`);
+        const data = await resp.json();
+        if (!data.routes || data.routes.length === 0) return null;
+        const route = data.routes[0];
+        const resultado = {
+            geometry: route.geometry,      // GeoJSON LineString [lon,lat] siguiendo calles
+            distance: route.distance,      // metros
+            duration: route.duration,      // segundos
+            weight: route.weight,
+            weight_name: route.weight_name || 'routability',
+            steps: [],
+            annotations: { distance: [], duration: [], speed: [], velocidad_promedio_ms: null },
+            fuente: 'osrm'
+        };
+        cacheRutas.set(claveCache, resultado);
+        return resultado;
+    } catch (error) {
+        console.warn('OSRM falló, no se pudo enrutar por calles:', error);
         return null;
+    }
+}
+
+async function obtenerRutaMapbox(inicio, fin, profile = 'driving') {
+    // Sin token Mapbox -> usar OSRM gratuito (la ruta igual sigue las calles)
+    if (CONFIG.MAPBOX_TOKEN === 'TU_TOKEN_MAPBOX_AQUI') {
+        return await obtenerRutaOSRM(inicio, fin);
     }
 
     // Verificar caché primero
@@ -124,11 +158,40 @@ async function obtenerRutaMapbox(inicio, fin, profile = 'driving') {
  * @param {string} profile - Perfil de ruta: 'driving', 'walking', 'cycling'
  * @returns {Promise<Object>} Ruta con geometría GeoJSON o null si falla
  */
-async function obtenerRutaMapboxMultiple(waypoints, profile = 'driving') {
-    // Verificar si el token está configurado
-    if (CONFIG.MAPBOX_TOKEN === 'TU_TOKEN_MAPBOX_AQUI') {
-        console.warn('Sin token Mapbox - no se puede calcular ruta múltiple');
+// OSRM multi-waypoint: ruta que SIGUE LAS CALLES pasando por cada waypoint
+// (cada controlador del ola verde). Gratis, sin token.
+async function obtenerRutaOSRMMultiple(waypoints) {
+    if (!waypoints || waypoints.length < 2) return null;
+    if (waypoints.length > 25) waypoints = waypoints.slice(0, 25);
+    try {
+        const coords = waypoints.map(w => `${w[1]},${w[0]}`).join(';');
+        const url = `https://router.project-osrm.org/route/v1/driving/${coords}` +
+                    `?overview=full&geometries=geojson`;
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`OSRM HTTP ${resp.status}`);
+        const data = await resp.json();
+        if (!data.routes || data.routes.length === 0) return null;
+        const route = data.routes[0];
+        return {
+            geometry: route.geometry,
+            distance: route.distance,
+            duration: route.duration,
+            weight: route.weight,
+            weight_name: route.weight_name || 'routability',
+            steps: [],
+            annotations: { distance: [], duration: [], speed: [], velocidad_promedio_ms: null },
+            fuente: 'osrm'
+        };
+    } catch (error) {
+        console.warn('OSRM múltiple falló:', error);
         return null;
+    }
+}
+
+async function obtenerRutaMapboxMultiple(waypoints, profile = 'driving') {
+    // Sin token Mapbox -> OSRM gratuito (la ruta sigue las calles por cada waypoint)
+    if (CONFIG.MAPBOX_TOKEN === 'TU_TOKEN_MAPBOX_AQUI') {
+        return await obtenerRutaOSRMMultiple(waypoints);
     }
 
     if (!waypoints || waypoints.length < 2) {

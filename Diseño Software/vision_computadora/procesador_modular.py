@@ -106,7 +106,13 @@ class ProcesadorModular:
             Diccionario con estadísticas del procesamiento
         """
         if directorio_salida is None:
-            directorio_salida = f"datos/resultados-video/exportaciones/{self.modo}/"
+            # Ruta ABSOLUTA relativa a la raíz del proyecto (Diseño Software/),
+            # no al CWD: así los outputs caen siempre en el mismo sitio sin
+            # importar desde dónde se lance el script.
+            raiz_proyecto = Path(__file__).parent.parent
+            directorio_salida = str(
+                raiz_proyecto / 'datos' / 'resultados-video' / 'exportaciones' / self.modo
+            )
 
         Path(directorio_salida).mkdir(parents=True, exist_ok=True)
 

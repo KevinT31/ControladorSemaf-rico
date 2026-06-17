@@ -33,7 +33,7 @@ const estado = {
     actualizacionTraficoInterval: null,
     capaTrafico: null,  // Layer group para calles con tráfico
     datosTrafico: {},  // Datos de tráfico por conexión
-    mostrarSUMOTrafico: false // Control para ocultar visualización de tráfico SUMO
+    mostrarSUMOTrafico: true // Mostrar coloreado de tráfico SUMO en el mapa
     ,metricasSUMOResumen: null  // Resumen global de SUMO para sesgo en simulador
     ,__proxSUMOCache: {} // cache de proximidad por intersección
     ,__hudSUMO: null // control HUD con totales
@@ -2035,6 +2035,18 @@ async function cargarYVisualizarCallesSUMO() {
 
         console.log('[OK] Calles visualizadas en el mapa');
 
+        // Encuadrar el mapa a TODA la red cargada (cubre PUCP, costa, Universitaria
+        // y los corredores) la primera vez que se cargan las calles.
+        try {
+            if (!estado.__encuadradoSUMO) {
+                const b = estado.callesSUMO.getBounds();
+                if (b && b.isValid()) {
+                    estado.mapa.fitBounds(b, { padding: [20, 20] });
+                    estado.__encuadradoSUMO = true;
+                }
+            }
+        } catch (e) { console.warn('No se pudo encuadrar el mapa:', e); }
+
         // Iniciar actualización de tráfico cada 2 segundos SIEMPRE en modo SUMO
         actualizarTraficoSUMO();
         estado.actualizacionTraficoInterval = setInterval(actualizarTraficoSUMO, 2000);
@@ -2113,16 +2125,12 @@ async function actualizarTraficoSUMO() {
             return;
         }
 
-        // Crear mapa de congestión por ID de calle con mínimos y micro-ruido si viene 0
+        // Mapa de congestión REAL por ID de calle (sin ruido sintético):
+        // una calle sin vehículos queda en ~0 (verde/fluido real), no inventado.
         const congestionPorCalle = {};
         data.calles.forEach(calle => {
-            let cong = typeof calle.congestion === 'number' ? calle.congestion : 0;
-            if (cong <= 0) {
-                const seed = (calle.id.charCodeAt(0) + (calle.id.charCodeAt(calle.id.length - 1) || 0)) % 97;
-                const jitter = (Math.sin(Date.now() / 7000 + seed) + 1) * 0.01; // 0–0.02
-                cong = 0.03 + jitter; // mínimo visible ~0.03–0.05
-            }
-            congestionPorCalle[calle.id] = Math.max(0.02, Math.min(0.99, cong));
+            const cong = typeof calle.congestion === 'number' ? calle.congestion : 0;
+            congestionPorCalle[calle.id] = Math.max(0, Math.min(1, cong));
         });
 
         // Umbrales dinámicos: si hay suficientes calles activas, usar percentiles 33/66
@@ -2986,6 +2994,25 @@ function dibujarDetecciones(ctx, detecciones, canvasWidth, canvasHeight) {
 
 // ==================== MEJORA DE OLAS VERDES ====================
 
+// Ruta de emergencia CONSCIENTE DE LA CONGESTIÓN calculada por SUMO:
+// elige el camino más despejado según el tráfico real y devuelve la geometría
+// (siguiendo calles) y los semáforos/controladores a coordinar.
+async function obtenerRutaSumoCongestion(origenLatLng, destinoLatLng) {
+    try {
+        const u = `${API_URL}/api/emergencia/ruta-optima`
+            + `?origen_lat=${origenLatLng[0]}&origen_lon=${origenLatLng[1]}`
+            + `&destino_lat=${destinoLatLng[0]}&destino_lon=${destinoLatLng[1]}`;
+        const resp = await fetch(u);
+        if (!resp.ok) return null;
+        const d = await resp.json();
+        if (!d.geometry || d.geometry.length < 2) return null;
+        return d; // {geometry:[[lon,lat]], semaforos:[{id,lon,lat}], distancia_m, tiempo_s, num_semaforos}
+    } catch (e) {
+        console.warn('Ruta SUMO congestion-aware no disponible:', e);
+        return null;
+    }
+}
+
 async function mostrarOlaVerdeActivada(datos) {
     console.log('📍 Mostrando ola verde:', datos);
     console.log('   ¿Tiene hospital destino?', !!datos._hospitalDestino);
@@ -3087,34 +3114,51 @@ async function mostrarOlaVerdeActivada(datos) {
         destinoFinalCoords = destinoCoords;
         nombreDestino = destinoInter.nombre;
         iconoDestino = '🏁';
-        
+
         console.log('🚦 Destino: Intersección -', nombreDestino);
-        console.log('🚗 Calculando ruta directa óptima');
-        
-        // Calcular ruta DIRECTA con Mapbox (solo origen y destino)
+
+        // Construir waypoints con TODOS los controladores (intersecciones) de la
+        // ruta del ola verde, para que la línea PASE POR LAS CALLES a través de
+        // cada controlador (no una recta origen->destino).
+        const waypoints = ruta
+            .map(id => INTERSECCIONES_LIMA.find(i => i.id === id))
+            .filter(Boolean)
+            .map(i => [i.latitud, i.longitud]);
+
+        console.log(`🚗 Enrutando por ${waypoints.length} controladores siguiendo calles`);
+
         try {
-            const rutaMapbox = await obtenerRutaMapbox(origenCoordsBase, destinoCoords, 'driving');
-            
-            if (rutaMapbox && rutaMapbox.geometry && rutaMapbox.geometry.coordinates) {
-                coordenadasRutaReal = rutaMapbox.geometry.coordinates.map(c => [c[1], c[0]]);
-                
+            // 1º opción: ruta SUMO CONSCIENTE DE LA CONGESTIÓN (la integrada).
+            const rutaSumo = await obtenerRutaSumoCongestion(origenCoordsBase, destinoCoords);
+            if (rutaSumo) {
+                coordenadasRutaReal = rutaSumo.geometry.map(c => [c[1], c[0]]);
+                datos._semaforosRuta = rutaSumo.semaforos || [];
                 datos._datosMapbox = {
-                    distance: rutaMapbox.distance,
-                    duration: rutaMapbox.duration,
-                    weight: rutaMapbox.weight,
-                    weight_name: rutaMapbox.weight_name
+                    distance: rutaSumo.distancia_m,
+                    duration: rutaSumo.tiempo_s,
+                    weight: 0,
+                    weight_name: 'sumo_congestion'
                 };
-                
-                const distanciaKm = (rutaMapbox.distance / 1000).toFixed(2);
-                const tiempoMin = (rutaMapbox.duration / 60).toFixed(1);
-                console.log('   ✅ Ruta calculada:', distanciaKm, 'km,', tiempoMin, 'min');
+                console.log(`   ✅ Ruta SUMO congestion-aware: ${(rutaSumo.distancia_m / 1000).toFixed(2)} km, ${rutaSumo.num_semaforos} semáforos coordinados`);
             } else {
-                console.warn('   ⚠️  Mapbox falló, usando línea directa');
-                coordenadasRutaReal = [origenCoordsBase, destinoCoords];
+                // Fallback: routing por calles (OSRM/Mapbox) por los controladores.
+                const rutaCalle = (waypoints.length > 2)
+                    ? await obtenerRutaMapboxMultiple(waypoints, 'driving')
+                    : await obtenerRutaMapbox(origenCoordsBase, destinoCoords, 'driving');
+                if (rutaCalle && rutaCalle.geometry && rutaCalle.geometry.coordinates) {
+                    coordenadasRutaReal = rutaCalle.geometry.coordinates.map(c => [c[1], c[0]]);
+                    datos._datosMapbox = {
+                        distance: rutaCalle.distance, duration: rutaCalle.duration,
+                        weight: rutaCalle.weight, weight_name: rutaCalle.weight_name
+                    };
+                    console.log(`   ✅ Ruta por calles (${rutaCalle.fuente || 'mapbox'})`);
+                } else {
+                    coordenadasRutaReal = waypoints.length >= 2 ? waypoints : [origenCoordsBase, destinoCoords];
+                }
             }
         } catch (error) {
-            console.warn('   ❌ Error Mapbox:', error);
-            coordenadasRutaReal = [origenCoordsBase, destinoCoords];
+            console.warn('   ❌ Error de routing:', error);
+            coordenadasRutaReal = waypoints.length >= 2 ? waypoints : [origenCoordsBase, destinoCoords];
         }
     }
 
@@ -3139,6 +3183,22 @@ async function mostrarOlaVerdeActivada(datos) {
     // Inicializar array de marcadores si no existe
     if (!estado.marcadoresOlaVerde) {
         estado.marcadoresOlaVerde = [];
+    }
+
+    // Marcar los CONTROLADORES (semáforos) que la ola verde coordina en la ruta
+    if (datos._semaforosRuta && datos._semaforosRuta.length) {
+        datos._semaforosRuta.forEach(function (s) {
+            if (s.lat == null || s.lon == null) return;
+            const mk = L.marker([s.lat, s.lon], {
+                icon: L.divIcon({
+                    html: '<div style="background:#059669;color:#fff;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 6px #10b981;"></div>',
+                    className: '',
+                    iconSize: [14, 14]
+                })
+            }).addTo(estado.mapa).bindTooltip('Semáforo coordinado (ola verde)', { direction: 'top' });
+            estado.marcadoresOlaVerde.push(mk);
+        });
+        console.log(`🚦 ${datos._semaforosRuta.length} controladores marcados en la ola verde`);
     }
 
     // Agregar marcadores en origen y destino
