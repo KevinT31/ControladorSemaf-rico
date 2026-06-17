@@ -28,3 +28,9 @@ Diseño Software/datos/resultados-video/
 # Logs temporales del dashboard
 _dashboard*.log
 _srv*.log
+
+# Claves/API secretas (NO subir)
+here_api_key.txt
+**/here_api_key.txt
+.env
+config_local.py
