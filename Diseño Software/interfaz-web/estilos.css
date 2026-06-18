@@ -541,6 +541,52 @@ canvas {
     height: 100%;
 }
 
+/* Panel de comparación SUMO vs Real (HERE), dentro del mapa */
+.panel-comparacion {
+    background: rgba(15, 23, 42, 0.88);
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 10px 12px;
+    width: 190px;
+    font-size: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+}
+.panel-comparacion .pc-title {
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: #fff;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 5px;
+}
+.panel-comparacion .pc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 4px 0 2px;
+}
+.panel-comparacion .pc-row.pc-match {
+    margin-top: 8px;
+    border-top: 1px solid #334155;
+    padding-top: 6px;
+    color: #10b981;
+}
+.panel-comparacion .pc-bar {
+    height: 6px;
+    background: #1e293b;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+.panel-comparacion .pc-bar > div {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+.panel-comparacion .pc-warn { color: #f59e0b; }
+
 
 /* Sidebar Right - Ultra Optimizado para evitar superposiciones */
 .sidebar-right {
