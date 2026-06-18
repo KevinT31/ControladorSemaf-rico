@@ -69,7 +69,7 @@ class SumoService:
 
     # Pasos de simulación a avanzar por cada poll del dashboard. El frontend
     # consulta /api/sumo/trafico cada ~2s, así la simulación corre ~6x tiempo real.
-    PASOS_POR_POLL = 12
+    PASOS_POR_POLL = 8
 
     @staticmethod
     def obtener_estado_trafico() -> Dict:
@@ -95,6 +95,15 @@ class SumoService:
             estados = conector.obtener_estado_calles(limite=2000)
             activas = [e for e in estados if e.get('vehiculos', 0) > 0]
             icv_prom = (sum(e.get('congestion', 0) for e in activas) / len(activas)) if activas else 0.0
+
+            # Calibración automática hacia el tráfico real de HERE (ajusta la
+            # demanda de SUMO para acercar la congestión simulada a la real).
+            try:
+                from .calibracion_service import calibrar
+                calibrar(_get_traci())
+            except Exception as e_cal:
+                logger.debug(f"Calibración omitida: {e_cal}")
+
             return {
                 'calles': estados,
                 'fuente': 'sumo_real',

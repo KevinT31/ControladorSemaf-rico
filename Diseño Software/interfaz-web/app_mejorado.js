@@ -198,10 +198,51 @@ function inicializarMapa() {
         }
     });
 
+    // Panel de COMPARACIÓN SUMO vs Real (HERE) DENTRO del mapa (abajo-izquierda)
+    const PanelComparacion = L.Control.extend({
+        options: { position: 'bottomleft' },
+        onAdd: function () {
+            const div = L.DomUtil.create('div', 'panel-comparacion');
+            div.id = 'panel-comparacion';
+            div.innerHTML = '<div class="pc-title">SUMO vs Real (HERE)</div>' +
+                            '<div id="pc-body" class="pc-body">Calibrando…</div>';
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        }
+    });
+    estado.mapa.addControl(new PanelComparacion());
+    actualizarPanelComparacion();
+    setInterval(actualizarPanelComparacion, 4000);
+
     // Configurar modo de obtener coordenadas
     setupMapClickForCoords();
 
     console.log('Mapa inicializado');
+}
+
+// Actualiza el panel de comparación SUMO (simulado) vs HERE (real) + calibración.
+async function actualizarPanelComparacion() {
+    const body = document.getElementById('pc-body');
+    if (!body) return;
+    try {
+        const r = await fetch(`${API_URL}/api/comparacion`);
+        const d = await r.json();
+        if (!d.calibrado || d.objetivo_here == null) {
+            body.innerHTML = '<span class="pc-warn">Sin referencia HERE</span>' +
+                (d.icv_sumo != null ? `<br>Simulado: ${Math.round(d.icv_sumo * 100)}%` : '');
+            return;
+        }
+        const sim = Math.round((d.icv_sumo || 0) * 100);
+        const real = Math.round((d.objetivo_here || 0) * 100);
+        const barra = (pct, color) => `<div class="pc-bar"><div style="width:${Math.min(100, pct)}%;background:${color}"></div></div>`;
+        body.innerHTML =
+            `<div class="pc-row"><span>Simulado</span><b>${sim}%</b></div>${barra(sim, '#3b82f6')}` +
+            `<div class="pc-row"><span>Real HERE</span><b>${real}%</b></div>${barra(real, '#10b981')}` +
+            `<div class="pc-row"><span>Escala</span><b>${(d.escala != null ? d.escala : 1).toFixed ? d.escala.toFixed(2) : d.escala}x</b></div>` +
+            `<div class="pc-row pc-match"><span>Coincidencia</span><b>${d.coincidencia != null ? d.coincidencia + '%' : '—'}</b></div>`;
+    } catch (e) {
+        body.innerHTML = '<span class="pc-warn">No disponible</span>';
+    }
 }
 
 // Dibuja la capa de TRÁFICO REAL (HERE). Independiente del tráfico SUMO.

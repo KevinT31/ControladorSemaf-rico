@@ -20,3 +20,14 @@ async def trafico_real(
     if None not in (oeste, sur, este, norte):
         bbox = (oeste, sur, este, norte)
     return obtener_trafico_real(bbox)
+
+
+@router.get("/comparacion")
+async def comparacion_sumo_vs_real():
+    """Comparación SUMO (simulado) vs HERE (real) + estado de calibración.
+
+    Devuelve la congestión simulada, la real (objetivo), la escala de demanda
+    aplicada y el % de coincidencia. Lo consume el panel del mapa.
+    """
+    from servicios.calibracion_service import ultima_comparacion
+    return ultima_comparacion()
