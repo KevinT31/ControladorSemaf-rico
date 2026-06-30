@@ -31,8 +31,17 @@ class Settings(BaseSettings):
     BASE_DATOS_DIR: Path = BASE_DIR / "base-datos"
     INTERFAZ_WEB_DIR: Path = BASE_DIR / "interfaz-web"
 
-    # CORS
-    CORS_ORIGINS: list = ["*"]
+    # CORS (en producción: lista blanca de dominios, no "*")
+    CORS_ORIGINS: list = ["http://localhost:8000", "http://127.0.0.1:8000"]
+
+    # ==================== Ciberseguridad ====================
+    # Clave de firma JWT (HS256). En producción: definir SECRET_KEY en .env / KeyVault.
+    SECRET_KEY: str = Field(
+        default="cambia-esta-clave-en-produccion-tesis-pucp-2026",
+        description="Clave HMAC-SHA256 para firmar tokens JWT")
+    TOKEN_EXP_MIN: int = Field(default=480, description="Expiración del token en minutos")
+    AUTH_ENABLED: bool = Field(
+        default=True, description="Exigir autenticación en la API (desactivar solo para depurar)")
 
     # WebSocket
     WS_HEARTBEAT_INTERVAL: int = 30  # segundos

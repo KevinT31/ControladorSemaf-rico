@@ -1,0 +1,55 @@
+\babel@toc {spanish}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10pt}\noindent {\bfseries CAPÍTULO 1}\par 
+\addvspace {10\p@ }
+\addvspace {10pt}\noindent {\bfseries CAPÍTULO 2}\par 
+\contentsline {table}{\numberline {2.1}{\ignorespaces Comparativa de tecnologías de detección vehicular en intersecciones.\relax }}{13}{table.caption.11}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Resultados reportados por la literatura de control adaptativo.\relax }}{17}{table.caption.13}%
+\contentsline {table}{\numberline {2.3}{\ignorespaces Comparativa de estrategias de control semafórico.\relax }}{18}{table.caption.14}%
+\contentsline {table}{\numberline {2.4}{\ignorespaces Rol de los protocolos principales en la arquitectura propuesta.\relax }}{20}{table.caption.16}%
+\contentsline {table}{\numberline {2.5}{\ignorespaces Mecanismos de ciberseguridad para semáforos inteligentes IoT.\relax }}{22}{table.caption.17}%
+\contentsline {table}{\numberline {2.6}{\ignorespaces Modelo de amenazas del sistema IoT semafórico.\relax }}{23}{table.caption.18}%
+\contentsline {table}{\numberline {2.7}{\ignorespaces Criterios de seguridad funcional para el módulo propuesto.\relax }}{24}{table.caption.19}%
+\contentsline {table}{\numberline {2.8}{\ignorespaces Comparativa de simuladores de tráfico.\relax }}{26}{table.caption.21}%
+\contentsline {table}{\numberline {2.9}{\ignorespaces Síntesis del estado del arte y criterios adoptados para la solución propuesta.\relax }}{27}{table.caption.22}%
+\addvspace {10\p@ }
+\addvspace {10pt}\noindent {\bfseries CAPÍTULO 3}\par 
+\contentsline {table}{\numberline {3.1}{\ignorespaces Actores clave del sistema y sus necesidades principales.\relax }}{29}{table.caption.23}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Resumen de exigencias y deseos por dominio de diseño.\relax }}{30}{table.caption.24}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Requerimientos verificables del módulo IoT semafórico.\relax }}{32}{table.3.3}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Entradas y salidas del módulo IoT y su uso dentro de la arquitectura.\relax }}{37}{table.caption.26}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces Significado de las señales internas de la estructura de funciones.\relax }}{39}{table.caption.28}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Matriz morfológica del sistema.\relax }}{43}{table.3.6}%
+\contentsline {table}{\numberline {3.7}{\ignorespaces Evaluación ponderada de conceptos de solución.\relax }}{45}{table.3.7}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces Niveles de alcance del sistema y evidencia esperada.\relax }}{55}{table.caption.39}%
+\contentsline {table}{\numberline {3.9}{\ignorespaces Riesgos y limitaciones del concepto edge--nube y sus mitigaciones.\relax }}{56}{table.caption.40}%
+\contentsline {table}{\numberline {3.10}{\ignorespaces Trazabilidad entre objetivos, requerimientos y evidencia.\relax }}{57}{table.3.10}%
+\addvspace {10\p@ }
+\addvspace {10pt}\noindent {\bfseries CAPÍTULO 4}\par 
+\contentsline {table}{\numberline {4.1}{\ignorespaces Selección trazable de componentes electrónicos.\relax }}{59}{table.caption.41}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Comparación técnica de las unidades de control evaluadas.\relax }}{67}{table.caption.52}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Consumo energético por componente.\relax }}{69}{table.caption.54}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Consumo teórico de diseño por nivel de voltaje.\relax }}{69}{table.caption.55}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Lista de componentes del sistema de alimentación y protecciones.\relax }}{75}{table.caption.64}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Estimación de costos por componente del módulo electrónico (valores referenciales).\relax }}{76}{table.caption.65}%
+\addvspace {10\p@ }
+\addvspace {10pt}\noindent {\bfseries CAPÍTULO 5}\par 
+\contentsline {table}{\numberline {5.1}{\ignorespaces Requerimientos mecánicos verificables del sistema.\relax }}{82}{table.caption.72}%
+\addvspace {10\p@ }
+\addvspace {10pt}\noindent {\bfseries CAPÍTULO 6}\par 
+\contentsline {table}{\numberline {6.1}{\ignorespaces Verificación de los pesos del ICV mediante el método AHP.\relax }}{117}{table.caption.99}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Casos de prueba del ICV con sus variables de entrada y nivel resultante.\relax }}{117}{table.caption.100}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Análisis de sensibilidad del ICV ante un incremento del $10\%$ en cada variable (caso base $ICV\approx 0.669$).\relax }}{118}{table.caption.101}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Base de reglas difusas organizada por nivel de prioridad.\relax }}{120}{table.caption.102}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces Modos de operación y degradación segura del módulo de control.\relax }}{122}{table.caption.103}%
+\contentsline {table}{\numberline {6.6}{\ignorespaces Modelo de amenazas y mecanismos de mitigación propuestos.\relax }}{126}{table.caption.104}%
+\addvspace {10\p@ }
+\addvspace {10pt}\noindent {\bfseries CAPÍTULO 7}\par 
+\contentsline {table}{\numberline {7.1}{\ignorespaces Casos de validación comparativa en SUMO.\relax }}{130}{table.caption.105}%
+\contentsline {table}{\numberline {7.2}{\ignorespaces Parámetros de reproducibilidad de la validación SUMO.\relax }}{131}{table.caption.106}%
+\contentsline {table}{\numberline {7.3}{\ignorespaces Comparación del control fijo (A) y el control difuso adaptativo (B) en el escenario Lima-Centro (media $\pm $ desviación, 3 semillas).\relax }}{134}{table.caption.110}%
+\contentsline {table}{\numberline {7.4}{\ignorespaces Desempeño por réplica (semilla): ICV, demora media y throughput en control fijo (A) y difuso (B).\relax }}{135}{table.caption.111}%
+\contentsline {table}{\numberline {7.5}{\ignorespaces Comportamiento del sistema ante fallas y modo degradado.\relax }}{136}{table.caption.112}%
+\contentsline {table}{\numberline {7.6}{\ignorespaces Matriz de cumplimiento de requerimientos del sistema.\relax }}{137}{table.caption.113}%
+\contentsline {table}{\numberline {7.7}{\ignorespaces CAPEX por intersección, agrupado por rubro.\relax }}{139}{table.caption.114}%
+\contentsline {table}{\numberline {7.8}{\ignorespaces OPEX anual por intersección.\relax }}{140}{table.caption.115}%

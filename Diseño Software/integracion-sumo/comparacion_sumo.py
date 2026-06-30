@@ -13,6 +13,7 @@ Devuelve dos listas de MetricasRed listas para SistemaComparacion.
 """
 
 import sys
+import logging
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import List, Tuple
@@ -25,6 +26,9 @@ if str(_RAIZ) not in sys.path:
 from nucleo.metricas_red import MetricasRed
 from nucleo.indice_congestion import CalculadorICV, ParametrosInterseccion
 from nucleo.controlador_difuso_capitulo6 import ControladorDifusoCapitulo6
+from nucleo.seguridad_semaforica import LIMITES as _LIMITES_SEG
+
+logger = logging.getLogger(__name__)
 
 # Conexión SUMO (libsumo si está disponible)
 _INTEG = Path(__file__).parent
@@ -257,6 +261,17 @@ def _redistribuir_verde(info: dict, calc_icv: CalculadorICV,
             s2 = sum(nuevos)
             if s2 > 0:
                 nuevos = [presupuesto * x / s2 for x in nuevos]
+
+            # ── Guardia de SEGURIDAD FUNCIONAL (autoridad central) ──
+            # El módulo adaptativo NUNCA puede salir de los límites duros, pase
+            # lo que pase con el reparto. Solo se registra si hubo que corregir.
+            nuevos_seg = []
+            for x in nuevos:
+                xs = max(_LIMITES_SEG.T_VERDE_MIN, min(float(x), _LIMITES_SEG.T_VERDE_MAX))
+                if abs(xs - x) > 1e-6:
+                    logger.warning(f"[SEGURIDAD] verde {x:.1f}s acotado a {xs:.1f}s (límite duro)")
+                nuevos_seg.append(xs)
+            nuevos = nuevos_seg
 
             logic = data['logic']
             # Conservar la fase en curso para no reiniciar el ciclo

@@ -147,7 +147,162 @@
 <body>
     <!-- Partículas de fondo -->
     <div id="particles-js"></div>
-    
+
+    <!-- ===================== Ciberseguridad ===================== -->
+    <style>
+        #auth-overlay { position: fixed; inset: 0; z-index: 100000;
+            background: linear-gradient(135deg,#0f172a,#1e3a8a);
+            display: flex; align-items: center; justify-content: center; }
+        #auth-overlay .auth-card { background:#fff; border-radius:16px; padding:30px 34px;
+            width:370px; max-width:90vw; box-shadow:0 20px 60px rgba(0,0,0,.45);
+            font-family:Arial,Helvetica,sans-serif; }
+        #auth-overlay h2 { margin:0 0 4px; color:#0f172a; font-size:21px; }
+        #auth-overlay p.sub { margin:0 0 18px; color:#64748b; font-size:13px; }
+        #auth-overlay label { display:block; font-size:12px; color:#334155; margin:10px 0 4px; font-weight:600; }
+        #auth-overlay input { width:100%; padding:10px 12px; border:1px solid #cbd5e1;
+            border-radius:8px; font-size:14px; box-sizing:border-box; }
+        #auth-overlay .login-btn { width:100%; margin-top:18px; padding:11px; background:#2563eb;
+            color:#fff; border:0; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; }
+        #auth-overlay .login-btn:hover { background:#1d4ed8; }
+        #auth-error { color:#dc2626; font-size:13px; margin-top:12px; min-height:18px; }
+        #auth-hint { margin-top:16px; font-size:11px; color:#94a3b8; line-height:1.7;
+            border-top:1px solid #e2e8f0; padding-top:12px; }
+        .auth-badge { display:flex; align-items:center; gap:8px; margin-left:10px; }
+        .auth-badge #auth-user-label { color:#e2e8f0; font-size:12px; font-weight:600; }
+        .auth-badge .rol-chip { background:#1e293b; color:#fff; border-radius:6px; padding:2px 8px;
+            font-size:10px; text-transform:uppercase; letter-spacing:.5px; }
+        .auth-btn { background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.25);
+            border-radius:8px; padding:6px 10px; font-size:12px; cursor:pointer; display:inline-flex;
+            align-items:center; gap:5px; }
+        .auth-btn:hover { background:rgba(255,255,255,.22); }
+        #audit-modal { position:fixed; inset:0; z-index:99999; background:rgba(15,23,42,.65);
+            display:none; align-items:center; justify-content:center; }
+        #audit-modal .audit-card { background:#fff; border-radius:14px; width:860px; max-width:94vw;
+            max-height:82vh; overflow:hidden; display:flex; flex-direction:column;
+            font-family:Arial,Helvetica,sans-serif; }
+        #audit-modal .audit-head { padding:15px 20px; background:#0f172a; color:#fff;
+            display:flex; justify-content:space-between; align-items:center; font-weight:600; }
+        #audit-modal table { width:100%; border-collapse:collapse; font-size:12px; }
+        #audit-modal th, #audit-modal td { padding:8px 10px; border-bottom:1px solid #e2e8f0;
+            text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #audit-modal thead th { background:#f1f5f9; color:#334155; }
+        #audit-modal tbody { display:block; overflow-y:auto; max-height:62vh; }
+        #audit-modal thead, #audit-modal tbody tr { display:table; width:100%; table-layout:fixed; }
+        .res-ACEPTADO { color:#16a34a; font-weight:700; }
+        .res-RECHAZADO { color:#dc2626; font-weight:700; }
+    </style>
+
+    <!-- Overlay de inicio de sesión -->
+    <div id="auth-overlay">
+        <form class="auth-card" id="auth-form" autocomplete="on">
+            <h2>🔐 Acceso al Sistema</h2>
+            <p class="sub">Control Semafórico Adaptativo Inteligente — PUCP</p>
+            <label for="auth-user">Usuario</label>
+            <input id="auth-user" autocomplete="username" autofocus>
+            <label for="auth-pass">Contraseña</label>
+            <input id="auth-pass" type="password" autocomplete="current-password">
+            <button type="submit" class="login-btn" id="auth-login-btn">Ingresar</button>
+            <div id="auth-error"></div>
+            <div id="auth-hint">
+                Roles de demostración:<br>
+                • <b>operador</b> / operador123 — solo monitoreo (lectura)<br>
+                • <b>tecnico</b> / tecnico123 — ajusta parámetros y emergencias<br>
+                • <b>admin</b> / admin123 — gestión total
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal de bitácora de auditoría -->
+    <div id="audit-modal">
+        <div class="audit-card">
+            <div class="audit-head">
+                <span>🛡️ Bitácora de Auditoría — eventos de seguridad</span>
+                <button class="auth-btn" onclick="cerrarAuditoria()">✕ Cerrar</button>
+            </div>
+            <table>
+                <thead><tr>
+                    <th style="width:150px;">Fecha (UTC)</th>
+                    <th style="width:90px;">Usuario</th>
+                    <th style="width:70px;">Rol</th>
+                    <th style="width:160px;">Acción</th>
+                    <th style="width:95px;">Resultado</th>
+                    <th>Motivo</th>
+                </tr></thead>
+                <tbody id="audit-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============ Trazabilidad y Seguridad (Fase C) ============ -->
+    <style>
+        #data-source-banner { position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+            z-index: 900; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            font-family: Arial,Helvetica,sans-serif; box-shadow: 0 4px 14px rgba(0,0,0,.2); pointer-events: none; }
+        #data-source-banner.ds-real { background:#dcfce7; color:#166534; border:1px solid #86efac; }
+        #data-source-banner.ds-sim  { background:#fef9c3; color:#854d0e; border:1px solid #fde047; }
+        #data-source-banner.ds-off  { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+        .cs-modal { position:fixed; inset:0; z-index:99998; background:rgba(15,23,42,.6);
+            display:none; align-items:center; justify-content:center; font-family:Arial,Helvetica,sans-serif; }
+        .cs-modal .cs-card { background:#fff; border-radius:14px; width:680px; max-width:94vw; max-height:86vh;
+            overflow:hidden; display:flex; flex-direction:column; }
+        .cs-modal .cs-head { padding:15px 20px; background:#0f172a; color:#fff; display:flex;
+            justify-content:space-between; align-items:center; font-weight:600; }
+        .cs-modal .cs-body { padding:18px 20px; overflow-y:auto; }
+        .cs-inputs { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:14px;
+            background:#f8fafc; padding:12px; border-radius:10px; }
+        .cs-inputs label { font-size:11px; color:#475569; display:block; font-weight:600; margin-bottom:3px; }
+        .cs-inputs input[type=number], .cs-inputs input[type=text] { width:80px; padding:6px 8px;
+            border:1px solid #cbd5e1; border-radius:6px; font-size:13px; }
+        .cs-inputs button { padding:8px 14px; background:#2563eb; color:#fff; border:0; border-radius:7px;
+            font-weight:600; cursor:pointer; }
+        .traza-chain { display:flex; flex-direction:column; gap:2px; }
+        .traza-step { background:#f1f5f9; border-radius:9px; padding:10px 14px; font-size:13px; color:#1e293b; }
+        .traza-step.traza-final { background:#eff6ff; border:1px solid #bfdbfe; }
+        .traza-tag { display:inline-block; font-size:10px; text-transform:uppercase; letter-spacing:.5px;
+            color:#2563eb; font-weight:700; margin-bottom:4px; }
+        .traza-arrow { text-align:center; color:#94a3b8; font-size:11px; }
+        .traza-reglas { margin:6px 0 0; padding-left:18px; }
+        .traza-reglas li { margin:3px 0; }
+        .traza-fuente { font-size:11px; color:#64748b; margin-top:5px; }
+        .traza-seguro { background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:6px; font-size:11px; margin-left:8px; }
+        .seg-caso { display:flex; gap:12px; align-items:flex-start; padding:11px; border-bottom:1px solid #eef2f7; }
+        .seg-ic { font-size:20px; }
+    </style>
+
+    <div id="data-source-banner" class="ds-off">verificando fuente de datos…</div>
+
+    <!-- Modal de trazabilidad de la decisión -->
+    <div id="traza-modal" class="cs-modal">
+        <div class="cs-card">
+            <div class="cs-head">
+                <span>🔎 Trazabilidad de la decisión — Entrada → ICV → Reglas → Verde</span>
+                <button class="auth-btn" onclick="cerrarTrazabilidad()">✕ Cerrar</button>
+            </div>
+            <div class="cs-body">
+                <div class="cs-inputs">
+                    <div><label>Intersección</label><input type="text" id="traza-id" value="INT-001"></div>
+                    <div><label>Cola (m)</label><input type="number" id="traza-cola" value="28"></div>
+                    <div><label>Velocidad (km/h)</label><input type="number" id="traza-vel" value="12"></div>
+                    <div><label>Flujo (veh/min)</label><input type="number" id="traza-flujo" value="22"></div>
+                    <div><label>Emergencia</label><input type="checkbox" id="traza-ev"></div>
+                    <button onclick="recalcularTraza()">Recalcular</button>
+                </div>
+                <div id="traza-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de seguridad funcional -->
+    <div id="seg-modal" class="cs-modal">
+        <div class="cs-card">
+            <div class="cs-head">
+                <span>🛡️ Seguridad funcional — la autoridad final del controlador</span>
+                <button class="auth-btn" onclick="cerrarSeguridad()">✕ Cerrar</button>
+            </div>
+            <div class="cs-body"><div id="seg-result"></div></div>
+        </div>
+    </div>
+
     <!-- Botón para activar modo coordenadas (oculto) -->
     <button class="toggle-coord-btn" id="toggleCoordMode" onclick="toggleCoordMode()" style="display: none;">
         📍 Obtener Coordenadas
@@ -209,6 +364,14 @@
             <button id="btn-emergencia" class="btn-emergency">
                 <i class="fas fa-ambulance"></i> Emergencia
             </button>
+            <button class="auth-btn" id="btn-trazabilidad" onclick="abrirTrazabilidad()" title="Trazabilidad de la decisión">🔎 Trazabilidad</button>
+            <button class="auth-btn" id="btn-seguridad" onclick="abrirSeguridadDemo()" title="Seguridad funcional">🛡️ Seguridad</button>
+            <div class="auth-badge">
+                <span id="auth-user-label">—</span>
+                <span class="rol-chip" id="auth-rol-chip">—</span>
+                <button class="auth-btn" id="btn-auditoria" onclick="abrirAuditoria()" title="Bitácora de auditoría" style="display:none;">🛡️ Auditoría</button>
+                <button class="auth-btn" id="btn-logout" onclick="cerrarSesion()" title="Cerrar sesión">⏻ Salir</button>
+            </div>
         </div>
     </header>
 
@@ -574,6 +737,9 @@
     </div>
 
     <!-- Scripts -->
+    <!-- Ciberseguridad: debe cargar primero para interceptar fetch con el token -->
+    <script src="auth.js?v=1"></script>
+    <script src="trazabilidad.js?v=1"></script>
     <script src="libs/chart/chart.umd.min.js?v=3"></script>
     <script src="libs/leaflet/leaflet.js?v=3"></script>
     <script src="libs/particles/particles.min.js?v=3"></script>

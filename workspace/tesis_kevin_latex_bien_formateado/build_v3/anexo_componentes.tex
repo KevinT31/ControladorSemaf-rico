@@ -1,0 +1,1414 @@
+\section*{C.1\quad Sensores}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.1. Comparativa de sensores de temperatura}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1641}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2352}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3003}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3003}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Criterio}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{DS18B20}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{DHT22}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{LM35}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Tipo de salida
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Digital (OneWire)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Digital (protocolo propietario)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analógica
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Rango de temperatura
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+-55°C a +125°C
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+-40°C a +80°C
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+-55°C a +150°C
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Precisión
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\ensuremath{\pm}0.5°C (-10°C a +85°C)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\ensuremath{\pm}0.5°C (15°C a 25°C), \ensuremath{\pm}2°C (fuera del rango)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\ensuremath{\pm}0.5°C (a 25°C)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.2. Especificaciones técnicas del Sensor DS18B20}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3005}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6995}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Característica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Descripción}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Función}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Medición digital de temperatura de 9-bit a 12-bit en Celsius
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Protocolo comunicación}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1-Wire bus
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Rango de temperatura}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+-55°C to +125°C (-67°F to +257°F)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Precisión}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\ensuremath{\pm}5°C (de -10°C a +85°C)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.3. Comparativa de sensores de corriente}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2190}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1796}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3007}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3007}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Criterio}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{WCS1600 (Efecto Hall)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Sensor Shunt (ACS712)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Transformador de Corriente (CT)}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Principio de funcionamiento
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Efecto Hall
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Resistencia shunt + Hall
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Inducción magnética
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Rango de medición
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\ensuremath{\pm}100A DC, 70A RMS AC
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\ensuremath{\pm}5A, \ensuremath{\pm}20A, \ensuremath{\pm}30A
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0-100A AC
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Salida
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analógica (0.3-4.7V)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analógica (0-5V)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analógica (AC)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.4. Especificaciones técnicas del Sensor WCS1600}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3845}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6155}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Característica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Descripción}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Función}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Medición de corriente DC o AC utilizando el efecto Hall
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Rango de medición}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\ensuremath{\pm}100A (DC), 70A RMS(AC)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Temperatura de funcionamiento}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+-20°C \textasciitilde{} 125°C
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Diámetro máximo del conductor}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+9mm
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.5. Comparativa de sensores de presencia}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1908}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1899}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2628}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3565}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Criterio}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{URM06 (Ultrasónico)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{HC-SR04 (Ultrasónico)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Sensor Infrarrojo (PIR/IR)}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Principio de funcionamiento
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ultrasonido 40kHz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ultrasonido 40kHz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Detección infrarroja
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Rango de detección
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+20cm a 10m
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+2cm a 4m
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+3m a 7m (típico)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Ángulo del haz
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+15° (haz estrecho)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+30° (haz amplio)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+110° (amplio)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.6. Especificaciones técnicas del Sensor URM06}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3073}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6927}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Característica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Descripción}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Función}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Detección ultrasónica de presencia/distancia de corto a largo alcance
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tipo}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sensor ultrasónico de haz estrecho
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Rango de detección}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+20cm \textasciitilde{} 10m (1000cm)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.7. Comparativa de sensores de presencia}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1991}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2301}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2177}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1696}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1836}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Criterio}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{DS-2CE57H0T-VPITF (Domo)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cámara PTZ Motorizada}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cámara IP Estándar}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cámara Bullet}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Tipo de montaje
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Domo fijo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+PTZ (Pan-Tilt-Zoom)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fija
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fija cilíndrica
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Frame rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+20 fps
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+25-30 fps
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+25-30 fps
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+25-30 fps
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Visión nocturna
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EXIR 2.0 (20m)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+IR estándar (30m)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Varía
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+IR estándar (20-30m)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Protección ambiental
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+IP67 + IK10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+IP66 + IK10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+IP65 (típica)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+IP66
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Resistencia vandalismo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Excelente (IK10)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Buena
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Limitada
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Moderada
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Consumo energía
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+4W
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+15-30W
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+5-8W
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+4-6W
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.8. Especificaciones técnicas del DS-2CE57H0T-VPITF}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3065}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6935}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Característica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Descripción}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Función}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Videovigilancia domo fijo de 5 MP con visión nocturna
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Resolución máxima}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+2560 (H) \ensuremath{\times} 1944 (V)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Frame rate}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+20 fps
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Protección}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Resistente al agua y polvo (IP67) y prueba de vandalismo (IK10)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\section*{C.2\quad Actuadores y drivers}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.9. Comparativa de actuadores para movilización de cámara}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2102}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2603}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3321}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1973}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Criterio}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Motor Paso a Paso}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Motor DC con Encoders}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Servomotor}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Control de posición
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Lazo abierto (sin retroalimentación)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Lazo cerrado (requiere encoders)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Lazo cerrado (interno)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Precisión angular
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.8° por paso (200 pasos/rev)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Depende del encoder
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.1-0.5° (típico)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Mantenimiento de posición
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Excelente sin energía adicional
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Requiere consumo continuo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Requiere señal PWM continua
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.10. Especificaciones técnicas del Motor PaP Stepper Nema 23}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3162}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6838}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Característica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Descripción}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente nominal por fase}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+4.2A
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Torque máximo detenido}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+18.4 kg.cm (1.8 N.m)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Diámetro del eje}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+8 mm (Eje tipo D)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Largo del eje}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+21 mm
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Perfil NEMA 23}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+56*56 mm
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Agujeros para montaje}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+4*D5.2 mm pasante
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.11. Driver DM542T - Especificaciones Técnicas}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3309}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6691}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Característica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Descripción}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Voltaje de entrada}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+18V - 50V DC
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente de salida}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.0A - 4.5A
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente máxima RMS}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+3.2A
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Resolución de micropasos}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+15 opciones: desde 400 hasta 25,600 pasos/revolución
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Temperatura de operación}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+-10°C a +45°C
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.12. Conexiones Físicas y Configuración}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3251}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6749}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Parámetro}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Especificación}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Conexión física}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+GPIO 40 pines + Header apilable incluido
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Alimentación}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+5V vía GPIO o USB-C externo (hasta 27W)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Comunicación con RPi 5}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+USB 2.0
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Control GPIO}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+RST (GPIO 29), PWR (GPIO 31), RX/TX configurable
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Ranura SIM}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nano SIM 3V/1.8V
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Antenas}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+2x LTE + 1x GPS (conectores IPEX-1)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\section*{C.3\quad Alimentación y protecciones}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.16. Especificaciones técnicas SMPS}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3919}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6081}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Característica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Especificación}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Salida de Voltaje}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+12 VDC
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente de salida}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+8 A
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Potencia máxima}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+96 W
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Entrada de Voltaje}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+24 VDC
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Eficiencia típica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+88.2 \%
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Protecciones}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cortocircuitos, sobrecarga, sobretensión
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Dimensiones}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+32 x 124 x 102 mm
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Peso}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+425 g
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.17. Especificaciones técnicas SMPS}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3919}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6081}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Característica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Especificación}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Salida de Voltaje}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+5 VDC
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente de salida}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+10 A
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Potencia máxima}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+50 W
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Entrada de Voltaje}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+24 VDC
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Eficiencia típica}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+81,5\%
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Protecciones}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cortocircuitos, sobrecarga, sobretensión
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Peso}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+425 g
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.18. Especificaciones técnicas SMPS}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3919}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6081}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Parámetro}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Especificación}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Modelo}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+S-360-24
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Potencia nominal}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+360W
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Voltaje entrada}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+220V AC, 60Hz
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Voltaje salida principal}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+24V DC
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente máxima}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+15A
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Eficiencia}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textgreater85\%
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Regulación de línea}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\ensuremath{\pm}0.5\%
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Regulación de carga}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\ensuremath{\pm}1\%
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Temperatura operativa}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+-10°C a +50°C
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Dimensiones}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+215 \ensuremath{\times} 115 \ensuremath{\times} 51 mm
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.19. Especificaciones del UPS}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3796}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6204}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Parámetro}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Especificación}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Potencia nominal}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1500VA / 1000W
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Voltaje entrada}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+160-286V AC
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Voltaje salida}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+230V AC \ensuremath{\pm} 3\%
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Frecuencia}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+50/60 Hz \ensuremath{\pm} 3Hz
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Forma de onda}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Senoidal pura
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Baterías}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+2 \ensuremath{\times} 12V 12Ah AGM
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Protecciones}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sobrecarga, cortocircuito, sobretensión
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.20. Especificaciones del Breaker}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5335}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4665}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Parámetro}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Especificación}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente nominal}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+6A
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Curva de disparo}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tipo C (5-10\ensuremath{\times}In)
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Capacidad de ruptura}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+6kA a 230/400V AC
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Polos}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1 polo
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.21. Especificaciones del DPS}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5948}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4052}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Parámetro}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Especificación}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Voltaje nominal}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{230V AC}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente de descarga}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{10kA (8/20\ensuremath{\mu}s)}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Nivel de protección}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{\ensuremath{\leq} 1.5kV}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tiempo de respuesta}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{\textless{} 100ns}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente de fuga}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{\textless{} 10\ensuremath{\mu}A}
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-4.22. Especificaciones del RCD}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3997}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6003}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Parámetro}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Especificación}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Corriente nominal}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{25A}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Sensibilidad}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{30mA}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tipo}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{AC (corrientes alternas sinusoidales)}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Tiempo de disparo}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{\ensuremath{\leq} 30ms a 5\ensuremath{\times}I\ensuremath{\Delta}n}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Voltaje nominal}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{230V AC}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Capacidad de ruptura}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{6kA}
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}
+
+\Needspace{6\baselineskip}
+\captionof*{table}{\small\bfseries Tabla C-5.1. Masa de Componentes (Kg)}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4493}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1963}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1348}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2196}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{COMPONENTE}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{MASA (kg)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{\%TOTAL}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{UBICACIÓN}
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ESTRUCTURA PRINCIPAL}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Gabinete (Aluminio 5052-H32, 6mm)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+21.976
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+46.4\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Estructura externa
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Rack y estructura interna (perfiles 30\ensuremath{\times}30mm)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+5.700
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+12.0\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Soporte interno
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Aro/riel de giro (Aluminio 5052-H32)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+7.800
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+16.5\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sistema visión base
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Protector circular plano (Policarbonato, Ø420\ensuremath{\times}6mm)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.000
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+2.1\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Base sistema visión
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Subtotal estructura}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{36.476}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{77.0\%}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{SISTEMA DE MOVIMIENTO}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Motor PAP NEMA 23
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.500
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+3.2\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Actuador principal
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Biela (Aluminio 5052-H32)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.142
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.3\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Transmisión
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Conector cámara-biela
+
+(Aluminio 5052-H32)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.857
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.8\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Acoplamiento
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Rodamiento rígido de bolas Ø120mm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.000
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+2.1\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Aro giratorio
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Subtotal sistema movimiento}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{3.499}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{7.4\%}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{COMPONENTES ELECTRÓNICOS POTENCIA}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+UPS (500VA, baterías VRLA)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+3.500
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+7.4\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel superior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+SMPS S-360-24 (360W)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.200
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+2.5\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel superior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Driver DM542T
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.350
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.7\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel inferior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Subtotal electrónica potencia}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{5.050}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{10.7\%}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{COMPONENTES ELECTRÓNICOS CONTROL}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+PCB Controlador (incluye base PCB)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.050
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.1\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel inferior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Raspberry Pi 5 (montado en PCB)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.075
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.2\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel inferior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+HAT 4G LTE Quectel EG25-G (montado)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.050
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.1\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel inferior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+PCB de distribución de voltaje
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.300
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.6\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel inferior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Subtotal electrónica control}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{0.475}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{1.0\%}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{PROTECCIÓN ELÉCTRICA}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Breaker C60N-C6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.100
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.2\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel superior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+RCD ID K 25A/30mA
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.150
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.3\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel superior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+DPS VAL-MS 230
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.080
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.2\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel superior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Conversor DC-DC 5V (LM2596)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.040
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.1\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel superior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Conversor DC-DC 12V (LM2596)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.040
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.1\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nivel superior rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Subtotal protección}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{0.410}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{0.9\%}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{SENSORES}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+WCS1600 (sensor corriente)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.015
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.03\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+URM06 (sensor ultrasónico RS485)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.025
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.05\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+DS18B20 (sensor temperatura con sonda)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.020
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.04\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Rack
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Subtotal sensores}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{0.060}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{0.13\%}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{SISTEMA DE VISIÓN}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Cámara domo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.600
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.3\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Montaje móvil
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Soporte de cámara (metálico)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.050
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.1\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Acoplamiento
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Subtotal visión}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{0.650}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{1.4\%}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{ACCESORIOS Y FIJACIÓN}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Cableado (potencia, señal, datos)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.400
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.8\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Distribuido
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Antenas y conectores externos
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.300
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.6\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Externos
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Ventilador 120\ensuremath{\times}120mm (24V, 12W)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.200
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.4\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Superior gabinete
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Tornillería M24 (8 unid, conexión estructural)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.440
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+3.0\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Gabinete-soporte
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Tornillería M12 (30 unid, montaje rack)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1.050
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+2.2\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Rack/componentes
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Tornillería M3 (8 unid, fijación PCBs)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.016
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+0.03\%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+PCBs
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Subtotal accesorios}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{3.406}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{7.2\%}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{MASA TOTAL DEL SISTEMA}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{47.126 kg}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{100.0\%}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}

@@ -1,0 +1,291 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% ==================== Idioma, tipografía y página ====================
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{lmodern}
+\else
+  \usepackage{fontspec}
+  \IfFontExistsTF{Liberation Serif}{\setmainfont{Liberation Serif}}{\setmainfont{Times New Roman}}
+  \IfFontExistsTF{Liberation Sans}{\setsansfont{Liberation Sans}}{\setsansfont{Arial}}
+  \IfFontExistsTF{Liberation Mono}{\setmonofont{Liberation Mono}}{\setmonofont{Courier New}}
+\fi
+\usepackage[spanish,es-nodecimaldot,es-tabla,es-noquoting]{babel}
+\usepackage{microtype}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage[a4paper,left=3.0cm,right=2.5cm,top=2.7cm,bottom=2.7cm,headheight=15pt]{geometry}
+\usepackage{ragged2e}
+\justifying
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0.25em}
+\emergencystretch=3em
+
+% ==================== Matemática y símbolos ====================
+\usepackage{amsmath,amssymb}
+\usepackage{textcomp}
+
+% ==================== Tablas ====================
+\usepackage{longtable,booktabs,array,multirow,makecell,tabularx,calc}
+\usepackage{pdflscape}
+\usepackage{etoolbox}
+\usepackage{colortbl}
+\renewcommand{\arraystretch}{1.18}
+\setlength{\tabcolsep}{4pt}
+\AtBeginEnvironment{longtable}{\footnotesize\setlength{\LTleft}{0pt}\setlength{\LTright}{0pt}}
+\AtEndEnvironment{longtable}{\normalsize}
+
+% ==================== Figuras, flotantes y captions ====================
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{font=small,labelfont=bf,justification=centering,singlelinecheck=false,skip=6pt}
+\captionsetup[table]{position=above}
+\usepackage{placeins}
+\usepackage{needspace}
+\setlength{\intextsep}{12pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{14pt plus 2pt minus 2pt}
+\makeatletter
+\def\fps@figure{H}
+\def\fps@table{H}
+\makeatother
+
+% ==================== Listas ====================
+\usepackage{enumitem}
+\setlist[itemize]{topsep=3pt,itemsep=2pt,leftmargin=1.2cm}
+\setlist[enumerate]{topsep=3pt,itemsep=2pt,leftmargin=1.2cm}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% ==================== Encabezados, títulos e índices ====================
+\usepackage{xcolor}
+\usepackage{soul}
+\definecolor{PUCPBlue}{HTML}{0B2B5C}
+\definecolor{PUCPGray}{HTML}{4A4A4A}
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\centering\color{PUCPBlue}}
+  {\Large CAPÍTULO \thechapter}{0.5em}{\LARGE}
+\titlespacing*{\chapter}{0pt}{-0.2cm}{1.0cm}
+\titleformat{name=\chapter,numberless}[display]
+  {\normalfont\bfseries\centering\color{PUCPBlue}}{}{0pt}{\LARGE}
+\titleformat{\section}{\normalfont\Large\bfseries\color{PUCPBlue}}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries\color{PUCPGray}}{\thesubsection}{0.8em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{0.8em}{}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+% Numeración de figuras, tablas y ecuaciones POR CAPÍTULO (X.Y)
+\numberwithin{figure}{chapter}
+\numberwithin{table}{chapter}
+\numberwithin{equation}{chapter}
+
+% Títulos de los índices (estilo PUCP)
+\addto\captionsspanish{%
+  \renewcommand{\contentsname}{ÍNDICE DE CONTENIDO}%
+  \renewcommand{\listfigurename}{ÍNDICE DE FIGURAS}%
+  \renewcommand{\listtablename}{ÍNDICE DE TABLAS}%
+}
+
+\usepackage{tocloft}
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\setlength{\cftbeforechapskip}{5pt}
+% Encabezado "CAPÍTULO N" dentro de los índices de figuras y tablas (estilo referencia)
+\newcommand{\listasdecapitulo}[1]{%
+  \addtocontents{lof}{\protect\addvspace{10pt}\protect\noindent{\bfseries CAPÍTULO #1}\protect\par}%
+  \addtocontents{lot}{\protect\addvspace{10pt}\protect\noindent{\bfseries CAPÍTULO #1}\protect\par}%
+}
+% Nota de fuente bajo figuras/tablas (alternativa al paréntesis en el caption)
+\newcommand{\fuente}[1]{\par\vspace{-2pt}{\footnotesize\itshape Fuente: #1\par}}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ==================== Hipervínculos ====================
+\usepackage{xurl}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\hypersetup{
+  pdflang={es},colorlinks=true,linkcolor=PUCPBlue,citecolor=PUCPBlue,urlcolor=PUCPBlue,
+  pdfauthor={Kevin André Tumbalobos Gamboa},
+  pdftitle={Diseño de un módulo IoT mecatrónico complementario para control semafórico adaptativo}
+}
+\urlstyle{same}
+
+% ==================== Compatibilidad ====================
+\providecommand{\texorpdfstring}[2]{#1}
+\providecommand{\ul}[1]{\underline{#1}}
+\providecommand{\real}[1]{#1}
+
+% babel-spanish redefine \% con un espacio fino que usa operaciones de glue y
+% rompe dentro de modo matemático ("Incompatible glue units"). Se reemplaza por un
+% signo de porcentaje simple y seguro en ambos modos (texto y matemático).
+\AtBeginDocument{%
+  \DeclareRobustCommand{\%}{\ifmmode\text{\char37\relax}\else\char37\relax\fi}%
+}
+
+\begin{document}
+
+% ======================================================================
+%                           PORTADA
+% ======================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+\vspace*{0.4cm}
+{\Large\bfseries PONTIFICIA UNIVERSIDAD CATÓLICA DEL PERÚ\par}
+\vspace{0.25cm}
+{\Large\bfseries FACULTAD DE CIENCIAS E INGENIERÍA\par}
+\vspace{0.8cm}
+\includegraphics[width=0.30\linewidth,keepaspectratio]{media/image155.png}\par
+\vspace{1.0cm}
+{\large\bfseries\setlength{\baselineskip}{1.2\baselineskip}
+DISEÑO DE UN MÓDULO IoT MECATRÓNICO COMPLEMENTARIO PARA EL CONTROL SEMAFÓRICO ADAPTATIVO CON COMUNICACIÓN SEGURA EN LA NUBE\par}
+\vspace{0.9cm}
+{\large\bfseries Tesis para obtener el título profesional de Ingeniero Mecatrónico\par}
+\vspace{0.9cm}
+{\large AUTOR:\par}
+\vspace{0.10cm}
+{\large Kevin André Tumbalobos Gamboa\par}
+\vspace{0.6cm}
+{\large ASESOR:\par}
+\vspace{0.10cm}
+{\large Dr. Gustavo Pérez Zúñiga\par}
+\vfill
+{\large Lima, Diciembre, 2025\par}
+\end{center}
+\end{titlepage}
+
+\pagestyle{empty}
+
+% ======================================================================
+%                       INFORME DE SIMILITUD
+% ======================================================================
+\chapter*{}
+\thispagestyle{empty}
+\begin{center}{\large\bfseries Informe de Similitud}\end{center}
+\vspace{0.5cm}
+\noindent Yo, Gustavo Pérez Zúñiga, docente de la Facultad de Ciencias e Ingeniería de la Pontificia
+Universidad Católica del Perú, asesor de la tesis titulada \textit{«Diseño de un módulo IoT mecatrónico
+complementario para el control semafórico adaptativo con comunicación segura en la nube»}, del autor
+Kevin André Tumbalobos Gamboa, dejo constancia de lo siguiente:
+
+\begin{itemize}
+\item El mencionado documento tiene un índice de puntuación de similitud de \rule{1.2cm}{0.4pt}\%. Así lo
+consigna el reporte de similitud emitido por el software Turnitin.
+\item He revisado con detalle dicho reporte y la tesis, y no se advierten indicios de plagio.
+\item Las citas a otros autores y sus respectivas referencias cumplen con las pautas académicas vigentes.
+\end{itemize}
+
+\vspace{0.8cm}
+\noindent Lugar y fecha: Lima, \rule{4cm}{0.4pt}\\[0.6cm]
+\noindent Apellidos y nombres del asesor: Pérez Zúñiga, Gustavo\\[0.4cm]
+\noindent DNI: \rule{3cm}{0.4pt} \hfill Firma: \rule{4cm}{0.4pt}\\[0.4cm]
+\noindent ORCID: \rule{5cm}{0.4pt}
+
+% ======================================================================
+%                          DEDICATORIA
+% ======================================================================
+\chapter*{}
+\thispagestyle{empty}
+\vspace*{4cm}
+\begin{flushright}
+\begin{minipage}{0.62\linewidth}
+\itshape
+A mis padres, por su apoyo incondicional y por impulsarme a seguir adelante en cada etapa.
+A mis amigos y compañeros de la facultad, por los momentos compartidos a lo largo de esta experiencia.
+Y a mi asesor, por su orientación y disposición constante durante el desarrollo de este trabajo.
+\end{minipage}
+\end{flushright}
+
+% ======================================================================
+%                            RESUMEN
+% ======================================================================
+\clearpage
+\pagestyle{fancy}
+\pagenumbering{roman}
+\chapter*{RESUMEN}\addcontentsline{toc}{chapter}{RESUMEN}\label{resumen}
+
+La congestión vehicular en Lima Metropolitana evidencia una limitación de ingeniería en las intersecciones
+que operan con planes semafóricos fijos o con capacidad reducida de adaptación: los tiempos de fase no
+responden oportunamente a variaciones direccionales de demanda, incidentes ni formación de colas. La
+dependencia exclusiva de una central remota tampoco resulta conveniente para decisiones de baja latencia,
+debido a la disponibilidad variable de las comunicaciones y al riesgo de introducir un punto único de
+falla. En este contexto, la conexión de sensores y plataformas de supervisión amplía la superficie de
+ataque y obliga a considerar la ciberseguridad desde la definición de la arquitectura.
+
+La presente tesis diseña y establece un procedimiento de validación en entorno simulado para un módulo IoT
+mecatrónico complementario al controlador semafórico existente. El módulo integra una cámara para estimar
+variables de tráfico, procesamiento local en el borde, el cálculo de un índice de congestión vehicular
+(ICV), un controlador difuso de tipo Mamdani que genera parámetros de fase recomendados, comunicación
+segura con una plataforma en la nube y medidas de protección de la información. El controlador semafórico
+existente conserva la autoridad final sobre luces, enclavamientos, fases incompatibles, tiempos de despeje
+y modos seguros; por tanto, la propuesta no sustituye un controlador certificado ni acciona directamente
+estados críticos.
+
+El desarrollo sigue la metodología VDI 2221 para la clarificación de la tarea, la definición de
+requerimientos, la estructura funcional, la matriz morfológica y la selección técnico-económica; la VDI
+2206 se emplea para integrar los dominios mecánico, electrónico, de control, de comunicaciones y de
+software. La verificación se realiza mediante revisión de diseño, cálculos eléctricos y mecánicos, análisis
+de amenazas y simulaciones reproducibles en SUMO que comparan el control de tiempo fijo con el control
+difuso adaptativo. El módulo difuso, evaluado sobre escenarios de Lima en SUMO, reduce el índice de
+congestión y mejora la velocidad media de la red respecto del plan de tiempo fijo, manteniendo en todo
+momento los límites duros de seguridad sobre los tiempos de verde. El trabajo constituye una base técnica
+trazable para fabricar un prototipo y ejecutar un piloto posterior; no incluye instalación vial, pruebas
+con tráfico real, certificación de seguridad funcional ni auditoría formal de ciberseguridad.
+
+\vspace{0.4cm}
+\noindent\textbf{Palabras clave:} congestión vehicular, sistema semafórico adaptativo, IoT, computación en
+el borde, nube, ciberseguridad, control difuso, visión por computadora, VDI 2221, SUMO.
+
+% ======================================================================
+%                            ÍNDICES
+% ======================================================================
+\cleardoublepage
+\phantomsection
+\renewcommand{\contentsname}{ÍNDICE DE CONTENIDO}
+\tableofcontents
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{ÍNDICE DE TABLAS}
+\listoftables
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{ÍNDICE DE FIGURAS}
+\listoffigures
+
+% ======================================================================
+%                          INTRODUCCIÓN
+% ======================================================================
+\cleardoublepage
+\pagenumbering{arabic}
+\input{build_v3/introduccion}
+
+% ======================================================================
+%                          CAPÍTULOS
+% ======================================================================
+\input{build_v3/cap1_antecedentes}
+\input{build_v3/cap2_estado_arte}
+\input{build_v3/cap3_diseno_conceptual}
+\input{build_v3/cap4_diseno_electronico}
+\input{build_v3/cap5_diseno_mecanico}
+\input{build_v3/cap6_control}
+\input{build_v3/cap7_validacion}
+
+% ======================================================================
+%                    CONCLUSIONES / BIBLIOGRAFÍA / ANEXOS
+% ======================================================================
+\input{build_v3/cierre}
+
+\end{document}

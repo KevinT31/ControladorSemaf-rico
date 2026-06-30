@@ -7,6 +7,8 @@ from .interseccion import InterseccionDB, ConexionInterseccionDB
 from .metrica import MetricaTrafico
 from .ola_verde import OlaVerde
 from .deteccion_video import DeteccionVideo
+from .usuario import UsuarioDB
+from .evento_auditoria import EventoAuditoriaDB
 
 __all__ = [
     'Base',
@@ -18,4 +20,6 @@ __all__ = [
     'MetricaTrafico',
     'OlaVerde',
     'DeteccionVideo',
+    'UsuarioDB',
+    'EventoAuditoriaDB',
 ]

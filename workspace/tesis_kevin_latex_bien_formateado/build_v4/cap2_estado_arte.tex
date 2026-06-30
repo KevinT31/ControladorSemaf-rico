@@ -1,0 +1,486 @@
+\chapter{ESTADO DEL ARTE}\label{cap:estado-arte}
+\listasdecapitulo{2}
+
+El estado del arte se organiza en torno a los cinco subsistemas que estructuran la solución propuesta: el
+sensado y la detección vehicular, el control adaptativo, la arquitectura de cómputo en el borde y la nube
+con sus comunicaciones, la ciberseguridad y confiabilidad, y la validación por simulación. Cada sección
+revisa de forma crítica las tecnologías disponibles, las contrasta en una tabla comparativa y concluye con
+el criterio adoptado para el diseño, de modo que la revisión bibliográfica justifique directamente las
+decisiones que se desarrollan en los capítulos siguientes.
+
+\section{Sensado y detección vehicular}\label{sec:sensado}
+
+Un sistema semafórico inteligente depende de la detección fiable del flujo vehicular y de actuadores
+eficientes para gestionar las señales luminosas. La detección en intersecciones se ha realizado
+tradicionalmente mediante lazos inductivos: un bucle de cable instalado bajo el pavimento que actúa como
+detector magnético, ya que el paso de un vehículo (una masa metálica) altera la inductancia del lazo y
+permite registrar su presencia (Buchanan, 2023). Estos sensores ofrecen alta precisión y respuesta
+inmediata, pero su instalación es invasiva, requiere obras en la calzada y se deteriora con las
+repavimentaciones.
+
+En la última década se han incorporado sensores sobre la superficie para complementar o reemplazar a los
+lazos. Las cámaras de vídeo permiten una detección flexible (múltiples carriles, peatones y clasificación de
+tipos de vehículo) y sirven además para vigilancia de infracciones; su desempeño puede degradarse con
+condiciones climáticas adversas (humedad y polvo, frecuentes en Lima) o iluminación deficiente, y requieren
+algoritmos de visión artificial para interpretar la imagen. Los radares de microondas, instalados sobre el
+semáforo, miden el reflejo de las ondas para detectar vehículos y estimar su velocidad, operan de día y de
+noche y bajo lluvia, pero su costo es elevado. Los magnetómetros inalámbricos detectan los cambios en el
+campo magnético terrestre producidos por los vehículos y, al conectarse en red, facilitan la instalación sin
+cableado y la cobertura modular de varios puntos de la intersección (Gheorghe y Soica, 2025).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth,keepaspectratio]{media/image25.png}
+  \caption{Vista general de un sistema de control de tráfico con detección en la vía.}
+  \label{fig:sistema-trafico}
+  \fuente{Buchanan (2023).}
+\end{figure}
+
+En cuanto a los actuadores, los semáforos modernos emplean tecnología LED, que ofrece mayor eficiencia
+energética (consumos hasta 80--90\,\% menores), una vida útil del orden de 50\,000 horas y mejor visibilidad;
+además, los módulos con diodos redundantes conservan el aspecto visible parcialmente ante la falla de un
+diodo, mejorando la seguridad (Buchanan, 2023). Los controladores de corriente que encienden las luces deben
+cumplir normas que eviten estados peligrosos, y los gabinetes incorporan unidades de monitoreo de
+malfuncionamiento (\emph{Malfunction Management Units}, MMU) que fuerzan al semáforo a un estado seguro de
+intermitencia ámbar cuando detectan una inconsistencia en la secuencia de luces (Buchanan, 2023). A estos
+elementos se suman los dispositivos de demanda peatonal (pulsadores o sensores de presencia) que informan al
+controlador la necesidad de servir la fase peatonal.
+
+\subsection{Métodos de visión por computadora para detección vehicular}
+
+Cuando la fuente de detección es la cámara, la información visual debe procesarse para extraer conteo,
+clasificación, velocidad y longitud de cola. Las técnicas clásicas de sustracción de fondo siguen siendo
+útiles con recursos limitados: el modelo de Mezcla de Gaussianas (MOG2) representa cada píxel como una
+combinación de distribuciones gaussianas que se adaptan a cambios graduales de iluminación, manteniendo
+buena precisión en escenas urbanas controladas (Rodriguez-Canosa et al., 2023). El descriptor HOG
+(\emph{Histogram of Oriented Gradients}) resulta apropiado para la detección de peatones en cruces
+semaforizados, aunque pierde fiabilidad ante oclusiones parciales frecuentes en intersecciones congestionadas
+(Dalal y Triggs, 2020). Los clasificadores Haar Cascade destacan por su eficiencia computacional y permiten
+estimar la velocidad vehicular con bajo error cuando se combinan con seguimiento, a costa de una mayor tasa
+de falsos positivos (Kumar et al., 2024).
+
+El aprendizaje profundo ha desplazado a estas técnicas como referencia para la detección en tiempo real. La
+familia de detectores YOLO (\emph{You Only Look Once}) realiza la detección en una sola pasada de inferencia
+y alcanza precisión elevada con tasas de cuadros adecuadas para aplicaciones de tráfico, lo que la convierte
+en la opción más extendida para conteo y clasificación vehicular sobre vídeo (Liu et al., 2024). La detección
+cuadro a cuadro se complementa con algoritmos de seguimiento que mantienen identidades consistentes a lo
+largo del tiempo; Deep SORT (\emph{Simple Online and Realtime Tracking with Deep Association Metric}) combina
+un filtro de Kalman para predecir la posición con descriptores visuales extraídos por una red neuronal,
+reduciendo de forma marcada los cambios de identidad frente al seguimiento puramente cinemático (Wojke et
+al., 2023). Esta combinación de detección y seguimiento es la que habilita la estimación de flujo, cola y
+velocidad a partir de una única cámara. La selección concreta de la arquitectura de detección y de la
+plataforma de cómputo corresponde al diseño electrónico y se aborda en los capítulos posteriores; aquí
+interesa establecer que la visión por computadora es técnicamente madura para sustituir o complementar a los
+sensores empotrados.
+
+\begin{table}[H]
+  \centering
+  \caption{Comparativa de tecnologías de detección vehicular en intersecciones.}
+  \label{tab:sensado}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.18\linewidth}XX>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Tecnología} & \textbf{Principio} & \textbf{Ventajas} & \textbf{Limitaciones} \\
+    \midrule
+    Lazo inductivo & Variación de inductancia al paso del vehículo & Alta precisión, respuesta inmediata & Instalación invasiva, mantenimiento costoso \\
+    Cámara + visión & Procesamiento de imagen (detección y seguimiento) & Cobertura amplia, clasificación y métricas múltiples por carril & Sensible a clima e iluminación, requiere cómputo dedicado \\
+    Radar de microondas & Reflexión de microondas en el vehículo & Opera de día/noche y con mal clima, mide velocidad & Costo elevado, cobertura focal \\
+    Magnetómetro inalámbrico & Perturbación del campo magnético terrestre & Instalación sencilla, malla flexible & Alcance limitado, vida de batería finita \\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}
+
+\textbf{Criterio adoptado.} La comparación de la Tabla~\ref{tab:sensado} justifica adoptar la cámara con
+visión por computadora como fuente principal de detección: es la única tecnología que provee de forma
+simultánea conteo, clasificación, velocidad y cola con una instalación no invasiva, aprovechable sobre la
+infraestructura existente. Sus limitaciones ante condiciones adversas se mitigan con sensores auxiliares de
+diagnóstico y con un actuado fiable basado en LED y mecanismos de \emph{failsafe} (MMU), de modo que el
+sensado se equilibre entre costo, facilidad de despliegue e interoperabilidad.
+
+\section{Control adaptativo}\label{sec:control}
+
+El controlador de tráfico es la unidad lógica que recibe la información de los sensores y ejecuta la
+temporización de las luces. Las estrategias de control adaptativo se revisan a continuación en orden de
+creciente autonomía y dependencia de datos —control clásico analítico, heurísticas de optimización en línea,
+lógica difusa y aprendizaje por refuerzo—, de modo que la comparación justifique el núcleo de control
+adoptado. Los esquemas convencionales operan con planes de tiempo fijo o con control
+actuado, en el que cada fase se activa ante la demanda detectada y la duración de verde se extiende hasta un
+máximo predefinido mientras persistan vehículos. El método de Webster (1958) estableció las bases del control
+optimizado con su fórmula del ciclo óptimo $C_0 = (1{,}5L + 5)/(1 - Y)$, donde $L$ es el tiempo perdido total
+e $Y$ la suma de las razones de flujo crítico; sin embargo, sobreestima la duración del ciclo cuando la
+relación volumen/capacidad es alta, produciendo ciclos irrealmente largos que degradan el rendimiento en
+saturación (Zhang et al., 2021). El refinamiento de Akçelik (1981) amplió este marco analítico con una
+fórmula de demora dependiente del tiempo, aplicable también en régimen de sobresaturación donde la
+formulación original pierde precisión. El valor de esta familia clásica reside en su interpretabilidad y
+simplicidad analítica para intersecciones aisladas, a costa de no reaccionar a la fluctuación de la demanda
+dentro del ciclo.
+
+Sobre esa base surgieron los sistemas adaptativos comerciales. SCATS (\emph{Sydney Coordinated Adaptive
+Traffic System}) ajusta de forma cíclica el ciclo y el reparto de tiempos midiendo la saturación en la línea
+de parada (Fehon, 2016), mientras que SCOOT (\emph{Split Cycle Offset Optimization Technique}) realiza
+pequeñas correcciones en cada ciclo a partir de detectores aguas arriba, optimizando los desfases para
+generar olas verdes progresivas. Ambos operan de forma centralizada, han demostrado reducir demoras e
+incrementar capacidad, pero exigen calibración cuidadosa e inversión considerable en detección y
+comunicaciones. Como alternativa descentralizada, Surtrac (\emph{Scalable Urban Traffic Control}) hace que
+cada intersección decida localmente de forma asíncrona y comunique a sus vecinas una proyección de su flujo
+de salida, lo que mejora la escalabilidad y la robustez ante fallos de comunicación; logró reducciones
+significativas de tiempos de viaje en pruebas de campo en Pittsburgh (Smith, Barlow, Xie y Rubinstein, 2013).
+En el Perú, los controladores instalados manejan hasta 20 fases y pueden coordinar varias intersecciones; el
+distrito de San Isidro implementó el controlador ITC-3 de SWARCO, modular y compatible con TCP/IP y NTCIP,
+enlazado a un centro de control distrital (ITS Perú, 2024).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth,keepaspectratio]{media/image17.png}
+  \caption{Centro de control de gestión de tránsito de la Municipalidad Metropolitana de Lima.}
+  \label{fig:centro-control}
+  \fuente{ITS Perú (2024).}
+\end{figure}
+
+Más allá de los sistemas comerciales cíclicos, las heurísticas analíticas de optimización en línea constituyen
+una familia descentralizada que prescinde de un ciclo fijo y decide la fase a servir a partir del estado
+instantáneo de las colas. El control por máxima presión (\emph{Max-Pressure}), formalizado por Varaiya (2013),
+selecciona en cada instante la fase que maximiza la diferencia de presión entre los enlaces de entrada y de
+salida, con garantía teórica de estabilidad de las colas y operación descentralizada por intersección; las
+estrategias autoorganizadas SOTL (\emph{Self-Organizing Traffic Lights}) siguen un principio análogo basado en
+umbrales de acumulación vehicular. La evidencia comparativa resulta ilustrativa para situar el resto de
+técnicas: en un marco abierto sobre SUMO con 32 semillas aleatorias, Max-Pressure igualó o superó a
+controladores de aprendizaje profundo (DQN, DDPG) en tiempo de viaje, con una reducción cercana al 25\,\%
+frente al control de tiempo fijo (Genders y Razavi, 2019). Que una heurística simple alcance al aprendizaje
+profundo matiza la necesidad de recurrir a modelos de caja negra y motiva el uso de controladores
+interpretables como la lógica difusa.
+
+\subsection{Lógica difusa como núcleo del control adaptativo}
+
+Entre las técnicas de aprendizaje aplicadas al control de tráfico, la lógica difusa destaca por combinar un
+desempeño elevado con interpretabilidad. Los sistemas difusos procesan variables lingüísticas como
+\emph{tráfico pesado}, \emph{cola larga} o \emph{tiempo de espera excesivo} mediante funciones de membresía
+que mapean valores numéricos a grados de pertenencia, y aplican reglas del tipo \emph{si--entonces} para
+decidir la extensión o el cambio de fase. Esta representación reproduce el razonamiento de un ingeniero de
+tránsito y, a diferencia de los modelos de caja negra, permite inspeccionar, validar y certificar cada regla
+antes de su despliegue, lo que resulta decisivo en un sistema donde el controlador conserva la autoridad
+final sobre la seguridad.
+
+En términos de desempeño, la evidencia reportada es favorable: el control difuso alcanza una mejora cercana
+al 74\,\% respecto de los controladores de tiempo fijo, superando a Q-learning (66\,\%) y a redes neuronales
+simples (71\,\%), y el proyecto europeo FUSICO lo validó como método especialmente efectivo en condiciones
+de tráfico irregular (Koukol et al., 2023). El método de Mamdani resulta más adecuado para intensidades
+bajas y medias, y se han documentado reducciones de los tiempos de espera de alrededor del 35\,\% frente a
+estrategias convencionales en casos de estudio reales.
+
+De manera más específica, dos trabajos del mismo grupo de investigación aportan validaciones cuantitativas
+directamente comparables con la solución propuesta, al combinar un sistema difuso de Mamdani con el cálculo de
+ciclo de Webster sobre SUMO. Ali et al. (2021) afinan fase a fase, mediante defuzzificación por centroide, el
+verde estimado por la fórmula de Webster aplicada en tiempo real, y reportan reducciones del tiempo de espera
+de hasta 41,7\,\% con datos reales de campo y de 49,4\,\% bajo demanda variable frente al Webster de tiempo
+fijo, con la observación de que la ventaja del control adaptativo se maximiza cuando la demanda fluctúa en el
+tiempo. Yalcinli et al. (2024) modelan a escala 1:1 una intersección real en SUMO y, con un esquema adaptativo
+de extensión de fase por densidad, obtienen 27,2\,\% menos demora, 32,4\,\% menos tiempo de espera y 16,7\,\%
+más velocidad respecto del tiempo fijo, valores que verifican de forma cruzada contra la fórmula de Webster y
+contra una medición por cámara, lo que enlaza la validación en simulación con la detección por visión. Esta
+combinación de mejora cuantificable, interpretabilidad y validabilidad fundamenta la elección de la lógica
+difusa de Mamdani como núcleo del control adaptativo de la solución propuesta.
+
+El aprendizaje por refuerzo profundo (DRL) cierra esta progresión como contrapunto: aprende políticas
+mediante interacción continua con el entorno y alcanza mejoras competitivas en redes complejas, pero a costa
+de requisitos que comprometen su uso en operación crítica. Rafique et al. (2024) muestran que su agente
+necesita 300 episodios de entrenamiento para converger y que el desempeño puede degradarse fuera del régimen
+aprendido: la variante \emph{turn-based} empeora hasta 67\,\% en alta demanda, mientras que la variante
+\emph{time-based}, más conservadora, alcanza alrededor del 35\,\% de mejora promedio sobre el tiempo fijo. A
+ello se suma la marcada sensibilidad a los hiperparámetros documentada por Genders y Razavi (2019), quienes
+observan que los métodos con más hiperparámetros (SOTL, DQN, DDPG) presentan una varianza notablemente mayor
+y deben optimizarse antes de cualquier comparación, pues un ajuste deficiente puede inducir conclusiones
+erróneas. Esta fragilidad, unida a la baja interpretabilidad que dificulta certificar cada decisión, justifica
+por contraste la elección de un control difuso de Mamdani: no requiere entrenamiento, no es frágil ante
+cambios de régimen y resulta trazable y validable regla a regla. Por ello el DRL se reserva como capa
+experimental de optimización global, sin sustituir al control difuso local validable.
+
+Los órdenes de magnitud reportados por la literatura cuantitativa de control adaptativo se resumen en la
+Tabla~\ref{tab:resultados-adaptativo}, que sirve de referencia para situar el desempeño esperable del núcleo
+difuso propuesto frente a líneas base clásicas, heurísticas y de aprendizaje por refuerzo.
+
+\begin{table}[H]
+  \centering
+  \caption{Resultados reportados por la literatura de control adaptativo.}
+  \label{tab:resultados-adaptativo}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.11\linewidth}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Trabajo (año)} & \textbf{Controladores} & \textbf{Simulador / escenario} & \textbf{Métrica principal} & \textbf{Mejora reportada vs.\ fijo} \\
+    \midrule
+    Genders y Razavi (2019) & Tiempo fijo, Webster, Max-Pressure, SOTL, DQN, DDPG & SUMO; dos intersecciones; 32 semillas aleatorias & Tiempo de viaje & Max-Pressure: $\sim$25\,\% menos (59 frente a 79\,s); iguala o supera al RL profundo \\
+    Ali et al. (2021) & Webster fijo, Webster modificado, Difuso+Webster, Difuso+Webster modificado, difuso puro & SUMO+TraCI; intersecciones reales de 3/4/5 ramas (Kilis) & Tiempo de espera & Difuso+Webster: 41,7\,\% menos (datos reales) y 49,4\,\% menos (demanda variable) \\
+    Yalcinli et al. (2024) & Tiempo fijo frente a modelo adaptativo (ablación de tres componentes) & SUMO; intersección real de Heybe (Antalya), hora pico & Demora por vehículo & 27,2\,\% menos demora; 32,4\,\% menos espera; 16,7\,\% más velocidad \\
+    Rafique et al. (2024) & RL \emph{turn-based} y \emph{time-based} frente a tiempo fijo & SUMO; una intersección de 4 ramas; demanda Low/High/EW/NS & Tiempo de espera acumulado & \emph{Time-based}: $\sim$35\,\% en promedio (hasta 57\,\% en alta demanda); \emph{turn-based} se degrada (hasta 67\,\% peor) \\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia a partir de las fuentes citadas.}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Comparativa de estrategias de control semafórico.}
+  \label{tab:control}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}XX>{\raggedright\arraybackslash}p{0.13\linewidth}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.12\linewidth}@{}}
+    \toprule
+    \textbf{Controlador} & \textbf{Principio} & \textbf{Datos requeridos} & \textbf{Interpre\-tabilidad} & \textbf{Escala\-bilidad} & \textbf{Mejora reportada} \\
+    \midrule
+    Webster & Cálculo analítico del ciclo óptimo & Flujos de saturación por acceso & Alta & Aislada & 10--15\,\% \\
+    SCATS & Ajuste cíclico centralizado por saturación & Detectores en línea de parada & Media & Media & 12--20\,\% \\
+    SCOOT & Optimización incremental de desfases & Detectores aguas arriba & Media & Media & $\sim$12\,\% \\
+    Surtrac & Programación distribuida multiagente & Colas y tiempos de llegada & Media & Muy alta & $\sim$25\,\% \\
+    Difuso & Reglas lingüísticas si--entonces & Flujo, cola y espera locales & Alta & Media & $\sim$74\,\% \\
+    DRL & Política aprendida por refuerzo & Gran volumen de datos/entrenamiento & Baja & Alta & 27--68\,\% (experimental) \\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia a partir de las fuentes citadas en la sección.}
+\end{table}
+
+\textbf{Criterio adoptado.} La Tabla~\ref{tab:control} muestra que, frente a controladores de mayor mejora
+nominal pero baja interpretabilidad (DRL) o de gran dependencia de infraestructura centralizada (SCATS,
+SCOOT), la lógica difusa ofrece el mejor equilibrio entre mejora reportada, interpretabilidad y validabilidad
+local. Se adopta, por tanto, un control difuso que opera de forma autónoma en cada intersección como
+herramienta de recomendación, mientras el controlador semafórico existente conserva la autoridad final y las
+funciones críticas de seguridad; la coordinación global y el DRL se reservan como capas de optimización
+futura.
+
+El núcleo difuso de esta tesis se inscribe explícitamente en la familia difuso+Webster validada por Ali et
+al. (2021) y Yalcinli et al. (2024): un sistema de Mamdani interpretable que afina en tiempo real el verde
+calculado por la fórmula de ciclo óptimo, sin requerir entrenamiento previo ni comprometer la trazabilidad de
+cada decisión. Su validación se desarrolla en el Capítulo~\ref{cap:validacion}, donde el controlador propuesto
+se compara contra líneas base clásicas (tiempo fijo y Webster) y heurísticas (control actuado y máxima
+presión) bajo escenarios reproducibles y semillas aleatorias.
+
+\section{Arquitectura edge--nube y comunicaciones}\label{sec:arquitectura}
+
+La incorporación de la Internet de las Cosas (IoT) en el control de tráfico habilita la conectividad y la
+gestión remota de los semáforos. Un sistema habilitado para IoT consta de módulos conectados a cada
+controlador que sensan el entorno, se comunican y pueden gestionarse desde la nube. La comunicación con la
+nube permite enviar datos en tiempo real (conteos, estados, fallos) a servidores donde se aplican algoritmos
+intensivos, análisis y almacenamiento histórico, y desplegar de vuelta recomendaciones o parámetros
+previamente validados.
+
+El aspecto crítico de esta integración es la latencia cuando se requiere control en tiempo real. Enviar datos
+a un servidor remoto y esperar la decisión puede comprometer la respuesta del semáforo, por lo que se adoptan
+arquitecturas de cómputo en el borde (\emph{edge computing}): la inteligencia que decide el ciclo se resuelve
+localmente en el módulo de la intersección, mientras que la nube se reserva para cálculos de mayor nivel
+—coordinación entre intersecciones, optimización global y supervisión— (Gheorghe y Soica, 2025). Este
+reparto asegura que el semáforo siga operando de forma segura aunque pierda la conexión con la nube, y que
+aproveche esa conexión cuando esté disponible para mejorar su desempeño con información global.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth,keepaspectratio]{media/image82.png}
+  \caption{Componentes funcionales de un sistema de control de tráfico adaptativo basado en IoT.}
+  \label{fig:componentes-iot}
+  \fuente{Gheorghe y Soica (2025).}
+\end{figure}
+
+La interoperabilidad entre componentes depende de los protocolos de comunicación. El estándar NTCIP
+(\emph{National Transportation Communications for ITS Protocol}), desarrollado por AASHTO, ITE y NEMA, es la
+referencia para la comunicación entre dispositivos de campo y centros de gestión, define una arquitectura por
+capas que asegura la interoperabilidad entre equipos de distintos fabricantes y maneja solicitudes de
+prioridad con latencias inferiores a 500\,ms; su perfil para controladores de señales actuadas (NTCIP 1202)
+está ampliamente soportado por los controladores modernos (NTCIP, 2025). Para la telemetría IoT, el protocolo
+MQTT (\emph{Message Queuing Telemetry Transport}) ofrece una arquitectura publicar/suscribir con sobrecarga
+mínima de cabecera, ideal para transmitir datos de sensores con actualizaciones frecuentes y entrega fiable
+sobre redes urbanas (Rahman et al., 2023). Por encima de ambos, TCP/IP actúa como capa de transporte de red
+común a los equipos, la central y los servicios remotos. La separación de roles entre estos protocolos evita
+presentar a la nube como reemplazo del controlador certificado y preserva una jerarquía segura de decisión,
+como se resume en la Tabla~\ref{tab:protocolos}.
+
+\begin{table}[H]
+  \centering
+  \caption{Rol de los protocolos principales en la arquitectura propuesta.}
+  \label{tab:protocolos}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.18\linewidth}XX>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Protocolo / capa} & \textbf{Uso dentro del sistema} & \textbf{Tipo de información} & \textbf{Criterio de seguridad} \\
+    \midrule
+    TCP/IP & Capa base de comunicación entre equipos de red, central, módulo IoT y servicios remotos. & Paquetes de datos, transporte de mensajes y servicios de red. & Segmentación de red, filtrado por firewall y monitoreo de disponibilidad. \\
+    NTCIP & Interoperabilidad con el controlador semafórico y la central de gestión. & Estados de operación, configuración de fases y parámetros permitidos por el controlador. & Uso restringido al dominio semafórico y validación por el controlador existente. \\
+    MQTT sobre TLS & Telemetría del módulo IoT hacia la nube y recepción de recomendaciones o parámetros. & Métricas de tráfico, alarmas, estado energético, eventos y datos agregados. & Autenticación por certificados, cifrado TLS y control de tópicos autorizados. \\
+    Interfaz de operador & Supervisión local/remota desde la central semafórica. & Visualización, alertas, reportes y aprobación de acciones críticas. & RBAC, MFA, registro de auditoría y separación entre monitoreo y mando. \\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}
+
+\textbf{Criterio adoptado.} Se adopta una arquitectura híbrida borde--nube en la que el módulo IoT actúa como
+puente seguro entre el nivel local y la nube: habilita decisiones locales inmediatas y, a la vez, envía
+información agregada para la optimización global. La pila de comunicaciones se acota a NTCIP para la
+interoperabilidad con el controlador, MQTT sobre TLS para la telemetría IoT y TCP/IP como transporte, de modo
+que la arquitectura sea escalable y tolerante a fallos: el semáforo opera con seguridad incluso sin enlace a
+la nube.
+
+\section{Ciberseguridad y confiabilidad}\label{sec:ciberseguridad-arte}
+
+La interconexión de los semáforos con la nube y otros dispositivos, que en su origen fueron equipos aislados,
+los expone a riesgos cibernéticos capaces de afectar la operación urbana: manipulación de la señalización,
+inyección de datos falsos o acceso no autorizado al control de tránsito. Un caso documentado en los Países
+Bajos demostró que era posible manipular remotamente semáforos IoT enviando datos falsos de bicicletas
+inexistentes para forzar el cambio de luces, debido a la ausencia de autenticación robusta en la comunicación
+(Kirk, 2020; Buchanan, 2023). La ciberseguridad es, por tanto, un requisito de diseño y no un añadido.
+
+Los mecanismos de protección habituales se articulan en capas. El cifrado de extremo a extremo y los
+protocolos de capa de transporte (TLS/SSL) garantizan la confidencialidad e integridad de los datos en
+tránsito y permiten la autenticación mutua de los dispositivos. La autenticación multifactor (MFA) y el
+control de acceso basado en roles (RBAC) restringen el acceso a personal autorizado y limitan las funciones
+según el rol. Las firmas digitales verifican la autenticidad y la integridad de cada mensaje, mientras que
+las redes privadas virtuales (VPN) y los firewalls aíslan la comunicación de amenazas externas. Finalmente,
+el análisis periódico de vulnerabilidades y la aplicación oportuna de parches mantienen la protección frente
+a amenazas emergentes.
+
+\begin{table}[H]
+  \centering
+  \caption{Mecanismos de ciberseguridad para semáforos inteligentes IoT.}
+  \label{tab:ciberseg-mecanismos}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.22\linewidth}XX>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Mecanismo} & \textbf{Ventajas} & \textbf{Limitaciones} & \textbf{Uso en semáforos inteligentes} \\
+    \midrule
+    Cifrado de extremo a extremo (E2EE) & Confidencialidad de los datos de principio a fin. & Puede aumentar la latencia por cifrado/descifrado. & Protege las comunicaciones entre los semáforos y la nube. \\
+    Protocolos de transporte (TLS/SSL) & Protege las comunicaciones en tránsito y su integridad. & Requiere gestión correcta de certificados. & Asegura las conexiones entre dispositivos IoT y la nube. \\
+    Autenticación multifactor (MFA) & Refuerza la seguridad con múltiples capas de verificación. & Añade pasos de acceso para los operadores. & Garantiza que solo personal autorizado acceda a los controles. \\
+    Firmas digitales & Verifica autenticidad e impide modificaciones no autorizadas. & Requiere infraestructura de gestión de claves. & Asegura el origen verificado de los datos enviados a la nube. \\
+    VPN y firewalls & Aíslan la red semafórica de amenazas externas. & Demandan inversión y mantenimiento adicionales. & Protegen los semáforos y la nube de accesos no autorizados. \\
+    RBAC & Gestiona el acceso a las funciones según el rol. & Complejo de administrar con muchos usuarios. & Asigna niveles de acceso adecuados a cada operador. \\
+    Análisis de vulnerabilidades & Identifica debilidades antes de su explotación. & Exige monitoreo y actualización constantes. & Mantiene la seguridad en el tiempo mediante parches. \\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}
+
+Para que la seguridad no quede como una mera lista de mecanismos, se plantea un modelo de amenazas aplicado a
+la arquitectura propuesta. Este modelo identifica los puntos de exposición más relevantes y define
+mitigaciones coherentes con un módulo IoT que complementa al controlador semafórico, sin sustituir sus
+funciones críticas de seguridad funcional.
+
+\begin{table}[H]
+  \centering
+  \caption{Modelo de amenazas del sistema IoT semafórico.}
+  \label{tab:amenazas-arte}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}XX>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Amenaza} & \textbf{Impacto posible} & \textbf{Punto vulnerable} & \textbf{Mitigación propuesta} \\
+    \midrule
+    Suplantación del módulo IoT & Ingreso de telemetría falsa o recomendaciones no autorizadas. & Conexión MQTT y registro de dispositivos. & Certificados por dispositivo, lista blanca, rotación de credenciales y revocación. \\
+    Manipulación de datos de tráfico & Optimización basada en información incorrecta. & Telemetría, API externa y datos de visión. & Validación cruzada, límites físicos, detección de valores anómalos y auditoría. \\
+    Acceso no autorizado de operador & Modificación indebida de parámetros o consulta de datos sensibles. & Interfaz de monitoreo y consola administrativa. & MFA, RBAC, registros de auditoría y separación entre roles de lectura y mando. \\
+    Denegación de servicio & Pérdida temporal de conexión con la nube o la central. & Enlace de comunicación y broker MQTT. & Operación local degradada, almacenamiento temporal, reintento controlado y alertas. \\
+    Compromiso físico del gabinete & Daño de sensores, corte de energía o manipulación de interfaces. & Gabinete, cableado y periféricos externos. & Gabinete IP65/IK, cerradura, sensores de apertura y procedimientos de mantenimiento. \\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}
+
+La arquitectura debe diferenciar la ciberseguridad de la seguridad funcional. La ciberseguridad protege la
+información y el acceso al sistema; la seguridad funcional evita estados semafóricos peligrosos incluso ante
+una falla de software, de comunicación o de energía. Por ello, el módulo IoT se plantea como capa de sensado,
+análisis y recomendación, mientras que el controlador semafórico mantiene la autoridad final sobre la
+ejecución segura de las fases, según los criterios de la Tabla~\ref{tab:seg-funcional}.
+
+\begin{table}[H]
+  \centering
+  \caption{Criterios de seguridad funcional para el módulo propuesto.}
+  \label{tab:seg-funcional}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.26\linewidth}XX@{}}
+    \toprule
+    \textbf{Condición} & \textbf{Respuesta requerida} & \textbf{Justificación} \\
+    \midrule
+    Pérdida de comunicación con la nube & El controlador mantiene el plan local vigente y el módulo IoT almacena datos hasta recuperar conexión. & Evita depender de la nube para decisiones críticas en tiempo real. \\
+    Datos anómalos o inconsistentes & Se descartan recomendaciones fuera de límites y se genera una alerta de diagnóstico. & Reduce el riesgo de actuar sobre mediciones erróneas o manipuladas. \\
+    Falla del módulo IoT & El controlador semafórico continúa operando con su lógica convencional. & Conserva la continuidad del servicio aunque falle la capa adaptativa. \\
+    Solicitud de ola verde prioritaria & La sugerencia debe respetar tiempos mínimos, conflictos de fases y la validación del controlador. & Evita generar condiciones inseguras para peatones y flujos transversales. \\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}
+
+\textbf{Criterio adoptado.} El diseño aplica una defensa por capas (cifrado TLS, MFA, RBAC, firmas digitales,
+segmentación y auditoría) acompañada de un modo degradado seguro. El principio rector es la separación entre
+recomendación y actuación: el módulo IoT puede ser comprometido o quedar incomunicado sin que ello derive en
+un estado semafórico peligroso, porque el controlador certificado conserva la autoridad final.
+
+\section{Validación por simulación}\label{sec:validacion}
+
+La simulación por computadora permite probar estrategias y tecnologías de control en un entorno controlado
+antes de su implementación real. Los simuladores de tráfico varían en su nivel de detalle y capacidad de
+integración con sistemas externos, criterio decisivo para validar un controlador adaptativo en lazo cerrado.
+
+PTV VISSIM es un simulador microscópico comercial de alto nivel de detalle y fidelidad, con una potente
+interfaz 3D, que modela individualmente cada vehículo y peatón y permite control adaptativo mediante APIs
+externas y módulos para comunicación V2X; se le considera un referente en calibración fina, aunque su costo
+de licencia es elevado y exige hardware potente (Bedoya Reyes, 2013). AIMSUN es un simulador híbrido
+micro-mesoscópico que opera tanto a nivel microscópico como agrupando vehículos en flujos para acelerar el
+cálculo en redes grandes; permite cargar planes SCATS o SCOOT reales y probar algoritmos mediante su API,
+pero requiere mayor experiencia de calibración (Bedoya Reyes, 2013). Synchro 8, basado en el motor del
+\emph{Highway Capacity Manual} 2010, está orientado al análisis y optimización de intersecciones y se integra
+con SimTraffic para simulación, con un alcance más cercano al análisis que al control en tiempo real
+(Trafficware, 2014).
+
+SUMO (\emph{Simulation of Urban Mobility}) es un simulador microscópico de código abierto, ampliamente
+adoptado en el ámbito académico, capaz de simular redes a gran escala. Su principal ventaja es ser gratuito y
+altamente personalizable, e incorpora el módulo TraCI (\emph{Traffic Control Interface}), que habilita la
+comunicación en vivo con la simulación: un programa externo —como el módulo de control IoT— puede consultar
+el estado del tráfico e imponer acciones, como cambiar la luz de un semáforo, durante la ejecución. Esto lo
+hace idóneo para probar algoritmos de control adaptativo en lazo cerrado, y soporta además la importación de
+mapas reales (OpenStreetMap) y comunicaciones vehiculares simuladas. Como contrapartida, requiere calibración
+manual cuidadosa para reflejar condiciones reales. Por estas características, SUMO es el microsimulador de
+código abierto más utilizado para desarrollar y evaluar algoritmos de control semafórico antes de su
+despliegue en campo, como evidencian los trabajos de referencia en control adaptativo (Ali et al., 2021;
+Genders y Razavi, 2019); además, habilita una comparación reproducible mediante semillas aleatorias y líneas
+base comunes, condición necesaria para contrastar el controlador propuesto con estrategias clásicas y
+heurísticas en igualdad de condiciones.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth,keepaspectratio]{media/image144.png}
+  \caption{Interfaz del simulador de tráfico de código abierto SUMO.}
+  \label{fig:sumo}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Comparativa de simuladores de tráfico.}
+  \label{tab:simuladores}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.15\linewidth}>{\raggedright\arraybackslash}p{0.20\linewidth}XX@{}}
+    \toprule
+    \textbf{Simulador} & \textbf{Tipo} & \textbf{Características principales} & \textbf{Integración con sistemas externos} \\
+    \midrule
+    PTV VISSIM & Microscópico (comercial) & Alta fidelidad, visualización 3D, semáforos programables, V2X. & APIs externas; costo de licencia elevado. \\
+    AIMSUN & Híbrido micro-mesoscópico & Planes SCATS/SCOOT, vehículos autónomos, optimización en tiempo real. & API para algoritmos; mayor exigencia de calibración. \\
+    SUMO & Microscópico (código abierto) & Gratuito, escalable, mapas reales, comunicaciones vehiculares. & TraCI: comunicación en vivo y control en lazo cerrado. \\
+    Synchro 8 & Análisis/mesoscópico & Optimización de intersecciones, motor HCM 2010, SimTraffic. & Integración con otros simuladores (UTDF). \\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}
+
+\textbf{Criterio adoptado.} La comparación de la Tabla~\ref{tab:simuladores} sustenta la elección de SUMO con
+TraCI para la validación: su carácter abierto y la comunicación en vivo permiten conectar el controlador
+adaptativo externo, reproducir escenarios y evaluar métricas de cola, espera, velocidad y congestión, además
+de emular condiciones de comunicación y ciberseguridad. VISSIM o AIMSUN podrían reservarse para validaciones
+puntuales de micro-detalle o presentación visual a interesados.
+
+Para cerrar el estado del arte, la Tabla~\ref{tab:sintesis} integra las lecciones extraídas de cada
+subsistema con el criterio adoptado y su aplicación en la solución propuesta, evidenciando la trazabilidad
+entre la revisión bibliográfica y las decisiones de diseño desarrolladas en los capítulos siguientes.
+
+\begin{table}[H]
+  \centering
+  \caption{Síntesis del estado del arte y criterios adoptados para la solución propuesta.}
+  \label{tab:sintesis}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.16\linewidth}XX>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Eje tecnológico} & \textbf{Lección del estado del arte} & \textbf{Criterio adoptado} & \textbf{Aplicación en la tesis} \\
+    \midrule
+    Sensado vehicular & La visión por computadora aporta flujo, colas y clasificación, aunque requiere calibración y respaldo ante condiciones adversas. & Usar la cámara como fuente principal y sensores auxiliares para diagnóstico. & Módulo IoT con cámara, sensores ambientales y monitoreo energético. \\
+    Control adaptativo & El control difuso combina mejora cuantificable con interpretabilidad y validabilidad. & Priorizar el control difuso local validable y dejar la optimización global como recomendación. & Control local autónomo, coordinación por nube y validación en simulación. \\
+    Comunicaciones & La interoperabilidad exige separar los protocolos industriales de la telemetría IoT. & NTCIP para el entorno semafórico y MQTT/TLS para la telemetría. & Arquitectura compatible con el controlador existente y servicios en la nube. \\
+    Ciberseguridad & Los sistemas conectados requieren autenticación, cifrado y trazabilidad. & Diseñar defensa por capas y modo degradado seguro. & TLS, MFA, RBAC, auditoría y controlador como autoridad final. \\
+    Validación & La simulación permite comparar estrategias antes de intervenir la infraestructura real. & Usar SUMO/TraCI para escenarios reproducibles. & Evaluación de métricas de cola, espera, velocidad y congestión. \\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}

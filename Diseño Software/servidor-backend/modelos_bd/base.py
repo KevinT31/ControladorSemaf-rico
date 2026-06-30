@@ -55,7 +55,7 @@ def init_db():
     logger.info(f"Inicializando base de datos en: {DB_PATH}")
 
     # Importar todos los modelos para que SQLAlchemy los registre
-    from . import interseccion, metrica, ola_verde, deteccion_video
+    from . import interseccion, metrica, ola_verde, deteccion_video, usuario, evento_auditoria
 
     # Crear todas las tablas
     Base.metadata.create_all(bind=engine)
