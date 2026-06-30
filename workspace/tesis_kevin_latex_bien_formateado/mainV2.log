@@ -1,0 +1,4045 @@
+**
+(mainV2.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-02-24> (report.cls
+Document Class: report 2021/10/04 v1.4n Standard LaTeX document class
+(size12.clo
+File: size12.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count181
+\c@chapter=\count182
+\c@section=\count183
+\c@subsection=\count184
+\c@subsubsection=\count185
+\c@paragraph=\count186
+\c@subparagraph=\count187
+\c@figure=\count188
+\c@table=\count189
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+) (iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
+) (fontspec.sty (xparse.sty (expl3.sty
+Package: expl3 2022-02-24 L3 programming layer (loader) 
+
+(l3backend-xetex.def
+File: l3backend-xetex.def 2022-02-07 L3 backend support: XeTeX
+\c__kernel_sys_dvipdfmx_version_int=\count190
+\l__color_backend_stack_int=\count191
+\g__color_backend_stack_int=\count192
+\g__graphics_track_int=\count193
+\l__pdf_internal_box=\box50
+\g__pdf_backend_object_int=\count194
+\g__pdf_backend_annotation_int=\count195
+\g__pdf_backend_link_int=\count196
+))
+Package: xparse 2022-01-12 L3 Experimental document command parser
+)
+Package: fontspec 2022/01/15 v2.8a Font selection for XeLaTeX and LuaLaTeX
+ (fontspec-xetex.sty
+Package: fontspec-xetex 2022/01/15 v2.8a Font selection for XeLaTeX and LuaLaTe
+X
+\l__fontspec_script_int=\count197
+\l__fontspec_language_int=\count198
+\l__fontspec_strnum_int=\count199
+\l__fontspec_tmp_int=\count266
+\l__fontspec_tmpa_int=\count267
+\l__fontspec_tmpb_int=\count268
+\l__fontspec_tmpc_int=\count269
+\l__fontspec_em_int=\count270
+\l__fontspec_emdef_int=\count271
+\l__fontspec_strong_int=\count272
+\l__fontspec_strongdef_int=\count273
+\l__fontspec_tmpa_dim=\dimen139
+\l__fontspec_tmpb_dim=\dimen140
+\l__fontspec_tmpc_dim=\dimen141
+ (fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
+) (fontspec.cfg)))
+
+Package fontspec Info: Font family 'TimesNewRoman(0)' created for font 'Times
+(fontspec)             New Roman' with options [Ligatures=TeX].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.: <->"Times New
+(fontspec)             Roman/OT:script=latn;language=dflt;mapping=tex-text;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: <->"Times New
+(fontspec)             Roman/OT:script=latn;language=dflt;+smcp;mapping=tex-tex
+t;"
+(fontspec)             - 'bold' (b/n) with NFSS spec.: <->"Times New
+(fontspec)             Roman/B/OT:script=latn;language=dflt;mapping=tex-text;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: <->"Times
+(fontspec)             New
+(fontspec)             Roman/B/OT:script=latn;language=dflt;+smcp;mapping=tex-t
+ext;"
+(fontspec)             - 'italic' (m/it) with NFSS spec.: <->"Times New
+(fontspec)             Roman/I/OT:script=latn;language=dflt;mapping=tex-text;"
+(fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.:
+(fontspec)             <->"Times New
+(fontspec)             Roman/I/OT:script=latn;language=dflt;+smcp;mapping=tex-t
+ext;"
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.: <->"Times New
+(fontspec)             Roman/BI/OT:script=latn;language=dflt;mapping=tex-text;"
+
+(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.:
+(fontspec)             <->"Times New
+(fontspec)             Roman/BI/OT:script=latn;language=dflt;+smcp;mapping=tex-
+text;"
+
+
+Package fontspec Info: Font family 'Arial(0)' created for font 'Arial' with
+(fontspec)             options [Ligatures=TeX].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.:
+(fontspec)             <->"Arial/OT:script=latn;language=dflt;mapping=tex-text;
+"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
+(fontspec)             <->"Arial/OT:script=latn;language=dflt;+smcp;mapping=tex
+-text;"
+(fontspec)             - 'bold' (b/n) with NFSS spec.:
+(fontspec)             <->"Arial/B/OT:script=latn;language=dflt;mapping=tex-tex
+t;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.:
+(fontspec)             <->"Arial/B/OT:script=latn;language=dflt;+smcp;mapping=t
+ex-text;"
+(fontspec)             - 'italic' (m/it) with NFSS spec.:
+(fontspec)             <->"Arial/I/OT:script=latn;language=dflt;mapping=tex-tex
+t;"
+(fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.:
+(fontspec)             <->"Arial/I/OT:script=latn;language=dflt;+smcp;mapping=t
+ex-text;"
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.:
+(fontspec)             <->"Arial/BI/OT:script=latn;language=dflt;mapping=tex-te
+xt;"
+(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.:
+(fontspec)             <->"Arial/BI/OT:script=latn;language=dflt;+smcp;mapping=
+tex-text;"
+
+
+Package fontspec Info: Font family 'CourierNew(0)' created for font 'Courier
+(fontspec)             New' with options
+(fontspec)             [WordSpace={1,0,0},HyphenChar=None,PunctuationSpace=Word
+Space].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.: <->"Courier
+(fontspec)             New/OT:script=latn;language=dflt;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+(fontspec)             - 'bold' (b/n) with NFSS spec.: <->"Courier
+(fontspec)             New/B/OT:script=latn;language=dflt;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+(fontspec)             - 'italic' (m/it) with NFSS spec.: <->"Courier
+(fontspec)             New/I/OT:script=latn;language=dflt;"
+(fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.: <->"Courier
+(fontspec)             New/BI/OT:script=latn;language=dflt;"
+(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+
+
+(babel.sty
+Package: babel 2022/02/26 3.73 The Babel package
+\babel@savecnt=\count274
+\U@D=\dimen142
+\l@unhyphenated=\language87
+ (xebabel.def (txtbabel.def))
+\bbl@readstream=\read2
+\bbl@dirlevel=\count275
+ (spanish.ldf
+Language: spanish.ldf 2021/05/27 v5.0q Spanish support from the babel system
+\es@quottoks=\toks16
+\es@quotdepth=\count276
+Package babel Info: Making " an active character on input line 570.
+)) (microtype.sty
+Package: microtype 2022/03/14 v3.0d Micro-typographical refinements (RS)
+
+(keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks17
+) (etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count277
+)
+\MT@toks=\toks18
+\MT@tempbox=\box51
+\MT@count=\count278
+LaTeX Info: Redefining \noprotrusionifhmode on input line 1027.
+LaTeX Info: Redefining \leftprotrusion on input line 1028.
+LaTeX Info: Redefining \rightprotrusion on input line 1036.
+LaTeX Info: Redefining \textls on input line 1195.
+\MT@outer@kern=\dimen143
+LaTeX Info: Redefining \textmicrotypecontext on input line 1781.
+\MT@listname@count=\count279
+ (microtype-xetex.def
+File: microtype-xetex.def 2022/03/14 v3.0d Definitions specific to xetex (RS)
+LaTeX Info: Redefining \lsstyle on input line 236.
+)
+Package microtype Info: Loading configuration file microtype.cfg.
+ (microtype.cfg
+File: microtype.cfg 2022/03/14 v3.0d microtype main configuration file (RS)
+))
+(setspace.sty
+Package: setspace 2011/12/19 v6.7a set line spacing
+) (geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+ (ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+)
+\Gm@cnth=\count280
+\Gm@cntv=\count281
+\c@Gm@tempcnt=\count282
+\Gm@bindingoffset=\dimen144
+\Gm@wd@mp=\dimen145
+\Gm@odd@mp=\dimen146
+\Gm@even@mp=\dimen147
+\Gm@layoutwidth=\dimen148
+\Gm@layoutheight=\dimen149
+\Gm@layouthoffset=\dimen150
+\Gm@layoutvoffset=\dimen151
+\Gm@dimlist=\toks19
+) (ragged2e.sty
+Package: ragged2e 2021/12/15 v3.1 ragged2e Package
+\CenteringLeftskip=\skip49
+\RaggedLeftLeftskip=\skip50
+\RaggedRightLeftskip=\skip51
+\CenteringRightskip=\skip52
+\RaggedLeftRightskip=\skip53
+\RaggedRightRightskip=\skip54
+\CenteringParfillskip=\skip55
+\RaggedLeftParfillskip=\skip56
+\RaggedRightParfillskip=\skip57
+\JustifyingParfillskip=\skip58
+\CenteringParindent=\skip59
+\RaggedLeftParindent=\skip60
+\RaggedRightParindent=\skip61
+\JustifyingParindent=\skip62
+) (amsmath.sty
+Package: amsmath 2021/10/15 v2.17l AMS math features
+\@mathmargin=\skip63
+
+For additional information on amsmath, use the `?' option.
+(amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
+ (amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks20
+\ex@=\dimen152
+)) (amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen153
+) (amsopn.sty
+Package: amsopn 2021/08/26 v2.02 operator names
+)
+\inf@bad=\count283
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count284
+\leftroot@=\count285
+LaTeX Info: Redefining \overline on input line 399.
+\classnum@=\count286
+\DOTSCASE@=\count287
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box52
+\strutbox@=\box53
+\big@size=\dimen154
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count288
+\c@MaxMatrixCols=\count289
+\dotsspace@=\muskip16
+\c@parentequation=\count290
+\dspbrk@lvl=\count291
+\tag@help=\toks21
+\row@=\count292
+\column@=\count293
+\maxfields@=\count294
+\andhelp@=\toks22
+\eqnshift@=\dimen155
+\alignsep@=\dimen156
+\tagshift@=\dimen157
+\tagwidth@=\dimen158
+\totwidth@=\dimen159
+\lineht@=\dimen160
+\@envbody=\toks23
+\multlinegap=\skip64
+\multlinetaggap=\skip65
+\mathdisplay@stack=\toks24
+LaTeX Info: Redefining \[ on input line 2938.
+LaTeX Info: Redefining \] on input line 2939.
+) (amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)) (textcomp.sty
+Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
+) (longtable.sty
+Package: longtable 2021-09-01 v4.17 Multi-page Table package (DPC)
+\LTleft=\skip66
+\LTright=\skip67
+\LTpre=\skip68
+\LTpost=\skip69
+\LTchunksize=\count295
+\LTcapwidth=\dimen161
+\LT@head=\box54
+\LT@firsthead=\box55
+\LT@foot=\box56
+\LT@lastfoot=\box57
+\LT@gbox=\box58
+\LT@cols=\count296
+\LT@rows=\count297
+\c@LT@tables=\count298
+\c@LT@chunks=\count299
+\LT@p@ftn=\toks25
+) (booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen162
+\lightrulewidth=\dimen163
+\cmidrulewidth=\dimen164
+\belowrulesep=\dimen165
+\belowbottomsep=\dimen166
+\aboverulesep=\dimen167
+\abovetopsep=\dimen168
+\cmidrulesep=\dimen169
+\cmidrulekern=\dimen170
+\defaultaddspace=\dimen171
+\@cmidla=\count300
+\@cmidlb=\count301
+\@aboverulesep=\dimen172
+\@belowrulesep=\dimen173
+\@thisruleclass=\count302
+\@lastruleclass=\count303
+\@thisrulewidth=\dimen174
+) (array.sty
+Package: array 2021/10/04 v2.5f Tabular extension package (FMi)
+\col@sep=\dimen175
+\ar@mcellbox=\box59
+\extrarowheight=\dimen176
+\NC@list=\toks26
+\extratabsurround=\skip70
+\backup@length=\skip71
+\ar@cellbox=\box60
+)
+(multirow.sty
+Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
+\multirow@colwidth=\skip72
+\multirow@cntb=\count304
+\multirow@dima=\skip73
+\bigstrutjot=\dimen177
+) (makecell.sty
+Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
+\rotheadsize=\dimen178
+\c@nlinenum=\count305
+\TeXr@lab=\toks27
+) (tabularx.sty
+Package: tabularx 2020/01/15 v2.11c `tabularx' package (DPC)
+\TX@col@width=\dimen179
+\TX@old@table=\dimen180
+\TX@old@col=\dimen181
+\TX@target=\dimen182
+\TX@delta=\dimen183
+\TX@cols=\count306
+\TX@ftn=\toks28
+) (calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count307
+\calc@Bcount=\count308
+\calc@Adimen=\dimen184
+\calc@Bdimen=\dimen185
+\calc@Askip=\skip74
+\calc@Bskip=\skip75
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count309
+\calc@Cskip=\skip76
+) (pdflscape.sty
+Package: pdflscape 2019/12/05 v0.12 Display of landscape pages in PDF (HO)
+
+(lscape.sty
+Package: lscape 2020/05/28 v3.02 Landscape Pages (DPC)
+ (graphics.sty
+Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
+ (trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+) (graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: xetex.def on input line 107.
+ (xetex.def
+File: xetex.def 2021/03/18 v5.0k Graphics/color driver for xetex
+)))
+Package pdflscape Info: Auto-detected driver: dvipdfm (xetex) on input line 98.
+
+
+(atbegshi-ltx.sty
+Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
+package with kernel methods
+)) (colortbl.sty
+Package: colortbl 2020/01/04 v1.0e Color table columns (DPC)
+ (color.sty
+Package: color 2021/12/07 v1.3c Standard LaTeX Color (DPC)
+ (color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: xetex.def on input line 149.
+)
+\everycr=\toks29
+\minrowclearance=\skip77
+) (graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+\Gin@req@height=\dimen186
+\Gin@req@width=\dimen187
+)
+(adjustbox.sty
+Package: adjustbox 2020/08/19 v1.3 Adjusting TeX boxes (trim, clip, ...)
+ (xkeyval.sty
+Package: xkeyval 2020/11/20 v2.8 package option processing (HA)
+ (xkeyval (xkvutils
+\XKV@toks=\toks30
+\XKV@tempa@toks=\toks31
+)
+\XKV@depth=\count310
+File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
+)) (adjcalc.sty
+Package: adjcalc 2012/05/16 v1.1 Provides advanced setlength with multiple back
+-ends (calc, etex, pgfmath)
+) (trimclip.sty
+Package: trimclip 2020/08/19 v1.2 Trim and clip general TeX material
+
+(collectbox.sty
+Package: collectbox 2012/05/17 v0.4b Collect macro arguments as boxes
+\collectedbox=\box61
+)
+\tc@llx=\dimen188
+\tc@lly=\dimen189
+\tc@urx=\dimen190
+\tc@ury=\dimen191
+Package trimclip Info: Using driver 'tc-xetex.def'.
+ (tc-xetex.def
+File: tc-xetex.def 2019/01/04 v2.2 Clipping driver for xetex
+))
+\adjbox@Width=\dimen192
+\adjbox@Height=\dimen193
+\adjbox@Depth=\dimen194
+\adjbox@Totalheight=\dimen195
+\adjbox@pwidth=\dimen196
+\adjbox@pheight=\dimen197
+\adjbox@pdepth=\dimen198
+\adjbox@ptotalheight=\dimen199
+ (ifoddpage.sty
+Package: ifoddpage 2016/04/23 v1.1 Conditionals for odd/even page detection
+\c@checkoddpage=\count311
+) (varwidth.sty
+Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
+\@vwid@box=\box62
+\sift@deathcycles=\count312
+\@vwid@loff=\dimen256
+\@vwid@roff=\dimen257
+)) (float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count313
+\float@exts=\toks32
+\float@box=\box63
+\@float@everytoks=\toks33
+\@floatcapt=\box64
+)
+(caption.sty
+Package: caption 2022/03/01 v3.6b Customizing captions (AR)
+ (caption3.sty
+Package: caption3 2022/03/17 v2.3b caption3 kernel (AR)
+\caption@tempdima=\dimen258
+\captionmargin=\dimen259
+\caption@leftmargin=\dimen260
+\caption@rightmargin=\dimen261
+\caption@width=\dimen262
+\caption@indent=\dimen263
+\caption@parindent=\dimen264
+\caption@hangindent=\dimen265
+Package caption Info: Standard document class detected.
+)
+\c@caption@flags=\count314
+\c@continuedfloat=\count315
+Package caption Info: float package is loaded.
+Package caption Info: longtable package is loaded.
+ (ltcaption.sty
+Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
+)) (subcaption.sty
+Package: subcaption 2022/01/07 v1.5 Sub-captions (AR)
+\c@subfigure=\count316
+\c@subtable=\count317
+) (placeins.sty
+Package: placeins 2005/04/18  v 2.2
+)
+(needspace.sty
+Package: needspace 2010/09/12 v1.3d reserve vertical space
+) (enumitem.sty
+Package: enumitem 2019/06/20 v3.9 Customized lists
+\labelindent=\skip78
+\enit@outerparindent=\dimen266
+\enit@toks=\toks34
+\enit@inbox=\box65
+\enit@count@id=\count318
+\enitdp@description=\count319
+) (xcolor.sty
+Package: xcolor 2021/10/31 v2.13 LaTeX color extensions (UK)
+ (color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: xetex.def on input line 227.
+LaTeX Info: Redefining \color on input line 711.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1368.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1370.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1372.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1373.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1374.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1375.
+) (soul.sty
+Package: soul 2003/11/17 v2.4 letterspacing/underlining (mf)
+\SOUL@word=\toks35
+\SOUL@lasttoken=\toks36
+\SOUL@cmds=\toks37
+\SOUL@buffer=\toks38
+\SOUL@token=\toks39
+\SOUL@spaceskip=\skip79
+\SOUL@ttwidth=\dimen267
+\SOUL@uldp=\dimen268
+\SOUL@ulht=\dimen269
+)
+(titlesec.sty
+Package: titlesec 2021/07/05 v2.14 Sectioning titles
+\ttl@box=\box66
+\beforetitleunit=\skip80
+\aftertitleunit=\skip81
+\ttl@plus=\dimen270
+\ttl@minus=\dimen271
+\ttl@toksa=\toks40
+\titlewidth=\dimen272
+\titlewidthlast=\dimen273
+\titlewidthfirst=\dimen274
+) (tocloft.sty
+Package: tocloft 2017/08/31 v2.3i parameterised ToC, etc., typesetting
+Package tocloft Info: The document has chapter divisions on input line 51.
+\cftparskip=\skip82
+\cftbeforetoctitleskip=\skip83
+\cftaftertoctitleskip=\skip84
+\cftbeforepartskip=\skip85
+\cftpartnumwidth=\skip86
+\cftpartindent=\skip87
+\cftbeforechapskip=\skip88
+\cftchapindent=\skip89
+\cftchapnumwidth=\skip90
+\cftbeforesecskip=\skip91
+\cftsecindent=\skip92
+\cftsecnumwidth=\skip93
+\cftbeforesubsecskip=\skip94
+\cftsubsecindent=\skip95
+\cftsubsecnumwidth=\skip96
+\cftbeforesubsubsecskip=\skip97
+\cftsubsubsecindent=\skip98
+\cftsubsubsecnumwidth=\skip99
+\cftbeforeparaskip=\skip100
+\cftparaindent=\skip101
+\cftparanumwidth=\skip102
+\cftbeforesubparaskip=\skip103
+\cftsubparaindent=\skip104
+\cftsubparanumwidth=\skip105
+\cftbeforeloftitleskip=\skip106
+\cftafterloftitleskip=\skip107
+\cftbeforefigskip=\skip108
+\cftfigindent=\skip109
+\cftfignumwidth=\skip110
+\c@lofdepth=\count320
+\c@lotdepth=\count321
+\cftbeforelottitleskip=\skip111
+\cftafterlottitleskip=\skip112
+\cftbeforetabskip=\skip113
+\cfttabindent=\skip114
+\cfttabnumwidth=\skip115
+) (fancyhdr.sty
+Package: fancyhdr 2021/01/28 v4.0.1 Extensive control of page headers and foote
+rs
+\f@nch@headwidth=\skip116
+\f@nch@O@elh=\skip117
+\f@nch@O@erh=\skip118
+\f@nch@O@olh=\skip119
+\f@nch@O@orh=\skip120
+\f@nch@O@elf=\skip121
+\f@nch@O@erf=\skip122
+\f@nch@O@olf=\skip123
+\f@nch@O@orf=\skip124
+) (xurl.sty
+Package: xurl 2022/01/09 v 0.10 modify URL breaks
+ (url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)) (hyperref.sty
+Package: hyperref 2022-02-21 v7.00n Hypertext links for LaTeX
+
+(ltxcmds.sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+) (pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+ (infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode not found.
+) (kvsetkeys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+)
+(kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+) (pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+) (hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+) (letltxmacro.sty
+Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
+) (auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+) (kvoptions.sty
+Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
+)
+\@linkdim=\dimen275
+\Hy@linkcounter=\count322
+\Hy@pagecounter=\count323
+ (pd1enc.def
+File: pd1enc.def 2022-02-21 v7.00n Hyperref: PDFDocEncoding definition (HO)
+) (intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+) (etexcmds.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
+)
+\Hy@SavedSpaceFactor=\count324
+ (puenc.def
+File: puenc.def 2022-02-21 v7.00n Hyperref: PDF Unicode definition (HO)
+)
+Package hyperref Info: Hyper figures OFF on input line 4137.
+Package hyperref Info: Link nesting OFF on input line 4142.
+Package hyperref Info: Hyper index ON on input line 4145.
+Package hyperref Info: Plain pages OFF on input line 4152.
+Package hyperref Info: Backreferencing OFF on input line 4157.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4390.
+\c@Hy@tempcnt=\count325
+LaTeX Info: Redefining \url on input line 4749.
+\XeTeXLinkMargin=\dimen276
+
+(bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+ (bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count326
+\Field@Width=\dimen277
+\Fld@charsize=\dimen278
+Package hyperref Info: Hyper figures OFF on input line 6027.
+Package hyperref Info: Link nesting OFF on input line 6032.
+Package hyperref Info: Hyper index ON on input line 6035.
+Package hyperref Info: backreferencing OFF on input line 6042.
+Package hyperref Info: Link coloring OFF on input line 6047.
+Package hyperref Info: Link coloring with OCG OFF on input line 6052.
+Package hyperref Info: PDF/A mode OFF on input line 6057.
+LaTeX Info: Redefining \ref on input line 6097.
+LaTeX Info: Redefining \pageref on input line 6101.
+\Hy@abspage=\count327
+\c@Item=\count328
+\c@Hfootnote=\count329
+)
+Package hyperref Info: Driver (autodetected): hxetex.
+ (hxetex.def
+File: hxetex.def 2022-02-21 v7.00n Hyperref driver for XeTeX
+ (stringenc.sty
+Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
+)
+)
+\pdfm@box=\box67
+\c@Hy@AnnotLevel=\count330
+\HyField@AnnotCount=\count331
+\Fld@listcount=\count332
+\c@bookmark@seq@number=\count333
+ (rerunfilecheck.sty
+Package: rerunfilecheck 2019/12/05 v1.9 Rerun checks for auxiliary files (HO)
+
+(atveryend-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
+kage
+with kernel methods
+) (uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+86.
+)
+\Hy@SectionHShift=\skip125
+) (bookmark.sty
+Package: bookmark 2020-11-06 v1.29 PDF bookmarks (HO)
+ (bkm-dvipdfm.def
+File: bkm-dvipdfm.def 2020-11-06 v1.29 bookmark driver for dvipdfm (HO)
+\BKM@id=\count334
+))
+Package hyperref Info: Option `colorlinks' set `true' on input line 122.
+
+(mainV2.aux
+LaTeX Info: Redefining \. on input line 23.
+LaTeX Info: Redefining \% on input line 23.
+)
+\openout1 = `mainV2.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 130.
+LaTeX Font Info:    ... okay on input line 130.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 130.
+LaTeX Font Info:    ... okay on input line 130.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 130.
+LaTeX Font Info:    ... okay on input line 130.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 130.
+LaTeX Font Info:    ... okay on input line 130.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 130.
+LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 1
+30.
+ (ts1cmr.fd
+File: ts1cmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    ... okay on input line 130.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 130.
+LaTeX Font Info:    ... okay on input line 130.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 130.
+LaTeX Font Info:    ... okay on input line 130.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 130.
+LaTeX Font Info:    ... okay on input line 130.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 130.
+LaTeX Font Info:    ... okay on input line 130.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 130.
+LaTeX Font Info:    ... okay on input line 130.
+
+Package fontspec Info: Adjusting the maths setup (use [no-math] to avoid
+(fontspec)             this).
+
+\symlegacymaths=\mathgroup6
+LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 130.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 130.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 130.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 130.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 130.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 130.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 130.
+LaTeX Font Info:    Redeclaring math accent \check on input line 130.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 130.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 130.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 130.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 130.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 130.
+LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
+(Font)              `operators' in the math version `normal' on input line 130.
+
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> TU/TimesNewRoman(0)/m/n on input line 1
+30.
+LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
+(Font)              `operators' in the math version `bold' on input line 130.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> TU/TimesNewRoman(0)/m/n on input line 
+130.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  TU/TimesNewRoman(0)/m/n --> TU/TimesNewRoman(0)/m/n on 
+input line 130.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> TU/TimesNewRoman(0)/m/it on input line
+ 130.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> TU/TimesNewRoman(0)/b/n on input line 
+130.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
+(Font)                  OT1/cmss/m/n --> TU/Arial(0)/m/n on input line 130.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
+(Font)                  OT1/cmtt/m/n --> TU/CourierNew(0)/m/n on input line 130
+.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  TU/TimesNewRoman(0)/m/n --> TU/TimesNewRoman(0)/b/n on 
+input line 130.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> TU/TimesNewRoman(0)/b/it on input lin
+e 130.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
+(Font)                  OT1/cmss/bx/n --> TU/Arial(0)/b/n on input line 130.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/cmtt/m/n --> TU/CourierNew(0)/b/n on input line 130
+.
+LaTeX Info: Redefining \. on input line 130.
+LaTeX Info: Redefining \% on input line 130.
+LaTeX Info: Redefining \microtypecontext on input line 130.
+Package microtype Info: Applying patch `item' on input line 130.
+Package microtype Info: Applying patch `toc' on input line 130.
+Package microtype Info: Applying patch `eqnum' on input line 130.
+Package microtype Info: Applying patch `footnote' on input line 130.
+Package microtype Info: Character protrusion enabled (level 2).
+Package microtype Info: Using default protrusion set `alltext'.
+Package microtype Info: No adjustment of tracking.
+Package microtype Info: No adjustment of spacing.
+Package microtype Info: No adjustment of kerning.
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `TimesNewRoman' (encoding: TU).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+*geometry* verbose mode - [ preamble ] result:
+* driver: xetex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(85.35826pt, 441.01773pt, 71.13188pt)
+* v-part:(T,H,B)=(76.82234pt, 691.40216pt, 76.82234pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=441.01773pt
+* \textheight=691.40216pt
+* \oddsidemargin=13.08827pt
+* \evensidemargin=13.08827pt
+* \topmargin=-35.44765pt
+* \headheight=15.0pt
+* \headsep=25.0pt
+* \topskip=12.0pt
+* \footskip=30.0pt
+* \marginparwidth=35.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: hyperref package is loaded.
+Package caption Info: End \AtBeginDocument code.
+Package hyperref Info: Link coloring ON on input line 130.
+(nameref.sty
+Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
+ (refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+) (gettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+)
+\c@section@level=\count335
+)
+LaTeX Info: Redefining \ref on input line 130.
+LaTeX Info: Redefining \pageref on input line 130.
+LaTeX Info: Redefining \nameref on input line 130.
+File: media/image155.png Graphic file (type bmp)
+<media/image155.png>
+ [1
+
+] [1
+
+] (mainV2.toc
+LaTeX Info: Redefining \. on input line 1.
+LaTeX Info: Redefining \% on input line 1.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 2.
+ (umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+) (mt-msa.cfg
+File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 2.
+ (umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) (mt-msb.cfg
+File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
+) (mt-cmr.cfg
+File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
+(RS)
+) [2
+
+]
+LaTeX Info: Redefining \. on input line 70.
+LaTeX Info: Redefining \% on input line 70.
+ [3]
+LaTeX Info: Redefining \. on input line 108.
+LaTeX Info: Redefining \% on input line 108.
+ [4]
+LaTeX Info: Redefining \. on input line 146.
+LaTeX Info: Redefining \% on input line 146.
+ [5])
+\tf@toc=\write3
+\openout3 = `mainV2.toc'.
+
+LaTeX Info: Redefining \. on input line 177.
+LaTeX Info: Redefining \% on input line 177.
+ [6]
+(mainV2.lof
+LaTeX Info: Redefining \. on input line 1.
+LaTeX Info: Redefining \% on input line 1.
+ [7
+
+]
+LaTeX Info: Redefining \. on input line 64.
+LaTeX Info: Redefining \% on input line 64.
+ [8]
+LaTeX Info: Redefining \. on input line 104.
+LaTeX Info: Redefining \% on input line 104.
+ [9])
+\tf@lof=\write4
+\openout4 = `mainV2.lof'.
+
+LaTeX Info: Redefining \. on input line 180.
+LaTeX Info: Redefining \% on input line 180.
+ [10] (mainV2.lot
+LaTeX Info: Redefining \. on input line 1.
+LaTeX Info: Redefining \% on input line 1.
+ [11
+
+])
+\tf@lot=\write5
+\openout5 = `mainV2.lot'.
+
+LaTeX Info: Redefining \. on input line 183.
+LaTeX Info: Redefining \% on input line 183.
+ [12] [1
+
+
+]
+LaTeX Info: Redefining \. on input line 199.
+LaTeX Info: Redefining \% on input line 199.
+ [2]
+Capítulo 1.
+[3
+
+]
+File: ./media/image149.png Graphic file (type bmp)
+<./media/image149.png>
+LaTeX Info: Redefining \. on input line 215.
+LaTeX Info: Redefining \% on input line 215.
+ [4]
+LaTeX Info: Redefining \. on input line 225.
+LaTeX Info: Redefining \% on input line 225.
+ [5]
+File: ./media/image116.png Graphic file (type bmp)
+<./media/image116.png>
+LaTeX Info: Redefining \. on input line 238.
+LaTeX Info: Redefining \% on input line 238.
+ [6]
+LaTeX Info: Redefining \. on input line 255.
+LaTeX Info: Redefining \% on input line 255.
+ [7]
+LaTeX Info: Redefining \. on input line 269.
+LaTeX Info: Redefining \% on input line 269.
+ [8]
+LaTeX Info: Redefining \. on input line 281.
+LaTeX Info: Redefining \% on input line 281.
+ [9]
+LaTeX Info: Redefining \. on input line 295.
+LaTeX Info: Redefining \% on input line 295.
+ [10]
+Capítulo 2.
+File: ./media/image25.png Graphic file (type bmp)
+<./media/image25.png>
+[11
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 314--316
+
+ []
+
+LaTeX Info: Redefining \. on input line 318.
+LaTeX Info: Redefining \% on input line 318.
+[12]
+File: ./media/image47.png Graphic file (type bmp)
+<./media/image47.png>
+
+
+Package caption Warning: \captionsetup{type*=...} or \captionof
+(caption)                outside box or environment on input line 329.
+See the caption package documentation for explanation.
+
+
+Underfull \hbox (badness 10000) in alignment at lines 338--407
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 407--409
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 409--410
+[] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 410.
+LaTeX Info: Redefining \% on input line 410.
+[13]
+LaTeX Info: Redefining \. on input line 419.
+LaTeX Info: Redefining \% on input line 419.
+ [14]
+File: ./media/image17.png Graphic file (type bmp)
+<./media/image17.png>
+LaTeX Info: Redefining \. on input line 430.
+LaTeX Info: Redefining \% on input line 430.
+ [15]
+File: ./media/image43.png Graphic file (type bmp)
+<./media/image43.png>
+LaTeX Info: Redefining \. on input line 441.
+LaTeX Info: Redefining \% on input line 441.
+ [16]
+LaTeX Info: Redefining \. on input line 449.
+LaTeX Info: Redefining \% on input line 449.
+ [17]
+LaTeX Info: Redefining \. on input line 460.
+LaTeX Info: Redefining \% on input line 460.
+ [18]
+File: ./media/image82.png Graphic file (type bmp)
+<./media/image82.png>
+LaTeX Info: Redefining \. on input line 472.
+LaTeX Info: Redefining \% on input line 472.
+ [19]
+LaTeX Info: Redefining \. on input line 483.
+LaTeX Info: Redefining \% on input line 483.
+ [20]
+Overfull \hbox (1.16571pt too wide) in paragraph at lines 511--512
+[]\TU/TimesNewRoman(0)/b/n/10 Confiabilidad  
+ []
+
+
+Overfull \hbox (2.22742pt too wide) in paragraph at lines 544--545
+\TU/TimesNewRoman(0)/m/n/10 802.11p/WAVE  
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 502--609
+[] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 609--611
+[] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 611--612
+[] [] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 612.
+LaTeX Info: Redefining \% on input line 612.
+[21]
+Underfull \hbox (badness 10000) in alignment at lines 625--673
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 673--675
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 675--676
+[] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 676.
+LaTeX Info: Redefining \% on input line 676.
+[22]
+LaTeX Info: Redefining \. on input line 692.
+LaTeX Info: Redefining \% on input line 692.
+ [23]
+Underfull \hbox (badness 10000) in alignment at lines 717--792
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 792--794
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 794--795
+[] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 795.
+LaTeX Info: Redefining \% on input line 795.
+[24]
+LaTeX Info: Redefining \. on input line 804.
+LaTeX Info: Redefining \% on input line 804.
+ [25]
+Underfull \hbox (badness 10000) in alignment at lines 814--871
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 871--873
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 873--874
+[] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 927.
+LaTeX Info: Redefining \% on input line 927.
+[26]
+LaTeX Info: Redefining \. on input line 940.
+LaTeX Info: Redefining \% on input line 940.
+ [27]
+LaTeX Info: Redefining \. on input line 955.
+LaTeX Info: Redefining \% on input line 955.
+ [28]
+LaTeX Info: Redefining \. on input line 1089.
+LaTeX Info: Redefining \% on input line 1089.
+ [29]
+LaTeX Info: Redefining \. on input line 1104.
+LaTeX Info: Redefining \% on input line 1104.
+ [30]
+LaTeX Info: Redefining \. on input line 1119.
+LaTeX Info: Redefining \% on input line 1119.
+ [31]
+LaTeX Info: Redefining \. on input line 1137.
+LaTeX Info: Redefining \% on input line 1137.
+ [32]
+Overfull \hbox (0.74086pt too wide) in paragraph at lines 1182--1183
+[]\TU/TimesNewRoman(0)/m/n/10 SCATS/SCOOT  
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1153--1286
+[] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1286--1288
+[] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1288--1289
+[] [] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 1294.
+LaTeX Info: Redefining \% on input line 1294.
+[33]
+LaTeX Info: Redefining \. on input line 1305.
+LaTeX Info: Redefining \% on input line 1305.
+ [34]
+File: ./media/image127.png Graphic file (type bmp)
+<./media/image127.png>
+File: ./media/image132.png Graphic file (type bmp)
+<./media/image132.png>
+LaTeX Info: Redefining \. on input line 1319.
+LaTeX Info: Redefining \% on input line 1319.
+ [35]
+File: ./media/image144.png Graphic file (type bmp)
+<./media/image144.png>
+LaTeX Info: Redefining \. on input line 1330.
+LaTeX Info: Redefining \% on input line 1330.
+ [36]
+File: ./media/image45.png Graphic file (type bmp)
+<./media/image45.png>
+LaTeX Info: Redefining \. on input line 1341.
+LaTeX Info: Redefining \% on input line 1341.
+ [37]
+Underfull \hbox (badness 10000) in alignment at lines 1356--1414
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1414--1416
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1416--1417
+[] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 1417.
+LaTeX Info: Redefining \% on input line 1417.
+[38]
+LaTeX Info: Redefining \. on input line 1423.
+LaTeX Info: Redefining \% on input line 1423.
+ [39]
+LaTeX Info: Redefining \. on input line 1494.
+LaTeX Info: Redefining \% on input line 1494.
+ [40]
+Capítulo 3.
+[41
+
+]
+LaTeX Info: Redefining \. on input line 1535.
+LaTeX Info: Redefining \% on input line 1535.
+ [42]
+Overfull \vbox (37.30869pt too high) detected at line 1565
+ []
+
+LaTeX Info: Redefining \. on input line 1680.
+LaTeX Info: Redefining \% on input line 1680.
+[43]
+LaTeX Info: Redefining \. on input line 1680.
+LaTeX Info: Redefining \% on input line 1680.
+ [44]
+LaTeX Info: Redefining \. on input line 1680.
+LaTeX Info: Redefining \% on input line 1680.
+ [45]
+Overfull \vbox (68.20389pt too high) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 1680.
+LaTeX Info: Redefining \% on input line 1680.
+
+[46]
+LaTeX Info: Redefining \. on input line 1686.
+LaTeX Info: Redefining \% on input line 1686.
+ [47]
+Overfull \hbox (6.0991pt too wide) in paragraph at lines 1693--1694
+[]|\TU/TimesNewRoman(0)/b/n/10 Prioridad| 
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1691--1695
+[] [] [] [] [] [] []
+ []
+
+
+Overfull \hbox (6.0991pt too wide) in paragraph at lines 1697--1698
+[]|\TU/TimesNewRoman(0)/b/n/10 Prioridad| 
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1695--1699
+[] [] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1699--1701
+[] [] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1703--1703
+[]|\TU/TimesNewRoman(0)/m/n/10 Índice normaliza-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1703--1703
+\TU/TimesNewRoman(0)/m/n/10 do y documentado;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1703--1703
+\TU/TimesNewRoman(0)/m/n/10 pesos calibrados o
+ []
+
+
+Underfull \hbox (badness 4266) in paragraph at lines 1703--1703
+[]|\TU/TimesNewRoman(0)/m/n/10 Revisión de ecuaciones,
+ []
+
+
+Underfull \hbox (badness 2088) in paragraph at lines 1704--1704
+[]|\TU/TimesNewRoman(0)/m/n/10 Estructura de mensa-
+ []
+
+
+Underfull \hbox (badness 1067) in paragraph at lines 1704--1704
+[]|\TU/TimesNewRoman(0)/m/n/10 La supervisión y el manteni-
+ []
+
+
+Underfull \hbox (badness 1412) in paragraph at lines 1704--1704
+\TU/TimesNewRoman(0)/m/n/10 miento requieren trazabilidad
+ []
+
+
+Underfull \hbox (badness 3514) in paragraph at lines 1704--1704
+[]|\TU/TimesNewRoman(0)/m/n/10 Inspección de mensajes,
+ []
+
+
+Underfull \hbox (badness 1609) in paragraph at lines 1705--1705
+[]|\TU/TimesNewRoman(0)/m/n/10 Decisión local dispo-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1706--1706
+[]|\TU/TimesNewRoman(0)/m/n/10 Seguridad
+ []
+
+
+Underfull \hbox (badness 2617) in paragraph at lines 1706--1706
+[]|\TU/TimesNewRoman(0)/m/n/10 Sin conexión directa
+ []
+
+
+Underfull \hbox (badness 3713) in paragraph at lines 1706--1706
+[]|\TU/TimesNewRoman(0)/m/n/10 Diagrama de arquitectu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1709--1709
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (11.37344pt too wide) in paragraph at lines 1709--1709
+[]|\TU/TimesNewRoman(0)/m/n/10 Comunicación| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1709--1709
+[]|\TU/TimesNewRoman(0)/m/n/10 MQTT/TLS u otro
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1709--1709
+\TU/TimesNewRoman(0)/m/n/10 protocolo equiva-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1709--1709
+\TU/TimesNewRoman(0)/m/n/10 lente; frecuencia
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1710--1710
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (11.37344pt too wide) in paragraph at lines 1710--1710
+[]|\TU/TimesNewRoman(0)/m/n/10 Comunicación| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1710--1710
+[]|\TU/TimesNewRoman(0)/m/n/10 Lista blanca, rango
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1710--1710
+\TU/TimesNewRoman(0)/m/n/10 permitido, vigen-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1710--1710
+\TU/TimesNewRoman(0)/m/n/10 cia y firma/token
+ []
+
+
+Underfull \hbox (badness 1072) in paragraph at lines 1710--1710
+[]|\TU/TimesNewRoman(0)/m/n/10 Reduce el riesgo de manipu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1710--1710
+[]|\TU/TimesNewRoman(0)/m/n/10 Casos de acepta-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1710--1710
+\TU/TimesNewRoman(0)/m/n/10 ción/rechazo de pará-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1711--1711
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Underfull \hbox (badness 1748) in paragraph at lines 1711--1711
+[]|\TU/TimesNewRoman(0)/m/n/10 Disponibilidad objeti-
+ []
+
+
+Underfull \hbox (badness 2302) in paragraph at lines 1711--1711
+\TU/TimesNewRoman(0)/m/n/10 vo propuesta \TU/TimesNewRoman(0)/b/n/10 [DEFI-
+ []
+
+
+Underfull \hbox (badness 1205) in paragraph at lines 1711--1711
+\TU/TimesNewRoman(0)/b/n/10 NIR SEGÚN PILO-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1712--1712
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (14.14688pt too wide) in paragraph at lines 1712--1712
+[]|\TU/TimesNewRoman(0)/m/n/10 Ciberseguridad| 
+ []
+
+
+Underfull \hbox (badness 1845) in paragraph at lines 1712--1712
+[]|\TU/TimesNewRoman(0)/m/n/10 TLS vigente, creden-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1712--1712
+[]|\TU/TimesNewRoman(0)/m/n/10 Revisión de configu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1712--1712
+\TU/TimesNewRoman(0)/m/n/10 ración, flujo de auten-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1712--1712
+\TU/TimesNewRoman(0)/m/n/10 ticación y modelo de
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1713--1713
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (14.14688pt too wide) in paragraph at lines 1713--1713
+[]|\TU/TimesNewRoman(0)/m/n/10 Ciberseguridad| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1714--1714
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (14.14688pt too wide) in paragraph at lines 1714--1714
+[]|\TU/TimesNewRoman(0)/m/n/10 Ciberseguridad| 
+ []
+
+
+Underfull \hbox (badness 5924) in paragraph at lines 1714--1714
+[]|\TU/TimesNewRoman(0)/m/n/10 Permite auditoría y análisis
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1715--1715
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (14.14688pt too wide) in paragraph at lines 1715--1715
+[]|\TU/TimesNewRoman(0)/m/n/10 Ciberseguridad| 
+ []
+
+
+Underfull \hbox (badness 1895) in paragraph at lines 1715--1715
+\TU/TimesNewRoman(0)/m/n/10 ción entre recomendación y actua-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1715--1715
+[]|\TU/TimesNewRoman(0)/m/n/10 Roles diferenciados;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1715--1715
+\TU/TimesNewRoman(0)/m/n/10 ningún usuario del
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1715--1715
+\TU/TimesNewRoman(0)/m/n/10 dashboard gobierna
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1715--1715
+\TU/TimesNewRoman(0)/m/n/10 directamente las
+ []
+
+
+Underfull \hbox (badness 2189) in paragraph at lines 1715--1715
+[]|\TU/TimesNewRoman(0)/m/n/10 Revisión de permisos y
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1716--1716
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (2.27463pt too wide) in paragraph at lines 1716--1716
+\TU/TimesNewRoman(0)/m/n/10 ELEC01| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1716--1716
+[]|\TU/TimesNewRoman(0)/m/n/10 Protecciones dimen-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1716--1716
+\TU/TimesNewRoman(0)/m/n/10 sionadas; valores
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1716--1716
+\TU/TimesNewRoman(0)/b/n/10 [VALIDAR CON
+ []
+
+
+Underfull \hbox (badness 1205) in paragraph at lines 1716--1716
+\TU/TimesNewRoman(0)/m/n/10 de datos y coordinación
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1717--1717
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (2.27463pt too wide) in paragraph at lines 1717--1717
+\TU/TimesNewRoman(0)/m/n/10 ELEC02| 
+ []
+
+
+Underfull \hbox (badness 1762) in paragraph at lines 1717--1717
+[]|\TU/TimesNewRoman(0)/m/n/10 Autonomía propuesta
+ []
+
+
+Underfull \hbox (badness 6047) in paragraph at lines 1717--1717
+\TU/TimesNewRoman(0)/b/n/10 [CALCULAR CON
+ []
+
+
+Underfull \hbox (badness 7944) in paragraph at lines 1717--1717
+\TU/TimesNewRoman(0)/b/n/10 PERFIL DE CAR-
+ []
+
+
+Underfull \hbox (badness 7888) in paragraph at lines 1717--1717
+[]|\TU/TimesNewRoman(0)/m/n/10 Balance de potencia y
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1718--1718
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (2.27463pt too wide) in paragraph at lines 1718--1718
+\TU/TimesNewRoman(0)/m/n/10 ELEC03| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1719--1719
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Underfull \hbox (badness 1320) in paragraph at lines 1719--1719
+[]|\TU/TimesNewRoman(0)/m/n/10 CAD, plano de distribu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1720--1720
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Underfull \hbox (badness 5726) in paragraph at lines 1720--1720
+[]|\TU/TimesNewRoman(0)/m/n/10 IP objetivo propues-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1720--1720
+\TU/TimesNewRoman(0)/m/n/10 to y resistencia al
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1720--1720
+\TU/TimesNewRoman(0)/m/n/10 impacto \TU/TimesNewRoman(0)/b/n/10 [DEFI-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1721--1721
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Underfull \hbox (badness 6284) in paragraph at lines 1721--1721
+[]|\TU/TimesNewRoman(0)/m/n/10 Campo visual y re-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1721--1721
+\TU/TimesNewRoman(0)/m/n/10 corrido \TU/TimesNewRoman(0)/b/n/10 [VALIDAR
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1722--1722
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1722--1722
+[]|\TU/TimesNewRoman(0)/m/n/10 Permitir mantenimiento, actualiza-
+ []
+
+
+Underfull \hbox (badness 2635) in paragraph at lines 1722--1722
+\TU/TimesNewRoman(0)/m/n/10 ción y recuperación sin alterar la
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1722--1722
+[]|\TU/TimesNewRoman(0)/m/n/10 Procedimiento docu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1723--1723
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1724--1724
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1725--1725
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1726--1726
+[]|\TU/TimesNewRoman(0)/m/n/10 R-
+ []
+
+
+Overfull \hbox (2.84103pt too wide) in paragraph at lines 1726--1726
+\TU/TimesNewRoman(0)/m/n/10 COST01| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1726--1726
+[]|\TU/TimesNewRoman(0)/m/n/10 Valores con fuente,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1726--1726
+\TU/TimesNewRoman(0)/m/n/10 fecha y supuestos;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1726--1726
+\TU/TimesNewRoman(0)/b/n/10 [ACTUALIZAR
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1701--1727
+[] [] [] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 1727.
+LaTeX Info: Redefining \% on input line 1727.
+[48
+
+]
+LaTeX Info: Redefining \. on input line 1727.
+LaTeX Info: Redefining \% on input line 1727.
+ [49]
+LaTeX Info: Redefining \. on input line 1727.
+LaTeX Info: Redefining \% on input line 1727.
+ [50]
+LaTeX Info: Redefining \. on input line 1727.
+LaTeX Info: Redefining \% on input line 1727.
+ [51]
+LaTeX Info: Redefining \. on input line 1728.
+LaTeX Info: Redefining \% on input line 1728.
+ [52]
+Overfull \hbox (28.93747pt too wide) in paragraph at lines 1748--1748
+\TU/TimesNewRoman(0)/m/n/12 tral/controlador; 
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1754--1758
+[] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1760--1760
+[]|\TU/TimesNewRoman(0)/m/n/10 Sensores auxiliares y diagnóstico
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 1758--1769
+[] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 1769.
+LaTeX Info: Redefining \% on input line 1769.
+[53
+
+]
+LaTeX Info: Redefining \. on input line 1785.
+LaTeX Info: Redefining \% on input line 1785.
+ [54]
+File: ./media/image91.png Graphic file (type bmp)
+<./media/image91.png>
+LaTeX Info: Redefining \. on input line 1821.
+LaTeX Info: Redefining \% on input line 1821.
+ [55]
+LaTeX Info: Redefining \. on input line 1859.
+LaTeX Info: Redefining \% on input line 1859.
+ [56]
+LaTeX Info: Redefining \. on input line 1898.
+LaTeX Info: Redefining \% on input line 1898.
+ [57]
+LaTeX Info: Redefining \. on input line 1971.
+LaTeX Info: Redefining \% on input line 1971.
+ [58]
+LaTeX Info: Redefining \. on input line 2025.
+LaTeX Info: Redefining \% on input line 2025.
+ [59]
+File: ./media/image154.jpg Graphic file (type bmp)
+<./media/image154.jpg>
+LaTeX Info: Redefining \. on input line 2049.
+LaTeX Info: Redefining \% on input line 2049.
+ [60]
+LaTeX Info: Redefining \. on input line 2112.
+LaTeX Info: Redefining \% on input line 2112.
+ [61]
+File: ./media/image27.png Graphic file (type bmp)
+<./media/image27.png>
+LaTeX Info: Redefining \. on input line 2124.
+LaTeX Info: Redefining \% on input line 2124.
+ [62]
+LaTeX Info: Redefining \. on input line 2151.
+LaTeX Info: Redefining \% on input line 2151.
+ [63]
+File: ./media/image74.png Graphic file (type bmp)
+<./media/image74.png>
+LaTeX Info: Redefining \. on input line 2177.
+LaTeX Info: Redefining \% on input line 2177.
+ [64]
+File: ./media/image83.png Graphic file (type bmp)
+<./media/image83.png>
+LaTeX Info: Redefining \. on input line 2199.
+LaTeX Info: Redefining \% on input line 2199.
+ [65]
+File: ./media/image80.png Graphic file (type bmp)
+<./media/image80.png>
+LaTeX Info: Redefining \. on input line 2232.
+LaTeX Info: Redefining \% on input line 2232.
+ [66]
+LaTeX Info: Redefining \. on input line 2248.
+LaTeX Info: Redefining \% on input line 2248.
+ [67]
+LaTeX Info: Redefining \. on input line 2268.
+LaTeX Info: Redefining \% on input line 2268.
+
+[68]
+File: ./media/image147.png Graphic file (type bmp)
+<./media/image147.png>
+LaTeX Info: Redefining \. on input line 2300.
+LaTeX Info: Redefining \% on input line 2300.
+ [69]
+LaTeX Info: Redefining \. on input line 2306.
+LaTeX Info: Redefining \% on input line 2306.
+ [70]
+Overfull \hbox (3.01158pt too wide) in alignment at lines 2311--2315
+[] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 1616) in paragraph at lines 2321--2321
+[]|\TU/TimesNewRoman(0)/b/n/10 4G/LTE con respaldo o
+ []
+
+
+Underfull \hbox (badness 1173) in paragraph at lines 2324--2324
+[]|\TU/TimesNewRoman(0)/b/n/10 UPS/batería dimensiona-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2325--2326
+[]|\TU/TimesNewRoman(0)/m/n/10 Gabinete de controlador
+ []
+
+
+Overfull \hbox (3.01158pt too wide) in alignment at lines 2315--2328
+[] [] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 2329.
+LaTeX Info: Redefining \% on input line 2329.
+[71
+
+]
+LaTeX Info: Redefining \. on input line 2344.
+LaTeX Info: Redefining \% on input line 2344.
+ [72
+
+]
+Underfull \hbox (badness 10000) in alignment at lines 2349--2353
+[] [] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 2353--2366
+[] [] [] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 2367.
+LaTeX Info: Redefining \% on input line 2367.
+[73
+
+]
+LaTeX Info: Redefining \. on input line 2380.
+LaTeX Info: Redefining \% on input line 2380.
+ [74
+
+]
+LaTeX Info: Redefining \. on input line 2390.
+LaTeX Info: Redefining \% on input line 2390.
+ [75]
+File: ./media/image140.png Graphic file (type bmp)
+<./media/image140.png>
+LaTeX Info: Redefining \. on input line 2401.
+LaTeX Info: Redefining \% on input line 2401.
+ [76]
+LaTeX Info: Redefining \. on input line 2411.
+LaTeX Info: Redefining \% on input line 2411.
+ [77]
+File: ./media/image49.png Graphic file (type bmp)
+<./media/image49.png>
+LaTeX Info: Redefining \. on input line 2422.
+LaTeX Info: Redefining \% on input line 2422.
+ [78]
+File: ./media/image66.png Graphic file (type bmp)
+<./media/image66.png>
+File: ./media/image33.png Graphic file (type bmp)
+<./media/image33.png>
+LaTeX Info: Redefining \. on input line 2428.
+LaTeX Info: Redefining \% on input line 2428.
+ [79]
+File: ./media/image13.png Graphic file (type bmp)
+<./media/image13.png>
+LaTeX Info: Redefining \. on input line 2438.
+LaTeX Info: Redefining \% on input line 2438.
+ [80]
+LaTeX Info: Redefining \. on input line 2448.
+LaTeX Info: Redefining \% on input line 2448.
+ [81]
+File: ./media/image151.png Graphic file (type bmp)
+<./media/image151.png>
+
+Underfull \hbox (badness 10000) in alignment at lines 2471--2475
+[] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2476--2476
+[]|\TU/TimesNewRoman(0)/m/n/10 Sensado/variables equivalentes, ICV,
+ []
+
+
+Underfull \hbox (badness 1478) in paragraph at lines 2477--2477
+[]|\TU/TimesNewRoman(0)/m/n/10 Comunicación con nube, supervisión,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2479--2479
+[]|\TU/TimesNewRoman(0)/m/n/10 Nivel 4: módu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2479--2479
+\TU/TimesNewRoman(0)/m/n/10 los explorato-
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 2475--2481
+[] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 2481.
+LaTeX Info: Redefining \% on input line 2481.
+[82]
+LaTeX Info: Redefining \. on input line 2485.
+LaTeX Info: Redefining \% on input line 2485.
+ [83]
+Underfull \hbox (badness 10000) in paragraph at lines 2492--2492
+[]|\TU/TimesNewRoman(0)/b/n/10 Requerimientos relaciona-
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 2490--2494
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 1515) in paragraph at lines 2495--2495
+[]|\TU/TimesNewRoman(0)/m/n/10 Base para todos los requeri-
+ []
+
+
+Underfull \hbox (badness 7504) in paragraph at lines 2495--2495
+[]|\TU/TimesNewRoman(0)/m/n/10 Revisión comparativa y
+ []
+
+
+Underfull \hbox (badness 1303) in paragraph at lines 2496--2496
+[]|\TU/TimesNewRoman(0)/m/n/10 Inspección de especifica-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2497--2497
+[]|\TU/TimesNewRoman(0)/m/n/10 R-C01, R-C02, R-C04, R-
+ []
+
+
+Underfull \hbox (badness 1668) in paragraph at lines 2498--2498
+[]|\TU/TimesNewRoman(0)/m/n/10 R-ELEC01 a R-ELEC03, R-
+ []
+
+
+Underfull \hbox (badness 3240) in paragraph at lines 2499--2499
+[]|\TU/TimesNewRoman(0)/m/n/10 CAD, cálculo y simula-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2501--2501
+[]|\TU/TimesNewRoman(0)/m/n/10 R-COM01, R-COM02, R-
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 2494--2506
+[] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 2507.
+LaTeX Info: Redefining \% on input line 2507.
+[84
+
+]
+Capítulo 4.
+[85
+
+
+]
+Overfull \hbox (1.24454pt too wide) in paragraph at lines 2522--2522
+[]|\TU/TimesNewRoman(0)/b/n/10 Función/componente| 
+ []
+
+
+Overfull \hbox (3.01117pt too wide) in alignment at lines 2520--2524
+[] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 2726) in paragraph at lines 2525--2525
+[]|\TU/TimesNewRoman(0)/m/n/10 Información obtenida, obra
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2527--2527
+[]|\TU/TimesNewRoman(0)/m/n/10 Cobertura, independencia,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2527--2527
+[]|\TU/TimesNewRoman(0)/m/n/10 4G/LTE y/o Ethernet
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2527--2528
+[]|\TU/TimesNewRoman(0)/m/n/10 R-COM01, R-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2528--2528
+[]|\TU/TimesNewRoman(0)/m/n/10 Aislamiento, rango, preci-
+ []
+
+
+Underfull \hbox (badness 1292) in paragraph at lines 2528--2528
+[]|\TU/TimesNewRoman(0)/m/n/10 Permite diagnóstico; una medición
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2529--2529
+[]|\TU/TimesNewRoman(0)/m/n/10 Fuente industrial
+ []
+
+
+Underfull \hbox (badness 1490) in paragraph at lines 2529--2529
+\TU/TimesNewRoman(0)/m/n/10 debe dimensionarse con margen y
+ []
+
+
+Underfull \hbox (badness 1533) in paragraph at lines 2530--2530
+[]|\TU/TimesNewRoman(0)/m/n/10 Convertidores buck re-
+ []
+
+
+Underfull \hbox (badness 2970) in paragraph at lines 2530--2530
+[]|\TU/TimesNewRoman(0)/m/n/10 Reduce pérdidas; requiere filtrado
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2530--2530
+\TU/TimesNewRoman(0)/m/n/10 y separación de cargas sensi-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2530--2531
+[]|\TU/TimesNewRoman(0)/m/n/10 R-ELEC01, R-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2531--2531
+[]|\TU/TimesNewRoman(0)/m/n/10 Sin respaldo, power bank,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2531--2531
+[]|\TU/TimesNewRoman(0)/m/n/10 UPS/batería dimensio-
+ []
+
+
+Overfull \hbox (3.01117pt too wide) in alignment at lines 2524--2534
+[] [] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 2534.
+LaTeX Info: Redefining \% on input line 2534.
+[86
+
+]
+LaTeX Info: Redefining \. on input line 2535.
+LaTeX Info: Redefining \% on input line 2535.
+ [87]
+File: ./media/image89.png Graphic file (type bmp)
+<./media/image89.png>
+LaTeX Info: Redefining \. on input line 2553.
+LaTeX Info: Redefining \% on input line 2553.
+ [88
+
+]
+LaTeX Info: Redefining \. on input line 2563.
+LaTeX Info: Redefining \% on input line 2563.
+ [89]
+File: ./media/image120.png Graphic file (type bmp)
+<./media/image120.png>
+LaTeX Info: Redefining \. on input line 2580.
+LaTeX Info: Redefining \% on input line 2580.
+ [90]
+File: ./media/image75.png Graphic file (type bmp)
+<./media/image75.png>
+LaTeX Info: Redefining \. on input line 2591.
+LaTeX Info: Redefining \% on input line 2591.
+ [91]
+File: ./media/image28.png Graphic file (type bmp)
+<./media/image28.png>
+LaTeX Info: Redefining \. on input line 2598.
+LaTeX Info: Redefining \% on input line 2598.
+ [92]
+LaTeX Info: Redefining \. on input line 2612.
+LaTeX Info: Redefining \% on input line 2612.
+ [93]
+File: ./media/image150.png Graphic file (type bmp)
+<./media/image150.png>
+File: ./media/image15.png Graphic file (type bmp)
+<./media/image15.png>
+LaTeX Info: Redefining \. on input line 2626.
+LaTeX Info: Redefining \% on input line 2626.
+ [94]
+LaTeX Info: Redefining \. on input line 2640.
+LaTeX Info: Redefining \% on input line 2640.
+ [95]
+File: ./media/image110.png Graphic file (type bmp)
+<./media/image110.png>
+File: ./media/image93.png Graphic file (type bmp)
+<./media/image93.png>
+LaTeX Info: Redefining \. on input line 2650.
+LaTeX Info: Redefining \% on input line 2650.
+ [96]
+File: ./media/image60.png Graphic file (type bmp)
+<./media/image60.png>
+LaTeX Info: Redefining \. on input line 2663.
+LaTeX Info: Redefining \% on input line 2663.
+ [97]
+File: ./media/image85.png Graphic file (type bmp)
+<./media/image85.png>
+LaTeX Info: Redefining \. on input line 2672.
+LaTeX Info: Redefining \% on input line 2672.
+ [98]
+LaTeX Info: Redefining \. on input line 2684.
+LaTeX Info: Redefining \% on input line 2684.
+ [99]
+File: ./media/image157.png Graphic file (type bmp)
+<./media/image157.png>
+File: ./media/image88.png Graphic file (type bmp)
+<./media/image88.png>
+LaTeX Info: Redefining \. on input line 2698.
+LaTeX Info: Redefining \% on input line 2698.
+ [100]
+File: ./media/image139.png Graphic file (type bmp)
+<./media/image139.png>
+LaTeX Info: Redefining \. on input line 2711.
+LaTeX Info: Redefining \% on input line 2711.
+
+[101]
+File: ./media/image54.png Graphic file (type bmp)
+<./media/image54.png>
+LaTeX Info: Redefining \. on input line 2722.
+LaTeX Info: Redefining \% on input line 2722.
+ [102]
+LaTeX Info: Redefining \. on input line 2774.
+LaTeX Info: Redefining \% on input line 2774.
+ [103]
+File: ./media/image153.png Graphic file (type bmp)
+<./media/image153.png>
+LaTeX Info: Redefining \. on input line 2804.
+LaTeX Info: Redefining \% on input line 2804.
+ [104]
+LaTeX Info: Redefining \. on input line 2814.
+LaTeX Info: Redefining \% on input line 2814.
+ [105]
+File: ./media/image20.png Graphic file (type bmp)
+<./media/image20.png>
+LaTeX Info: Redefining \. on input line 2833.
+LaTeX Info: Redefining \% on input line 2833.
+ [106]
+File: ./media/image68.png Graphic file (type bmp)
+<./media/image68.png>
+LaTeX Info: Redefining \. on input line 2844.
+LaTeX Info: Redefining \% on input line 2844.
+ [107]
+LaTeX Info: Redefining \. on input line 2862.
+LaTeX Info: Redefining \% on input line 2862.
+ [108]
+LaTeX Info: Redefining \. on input line 2877.
+LaTeX Info: Redefining \% on input line 2877.
+ [109]
+Underfull \hbox (badness 10000) in alignment at lines 2886--2966
+[] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 2966--2968
+[] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 2968--2969
+[] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 2976.
+LaTeX Info: Redefining \% on input line 2976.
+[110]
+File: ./media/image21.png Graphic file (type bmp)
+<./media/image21.png>
+LaTeX Info: Redefining \. on input line 2999.
+LaTeX Info: Redefining \% on input line 2999.
+ [111]
+LaTeX Info: Redefining \. on input line 3010.
+LaTeX Info: Redefining \% on input line 3010.
+ [112]
+Underfull \hbox (badness 10000) in alignment at lines 3020--3155
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 3155--3157
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 3157--3158
+[] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 3184.
+LaTeX Info: Redefining \% on input line 3184.
+[113]
+Underfull \hbox (badness 10000) in alignment at lines 3193--3240
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 3240--3242
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 3242--3243
+[] [] [] []
+ []
+
+File: ./media/image86.png Graphic file (type bmp)
+<./media/image86.png>
+LaTeX Info: Redefining \. on input line 3259.
+LaTeX Info: Redefining \% on input line 3259.
+[114]
+File: ./media/image87.png Graphic file (type bmp)
+<./media/image87.png>
+LaTeX Info: Redefining \. on input line 3286.
+LaTeX Info: Redefining \% on input line 3286.
+ [115]
+LaTeX Info: Redefining \. on input line 3326.
+LaTeX Info: Redefining \% on input line 3326.
+ [116]
+File: ./media/image114.png Graphic file (type bmp)
+<./media/image114.png>
+LaTeX Info: Redefining \. on input line 3364.
+LaTeX Info: Redefining \% on input line 3364.
+ [117]
+Underfull \hbox (badness 10000) in paragraph at lines 3382--3383
+
+ []
+
+File: ./media/image6.png Graphic file (type bmp)
+<./media/image6.png>
+LaTeX Info: Redefining \. on input line 3395.
+LaTeX Info: Redefining \% on input line 3395.
+[118]
+File: ./media/image72.png Graphic file (type bmp)
+<./media/image72.png>
+LaTeX Info: Redefining \. on input line 3425.
+LaTeX Info: Redefining \% on input line 3425.
+ [119]
+File: ./media/image56.png Graphic file (type bmp)
+<./media/image56.png>
+LaTeX Info: Redefining \. on input line 3447.
+LaTeX Info: Redefining \% on input line 3447.
+ [120]
+File: ./media/image136.png Graphic file (type bmp)
+<./media/image136.png>
+File: ./media/image101.png Graphic file (type bmp)
+<./media/image101.png>
+LaTeX Info: Redefining \. on input line 3461.
+LaTeX Info: Redefining \% on input line 3461.
+ [121]
+File: ./media/image35.png Graphic file (type bmp)
+<./media/image35.png>
+LaTeX Info: Redefining \. on input line 3474.
+LaTeX Info: Redefining \% on input line 3474.
+ [122]
+LaTeX Info: Redefining \. on input line 3553.
+LaTeX Info: Redefining \% on input line 3553.
+ [123]
+File: ./media/image40.png Graphic file (type bmp)
+<./media/image40.png>
+LaTeX Info: Redefining \. on input line 3563.
+LaTeX Info: Redefining \% on input line 3563.
+ [124]
+Underfull \hbox (badness 10000) in alignment at lines 3581--3629
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 3629--3631
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 3631--3632
+[] []
+ []
+
+LaTeX Info: Redefining \. on input line 3637.
+LaTeX Info: Redefining \% on input line 3637.
+[125]
+File: ./media/image44.png Graphic file (type bmp)
+<./media/image44.png>
+LaTeX Info: Redefining \. on input line 3642.
+LaTeX Info: Redefining \% on input line 3642.
+ [126]
+File: ./media/image107.png Graphic file (type bmp)
+<./media/image107.png>
+LaTeX Info: Redefining \. on input line 3654.
+LaTeX Info: Redefining \% on input line 3654.
+ [127]
+File: ./media/image126.png Graphic file (type bmp)
+<./media/image126.png>
+File: ./media/image148.png Graphic file (type bmp)
+<./media/image148.png>
+LaTeX Info: Redefining \. on input line 3669.
+LaTeX Info: Redefining \% on input line 3669.
+ [128]
+File: ./media/image24.png Graphic file (type bmp)
+<./media/image24.png>
+LaTeX Info: Redefining \. on input line 3686.
+LaTeX Info: Redefining \% on input line 3686.
+ [129]
+File: ./media/image2.png Graphic file (type bmp)
+<./media/image2.png>
+LaTeX Info: Redefining \. on input line 3696.
+LaTeX Info: Redefining \% on input line 3696.
+ [130]
+File: ./media/image22.png Graphic file (type bmp)
+<./media/image22.png>
+LaTeX Info: Redefining \. on input line 3704.
+LaTeX Info: Redefining \% on input line 3704.
+ [131]
+LaTeX Info: Redefining \. on input line 3716.
+LaTeX Info: Redefining \% on input line 3716.
+ [132]
+Underfull \hbox (badness 10000) in paragraph at lines 3719--3721
+
+ []
+
+File: ./media/image117.png Graphic file (type bmp)
+<./media/image117.png>
+LaTeX Info: Redefining \. on input line 3731.
+LaTeX Info: Redefining \% on input line 3731.
+[133]
+File: ./media/image77.png Graphic file (type bmp)
+<./media/image77.png>
+File: ./media/image69.png Graphic file (type bmp)
+<./media/image69.png>
+LaTeX Info: Redefining \. on input line 3745.
+LaTeX Info: Redefining \% on input line 3745.
+ [134]
+File: ./media/image8.png Graphic file (type bmp)
+<./media/image8.png>
+LaTeX Info: Redefining \. on input line 3762.
+LaTeX Info: Redefining \% on input line 3762.
+ [135]
+LaTeX Info: Redefining \. on input line 3774.
+LaTeX Info: Redefining \% on input line 3774.
+ [136]
+File: ./media/image97.png Graphic file (type bmp)
+<./media/image97.png>
+File: ./media/image11.png Graphic file (type bmp)
+<./media/image11.png>
+LaTeX Info: Redefining \. on input line 3788.
+LaTeX Info: Redefining \% on input line 3788.
+ [137]
+LaTeX Info: Redefining \. on input line 3793.
+LaTeX Info: Redefining \% on input line 3793.
+ [138]
+Capítulo 5.
+
+Underfull \hbox (badness 10000) in alignment at lines 3799--3803
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3805--3805
+[]|\TU/TimesNewRoman(0)/m/n/10 Grado IP objetivo pro-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3805--3805
+\TU/TimesNewRoman(0)/m/n/10 puesto, sellos y drena-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3808--3808
+[]|\TU/TimesNewRoman(0)/m/n/10 Mantener componentes
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3808--3809
+[]|\TU/TimesNewRoman(0)/m/n/10 Balance térmico y \TU/TimesNewRoman(0)/b/n/10 [V
+A-
+ []
+
+
+Underfull \hbox (badness 6510) in paragraph at lines 3808--3809
+\TU/TimesNewRoman(0)/b/n/10 LIDAR CON PRUEBA
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3809--3809
+[]|\TU/TimesNewRoman(0)/m/n/10 Reserva para terminales,
+ []
+
+
+Underfull \hbox (badness 3525) in paragraph at lines 3810--3811
+\TU/TimesNewRoman(0)/m/n/10 lo de torque y desplaza-
+ []
+
+
+Underfull \hbox (badness 1748) in paragraph at lines 3811--3811
+\TU/TimesNewRoman(0)/m/n/10 dad, radiación y manteni-
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 3803--3814
+[] [] [] []
+ []
+
+[139
+
+]
+File: ./media/image30.png Graphic file (type bmp)
+<./media/image30.png>
+File: ./media/image64.png Graphic file (type bmp)
+<./media/image64.png>
+LaTeX Info: Redefining \. on input line 3835.
+LaTeX Info: Redefining \% on input line 3835.
+ [140]
+LaTeX Info: Redefining \. on input line 3849.
+LaTeX Info: Redefining \% on input line 3849.
+ [141]
+LaTeX Info: Redefining \. on input line 3863.
+LaTeX Info: Redefining \% on input line 3863.
+ [142]
+File: ./media/image111.png Graphic file (type bmp)
+<./media/image111.png>
+LaTeX Info: Redefining \. on input line 3872.
+LaTeX Info: Redefining \% on input line 3872.
+ [143]
+File: ./media/image109.png Graphic file (type bmp)
+<./media/image109.png>
+LaTeX Info: Redefining \. on input line 3881.
+LaTeX Info: Redefining \% on input line 3881.
+ [144]
+LaTeX Info: Redefining \. on input line 3890.
+LaTeX Info: Redefining \% on input line 3890.
+ [145]
+File: ./media/image145.png Graphic file (type bmp)
+<./media/image145.png>
+LaTeX Info: Redefining \. on input line 3918.
+LaTeX Info: Redefining \% on input line 3918.
+ [146]
+File: ./media/image84.png Graphic file (type bmp)
+<./media/image84.png>
+LaTeX Info: Redefining \. on input line 3929.
+LaTeX Info: Redefining \% on input line 3929.
+ [147]
+File: ./media/image70.png Graphic file (type bmp)
+<./media/image70.png>
+LaTeX Info: Redefining \. on input line 3936.
+LaTeX Info: Redefining \% on input line 3936.
+ [148]
+File: ./media/image14.png Graphic file (type bmp)
+<./media/image14.png>
+LaTeX Info: Redefining \. on input line 3943.
+LaTeX Info: Redefining \% on input line 3943.
+ [149]
+File: ./media/image57.png Graphic file (type bmp)
+<./media/image57.png>
+LaTeX Info: Redefining \. on input line 3952.
+LaTeX Info: Redefining \% on input line 3952.
+ [150]
+File: ./media/image79.png Graphic file (type bmp)
+<./media/image79.png>
+LaTeX Info: Redefining \. on input line 3971.
+LaTeX Info: Redefining \% on input line 3971.
+
+[151]
+File: ./media/image16.png Graphic file (type bmp)
+<./media/image16.png>
+LaTeX Info: Redefining \. on input line 3982.
+LaTeX Info: Redefining \% on input line 3982.
+ [152]
+LaTeX Info: Redefining \. on input line 3986.
+LaTeX Info: Redefining \% on input line 3986.
+ [153]
+LaTeX Info: Redefining \. on input line 4019.
+LaTeX Info: Redefining \% on input line 4019.
+ [154]
+LaTeX Info: Redefining \. on input line 4046.
+LaTeX Info: Redefining \% on input line 4046.
+ [155]
+File: ./media/image42.png Graphic file (type bmp)
+<./media/image42.png>
+LaTeX Info: Redefining \. on input line 4071.
+LaTeX Info: Redefining \% on input line 4071.
+ [156]
+File: ./media/image37.png Graphic file (type bmp)
+<./media/image37.png>
+LaTeX Info: Redefining \. on input line 4078.
+LaTeX Info: Redefining \% on input line 4078.
+ [157]
+File: ./media/image51.png Graphic file (type bmp)
+<./media/image51.png>
+LaTeX Info: Redefining \. on input line 4124.
+LaTeX Info: Redefining \% on input line 4124.
+ [158]
+File: ./media/image125.png Graphic file (type bmp)
+<./media/image125.png>
+LaTeX Info: Redefining \. on input line 4152.
+LaTeX Info: Redefining \% on input line 4152.
+ [159]
+LaTeX Info: Redefining \. on input line 4232.
+LaTeX Info: Redefining \% on input line 4232.
+ [160]
+LaTeX Info: Redefining \. on input line 4288.
+LaTeX Info: Redefining \% on input line 4288.
+ [161]
+LaTeX Info: Redefining \. on input line 4345.
+LaTeX Info: Redefining \% on input line 4345.
+ [162]
+LaTeX Info: Redefining \. on input line 4366.
+LaTeX Info: Redefining \% on input line 4366.
+
+[163]
+LaTeX Info: Redefining \. on input line 4408.
+LaTeX Info: Redefining \% on input line 4408.
+ [164]
+File: ./media/image73.png Graphic file (type bmp)
+<./media/image73.png>
+LaTeX Info: Redefining \. on input line 4441.
+LaTeX Info: Redefining \% on input line 4441.
+ [165]
+LaTeX Info: Redefining \. on input line 4512.
+LaTeX Info: Redefining \% on input line 4512.
+ [166]
+File: ./media/image29.png Graphic file (type bmp)
+<./media/image29.png>
+LaTeX Info: Redefining \. on input line 4555.
+LaTeX Info: Redefining \% on input line 4555.
+ [167]
+File: ./media/image104.png Graphic file (type bmp)
+<./media/image104.png>
+LaTeX Info: Redefining \. on input line 4566.
+LaTeX Info: Redefining \% on input line 4566.
+ [168]
+LaTeX Info: Redefining \. on input line 4593.
+LaTeX Info: Redefining \% on input line 4593.
+ [169]
+LaTeX Info: Redefining \. on input line 4659.
+LaTeX Info: Redefining \% on input line 4659.
+ [170]
+File: ./media/image55.png Graphic file (type bmp)
+<./media/image55.png>
+LaTeX Info: Redefining \. on input line 4691.
+LaTeX Info: Redefining \% on input line 4691.
+ [171]
+File: ./media/image159.png Graphic file (type bmp)
+<./media/image159.png>
+LaTeX Info: Redefining \. on input line 4718.
+LaTeX Info: Redefining \% on input line 4718.
+ [172]
+File: ./media/image90.png Graphic file (type bmp)
+<./media/image90.png>
+LaTeX Info: Redefining \. on input line 4740.
+LaTeX Info: Redefining \% on input line 4740.
+ [173]
+LaTeX Info: Redefining \. on input line 4763.
+LaTeX Info: Redefining \% on input line 4763.
+ [174]
+File: ./media/image96.png Graphic file (type bmp)
+<./media/image96.png>
+LaTeX Info: Redefining \. on input line 4788.
+LaTeX Info: Redefining \% on input line 4788.
+
+[175]
+LaTeX Info: Redefining \. on input line 4824.
+LaTeX Info: Redefining \% on input line 4824.
+ [176]
+LaTeX Info: Redefining \. on input line 4867.
+LaTeX Info: Redefining \% on input line 4867.
+ [177]
+File: ./media/image134.png Graphic file (type bmp)
+<./media/image134.png>
+LaTeX Info: Redefining \. on input line 4881.
+LaTeX Info: Redefining \% on input line 4881.
+ [178]
+File: ./media/image31.png Graphic file (type bmp)
+<./media/image31.png>
+LaTeX Info: Redefining \. on input line 4899.
+LaTeX Info: Redefining \% on input line 4899.
+ [179]
+File: ./media/image100.png Graphic file (type bmp)
+<./media/image100.png>
+LaTeX Info: Redefining \. on input line 4916.
+LaTeX Info: Redefining \% on input line 4916.
+ [180]
+LaTeX Info: Redefining \. on input line 4940.
+LaTeX Info: Redefining \% on input line 4940.
+ [181]
+File: ./media/image141.png Graphic file (type bmp)
+<./media/image141.png>
+LaTeX Info: Redefining \. on input line 4966.
+LaTeX Info: Redefining \% on input line 4966.
+ [182]
+LaTeX Info: Redefining \. on input line 4998.
+LaTeX Info: Redefining \% on input line 4998.
+ [183]
+File: ./media/image61.png Graphic file (type bmp)
+<./media/image61.png>
+File: ./media/image99.png Graphic file (type bmp)
+<./media/image99.png>
+LaTeX Info: Redefining \. on input line 5015.
+LaTeX Info: Redefining \% on input line 5015.
+ [184]
+LaTeX Info: Redefining \. on input line 5047.
+LaTeX Info: Redefining \% on input line 5047.
+ [185]
+File: ./media/image130.png Graphic file (type bmp)
+<./media/image130.png>
+File: ./media/image1.png Graphic file (type bmp)
+<./media/image1.png>
+LaTeX Info: Redefining \. on input line 5060.
+LaTeX Info: Redefining \% on input line 5060.
+ [186]
+LaTeX Info: Redefining \. on input line 5085.
+LaTeX Info: Redefining \% on input line 5085.
+
+[187]
+LaTeX Info: Redefining \. on input line 5110.
+LaTeX Info: Redefining \% on input line 5110.
+ [188]
+Capítulo 6.
+[189
+
+]
+LaTeX Info: Redefining \. on input line 5175.
+LaTeX Info: Redefining \% on input line 5175.
+ [190]
+LaTeX Info: Redefining \. on input line 5247.
+LaTeX Info: Redefining \% on input line 5247.
+ [191]
+LaTeX Info: Redefining \. on input line 5312.
+LaTeX Info: Redefining \% on input line 5312.
+ [192]
+LaTeX Info: Redefining \. on input line 5368.
+LaTeX Info: Redefining \% on input line 5368.
+ [193]
+LaTeX Info: Redefining \. on input line 5409.
+LaTeX Info: Redefining \% on input line 5409.
+ [194]
+LaTeX Info: Redefining \. on input line 5454.
+LaTeX Info: Redefining \% on input line 5454.
+ [195]
+LaTeX Info: Redefining \. on input line 5479.
+LaTeX Info: Redefining \% on input line 5479.
+ [196]
+File: ./media/image95.png Graphic file (type bmp)
+<./media/image95.png>
+LaTeX Info: Redefining \. on input line 5509.
+LaTeX Info: Redefining \% on input line 5509.
+ [197]
+LaTeX Info: Redefining \. on input line 5550.
+LaTeX Info: Redefining \% on input line 5550.
+ [198]
+LaTeX Info: Redefining \. on input line 5559.
+LaTeX Info: Redefining \% on input line 5559.
+ [199]
+File: ./media/image143.png Graphic file (type bmp)
+<./media/image143.png>
+LaTeX Info: Redefining \. on input line 5600.
+LaTeX Info: Redefining \% on input line 5600.
+ [200]
+LaTeX Info: Redefining \. on input line 5642.
+LaTeX Info: Redefining \% on input line 5642.
+
+[201]
+LaTeX Info: Redefining \. on input line 5679.
+LaTeX Info: Redefining \% on input line 5679.
+ [202]
+File: ./media/image50.png Graphic file (type bmp)
+<./media/image50.png>
+LaTeX Info: Redefining \. on input line 5716.
+LaTeX Info: Redefining \% on input line 5716.
+ [203]
+LaTeX Info: Redefining \. on input line 5755.
+LaTeX Info: Redefining \% on input line 5755.
+ [204]
+LaTeX Info: Redefining \. on input line 5798.
+LaTeX Info: Redefining \% on input line 5798.
+ [205]
+File: ./media/image112.png Graphic file (type bmp)
+<./media/image112.png>
+LaTeX Info: Redefining \. on input line 5818.
+LaTeX Info: Redefining \% on input line 5818.
+ [206]
+LaTeX Info: Redefining \. on input line 5872.
+LaTeX Info: Redefining \% on input line 5872.
+ [207]
+LaTeX Info: Redefining \. on input line 5921.
+LaTeX Info: Redefining \% on input line 5921.
+ [208]
+LaTeX Info: Redefining \. on input line 5960.
+LaTeX Info: Redefining \% on input line 5960.
+ [209]
+LaTeX Info: Redefining \. on input line 5975.
+LaTeX Info: Redefining \% on input line 5975.
+ [210]
+LaTeX Info: Redefining \. on input line 6016.
+LaTeX Info: Redefining \% on input line 6016.
+ [211]
+LaTeX Info: Redefining \. on input line 6063.
+LaTeX Info: Redefining \% on input line 6063.
+ [212]
+LaTeX Info: Redefining \. on input line 6101.
+LaTeX Info: Redefining \% on input line 6101.
+
+[213]
+LaTeX Info: Redefining \. on input line 6140.
+LaTeX Info: Redefining \% on input line 6140.
+ [214]
+LaTeX Info: Redefining \. on input line 6171.
+LaTeX Info: Redefining \% on input line 6171.
+ [215]
+LaTeX Info: Redefining \. on input line 6210.
+LaTeX Info: Redefining \% on input line 6210.
+ [216]
+LaTeX Info: Redefining \. on input line 6262.
+LaTeX Info: Redefining \% on input line 6262.
+ [217]
+LaTeX Info: Redefining \. on input line 6320.
+LaTeX Info: Redefining \% on input line 6320.
+ [218]
+LaTeX Info: Redefining \. on input line 6419.
+LaTeX Info: Redefining \% on input line 6419.
+ [219]
+LaTeX Info: Redefining \. on input line 6523.
+LaTeX Info: Redefining \% on input line 6523.
+ [220]
+LaTeX Info: Redefining \. on input line 6623.
+LaTeX Info: Redefining \% on input line 6623.
+ [221]
+LaTeX Info: Redefining \. on input line 6659.
+LaTeX Info: Redefining \% on input line 6659.
+ [222]
+LaTeX Info: Redefining \. on input line 6689.
+LaTeX Info: Redefining \% on input line 6689.
+ [223]
+Underfull \hbox (badness 10000) in alignment at lines 6696--6700
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 1558) in paragraph at lines 6702--6702
+[]|\TU/TimesNewRoman(0)/m/n/10 Recomendación remota autenti-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6703--6703
+[]|\TU/TimesNewRoman(0)/m/n/10 Conserva configuración
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6703--6703
+\TU/TimesNewRoman(0)/m/n/10 válida, almacena local-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6703--6703
+\TU/TimesNewRoman(0)/m/n/10 mente y continúa con
+ []
+
+
+Underfull \hbox (badness 1308) in paragraph at lines 6705--6705
+\TU/TimesNewRoman(0)/m/n/10 comendaciones y ejecuta
+ []
+
+
+Overfull \hbox (13.93059pt too wide) in paragraph at lines 6706--6706
+[]|\TU/TimesNewRoman(0)/m/n/10 Manual/mantenimiento| 
+ []
+
+
+Underfull \hbox (badness 1394) in paragraph at lines 6706--6707
+[]|\TU/TimesNewRoman(0)/m/n/10 Operador y controla-
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 6700--6708
+[] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 6708.
+LaTeX Info: Redefining \% on input line 6708.
+[224]
+LaTeX Info: Redefining \. on input line 6732.
+LaTeX Info: Redefining \% on input line 6732.
+ [225]
+LaTeX Info: Redefining \. on input line 6760.
+LaTeX Info: Redefining \% on input line 6760.
+ [226]
+Underfull \hbox (badness 10000) in paragraph at lines 6774--6775
+[]\TU/TimesNewRoman(0)/m/n/12 donde $[]\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 X[]\OT
+1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 2 \U/msb/m/n/12 R[]$ \TU/TimesNewRoman(0)/m/n/1
+2 agrupa los estados locales, $\OML/cmm/m/it/12 M[]\OT1/cmr/m/n/12 (\OML/cmm/m/
+it/12 t\OT1/cmr/m/n/12 ) =
+ []
+
+LaTeX Info: Redefining \. on input line 6818.
+LaTeX Info: Redefining \% on input line 6818.
+[227]
+LaTeX Info: Redefining \. on input line 6876.
+LaTeX Info: Redefining \% on input line 6876.
+ [228]
+LaTeX Info: Redefining \. on input line 6908.
+LaTeX Info: Redefining \% on input line 6908.
+ [229]
+File: ./media/image5.png Graphic file (type bmp)
+<./media/image5.png>
+LaTeX Info: Redefining \. on input line 6927.
+LaTeX Info: Redefining \% on input line 6927.
+ [230]
+LaTeX Info: Redefining \. on input line 6954.
+LaTeX Info: Redefining \% on input line 6954.
+ [231]
+File: ./media/image36.png Graphic file (type bmp)
+<./media/image36.png>
+LaTeX Info: Redefining \. on input line 6981.
+LaTeX Info: Redefining \% on input line 6981.
+ [232]
+LaTeX Info: Redefining \. on input line 6995.
+LaTeX Info: Redefining \% on input line 6995.
+ [233]
+LaTeX Info: Redefining \. on input line 7010.
+LaTeX Info: Redefining \% on input line 7010.
+ [234]
+LaTeX Info: Redefining \. on input line 7051.
+LaTeX Info: Redefining \% on input line 7051.
+ [235]
+File: ./media/image39.png Graphic file (type bmp)
+<./media/image39.png>
+LaTeX Info: Redefining \. on input line 7071.
+LaTeX Info: Redefining \% on input line 7071.
+ [236]
+File: ./media/image78.png Graphic file (type bmp)
+<./media/image78.png>
+LaTeX Info: Redefining \. on input line 7104.
+LaTeX Info: Redefining \% on input line 7104.
+ [237]
+LaTeX Info: Redefining \. on input line 7113.
+LaTeX Info: Redefining \% on input line 7113.
+ [238]
+Underfull \hbox (badness 10000) in alignment at lines 7118--7122
+[] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7123--7123
+[]|\TU/TimesNewRoman(0)/m/n/10 Acceso no autorizado al
+ []
+
+
+Underfull \hbox (badness 1852) in paragraph at lines 7123--7123
+[]|\TU/TimesNewRoman(0)/m/n/10 Exposición o cambio
+ []
+
+
+Underfull \hbox (badness 6592) in paragraph at lines 7124--7124
+[]|\TU/TimesNewRoman(0)/m/n/10 Configuración y reco-
+ []
+
+
+Underfull \hbox (badness 5331) in paragraph at lines 7125--7125
+[]|\TU/TimesNewRoman(0)/m/n/10 Pérdida de confiden-
+ []
+
+
+Underfull \hbox (badness 2368) in paragraph at lines 7129--7129
+[]|\TU/TimesNewRoman(0)/m/n/10 Compromiso de credencia-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7129--7129
+[]|\TU/TimesNewRoman(0)/m/n/10 Identidad de equi-
+ []
+
+
+Underfull \hbox (badness 1297) in paragraph at lines 7129--7130
+[]|\TU/TimesNewRoman(0)/m/n/10 Revisión de arquitectura y
+ []
+
+
+Underfull \hbox (badness 5331) in paragraph at lines 7130--7130
+[]|\TU/TimesNewRoman(0)/m/n/10 Ejecución de código
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7131--7131
+[]|\TU/TimesNewRoman(0)/m/n/10 Timestamps y estado
+ []
+
+
+Underfull \hbox (badness 3623) in paragraph at lines 7131--7131
+[]|\TU/TimesNewRoman(0)/m/n/10 Recomendaciones ob-
+ []
+
+
+Underfull \hbox (badness 7468) in paragraph at lines 7131--7132
+[]|\TU/TimesNewRoman(0)/m/n/10 Caso de mensaje retrasa-
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 7122--7134
+[] [] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 7134.
+LaTeX Info: Redefining \% on input line 7134.
+[239
+
+]
+LaTeX Info: Redefining \. on input line 7135.
+LaTeX Info: Redefining \% on input line 7135.
+ [240]
+LaTeX Info: Redefining \. on input line 7173.
+LaTeX Info: Redefining \% on input line 7173.
+ [241
+
+]
+LaTeX Info: Redefining \. on input line 7220.
+LaTeX Info: Redefining \% on input line 7220.
+ [242]
+Capítulo 7.
+
+Underfull \hbox (badness 10000) in paragraph at lines 7228--7229
+[]|\TU/TimesNewRoman(0)/b/n/10 Condición de acepta-
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 7226--7230
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 1184) in paragraph at lines 7231--7232
+[]|\TU/TimesNewRoman(0)/m/n/10 Configuración documen-
+ []
+
+
+Underfull \hbox (badness 3815) in paragraph at lines 7233--7233
+[]|\TU/TimesNewRoman(0)/m/n/10 Difuso con recomendación de
+ []
+
+
+Underfull \hbox (badness 4181) in paragraph at lines 7233--7234
+[]|\TU/TimesNewRoman(0)/m/n/10 Resultado separado del
+ []
+
+
+Underfull \hbox (badness 1365) in paragraph at lines 7234--7235
+\TU/TimesNewRoman(0)/m/n/10 incompatibles y con re-
+ []
+
+
+Underfull \hbox (badness 1270) in paragraph at lines 7235--7235
+[]|\TU/TimesNewRoman(0)/m/n/10 Max-Pressure u otra referencia
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7235--7236
+\TU/TimesNewRoman(0)/m/n/10 plementación realizable
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 7230--7237
+[] [] [] []
+ []
+
+[243
+
+]
+Underfull \hbox (badness 10000) in alignment at lines 7253--7257
+[] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7263--7263
+[]|\TU/TimesNewRoman(0)/b/n/10 [COMPLETAR CICLO,
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 7257--7268
+[] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 7281.
+LaTeX Info: Redefining \% on input line 7281.
+[244]
+File: ./media/image65.png Graphic file (type bmp)
+<./media/image65.png>
+File: ./media/image58.png Graphic file (type bmp)
+<./media/image58.png>
+LaTeX Info: Redefining \. on input line 7306.
+LaTeX Info: Redefining \% on input line 7306.
+ [245]
+File: ./media/image10.png Graphic file (type bmp)
+<./media/image10.png>
+LaTeX Info: Redefining \. on input line 7328.
+LaTeX Info: Redefining \% on input line 7328.
+ [246]
+LaTeX Info: Redefining \. on input line 7349.
+LaTeX Info: Redefining \% on input line 7349.
+ [247]
+LaTeX Info: Redefining \. on input line 7414.
+LaTeX Info: Redefining \% on input line 7414.
+ [248]
+LaTeX Info: Redefining \. on input line 7458.
+LaTeX Info: Redefining \% on input line 7458.
+ [249]
+LaTeX Info: Redefining \. on input line 7459.
+LaTeX Info: Redefining \% on input line 7459.
+ [250]
+Underfull \hbox (badness 10000) in alignment at lines 7464--7468
+[] [] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 6542) in paragraph at lines 7473--7473
+[]|\TU/TimesNewRoman(0)/m/n/10 Throughput (vehículos completa-
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 7468--7480
+[] [] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 7481.
+LaTeX Info: Redefining \% on input line 7481.
+[251
+
+]
+Underfull \hbox (badness 10000) in alignment at lines 7485--7489
+[] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7493--7493
+[]|\TU/TimesNewRoman(0)/m/n/10 Recomendación venci-
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 7489--7495
+[] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 7528.
+LaTeX Info: Redefining \% on input line 7528.
+[252
+
+]
+File: ./media/image115.png Graphic file (type bmp)
+<./media/image115.png>
+LaTeX Info: Redefining \. on input line 7576.
+LaTeX Info: Redefining \% on input line 7576.
+ [253]
+File: ./media/image81.png Graphic file (type bmp)
+<./media/image81.png>
+LaTeX Info: Redefining \. on input line 7612.
+LaTeX Info: Redefining \% on input line 7612.
+ [254]
+File: ./media/image128.png Graphic file (type bmp)
+<./media/image128.png>
+LaTeX Info: Redefining \. on input line 7644.
+LaTeX Info: Redefining \% on input line 7644.
+ [255]
+File: ./media/image131.png Graphic file (type bmp)
+<./media/image131.png>
+LaTeX Info: Redefining \. on input line 7667.
+LaTeX Info: Redefining \% on input line 7667.
+ [256]
+LaTeX Info: Redefining \. on input line 7704.
+LaTeX Info: Redefining \% on input line 7704.
+ [257]
+LaTeX Info: Redefining \. on input line 7722.
+LaTeX Info: Redefining \% on input line 7722.
+ [258]
+Underfull \hbox (badness 10000) in alignment at lines 7727--7731
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7746--7746
+[]|\TU/TimesNewRoman(0)/b/n/10 [VALIDAR CON
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7747--7747
+[]|\TU/TimesNewRoman(0)/b/n/10 [VALIDAR CON
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7753--7753
+[]|\TU/TimesNewRoman(0)/b/n/10 [RESULTADOS SU-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7754--7754
+[]|\TU/TimesNewRoman(0)/b/n/10 [RESULTADOS SU-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7755--7755
+[]|\TU/TimesNewRoman(0)/b/n/10 [RESULTADO DE
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 7731--7758
+[] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 7758.
+LaTeX Info: Redefining \% on input line 7758.
+[259
+
+]
+LaTeX Info: Redefining \. on input line 7759.
+LaTeX Info: Redefining \% on input line 7759.
+ [260]
+LaTeX Info: Redefining \. on input line 8332.
+LaTeX Info: Redefining \% on input line 8332.
+ [261
+
+]
+LaTeX Info: Redefining \. on input line 8332.
+LaTeX Info: Redefining \% on input line 8332.
+ [262]
+LaTeX Info: Redefining \. on input line 8332.
+LaTeX Info: Redefining \% on input line 8332.
+ [263]
+Overfull \vbox (418.59583pt too high) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 8332.
+LaTeX Info: Redefining \% on input line 8332.
+
+[264]
+Underfull \hbox (badness 10000) in alignment at lines 8348--8493
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8493--8495
+[] [] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8495--8496
+[] [] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 8501.
+LaTeX Info: Redefining \% on input line 8501.
+[265]
+LaTeX Info: Redefining \. on input line 8509.
+LaTeX Info: Redefining \% on input line 8509.
+ [266]
+Underfull \hbox (badness 10000) in alignment at lines 8523--8570
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8570--8572
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8572--8573
+[] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 8587.
+LaTeX Info: Redefining \% on input line 8587.
+[267]
+LaTeX Info: Redefining \. on input line 8587.
+LaTeX Info: Redefining \% on input line 8587.
+ [268] [269
+
+]
+LaTeX Info: Redefining \. on input line 8624.
+LaTeX Info: Redefining \% on input line 8624.
+ [270]
+LaTeX Info: Redefining \. on input line 8627.
+LaTeX Info: Redefining \% on input line 8627.
+ [271]
+Underfull \hbox (badness 1178) in paragraph at lines 8632--8634
+[]\TU/TimesNewRoman(0)/m/n/12 Adafruit Industries. (2016, 9 de febrero). MCP300
+8 | Raspberry Pi Analog to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8634--8636
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://www.advancedpcb.com/en[]-[]us/resourc
+es/blog/understanding[]-[]high[]-[]po[]-[]wer[]-[]pcb[]-
+ []
+
+
+Underfull \hbox (badness 6188) in paragraph at lines 8636--8638
+[]\TU/TimesNewRoman(0)/m/n/12 Aleko, D. R., & Djahel, S. (2023). An IoT enabled
+ traffic light contro-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8636--8638
+\TU/TimesNewRoman(0)/m/n/12 llers synchronization method for road traffic conge
+stion mitigation. Pro-
+ []
+
+
+Underfull \hbox (badness 3919) in paragraph at lines 8636--8638
+\TU/TimesNewRoman(0)/m/n/12 ceedings of the 2nd International Conference on Edg
+e Computing and Ap-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8636--8638
+\TU/TimesNewRoman(0)/m/n/12 plications (ICECAA 2023), IEEE Xplore Part Number: 
+CFP23BV8-ART.
+ []
+
+
+Underfull \hbox (badness 4846) in paragraph at lines 8638--8640
+[]\TU/TimesNewRoman(0)/m/n/12 Altium. (2022, 10 de diciembre). IPC-2221 Calcula
+tor for PCB Trace Cu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8642--8644
+[]\TU/TimesNewRoman(0)/m/n/12 APC Guard. (s.f.). Smart-UPS SMT1500IC Datasheet.
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8650--8652
+[]\TU/TimesNewRoman(0)/m/n/12 ATO. (2020). NEMA 23 stepper motor specifications
+ [Hoja de datos].
+ []
+
+[272
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 8656--8658
+[]\TU/TimesNewRoman(0)/m/n/12 BBMLED. (s.f.). How IoT enhances smart traffic li
+ght systems.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8658--8660
+[]\TU/TimesNewRoman(0)/m/n/12 BC Robotics. (s.f.). Getting Started With The Ras
+pberry Pi 16
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8658--8660
+\TU/TimesNewRoman(0)/m/n/12 Channel ADC HAT. [][][]https://bc[]-[]ro[]-[]bo[]-[
+]tics.com/tutorials/getting[]-[]star[]-[]ted[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8658--8660
+[]\TU/TimesNewRoman(0)/m/n/12 rasp[]-[]berry[]-[]16[]-[]chan[]-[]nel[]-[]adc[]-
+[]hat/?srsltid=AfmBOoo5UNInhCebqc6AE[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8664--8666
+[]\TU/TimesNewRoman(0)/m/n/12 Boaz, R. W. (2009). NTCIP Center-To-Field Step by
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8664--8666
+\TU/TimesNewRoman(0)/m/n/12 Step. Pillar Consulting, Inc. [][][]https://pillari
+nc.com/wp[]-[]con[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8668--8670
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://www.cmu.edu/news/stories/archives/201
+9/october/traffic[]-[]mo[]-[]ves[]-[]at[]-[]speed[]-[]of[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8670--8672
+[]\TU/TimesNewRoman(0)/m/n/12 Coral. (s.f.). Get started with the Coral USB Acc
+elerator.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8674--8676
+[]\TU/TimesNewRoman(0)/m/n/12 DFRobot. (s.f.). Capacitive soil moisture sensor 
+v1.0.
+ []
+
+
+Underfull \hbox (badness 3250) in paragraph at lines 8676--8678
+[]\TU/TimesNewRoman(0)/m/n/12 Digi-Key. (2015). SEN0150 capacitive soil moistur
+e sensor [Hoja de datos].
+ []
+
+
+Overfull \hbox (36.34033pt too wide) in paragraph at lines 8676--8678
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://mm.digikey.com/Volume0/opasdata/d2200
+01/medias/docus/2511/SEN0150_Web.pdf[][] 
+ []
+
+LaTeX Info: Redefining \. on input line 8678.
+LaTeX Info: Redefining \% on input line 8678.
+[273]
+Underfull \hbox (badness 10000) in paragraph at lines 8678--8680
+[]\TU/TimesNewRoman(0)/m/n/12 vehi[]-[]cu[]-[]lar[]-[]en[]-[]li[]-[]ma[]-[]la[]
+-[]ciu[]-[]dad[]-[]mas[]-[]len[]-[]ta[]-[]de[]-[]ame[]-[]ri[]-[]ca[]-[]la[]-[]t
+i[]-[]na[]-[]con[]-[]so[]-[]lo[]-[]145[]-[]kmh[]-[]en[]-[]ho[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8680--8682
+[]\TU/TimesNewRoman(0)/m/n/12 El Español. (2024). Un gigantesco atasco creado p
+or hackers: así
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8680--8682
+\TU/TimesNewRoman(0)/m/n/12 conseguirían los atacantes controlar los semáforos 
+de una ciudad.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8680--8682
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://www.elespanol.com/omicrono/tecnologia
+/20240718/gigantesco[]-[]atas[]-[]co[]-[]crea[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8684--8686
+[]\TU/TimesNewRoman(0)/m/n/12 Finglai Electric. (s.f.). S-360-24 – Switching Po
+wer Supply 24V 15A.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8684--8686
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://www.finglai.com/products/switching[]-
+[]po[]-[]wer[]-[]sup[]-[]plies/general[]-[]swit[]-[]ching[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8688--8690
+\TU/TimesNewRoman(0)/m/n/12 para el control de una intersección semaforizada. T
+ecnología y Ciencias
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8688--8690
+\TU/TimesNewRoman(0)/m/n/12 del Agua, 4(4), 11–21. [][][]https://www.scielo.org
+.mx/scielo.php?pid=S1405[]-
+ []
+
+
+Underfull \hbox (badness 6110) in paragraph at lines 8690--8692
+[]\TU/TimesNewRoman(0)/m/n/12 HandsOn Technology. (s.f.). 360W 24V 15A SMPS – P
+ower Supply Da-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8690--8692
+\TU/TimesNewRoman(0)/m/n/12 tasheet. [][][]https://www.handsontec.com/dataspecs
+/power$ $%20supply/360W[]-[]24V[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8694--8696
+[]\TU/TimesNewRoman(0)/m/n/12 eng.lbl.gov/~shuman/NEXT/CURRENT_DESIGN/TP/MATERI
+ALS/IPC[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8696--8698
+[]\TU/TimesNewRoman(0)/m/n/12 ITS Perú. (2024a). Semáforos inteligentes en San 
+Isidro.
+ []
+
+
+Underfull \hbox (badness 1024) in paragraph at lines 8698--8700
+[]\TU/TimesNewRoman(0)/m/n/12 ITS Perú. (2024b). ¿Quién o qué decide el ritmo d
+e los semáforos en Lima?.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8698--8700
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://itsperu.org/articulos/quien[]-[]o[]-[
+]que[]-[]de[]-[]ci[]-[]de[]-[]el[]-[]rit[]-[]mo[]-[]de[]-[]los[]-[]se[]-[]ma[]-
+[]fo[]-[]ros[]-[]en[]-[]li[]-
+ []
+
+LaTeX Info: Redefining \. on input line 8700.
+LaTeX Info: Redefining \% on input line 8700.
+[274]
+Underfull \hbox (badness 10000) in paragraph at lines 8700--8702
+[]\TU/TimesNewRoman(0)/m/n/12 Jitpakdeebodin, S., & Thongprasri, P. (2024). A s
+im-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8700--8702
+\TU/TimesNewRoman(0)/m/n/12 ple real-time traffic light control system using PL
+C. 2024
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8700--8702
+\TU/TimesNewRoman(0)/m/n/12 12th International Electrical Engineering Congress 
+(iEECON).
+ []
+
+
+Underfull \hbox (badness 2401) in paragraph at lines 8706--8708
+[]\TU/TimesNewRoman(0)/m/n/12 KSN PCB. (s.f.). The Ultimate Guide of Mastering 
+PCB Design Guidelines.
+ []
+
+
+Underfull \hbox (badness 2409) in paragraph at lines 8708--8710
+[]\TU/TimesNewRoman(0)/m/n/12 Little Bird Electronics. (s.f.). Using a Logic-le
+vel Shifter with Raspberry Pi.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8708--8710
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://learn.littlebirdelectronics.com.au/gu
+ides/using[]-[]a[]-[]lo[]-[]gic[]-[]le[]-[]vel[]-[]shif[]-[]ter[]-[]with[]-[]ra
+sp[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8712--8714
+[]\TU/TimesNewRoman(0)/m/n/12 Mean Well. (s.f.b). HDR-15 Series Power Supply.
+ []
+
+
+Underfull \hbox (badness 1603) in paragraph at lines 8718--8720
+[]\TU/TimesNewRoman(0)/m/n/12 National Electrical Manufacturers Association (NE
+MA). (2021). NEMA TS 2-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8718--8720
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://www.nema.org/docs/default[]-[]sour[]-
+[]ce/standards[]-[]do[]-[]cu[]-[]ment[]-[]li[]-[]brary/nema[]-[]ts[]-[]2[]-
+ []
+
+
+Underfull \hbox (badness 8113) in paragraph at lines 8720--8722
+[]\TU/TimesNewRoman(0)/m/n/12 Naylamp Mechatronics. (s.f.a). Conversor de nivel
+ lógico 8ch TXS0108E.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8720--8722
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://naylampmechatronics.com/conversores[]
+-[]ttl/282[]-[]con[]-[]ver[]-[]sor[]-[]de[]-[]ni[]-[]vel[]-[]lo[]-[]gi[]-[]co[]
+-
+ []
+
+LaTeX Info: Redefining \. on input line 8724.
+LaTeX Info: Redefining \% on input line 8724.
+[275]
+Underfull \hbox (badness 5939) in paragraph at lines 8724--8726
+[]\TU/TimesNewRoman(0)/m/n/12 Naylamp Mechatronics. (s.f.c). Motor PAP stepper 
+NEMA23 57H1876-420-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8726--8728
+[]\TU/TimesNewRoman(0)/m/n/12 Naylamp Mechatronics. (s.f.d). Sensor de temperat
+ura digital DS18B20.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8726--8728
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://naylampmechatronics.com/sensores[]-[]
+tem[]-[]pe[]-[]ra[]-[]tu[]-[]ra[]-[]y[]-[]hu[]-[]me[]-[]dad/16[]-[]sen[]-[]sor[
+]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8732--8734
+[]\TU/TimesNewRoman(0)/m/n/12 PULS Power. (s.f.a). CD5.051 – 5V, 10A DIN Rail P
+ower Supply.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8734--8736
+[]\TU/TimesNewRoman(0)/m/n/12 PULS Power. (s.f.b). CD5.121 – 12V, 5A DIN Rail P
+ower Supply.
+ []
+
+
+Underfull \hbox (badness 4048) in paragraph at lines 8742--8744
+[]\TU/TimesNewRoman(0)/m/n/12 Raspberry Pi Stack Exchange. (2014, 13 de marzo).
+ Using 5 volts on an
+ []
+
+
+Underfull \hbox (badness 3525) in paragraph at lines 8742--8744
+\TU/TimesNewRoman(0)/m/n/12 mcp3008. [][][]https://raspberrypi.stackexchange.co
+m/questions/14450/using[]-[]5[]-[]volts[]-[]on[]-
+ []
+
+
+Underfull \hbox (badness 6364) in paragraph at lines 8744--8746
+[]\TU/TimesNewRoman(0)/m/n/12 S, S., Kingslin, M. T., M, S., Sivarajan, S., Jos
+phine, C. V., & Laksh-
+ []
+
+
+Underfull \hbox (badness 3179) in paragraph at lines 8744--8746
+\TU/TimesNewRoman(0)/m/n/12 mi, C. K. R. (2023). IoT based on smart traffic lig
+hts and streetlight sys-
+ []
+
+
+Underfull \hbox (badness 1448) in paragraph at lines 8744--8746
+\TU/TimesNewRoman(0)/m/n/12 tem. Proceedings of the Second International Confer
+ence on Edge Computing
+ []
+
+LaTeX Info: Redefining \. on input line 8748.
+LaTeX Info: Redefining \% on input line 8748.
+[276]
+Underfull \hbox (badness 10000) in paragraph at lines 8752--8754
+\TU/TimesNewRoman(0)/m/n/12 (SMT1500IC). [][][]https://www.se.com/pe/es/product
+/SMT1500IC/apc[]-[]smar[]-[]tups[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8752--8754
+[]\TU/TimesNewRoman(0)/m/n/12 l$ $%C3$ $%ADnea[]-[]in[]-[]ter[]-[]ac[]-[]ti[]-[
+]va[]-[]1500va[]-[]to[]-[]rre[]-[]230v[]-[]8x[]-[]iec[]-[]c13[]-[]sa[]-[]li[]-[
+]das[]-[]puer[]-[]to[]-[]smart[]-[]con[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8754--8756
+[]\TU/TimesNewRoman(0)/m/n/12 SciELO. (2023, julio). Tecnologías emergentes en 
+la in-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8754--8756
+\TU/TimesNewRoman(0)/m/n/12 fraestructura vial en el contexto peruano. SciELO P
+erú.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8754--8756
+[][][]\TU/TimesNewRoman(0)/m/n/12 http://www.scielo.org.pe/scielo.php?script=sc
+i_arttext&pid=S1810[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8756--8758
+[]\TU/TimesNewRoman(0)/m/n/12 SCOOT. (s.f.). Split Cycle Offset Optimization Te
+chnique.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8758--8760
+[]\TU/TimesNewRoman(0)/m/n/12 Seeed Studio. (s.f.). Getting started with Raspbe
+rry Pi 4G LTE HAT.
+ []
+
+
+Underfull \hbox (badness 5847) in paragraph at lines 8760--8762
+[]\TU/TimesNewRoman(0)/m/n/12 Sierra Circuits. (2023, 30 de enero). IPC-2221 St
+andards in PCB Design.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8768--8770
+[]\TU/TimesNewRoman(0)/m/n/12 StepperOnline. (2020). DM542T digital stepping dr
+ive [Hoja de datos].
+ []
+
+
+Overfull \hbox (9.75626pt too wide) in paragraph at lines 8768--8770
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://5.imimg.com/data5/SELLER/Doc/2020/12/
+GL/TF/KS/16561264/stepperonline[]-
+ []
+
+
+Underfull \hbox (badness 2582) in paragraph at lines 8770--8772
+[]\TU/TimesNewRoman(0)/m/n/12 Tario, J. D., Dillmann, R., Lardoux, J., Martinez
+, R., White, C., Gross, N.,
+ []
+
+
+Underfull \hbox (badness 1824) in paragraph at lines 8770--8772
+\TU/TimesNewRoman(0)/m/n/12 Patel, N., & Meyer, R. (2014). Adaptive traffic sig
+nal control for Tarrytown
+ []
+
+
+Underfull \hbox (badness 2012) in paragraph at lines 8770--8772
+\TU/TimesNewRoman(0)/m/n/12 Energy Research and Development Authority & New Yor
+k State Department
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8770--8772
+\TU/TimesNewRoman(0)/m/n/12 of Transportation. TransCore ITS, LLC. [][][]https:
+//www.nyserda.ny.gov/[]-[]/me[]-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8770--8772
+[]\TU/TimesNewRoman(0)/m/n/12 dia/Project/Nyserda/Files/Publications/Research/T
+ransportation/Adaptive[]-[]Traf[]-
+ []
+
+LaTeX Info: Redefining \. on input line 8772.
+LaTeX Info: Redefining \% on input line 8772.
+[277]
+Underfull \hbox (badness 10000) in paragraph at lines 8772--8774
+[]\TU/TimesNewRoman(0)/m/n/12 Trafficware. (2014). Summary of Version 8 release
+s.
+ []
+
+
+Overfull \hbox (65.80896pt too wide) in paragraph at lines 8772--8774
+[][][]\TU/TimesNewRoman(0)/m/n/12 https://online.trafficware.com/downloads/v8/S
+ummary$ $%20of$ $%20Version$ $%208$ $%20Releases.pdf[][] 
+ []
+
+LaTeX Info: Redefining \. on input line 8780.
+LaTeX Info: Redefining \% on input line 8780.
+[278]
+Underfull \hbox (badness 10000) in alignment at lines 8797--8836
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8836--8838
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8838--8839
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8848--8876
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8876--8878
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8878--8879
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8890--8929
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8929--8931
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8931--8932
+[] [] [] []
+ []
+
+[279
+
+]
+Underfull \hbox (badness 10000) in alignment at lines 8941--8969
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8969--8971
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8971--8972
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 8983--9022
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9022--9024
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9024--9025
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9034--9057
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9057--9059
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9059--9060
+[] []
+ []
+
+LaTeX Info: Redefining \. on input line 9155.
+LaTeX Info: Redefining \% on input line 9155.
+[280]
+Underfull \hbox (badness 10000) in alignment at lines 9164--9192
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9192--9194
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9194--9195
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9208--9247
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9247--9249
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9249--9250
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9259--9297
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9297--9299
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9299--9300
+[] []
+ []
+
+LaTeX Info: Redefining \. on input line 9300.
+LaTeX Info: Redefining \% on input line 9300.
+[281]
+Underfull \hbox (badness 10000) in alignment at lines 9309--9342
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9342--9344
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9344--9345
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9354--9392
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9392--9394
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9394--9395
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9406--9454
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9454--9456
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9456--9457
+[] []
+ []
+
+LaTeX Info: Redefining \. on input line 9457.
+LaTeX Info: Redefining \% on input line 9457.
+[282]
+Underfull \hbox (badness 10000) in alignment at lines 9466--9509
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9509--9511
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9511--9512
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9521--9579
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9579--9581
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9581--9582
+[] []
+ []
+
+LaTeX Info: Redefining \. on input line 9584.
+LaTeX Info: Redefining \% on input line 9584.
+[283]
+Underfull \hbox (badness 10000) in alignment at lines 9591--9634
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9634--9636
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9636--9637
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9646--9674
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9674--9676
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9676--9677
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9686--9719
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9719--9721
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9721--9722
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9731--9769
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9769--9771
+[] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 9771--9772
+[] []
+ []
+
+LaTeX Info: Redefining \. on input line 9772.
+LaTeX Info: Redefining \% on input line 9772.
+[284]
+Underfull \hbox (badness 10000) in alignment at lines 9783--10236
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 10236--10238
+[] [] [] []
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 10238--10239
+[] [] [] []
+ []
+
+LaTeX Info: Redefining \. on input line 10239.
+LaTeX Info: Redefining \% on input line 10239.
+[285]
+LaTeX Info: Redefining \. on input line 10239.
+LaTeX Info: Redefining \% on input line 10239.
+ [286]
+LaTeX Info: Redefining \. on input line 10239.
+LaTeX Info: Redefining \% on input line 10239.
+ [287]
+Overfull \vbox (366.0307pt too high) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 10239.
+LaTeX Info: Redefining \% on input line 10239.
+
+[288]
+File: ./media/image3.png Graphic file (type bmp)
+<./media/image3.png>
+File: ./media/image138.png Graphic file (type bmp)
+<./media/image138.png>
+File: ./media/image94.png Graphic file (type bmp)
+<./media/image94.png>
+LaTeX Info: Redefining \. on input line 10255.
+LaTeX Info: Redefining \% on input line 10255.
+ [289]
+File: ./media/image62.png Graphic file (type bmp)
+<./media/image62.png>
+File: ./media/image137.png Graphic file (type bmp)
+<./media/image137.png>
+LaTeX Info: Redefining \. on input line 10263.
+LaTeX Info: Redefining \% on input line 10263.
+ [290]
+File: ./media/image32.png Graphic file (type bmp)
+<./media/image32.png>
+File: ./media/image121.png Graphic file (type bmp)
+<./media/image121.png>
+LaTeX Info: Redefining \. on input line 10267.
+LaTeX Info: Redefining \% on input line 10267.
+ [291]
+File: ./media/image59.png Graphic file (type bmp)
+<./media/image59.png>
+File: ./media/image34.png Graphic file (type bmp)
+<./media/image34.png>
+LaTeX Info: Redefining \. on input line 10275.
+LaTeX Info: Redefining \% on input line 10275.
+ [292]
+File: ./media/image23.png Graphic file (type bmp)
+<./media/image23.png>
+File: ./media/image142.png Graphic file (type bmp)
+<./media/image142.png>
+LaTeX Info: Redefining \. on input line 10279.
+LaTeX Info: Redefining \% on input line 10279.
+ [293]
+File: ./media/image135.png Graphic file (type bmp)
+<./media/image135.png>
+File: ./media/image98.png Graphic file (type bmp)
+<./media/image98.png>
+LaTeX Info: Redefining \. on input line 10287.
+LaTeX Info: Redefining \% on input line 10287.
+ [294]
+File: ./media/image38.png Graphic file (type bmp)
+<./media/image38.png>
+File: ./media/image119.png Graphic file (type bmp)
+<./media/image119.png>
+LaTeX Info: Redefining \. on input line 10291.
+LaTeX Info: Redefining \% on input line 10291.
+ [295]
+File: ./media/image123.png Graphic file (type bmp)
+<./media/image123.png>
+File: ./media/image63.png Graphic file (type bmp)
+<./media/image63.png>
+LaTeX Info: Redefining \. on input line 10299.
+LaTeX Info: Redefining \% on input line 10299.
+ [296]
+File: ./media/image92.png Graphic file (type bmp)
+<./media/image92.png>
+File: ./media/image4.png Graphic file (type bmp)
+<./media/image4.png>
+LaTeX Info: Redefining \. on input line 10303.
+LaTeX Info: Redefining \% on input line 10303.
+ [297]
+File: ./media/image129.png Graphic file (type bmp)
+<./media/image129.png>
+File: ./media/image106.png Graphic file (type bmp)
+<./media/image106.png>
+LaTeX Info: Redefining \. on input line 10315.
+LaTeX Info: Redefining \% on input line 10315.
+ [298]
+LaTeX Info: Redefining \. on input line 10318.
+LaTeX Info: Redefining \% on input line 10318.
+ [299]
+(mainV2.aux
+LaTeX Info: Redefining \. on input line 23.
+LaTeX Info: Redefining \% on input line 23.
+) )
+Output written on mainV2.xdv (312 pages, 5469468 bytes).

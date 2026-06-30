@@ -2,7 +2,7 @@
 Rutas API para Vehículos de Emergencia y Olas Verdes
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request, Depends
 from typing import List
 
 from modelos.emergencia import (
@@ -11,6 +11,8 @@ from modelos.emergencia import (
     OlaVerdeHistorial
 )
 from modelos.respuestas import MensajeResponse
+from seguridad.dependencias import requiere_rol
+from seguridad.auditoria import registrar_evento
 
 router = APIRouter(
     prefix="/api/emergencia",
@@ -45,9 +47,11 @@ async def ruta_optima_emergencia(
 
 
 @router.post("/activar", response_model=OlaVerdeResponse)
-async def activar_ola_verde(request: VehiculoEmergenciaRequest):
+async def activar_ola_verde(request: VehiculoEmergenciaRequest, http: Request,
+                            usuario: dict = Depends(requiere_rol('tecnico', 'admin'))):
     """
     Activa una ola verde para un vehículo de emergencia
+    (requiere rol tecnico/admin; auditado)
 
     Args:
         request: Datos del vehículo y ruta de emergencia
@@ -57,8 +61,17 @@ async def activar_ola_verde(request: VehiculoEmergenciaRequest):
     """
     from servicios.emergencia_service import EmergenciaService
 
+    ip = http.client.host if http.client else ""
+    try:
+        detalle = request.model_dump() if hasattr(request, "model_dump") else dict(request)
+    except Exception:
+        detalle = {}
+
     try:
         resultado = await EmergenciaService.activar_ola_verde(request)
+        registrar_evento(usuario.get('username'), usuario.get('rol'), 'ACTIVAR_OLA_VERDE',
+                         '/api/emergencia/activar', 'ACEPTADO', 'ola verde activada',
+                         detalle=detalle, ip=ip)
         return resultado
     except ValueError as e:
         msg = str(e)

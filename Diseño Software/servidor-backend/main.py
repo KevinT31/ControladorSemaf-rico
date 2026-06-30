@@ -13,7 +13,7 @@ if sys.platform == 'win32':
     if hasattr(sys.stderr, 'buffer'):
         sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -345,6 +345,16 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app_instance: FastAPI):
     # Startup
+    # Inicializar base de datos y sembrar usuarios de ciberseguridad
+    try:
+        from modelos_bd import init_db
+        from seguridad.usuarios import seed_usuarios
+        init_db()
+        seed_usuarios()
+        logger.info("🔐 Base de datos y usuarios de seguridad inicializados")
+    except Exception as e_db:
+        logger.warning(f"No se pudo inicializar BD/usuarios (se usará fallback): {e_db}")
+
     inicializar_sistema()
     # Iniciar tarea de simulación
     tarea_simulacion = asyncio.create_task(bucle_simulacion())
@@ -365,10 +375,44 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configurar CORS
+# ==================== Ciberseguridad ====================
+# Importar configuración y subsistema de seguridad
+try:
+    from config import settings as _settings
+    from seguridad.middleware import AuthMiddleware
+    from seguridad.dependencias import requiere_rol
+    from seguridad.validador_comandos import validar_modo
+    from seguridad.auditoria import registrar_evento
+    _cors_origins = list(getattr(_settings, "CORS_ORIGINS", ["*"]))
+    _auth_disponible = True
+except Exception as _e_sec:
+    logger.warning(f"Subsistema de seguridad no disponible: {_e_sec}")
+    _cors_origins = ["*"]
+    _auth_disponible = False
+
+    # Fallbacks seguros para que la app cargue aunque falte el subsistema:
+    # sin seguridad disponible, NO se conceden permisos de escritura.
+    def requiere_rol(*roles):  # type: ignore
+        def _denegar():
+            raise HTTPException(status_code=503, detail="Subsistema de seguridad no disponible")
+        return _denegar
+
+    def validar_modo(modo):  # type: ignore
+        return (modo in ("simulador", "video", "sumo")), ["modo inválido"]
+
+    def registrar_evento(*a, **k):  # type: ignore
+        pass
+
+# Middleware de autenticación (exige token JWT en /api/*, salvo login/health/estáticos).
+# Se añade ANTES de CORS para que CORS quede como capa más externa (preflight OK).
+if _auth_disponible:
+    app.add_middleware(AuthMiddleware)
+    logger.info("🔐 Middleware de autenticación activo")
+
+# Configurar CORS (lista blanca desde settings; ya no "*")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -389,6 +433,25 @@ try:
     logger.info("Routers modulares registrados correctamente")
 except ImportError as e:
     logger.warning(f"No se pudieron cargar algunos routers modulares: {e}")
+
+# Registrar routers de seguridad (autenticación + control protegido)
+try:
+    from rutas import auth as _auth_router
+    from rutas import control as _control_router
+    from rutas import trazabilidad as _traza_router
+
+    app.include_router(_auth_router.router)
+    app.include_router(_control_router.router)
+    app.include_router(_traza_router.router)
+    logger.info("🔐 Routers de seguridad (auth + control + trazabilidad) registrados")
+except ImportError as e:
+    logger.warning(f"No se pudieron cargar los routers de seguridad: {e}")
+
+
+@app.get("/api/health")
+async def health():
+    """Endpoint público de salud (no requiere token)."""
+    return {"status": "ok", "auth": _auth_disponible}
 
 
 # ==================== RUTAS API ====================
@@ -564,10 +627,18 @@ adicional, revisar `servidor-backend/rutas/emergencias.py` y el servicio
 
 
 @app.post("/api/modo/cambiar")
-async def cambiar_modo(modo: str):
-    """Cambia el modo de operación"""
+async def cambiar_modo(modo: str, request: Request,
+                       usuario: dict = Depends(requiere_rol('tecnico', 'admin'))):
+    """Cambia el modo de operación (requiere rol tecnico/admin; auditado)"""
+    ip = request.client.host if request.client else ""
     if modo not in ['simulador', 'video', 'sumo']:
+        registrar_evento(usuario.get('username'), usuario.get('rol'), 'CAMBIAR_MODO',
+                         '/api/modo/cambiar', 'RECHAZADO', f"modo '{modo}' inválido",
+                         detalle={'modo': modo}, ip=ip)
         raise HTTPException(status_code=400, detail="Modo inválido")
+    registrar_evento(usuario.get('username'), usuario.get('rol'), 'CAMBIAR_MODO',
+                     '/api/modo/cambiar', 'ACEPTADO', f"modo -> {modo}",
+                     detalle={'modo': modo}, ip=ip)
 
     # Limpiar modo anterior
     if estado_sistema['modo'] == 'sumo' and estado_sistema['conector_sumo']:

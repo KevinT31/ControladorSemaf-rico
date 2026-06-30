@@ -1,0 +1,634 @@
+\chapter{DISEÑO DE LA ETAPA DE CONTROL}\label{cap:control}
+\listasdecapitulo{6}
+
+\section{Arquitectura de control en tres capas}\label{sec:arquitectura-control}
+
+El módulo de control propuesto para la red semafórica de Lima Metropolitana busca superar
+las limitaciones de los sistemas de tiempo fijo y programable que operan en la mayoría de
+intersecciones de la ciudad, los cuales no responden a las condiciones reales del tráfico y
+generan tiempos de espera excesivos, congestión crónica y desperdicio de capacidad vial en
+periodos de baja demanda. Frente a ello, el diseño no reemplaza al controlador semafórico
+existente, sino que añade una capa de sensado y decisión que \emph{recomienda} ajustes de
+fase. La premisa arquitectónica, sostenida en todo el documento, es que el controlador
+semafórico conserva la autoridad final de actuación y que ninguna salida del módulo se
+convierte por sí sola en una orden de lámpara.
+
+El sistema integra tres capas que operan de forma sinérgica y en escalas temporales
+complementarias:
+
+\begin{enumerate}
+\item \textbf{Capa de percepción.} Una cámara domo de visión cenital (modelo
+  DS-2CE57H0T-VPITF) instalada en el centro de cada intersección $I_{p}$ captura video que,
+  procesado mediante detección de objetos (YOLO) y seguimiento (ByteTrack), produce las
+  variables locales de tráfico: cola, velocidad, flujo, densidad y presencia de vehículos de
+  emergencia.
+\item \textbf{Capa de decisión local (núcleo validable).} Un controlador difuso de Mamdani,
+  ejecutado en el cómputo de borde de la intersección, integra esas variables en el Índice de
+  Congestión Vehicular (ICV) y genera un ajuste acotado del tiempo verde. Opera con latencia
+  baja, es interpretable y sobrevive a la pérdida de conectividad. Constituye el núcleo
+  validable del módulo.
+\item \textbf{Capa de coordinación global (soporte no crítico).} Una infraestructura en la
+  nube (Microsoft Azure) recibe la telemetría de todas las intersecciones, calcula métricas de
+  red y coordinación entre cruces y emite recomendaciones globales. Esta capa es de soporte:
+  su indisponibilidad degrada el desempeño de coordinación, pero no impide que la capa local
+  continúe operando con su plan seguro.
+\end{enumerate}
+
+La lógica difusa se selecciona como núcleo porque ofrece reglas interpretables, incorpora
+conocimiento experto, opera con pocos datos iniciales, se ejecuta en el borde y permite
+verificar sistemáticamente sus límites. Las capas de aprendizaje por refuerzo (RL) y de
+predicción CNN--LSTM se presentan como módulos experimentales de optimización y extensión
+futura (Sección~\ref{sec:capas-futuras}), no como sustitutos del controlador certificado.
+Esta delimitación mantiene la propuesta dentro de un alcance técnico realista para una tesis
+de titulación.
+
+\section{Percepción y variables locales}\label{sec:percepcion}
+
+La capa de percepción opera de manera autónoma en cada intersección $I_{p}$, procesando en
+tiempo real el video de la cámara domo para extraer las variables que alimentan la decisión
+local. Todas las variables se calculan por dirección y se organizan en vectores que se
+actualizan según la orientación de la cámara.
+
+\subsection{Orientación de cámara y función de máscara}\label{subsec:cammask}
+
+La cámara domo alterna entre dos vistas perpendiculares para cubrir los cuatro accesos de la
+intersección cruciforme: la vista Norte--Sur (NS), que observa los carriles Norte y Sur, y la
+vista Este--Oeste (EO), que observa los carriles Este y Oeste. El estado de observación en el
+instante $t$ se representa mediante la función de máscara:
+\[
+CamMask(I_{p},t) =
+\begin{cases}
+1, & \text{si la cámara apunta hacia Norte--Sur}\\[2pt]
+0, & \text{si la cámara apunta hacia Este--Oeste}
+\end{cases}
+\]
+
+Esta función determina qué grupo de carriles (NS o EO) está visible para el cálculo de
+métricas en un instante dado y controla la actualización de los vectores de estado local.
+
+\subsection{Funciones de detección}\label{subsec:funciones-deteccion}
+
+\textbf{Cola vehicular (conteo de detenidos).} Cuantifica los vehículos prácticamente
+inmóviles en cada carril, indicador directo de demanda acumulada:
+\[
+StoppedCount(l,t) = \sum_{v \in V(l,t)}\delta[v],
+\qquad
+\delta[v] =
+\begin{cases}
+1, & \text{si } velocidad(v) < \varepsilon\\[2pt]
+0, & \text{caso contrario}
+\end{cases}
+\]
+donde $V(l,t)$ es el conjunto de vehículos detectados en el carril $l$, $velocidad(v)$ la
+velocidad instantánea estimada por ByteTrack y $\varepsilon$ el umbral para considerar un
+vehículo detenido.
+
+\textbf{Velocidad promedio.} Evalúa la fluidez considerando solo vehículos en movimiento:
+\[
+V_{avg}(l,t) = \frac{1}{N_{mov}(l,t)}\sum_{v \in V_{mov}(l,t)}velocidad(v),
+\qquad
+V_{mov}(l,t) = \{ v \in V(l,t): velocidad(v) \geq \varepsilon\}.
+\]
+Para que la variable quede definida en todo escenario se adoptan dos convenciones de borde: si
+no hay vehículos en el carril ($N_{total}=0$) se asigna $V_{avg}=V_{MAX}$, pues la ausencia de
+demanda equivale a flujo libre; si hay vehículos pero todos están detenidos
+($N_{total}>0 \land N_{mov}=0$) se asigna $V_{avg}=0$, el caso de máxima retención. Estas
+convenciones evitan indeterminaciones del promedio y garantizan que los índices derivados
+interpreten correctamente tanto la vía vacía como la bloqueada.
+
+\textbf{Flujo vehicular.} Mide la tasa de salida de vehículos, útil para estimar capacidad y
+eficiencia instantánea:
+\[
+q(l,t) = \frac{N_{cross}(l,\ t_{0},\ t)}{t-t_{0}},
+\]
+donde $N_{cross}$ es el número de vehículos que cruzaron una línea de conteo virtual entre los
+tiempos $t_{0}$ y $t$.
+
+\textbf{Densidad vehicular.} Refleja la ocupación espacial del carril:
+\[
+k(l,t) = \frac{N_{total}(l,t)}{L_{efectiva}},
+\qquad N_{total}(l,t)=|V(l,t)|.
+\]
+A diferencia del modelo clásico $k=q/V_{avg}$, esta formulación calcula la densidad
+espacialmente contando directamente los vehículos en un área conocida, lo cual resulta más
+adecuado para sistemas de visión por computadora.
+
+\textbf{Detección de vehículos de emergencia.} Identifica ambulancias y vehículos de bomberos
+para activar protocolos de priorización:
+\[
+EV(l,t) = \sum_{v \in V(l,t)}\delta_{emg}[v,t],
+\qquad
+\delta_{emg}[v,t] =
+\begin{cases}
+1, & \text{si } class(v)\in C_{emg}\ \land\ confidence(v)\geq \tau_{EV}\\[2pt]
+0, & \text{caso contrario}
+\end{cases}
+\]
+donde $C_{emg}=\{\text{ambulancias, bomberos}\}$ y $\tau_{EV}=0.85$ es el umbral mínimo de
+confianza, fijado alto para minimizar falsos positivos dado el fuerte impacto de una
+activación errónea de prioridad. Una vez detectado un vehículo de emergencia, ByteTrack lo
+sigue de forma continua registrando posición, velocidad y direcciones de entrada y salida, e
+incluso reorienta la cámara de forma reactiva (mediante zonas de activación calibradas en el
+plano de la intersección) para no perder su visibilidad al girar dentro del cruce.
+
+Todas las variables se vectorizan según la orientación de cámara; por ejemplo, para la cola:
+\[
+SC_{p}(t) =
+\begin{cases}
+\left[\, SC_{N},\ SC_{S},\ 0,\ 0 \,\right], & CamMask(I_{p},t) = 1\\[2pt]
+\left[\, 0,\ 0,\ SC_{E},\ SC_{O} \,\right], & CamMask(I_{p},t) = 0
+\end{cases}
+\]
+con expresiones análogas para $V_{avg}$, $q$, $k$ y $EV$. En cada instante solo dos
+direcciones reciben valores observados; las dos restantes conservan su última lectura válida.
+
+\subsection{Parámetro de Intensidad (PI)}\label{subsec:pi}
+
+El Parámetro de Intensidad cuantifica la relación entre fluidez (velocidad) y acumulación
+(cola), permitiendo detectar estados de congestión inminente donde la velocidad cae mientras
+la cola crece:
+\[
+PI(l,t) = \frac{V_{avg}(l,t)+\delta}{SC(l,t)+\delta},
+\]
+con $\delta=0.1$ una pequeña constante de regularización que evita la división entre cero. Como
+$V_{avg}$ y $SC$ ingresan normalizados a $[0,1]$, el cociente crudo es asimétrico, por lo que
+el indicador se acota mediante la transformación racional:
+\[
+PI_{norm}(l,t) = \frac{PI(l,t)}{1+PI(l,t)}
+= \frac{V_{avg}(l,t)+\delta}{V_{avg}(l,t)+SC(l,t)+2\delta}.
+\]
+Esta transformación es estrictamente creciente y reparte el rango de salida de forma
+equilibrada: cuando velocidad y cola se igualan resulta $PI_{norm}=0.5$ (equilibrio entre
+movilidad y retención); el flujo libre puro produce $PI_{norm}\approx 0.92$ y el bloqueo total
+$PI_{norm}\approx 0.08$. Esta propiedad da significado físico directo a los umbrales de los
+conjuntos difusos definidos más adelante. En adelante, toda referencia al PI alude a
+$PI_{norm}$.
+
+\subsection{Matriz de estado local y transmisión}\label{subsec:matriz-estado}
+
+Las variables anteriores, más el ICV y el PI por dirección, se consolidan en la matriz de
+estado local de la intersección, de dimensión $\mathbb{R}^{28}$ (7 variables $\times$ 4
+direcciones):
+\[
+X_{\text{local}}^{(p)}(t)=
+\big[\,SC_{d},\ V_{avg,d},\ q_{d},\ k_{d},\ ICV_{d},\ PI_{d},\ EV_{d}\,\big]_{d\in\{N,S,E,O\}}
+\in \mathbb{R}^{28}.
+\]
+La normalización se aplica \emph{por variable} y no sobre el vector completo,
+$X_{norm}=(X-X_{MIN})/(X_{MAX}-X_{MIN})$, empleando matrices auxiliares $X_{MAX}$ y $X_{MIN}$
+reconfigurables. Un único rango global mezclaría escalas heterogéneas y anularía las variables
+de menor magnitud (como las banderas de emergencia). El vector resultante se transmite al
+servicio en la nube mediante un paquete de telemetría que incluye identificador de
+intersección, marca temporal UTC, fase actual, tiempo restante, estado de conexión y un hash
+SHA-256 de integridad; cuando $EV_{d}>0$ se activa un canal de transmisión prioritario con el
+estado cinemático del vehículo de emergencia. La relación entre las funciones de detección y
+los índices integrados se ilustra en la Figura~\ref{fig:variables-locales} y su consolidación
+en la matriz de estado en la Figura~\ref{fig:matriz-estado}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image95.png}
+  \caption{Relación de las variables locales: las cinco funciones de detección alimentan los
+  índices integrados PI e ICV de cada carril.}
+  \label{fig:variables-locales}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image143.png}
+  \caption{Relación de las variables locales con la matriz de estado local transmitida a la nube.}
+  \label{fig:matriz-estado}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\section{Índice de Congestión Vehicular (ICV)}\label{sec:icv}
+
+El ICV integra las variables de tráfico en un índice sintético continuo, normalizado en
+$[0,1]$, que representa el nivel de congestión de cada carril. Constituye la entrada compuesta
+principal del controlador difuso y, por su interpretabilidad, la base de la visualización de
+estado para los operadores.
+
+\subsection{Formulación y compuerta por demanda}\label{subsec:icv-formula}
+
+\[
+ICV(l,t) =
+\begin{cases}
+0, & \text{si } N_{total}(l,t)=0\\[6pt]
+w_{1}\dfrac{SC(l,t)}{SC_{MAX}}
++ w_{2}\!\left(1-\dfrac{V_{avg}(l,t)}{V_{MAX}}\right)
++ w_{3}\!\left(1-\dfrac{q(l,t)}{q_{MAX}}\right)
++ w_{4}\dfrac{k(l,t)}{k_{MAX}}, & \text{si } N_{total}(l,t)>0
+\end{cases}
+\]
+
+La compuerta por demanda ($ICV=0$ cuando no hay vehículos) es necesaria porque un flujo bajo
+es ambiguo: una vía vacía y una vía bloqueada producen ambas $q\approx 0$, pero solo la segunda
+está congestionada. Al condicionar el índice a la presencia de vehículos detectados, el término
+$1-q/q_{MAX}$ mide \emph{demanda insatisfecha} y no penaliza la simple ausencia de demanda. La
+restricción de convexidad $\sum_{i=1}^{4}w_{i}=1$, $w_{i}\geq 0$, garantiza que el ICV sea una
+combinación convexa de términos acotados en $[0,1]$ y, por lo tanto, quede acotado en $[0,1]$
+sin reescalamiento posterior.
+
+\subsection{Pesos, verificación por AHP y parámetros}\label{subsec:icv-pesos}
+
+Los pesos se asignan por ponderación directa a partir de conocimiento experto de tránsito,
+priorizando la cola detenida como el indicador más directo de demanda insatisfecha:
+$w_{1}=0.35$ (cola), $w_{2}=0.25$ (velocidad), $w_{3}=0.25$ (flujo) y $w_{4}=0.15$ (densidad).
+Esta asignación se verifica de forma independiente mediante el método de jerarquías analíticas
+(AHP), comparando los cuatro criterios por pares; los pesos normalizados resultantes
+(Tabla~\ref{tab:ahp}) coinciden en orden y magnitud con la ponderación directa, lo que respalda
+la consistencia de la elección. En el plan de validación del Capítulo~\ref{cap:validacion}
+estos pesos se refinan mediante búsqueda en malla sobre el simplex $\sum w_{i}=1$ en el entorno
+SUMO, tomando como criterio la minimización de la demora media por vehículo.
+
+\begin{table}[H]
+  \centering
+  \caption{Verificación de los pesos del ICV mediante el método AHP.}
+  \label{tab:ahp}
+  \begin{tabular}{@{}lcc@{}}
+    \toprule
+    \textbf{Criterio} & \textbf{Ponderación directa} & \textbf{Peso AHP} \\
+    \midrule
+    Longitud de cola (L) & 0.35 & 0.362 \\
+    Velocidad (V)        & 0.25 & 0.253 \\
+    Flujo (F)            & 0.25 & 0.253 \\
+    Densidad (D)         & 0.15 & 0.132 \\
+    \bottomrule
+  \end{tabular}
+  \fuente{Elaboración propia.}
+\end{table}
+
+Las constantes de normalización del índice corresponden a parámetros físicos del escenario:
+longitud máxima de cola $L_{max}=150$~m, velocidad libre de flujo $V_{MAX}=60$~km/h, flujo de
+saturación $F_{sat}=q_{MAX}=30$~veh/min, longitud de carril $L_{carril}=300$~m y densidad de
+atasco $\rho_{jam}=k_{MAX}=0.2$~veh/m. El valor continuo del ICV se interpreta en tres niveles
+operativos: \textbf{Bajo} ($ICV<0.3$, verde), \textbf{Medio} ($0.3\leq ICV<0.6$, amarillo) y
+\textbf{Alto} ($ICV\geq 0.6$, rojo).
+
+\subsection{Casos de prueba}\label{subsec:icv-casos}
+
+El ICV se evaluó sobre ocho casos de prueba que cubren el espectro de operación, desde flujo
+libre nocturno hasta atasco total. La Tabla~\ref{tab:casos-icv} reporta, para cada caso, las
+variables de entrada y el ICV resultante, que recorre el rango $0.112$--$0.975$ y cruza
+coherentemente los tres niveles de congestión.
+
+\begin{table}[H]
+  \centering
+  \caption{Casos de prueba del ICV con sus variables de entrada y nivel resultante.}
+  \label{tab:casos-icv}
+  \begin{tabular}{@{}lcccccll@{}}
+    \toprule
+    \textbf{Caso} & \textbf{L (m)} & \textbf{V (km/h)} & \textbf{F (veh/min)} &
+    \textbf{N (veh)} & \textbf{$\rho$ (veh/m)} & \textbf{ICV} & \textbf{Nivel} \\
+    \midrule
+    Flujo libre nocturno   & 5   & 58 & 8  & 10 & 0.033 & 0.112 & Bajo  \\
+    Flujo libre diurno     & 15  & 52 & 12 & 18 & 0.060 & 0.213 & Bajo  \\
+    Transición matutina    & 35  & 40 & 18 & 28 & 0.093 & 0.385 & Medio \\
+    Congestión leve        & 60  & 30 & 20 & 35 & 0.117 & 0.519 & Medio \\
+    Congestión moderada    & 85  & 22 & 24 & 45 & 0.150 & 0.669 & Alto  \\
+    Congestión severa      & 115 & 15 & 27 & 52 & 0.173 & 0.811 & Alto  \\
+    Atasco parcial         & 135 & 10 & 29 & 58 & 0.193 & 0.910 & Alto  \\
+    Atasco total           & 148 & 5  & 30 & 60 & 0.200 & 0.975 & Alto  \\
+    \bottomrule
+  \end{tabular}
+  \fuente{Elaboración propia, a partir de los resultados de cálculo del repositorio.}
+\end{table}
+
+\subsection{Análisis de sensibilidad}\label{subsec:icv-sensibilidad}
+
+Para cuantificar la influencia relativa de cada variable se perturbó individualmente cada
+entrada en $+10\%$ sobre el caso base de congestión moderada ($ICV\approx 0.669$), midiendo la
+variación porcentual del índice (Tabla~\ref{tab:sensibilidad}). La cola y el flujo resultan las
+variables más influyentes ($+2.96\%$ y $+2.99\%$ respectivamente), seguidas por la densidad
+($+1.68\%$); la velocidad presenta sensibilidad negativa ($-1.37\%$), coherente con su aporte
+inverso a la congestión. Este resultado es consistente con la jerarquía de pesos asignada y con
+la verificación por AHP: las variables de mayor peso son también las de mayor sensibilidad.
+
+\begin{table}[H]
+  \centering
+  \caption{Análisis de sensibilidad del ICV ante un incremento del $10\%$ en cada variable
+  (caso base $ICV\approx 0.669$).}
+  \label{tab:sensibilidad}
+  \begin{tabular}{@{}lccccc@{}}
+    \toprule
+    \textbf{Variable} & \textbf{Valor base} & \textbf{Valor $+10\%$} &
+    \textbf{ICV result.} & \textbf{$\Delta$ICV} & \textbf{Sensibilidad (\%)} \\
+    \midrule
+    Longitud de cola (L)  & 85 & 93.5 & 0.689 & $+0.0198$ & $+2.96$ \\
+    Flujo (F)             & 24 & 26.4 & 0.689 & $+0.0200$ & $+2.99$ \\
+    Densidad (N)          & 45 & 49.5 & 0.680 & $+0.0113$ & $+1.68$ \\
+    Velocidad (V)         & 22 & 24.2 & 0.660 & $-0.0092$ & $-1.37$ \\
+    \bottomrule
+  \end{tabular}
+  \fuente{Elaboración propia, a partir de los resultados de cálculo del repositorio.}
+\end{table}
+
+\subsection{Validación de la cadena cámara\,$\rightarrow$\,ICV con video real}\label{subsec:icv-video}
+
+Más allá de los casos sintéticos, la cadena completa cámara\,$\rightarrow$\,conteo/
+velocidad/cola\,$\rightarrow$\,ICV se probó sobre \emph{video real} de una intersección del
+campus PUCP. Se procesaron aproximadamente $700$ \emph{frames}, detectando entre $20$ y $35$
+vehículos por \emph{frame} y estimando velocidad y flujo por visión. El ICV calculado sobre los
+datos reales se situó en el rango $0.45$--$0.71$ (niveles medio y alto), consistente con las
+condiciones observadas de tráfico moderado a denso. Este resultado demuestra que el índice se
+calcula correctamente a partir de detecciones reales --- no de valores sintéticos --- y que la
+percepción entrega entradas físicamente coherentes al controlador difuso.
+
+\section{Control difuso local de Mamdani}\label{sec:control-difuso}
+
+El núcleo de decisión local es un controlador difuso de tipo Mamdani que, a partir del ICV y el
+PI ya definidos en las Secciones~\ref{sec:icv} y~\ref{subsec:pi}, genera un ajuste porcentual
+acotado del tiempo verde. Opera con latencia baja en el cómputo de borde y proporciona
+respuesta reactiva mientras la capa global calcula optimizaciones de red. Sus salidas son
+\emph{recomendaciones}: nunca constituyen por sí solas una orden de lámpara.
+
+\subsection{Variables lingüísticas de entrada}\label{subsec:fuzzy-entrada}
+
+El sistema procesa tres variables ya descritas: el ICV y el PI (Sección~\ref{sec:percepcion}) y
+la presencia de vehículos de emergencia (EV). Las funciones de pertenencia son trapezoidales o
+triangulares, elegidas por su bajo costo computacional (evaluación $O(1)$ por conjunto) y su
+interpretabilidad; los conjuntos adyacentes se traslapan para asegurar transiciones de control
+suaves. El ICV se mapea a tres conjuntos:
+\[
+\mu_{\text{Bajo}}(ICV)=
+\begin{cases}1,&ICV\le 0.2\\ \frac{0.4-ICV}{0.2},&0.2<ICV\le 0.4\\ 0,&ICV>0.4\end{cases}
+\;\;
+\mu_{\text{Medio}}(ICV)=
+\begin{cases}0,&ICV\le 0.2\\ \frac{ICV-0.2}{0.2},&0.2<ICV\le 0.4\\ \frac{0.7-ICV}{0.3},&0.4<ICV\le 0.7\\ 0,&ICV>0.7\end{cases}
+\;\;
+\mu_{\text{Alto}}(ICV)=
+\begin{cases}0,&ICV\le 0.4\\ \frac{ICV-0.4}{0.3},&0.4<ICV\le 0.7\\ 1,&ICV>0.7\end{cases}
+\]
+En todo el dominio se cumple $\mu_{\text{Bajo}}+\mu_{\text{Medio}}+\mu_{\text{Alto}}=1$
+(partición de Ruspini), lo que normaliza la suma de activaciones. El PI se modela de forma
+análoga con tres conjuntos (Ineficiente, Moderadamente eficiente y Muy eficiente) sobre los
+umbrales $0.3$/$0.5$/$0.8$, cuyos puntos de quiebre heredan el significado físico del
+$PI_{norm}$. La presencia de emergencia, al ser un conteo entero, se modela con conjuntos
+nítidos: $\mu_{\text{Ausente}}(EV)=1$ si $EV=0$ y $\mu_{\text{Presente}}(EV)=1$ si $EV>0$.
+
+\subsection{Variable de salida y base de reglas}\label{subsec:fuzzy-reglas}
+
+La salida es el ajuste porcentual del tiempo verde $\Delta T_{verde}\in[-30\%,+30\%]$, definido
+mediante cinco conjuntos: Reducir\_Fuerte, Reducir\_Leve, Mantener, Extender\_Leve y
+Extender\_Fuerte. La base de reglas contiene $12$ reglas organizadas en cuatro niveles de
+prioridad y es \emph{completa}: cuando hay vehículo de emergencia, las tres reglas de Prioridad
+1 cubren los tres niveles de ICV (el PI se ignora deliberadamente, pues la prioridad absoluta
+del vehículo domina cualquier consideración de eficiencia); cuando no lo hay, las nueve reglas
+restantes cubren exhaustivamente las $3\times 3$ combinaciones de ICV y PI. Por lo tanto, para
+cualquier estado de entrada existe al menos una regla activa y la salida está siempre definida.
+La Tabla~\ref{tab:reglas-difusas} resume la base de reglas.
+
+\begin{table}[H]
+  \centering
+  \caption{Base de reglas difusas organizada por nivel de prioridad.}
+  \label{tab:reglas-difusas}
+  \begin{tabular}{@{}clll@{}}
+    \toprule
+    \textbf{Regla} & \textbf{Antecedente} & \textbf{Consecuente ($\Delta T_{verde}$)} & \textbf{Prioridad}\\
+    \midrule
+    R1 & EV Presente $\land$ ICV Alto & Extender\_Fuerte & 1 (emergencia)\\
+    R2 & EV Presente $\land$ ICV Medio & Extender\_Fuerte & 1 (emergencia)\\
+    R3 & EV Presente $\land$ ICV Bajo & Extender\_Leve & 1 (emergencia)\\
+    \midrule
+    R4 & ICV Alto $\land$ PI Ineficiente & Extender\_Fuerte & 2 (congestión severa)\\
+    R5 & ICV Alto $\land$ PI Mod.\ eficiente & Extender\_Leve & 2 (congestión severa)\\
+    R6 & ICV Alto $\land$ PI Muy eficiente & Mantener & 2 (congestión severa)\\
+    \midrule
+    R7 & ICV Medio $\land$ PI Ineficiente & Extender\_Leve & 3 (congestión moderada)\\
+    R8 & ICV Medio $\land$ PI Mod.\ eficiente & Mantener & 3 (congestión moderada)\\
+    R9 & ICV Medio $\land$ PI Muy eficiente & Reducir\_Leve & 3 (congestión moderada)\\
+    \midrule
+    R10 & ICV Bajo $\land$ PI Ineficiente & Mantener & 4 (flujo libre)\\
+    R11 & ICV Bajo $\land$ PI Mod.\ eficiente & Reducir\_Leve & 4 (flujo libre)\\
+    R12 & ICV Bajo $\land$ PI Muy eficiente & Reducir\_Fuerte & 4 (flujo libre)\\
+    \bottomrule
+  \end{tabular}
+  \fuente{Elaboración propia.}
+\end{table}
+
+\subsection{Mecanismo de inferencia y defuzzificación}\label{subsec:fuzzy-inferencia}
+
+La inferencia sigue el método de Mamdani en cuatro etapas. En la \textbf{fuzzificación} se
+calculan los grados de pertenencia de ICV, PI y EV. En la \textbf{aplicación de reglas}, el
+grado de activación de cada regla con antecedente conjuntivo se obtiene por la t-norma del
+mínimo, $\alpha_i=\min(\mu_{1},\ldots,\mu_{n})$. En la \textbf{agregación} los consecuentes
+escalados se combinan por la s-norma del máximo,
+$\mu_{\text{agregado}}(\Delta T)=\max_i\big(\alpha_i\cdot\mu_{\text{cons},i}(\Delta T)\big)$.
+Finalmente, la \textbf{defuzzificación} por centroide entrega el valor nítido:
+\[
+\Delta T_{verde}^{*}=
+\frac{\sum_{i=1}^{M}\Delta T_i\,\mu_{\text{agregado}}(\Delta T_i)}
+     {\sum_{i=1}^{M}\mu_{\text{agregado}}(\Delta T_i)},
+\]
+discretizando el universo $[-30\%,+30\%]$ en $M=61$ puntos con paso de $1\%$. El centroide se
+prefiere sobre el máximo de pertenencia porque produce una superficie de control continua:
+pequeñas variaciones del ICV o el PI generan pequeñas variaciones de $\Delta T_{verde}^{*}$,
+evitando saltos abruptos que inducirían oscilaciones en el tráfico.
+
+\subsection{Restricciones de fase y autoridad de seguridad}\label{subsec:fuzzy-seguridad}
+
+El ajuste porcentual se traduce en tiempo verde como
+$T_{verde,d}(t)=T_{base,d}\,(1+\Delta T_{verde,d}^{*}/100)$, donde $T_{base,d}$ se inicializa
+con el ciclo óptimo de Webster presentado en el Capítulo~\ref{cap:estado-arte}. El resultado se
+somete \emph{siempre} a límites duros de seguridad:
+\[
+T_{verde,\min}\le T_{verde,d}(t)\le T_{verde,\max},
+\qquad T_{verde,\min}=10\ \text{s},\quad T_{verde,\max}=120\ \text{s},
+\]
+siendo $T_{verde,\min}$ el mínimo para cruce peatonal seguro y $T_{verde,\max}$ la cota que
+evita acumulación excesiva en la dirección perpendicular. Si el valor calculado viola un
+límite, se trunca al límite correspondiente. Adicionalmente, un \textbf{balanceo de fases}
+garantiza que la suma de verdes más los intervalos de despeje no exceda el ciclo:
+$T_{verde,NS}+T_{verde,EO}+2T_{\text{ámbar}}+2T_{\text{todo\_rojo}}\le T_{ciclo}$; si se viola,
+se reescala proporcionalmente y se vuelve a aplicar la saturación de límites. El orden de
+aplicación (ajuste difuso $\rightarrow$ saturación $\rightarrow$ balanceo $\rightarrow$
+saturación final) garantiza que la configuración entregada siempre sea factible.
+
+Es importante dejar explícito el principio de seguridad del diseño. El módulo difuso
+\textbf{nunca} viola los límites duros de fase ni de ciclo: estas restricciones constituyen una
+capa de seguridad inviolable, independiente de la fuente de la decisión. Más aún, la salida del
+módulo es una \emph{recomendación} y no una orden directa de lámpara; el \textbf{controlador
+semafórico existente es la autoridad final} de actuación y conserva sus enclavamientos. Esta
+separación entre recomendación y actuación se mantiene en todos los modos de operación
+(Sección~\ref{sec:modos-operacion}) y es la garantía central de que el sistema degrada de forma
+segura ante cualquier falla o entrada anómala.
+
+\section{Modos de operación y degradación segura}\label{sec:modos-operacion}
+
+La salida difusa nunca constituye por sí sola una orden de lámpara: antes de cualquier efecto
+se validan calidad de datos, vigencia, límites de fase y compatibilidad con el estado informado
+por el controlador. Cuando coexisten una recomendación global vigente y la decisión difusa
+local, el arbitraje es explícito: la recomendación global se adopta solo si está autenticada,
+dentro de rangos y con antigüedad $t-t_{g}\le T_{out}$ (con $T_{out}=30$~s) y no hay vehículo de
+emergencia local; en cualquier otro caso (enlace caído, recomendación expirada o emergencia
+detectada) el controlador difuso local asume el mando de inmediato. En todos los casos la salida
+final atraviesa las restricciones de seguridad de tiempos y de ciclo. La
+Tabla~\ref{tab:modos-operacion} define el comportamiento esperado ante fallas; nótese que la
+autoridad final recae siempre en el controlador semafórico.
+
+\begin{table}[H]
+  \centering
+  \caption{Modos de operación y degradación segura del módulo de control.}
+  \label{tab:modos-operacion}
+  \begin{tabular}{@{}p{2.4cm}p{3.6cm}p{4.0cm}p{3.2cm}@{}}
+    \toprule
+    \textbf{Modo} & \textbf{Condición de entrada} & \textbf{Acción del módulo} & \textbf{Autoridad final}\\
+    \midrule
+    Normal local & Sensado válido y configuración vigente. & Calcula ICV, ejecuta control difuso y entrega recomendación acotada. & Controlador semafórico.\\
+    Asistido por nube & Recomendación remota autenticada, vigente y dentro de rangos. & Arbitra según la regla de prioridad y vuelve a validar límites. & Controlador semafórico / central autorizada.\\
+    Sin conectividad & Pérdida o expiración del enlace con la nube. & Conserva configuración válida, almacena localmente y continúa con control local. & Controlador semafórico.\\
+    Sensado degradado & Video ausente, oclusión, baja confianza o variables fuera de rango. & Congela la adaptación, genera alerta y solicita plan base. & Controlador semafórico.\\
+    Falla interna & Watchdog, sobretemperatura o error no recuperable. & Registra el evento, inhibe recomendaciones y ejecuta apagado/reinicio controlado. & Controlador semafórico.\\
+    Manual / mantenimiento & Orden local autorizada. & Solo diagnóstico y telemetría; no genera ajustes. & Operador y controlador semafórico.\\
+    \bottomrule
+  \end{tabular}
+  \fuente{Elaboración propia.}
+\end{table}
+
+Si la conexión se interrumpe, el control difuso local mantiene operación autónoma con
+degradación gradual del desempeño en lugar de fallo catastrófico, y las reglas difusas aportan
+explicabilidad para validar el comportamiento del sistema ante los operadores. Frente a las
+referencias clásicas de la ingeniería de tránsito, el diseño parte del ciclo de mínima demora
+de Webster como tiempo base y posiciona la política Max-Pressure como línea base teórica de
+comparación en el plan de validación; esta última no se adopta como núcleo porque exige conocer
+las colas \emph{aguas abajo} y las razones de giro, información no disponible de forma fiable
+con el sensado de cámara cenital única que sobrevive a la pérdida de enlace.
+
+\section{Capas de investigación futura: RL y CNN--LSTM}\label{sec:capas-futuras}
+
+Sobre el núcleo difuso validable se plantean dos capas de optimización y predicción de alcance
+global, alojadas en la nube. Es fundamental precisar su estatus: \textbf{ninguna de estas dos
+capas se encuentra entrenada ni validada} en esta tesis. Se documentan como diseño de trabajo
+futuro y \textbf{no constituyen condición del objetivo general}, que se demuestra íntegramente
+con el control difuso local y su verificación. Su formulación detallada --- el modelo de
+decisión de Markov, los espacios de estados y acciones, la función de recompensa y los
+protocolos de entrenamiento --- se traslada al Anexo para no recargar el cuerpo del documento;
+aquí solo se enuncian su propósito y sus limitaciones.
+
+\textbf{Optimización mediante aprendizaje por refuerzo (RL).} Se plantea un agente de
+aprendizaje por refuerzo profundo (arquitectura Actor--Critic) que, entrenado en simulación
+SUMO, aprendería políticas de \emph{recomendación} de ajustes de fase coordinados a nivel de
+red, integrando además la priorización de vehículos de emergencia. El sistema se modela como un
+proceso de decisión de Markov sobre un estado global que concatena los estados locales, las
+métricas de red y la topología; la función de recompensa pondera throughput, equidad entre
+direcciones, priorización de emergencias y suavidad de control. Su salida sería siempre una
+recomendación sujeta a la validación local de límites y a la autoridad final del controlador.
+La limitación que impide adoptarlo como núcleo es clara: requiere conjuntos de entrenamiento,
+validación fuera de muestra y control de distribución que no están cerrados en esta tesis.
+
+\textbf{Predicción de congestión mediante CNN--LSTM.} Se plantea un modelo híbrido que combina
+redes convolucionales (para capturar la correlación espacial de la congestión entre
+intersecciones vecinas) y redes LSTM (para las dependencias temporales), con el fin de anticipar
+el ICV y el PI a un horizonte corto y habilitar acciones preventivas (alertas tempranas,
+preacondicionamiento de olas verdes). Al igual que el módulo de RL, se trata de una propuesta de
+diseño no entrenada: su validación, métricas de error y protocolo de reentrenamiento quedan como
+trabajo futuro descrito en el Anexo. Ambas capas comparten el mismo principio de seguridad: son
+módulos de soporte cuya indisponibilidad o inmadurez no compromete la operación del lazo local.
+
+\section{Arquitectura de ciberseguridad propuesta}\label{sec:ciberseguridad}
+
+La ciberseguridad se trata aquí como una propiedad de la \emph{arquitectura propuesta} y no como
+una certificación alcanzada ni como un sistema auditado. El análisis identifica activos,
+amenazas, impacto, probabilidad cualitativa y mecanismos de mitigación, pero sus valores ---
+especialmente las probabilidades --- son estimaciones de diseño que deberán revisarse durante un
+piloto mediante inventario real, exposición de red y pruebas autorizadas. La
+Tabla~\ref{tab:amenazas} resume el modelo de amenazas y los mecanismos de mitigación propuestos.
+
+\begin{landscape}
+\footnotesize
+\begin{table}[H]
+  \centering
+  \caption{Modelo de amenazas y mecanismos de mitigación propuestos.}
+  \label{tab:amenazas}
+  \begin{tabular}{@{}p{3.6cm}p{3.0cm}p{3.0cm}p{1.8cm}p{5.4cm}p{3.6cm}@{}}
+\toprule
+\textbf{Amenaza} & \textbf{Activo afectado} & \textbf{Impacto} & \textbf{Prob.} & \textbf{Medida de mitigación} & \textbf{Mecanismo propuesto}\\
+\midrule
+Acceso no autorizado al dashboard & Cuentas, visualización y configuración & Exposición o cambio indebido & Media & MFA, RBAC, mínimo privilegio, sesiones y bloqueo. & Revisión de roles y flujo de autenticación.\\
+Manipulación de parámetros de control & Configuración y recomendaciones & Degradación del tránsito & Media & Firma/token, lista blanca, rango, vigencia, doble validación y autoridad final del controlador. & Casos de rechazo de parámetros inválidos.\\
+Intercepción de telemetría & Datos operativos & Pérdida de confidencialidad e inteligencia operacional & Media & TLS, identidad por dispositivo y gestión de certificados. & Inspección de configuración y diagrama de confianza.\\
+Inyección de datos falsos & ICV, estados y alertas & Decisiones incorrectas & Media & Autenticación, integridad, sello temporal, detección de atípicos y comparación con estado local. & Pruebas con mensajes alterados o fuera de secuencia.\\
+Pérdida de conectividad & Supervisión y coordinación & Pérdida de visibilidad global & Alta & Control local, búfer de registros, reintento con retroceso y plan base. & Caso de validación y registro de transición.\\
+Denegación de servicio & Enlace, broker o API & Indisponibilidad de nube & Media & Límites de tasa, colas, segmentación y operación local independiente. & Prueba controlada de indisponibilidad.\\
+Compromiso de credenciales & Identidad de equipo/usuario & Suplantación & Media & Secretos no embebidos, rotación, revocación, MFA y almacenamiento seguro. & Revisión de arquitectura y procedimiento.\\
+Actualización no autorizada & Software edge y configuración & Ejecución de código malicioso & Baja/Media & Firma de firmware, canal autenticado, control de versiones y rollback. & Flujo de actualización y validación de firma.\\
+Fallo de sincronización con nube & Timestamps y estado distribuido & Recomendaciones obsoletas & Media & Vigencia, reloj sincronizado, número de secuencia e invalidación por timeout. & Caso de mensaje retrasado/duplicado.\\
+Corrupción de datos históricos & Base de datos y reportes & Pérdida de trazabilidad & Baja/Media & Backups, control de integridad, retención y permisos separados. & Revisión de política y restauración propuesta.\\
+\bottomrule
+  \end{tabular}
+  \fuente{Elaboración propia.}
+\end{table}
+\end{landscape}
+
+La medida arquitectónica principal es la separación entre \emph{recomendación} y \emph{acción
+final}: aun si la nube, una cuenta o un mensaje fueran comprometidos, la recomendación debe
+atravesar validación de identidad, vigencia, rango y restricciones, y el controlador semafórico
+conserva sus enclavamientos. Esta defensa reduce el impacto, pero no equivale a una
+verificación de seguridad. Se deja explícito que la \textbf{auditoría formal de seguridad ---
+incluyendo pruebas de penetración (pentesting) autorizadas y la evaluación de conformidad con la
+norma IEC 62443 --- queda fuera del alcance de esta tesis} y se plantea como actividad necesaria
+de una fase de piloto.
+
+\section{Subsistema de nube y comunicación}\label{sec:nube}
+
+La infraestructura en Microsoft Azure constituye una capa de soporte para supervisión,
+almacenamiento, analítica y coordinación no crítica. El núcleo de decisión validado permanece en
+el procesamiento local; la arquitectura de nube se diseña con disponibilidad, escalabilidad y
+tolerancia a fallos, pero su indisponibilidad no debe impedir que el controlador semafórico
+continúe operando con su plan seguro. La infraestructura se estructura en cinco capas
+funcionales:
+
+\begin{itemize}
+\item \textbf{Ingesta y procesamiento en tiempo real.} Azure IoT Hub recibe y autentica la
+  telemetría de todas las intersecciones; Azure Stream Analytics procesa los flujos con
+  consultas en tiempo real, calcula métricas y dispara alertas; Azure Event Hubs desacopla la
+  ingesta del procesamiento como búfer distribuido.
+\item \textbf{Almacenamiento.} Azure Cosmos DB (NoSQL distribuido) mantiene el estado operativo
+  de baja latencia y el registro estático de ubicaciones GPS; Azure Data Lake almacena video y
+  telemetría histórica; Azure SQL Database soporta consultas estructuradas y reportes.
+\item \textbf{Inteligencia artificial.} Azure Machine Learning aloja el entrenamiento y
+  despliegue (como \emph{endpoints} REST) de las capas experimentales de RL y CNN--LSTM
+  descritas en la Sección~\ref{sec:capas-futuras}.
+\item \textbf{Análisis de big data.} Azure Synapse Analytics integra SQL y Apache Spark para el
+  análisis histórico, la identificación de patrones recurrentes y la calibración de parámetros a
+  largo plazo.
+\item \textbf{Orquestación y gestión.} Azure Functions y Logic Apps ejecutan tareas
+  desatendidas (publicación de recomendaciones para validación local, solicitudes de ola verde,
+  cálculo de offsets de corredor, alertas y reportes); Azure Monitor y Application Insights
+  aportan observabilidad, trazabilidad y gestión de fallos.
+\end{itemize}
+
+\subsection{Coordinación global y analítica de red}\label{subsec:coordinacion-global}
+
+Sobre la telemetría agregada, la nube construye el estado global de red apilando las matrices de
+estado locales, $X_{global}(t)=[X_{local}^{(1)}(t),\ldots,X_{local}^{(P)}(t)]\in\mathbb{R}^{P\times 28}$,
+y modela la topología vial mediante una matriz de adyacencia ponderada cuyas distancias
+geodésicas se obtienen por la fórmula de Haversine sobre las coordenadas GPS almacenadas:
+\[
+A_{ij}=
+\begin{cases}
+w_{ij}\,d_{ij}^{-\alpha}, & \text{si existe conexión directa entre } I_i \text{ e } I_j\\[2pt]
+0, & \text{caso contrario}
+\end{cases}
+\qquad
+A_{norm}=D^{-1/2}AD^{-1/2},
+\]
+donde $w_{ij}$ pondera el flujo histórico, $\alpha$ controla el decaimiento con la distancia y
+$D$ es la matriz de grado. La normalización simétrica $A_{norm}$ acota los valores propios y
+permite modelar la propagación de congestión entre cruces vecinos. A partir de este estado, la
+nube calcula métricas agregadas de red (saturación de colas $QL_{red}$, velocidad, flujo,
+densidad, ICV de red ponderado por centralidad y PI de red) imputando con esquema \emph{last
+observation carried forward} las direcciones no observadas en cada instante por la alternancia
+de cámara.
+
+Dos funciones de coordinación se apoyan en esta analítica. La \textbf{optimización de olas
+verdes} calcula, para corredores de intersecciones consecutivas, el desfase temporal óptimo
+$\tau_{i,i+1}=(d_i/v_{prog})\bmod T_{ciclo}$ que permite a un pelotón atravesar varios cruces
+sin detenerse, con la velocidad de progresión $v_{prog}$ acotada por el límite legal de la vía.
+La \textbf{coordinación de vehículos de emergencia} predice, cuando una intersección detecta un
+vehículo prioritario, las intersecciones candidatas hacia las que se dirige (según
+compatibilidad direccional y proximidad) y genera comandos de preacondicionamiento para abrir
+olas verdes anticipadas. En todos los casos, estos comandos son recomendaciones que la central
+semafórica valida contra los límites operativos antes de cualquier aplicación, preservando la
+autoridad final del controlador definida a lo largo del capítulo.

@@ -1,0 +1,208 @@
+% ======================================================================
+%                  CONCLUSIONES Y RECOMENDACIONES
+% ======================================================================
+\chapter*{CONCLUSIONES Y RECOMENDACIONES}
+\addcontentsline{toc}{chapter}{CONCLUSIONES Y RECOMENDACIONES}\label{cap:conclusiones}
+
+\section*{Conclusiones}
+
+\begin{enumerate}
+\item La problemática se delimitó como una limitación de ingeniería: los planes de tiempo fijo o con
+adaptación limitada no representan adecuadamente las variaciones direccionales de demanda, mientras que una
+arquitectura exclusivamente remota introduce dependencia de la conectividad y un punto único de falla. Esto
+justifica un módulo local complementario y no el reemplazo directo del controlador semafórico (OE1, OE2).
+
+\item El diseño conceptual estableció una cadena trazable entre necesidades, requerimientos, funciones y
+alternativas. La evaluación técnico-económica seleccionó el concepto cámara + procesamiento en el borde +
+ICV + control difuso + nube segura + gabinete modular, principalmente por su autonomía local, su
+interpretabilidad y su compatibilidad con una validación reproducible (OE3).
+
+\item El diseño electrónico definió y dimensionó las funciones de sensado, procesamiento, comunicación,
+alimentación, protección, respaldo y diagnóstico. El balance de potencia (consumo cercano a 145.7~W,
+elevado a 182~W con un factor de seguridad del 25~\%), el dimensionamiento de las fuentes, la autonomía del
+respaldo ($\sim$72~min) y la coordinación de protecciones quedaron resueltos a nivel de diseño; su cierre
+para fabricación requiere la confirmación con componentes físicos y con el controlador objetivo (OE4).
+
+\item El diseño mecánico incorporó gabinete, distribución interna, ventilación, acceso de mantenimiento y
+soporte de cámara. El análisis estructural por elementos finitos arrojó un factor de seguridad mínimo de
+5.94 y un desplazamiento máximo de 0.21~mm bajo la carga de viento de diseño, y el análisis térmico estimó
+un incremento de 2.5~\textdegree C; la clasificación IP, la resistencia al vandalismo y el comportamiento
+térmico en campo deben confirmarse mediante prototipo y ensayos (OE5).
+
+\item El control difuso local se definió como núcleo por su interpretabilidad y su capacidad de operar en el
+borde. Las entradas, las funciones de pertenencia, las reglas, la inferencia, la defuzzificación y las
+saturaciones permiten revisar el comportamiento antes de emitir una recomendación. Ante una falla del
+sensado o del módulo, la arquitectura inhibe la adaptación y conserva el plan seguro del controlador, que
+mantiene la autoridad final sobre la actuación (OE6).
+
+\item La nube se delimitó como soporte para telemetría, históricos, alertas, coordinación y distribución
+autorizada de parámetros, demostrándose que la decisión local continúa sin conectividad externa. La
+ciberseguridad propuesta incorpora autenticación, cifrado, control de acceso por roles, validación de
+parámetros, registro de eventos y mínimo privilegio; estas medidas son criterios de diseño y no equivalen a
+una auditoría o certificación (OE7, OE8).
+
+\item La validación en SUMO comparó el control de tiempo fijo con el control difuso adaptativo en el
+escenario de Lima-Centro, bajo condiciones comunes y con tres semillas, conservando el mismo presupuesto de
+verde por ciclo. El control difuso redujo la demora media de 504.3 a 477.1~s/veh ($-5.4$~\%), la saturación
+de cola en $3.6$~\%, el índice de congestión de 0.5055 a 0.4954 ($-2.0$~\%), e incrementó la velocidad media
+en $1.4$~\% y el \textit{throughput} en $1.8$~\%, manteniendo en todo momento los límites duros de verde
+$[10,120]$~s. Las mejoras son modestas pero consistentes en promedio; en una de las tres semillas el control
+difuso no superó al plan fijo, lo que evidencia que el beneficio depende de la demanda y no está garantizado
+en toda condición. Estos resultados validan el núcleo de control y, a la vez, acotan honestamente su alcance
+(OE9).
+
+\item El análisis económico preliminar separó CAPEX y OPEX y situó el costo del primer año en torno a
+S/~17~mil por intersección, dominado por la estructura mecánica y el sistema de visión. Antes de defender
+una cifra definitiva deben actualizarse cotizaciones, tipo de cambio, consumo real y prorrateo de los
+servicios de nube; la certificación, la obra civil y el piloto deben presupuestarse como etapas posteriores
+(OE10).
+
+\item La principal limitación del trabajo es la ausencia de fabricación, de calibración con aforos reales,
+de integración con un controlador comercial certificado, de prueba vial y de auditoría de ciberseguridad.
+Estas limitaciones no invalidan el diseño, pero restringen la generalización de los resultados a las
+condiciones simuladas y a los supuestos documentados.
+
+\item La arquitectura resultante constituye una base técnica trazable para un prototipo de laboratorio y un
+piloto progresivo. La condición de avance debe ser demostrar cada requerimiento mandatorio en banco,
+preservar la autoridad final del controlador y obtener la aprobación normativa e institucional antes de
+cualquier intervención en vía pública.
+\end{enumerate}
+
+\section*{Recomendaciones}
+
+\begin{itemize}
+\item Fabricar un prototipo del módulo y verificar consumo, temperatura, respaldo, comunicaciones y
+\textit{watchdog} en un banco de pruebas.
+\item Probar la cámara con video real de Lima en condiciones de día, noche, contraluz, lluvia y neblina
+costera, y medir la precisión de conteo, cola y velocidad.
+\item Calibrar la demanda y el comportamiento vehicular de SUMO con aforos reales, ampliar el número de
+semillas y publicar los archivos de configuración y de salida para garantizar la reproducibilidad.
+\item Integrar el módulo a un controlador semafórico comercial en un banco \textit{hardware-in-the-loop},
+sin conexión directa a las lámparas durante la etapa inicial.
+\item Ejecutar pruebas autorizadas de ciberseguridad: gestión de certificados, rotación de credenciales,
+restauración de respaldos y respuesta ante incidentes.
+\item Revisar la normativa vial, la seguridad funcional, la compatibilidad electromagnética, la protección
+ambiental y los procedimientos municipales aplicables.
+\item Realizar un piloto controlado en una intersección o recinto cerrado, con plan de reversión,
+supervisión humana y métricas acordadas.
+\item Mantener el aprendizaje por refuerzo, la predicción CNN--LSTM y la optimización metropolitana como
+líneas futuras, hasta disponer de datos, validación fuera de muestra y criterios de aceptación
+(Anexo~\ref{anexo:futuros}).
+\item Extender el estudio de una intersección a un corredor solo después de demostrar estabilidad local,
+interoperabilidad y un beneficio estadísticamente sustentado.
+\end{itemize}
+
+% ======================================================================
+%                          BIBLIOGRAFÍA
+% ======================================================================
+\chapter*{BIBLIOGRAFÍA}\addcontentsline{toc}{chapter}{BIBLIOGRAFÍA}\label{bibliografia}
+\input{build_v4/bibliografia_items}
+
+% ======================================================================
+%                            ANEXOS
+% ======================================================================
+\chapter*{ANEXOS}\addcontentsline{toc}{chapter}{ANEXOS}\label{anexos}
+
+\noindent Los archivos de programación, simulación, esquemas CAD y recursos complementarios se conservan
+como material digital de soporte de la tesis. A continuación se incluyen los anexos referenciados a lo largo
+del documento.
+
+% ---------------------------------------------------------------------
+\section*{ANEXO A: Reproducibilidad de la validación en SUMO}
+\addcontentsline{toc}{section}{ANEXO A: Reproducibilidad de la validación en SUMO}\label{anexo:sumo}
+
+La comparación entre el control de tiempo fijo y el control difuso adaptativo se ejecutó sobre el mismo
+escenario y demanda, conservando el presupuesto de verde por ciclo, de modo que la única diferencia entre
+ambas corridas es la política de reparto del tiempo de verde. Las métricas provienen de la simulación real
+(no se utilizan números aleatorios sintéticos): se obtienen a nivel de vehículo mediante la interfaz de
+control de SUMO. Los parámetros de reproducibilidad son los siguientes:
+
+\begin{itemize}
+\item \textbf{Motor de simulación:} SUMO mediante \texttt{libsumo}.
+\item \textbf{Escenario:} Lima-Centro (\texttt{comparacion.sumocfg}); red importada de OpenStreetMap.
+\item \textbf{Horizonte:} 700 pasos de simulación por corrida.
+\item \textbf{Intervalo de control:} 25~s (cada intervalo se mide el estado, se calcula el ICV por
+dirección y la lógica difusa recalcula el verde recomendado).
+\item \textbf{Semillas:} \{1, 2, 3\}.
+\item \textbf{Restricciones de seguridad:} límites duros de verde $[10, 120]$~s aplicados por una guardia de
+seguridad funcional; cualquier recomendación fuera de rango se acota antes de aplicarse, registrándose el
+evento.
+\end{itemize}
+
+\noindent\textbf{Tabla A.1.} Resultados por réplica (control fijo / control difuso).
+\begin{center}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & \multicolumn{3}{c}{\textbf{Control fijo}} & \multicolumn{3}{c}{\textbf{Control difuso}} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+\textbf{Semilla} & ICV & Demora (s) & Thr. & ICV & Demora (s) & Thr. \\
+\midrule
+1 & 0.5039 & 496.6 & 733 & 0.4905 & 454.8 & 761 \\
+2 & 0.5040 & 492.1 & 735 & 0.5049 & 515.9 & 705 \\
+3 & 0.5086 & 524.3 & 707 & 0.4908 & 460.6 & 749 \\
+\midrule
+\textbf{Media} & 0.5055 & 504.3 & 725 & 0.4954 & 477.1 & 738 \\
+\bottomrule
+\end{tabular}
+\end{center}
+{\footnotesize\itshape Fuente: Elaboración propia a partir de la simulación en SUMO. La semilla~2 ilustra
+una condición en la que el control difuso no supera al plan fijo.\par}
+
+\vspace{0.4cm}
+La discusión completa y las mejoras porcentuales agregadas se presentan en el
+Capítulo~\ref{cap:validacion}.
+
+% ---------------------------------------------------------------------
+\section*{ANEXO B: Formulación de los módulos de investigación futura}
+\addcontentsline{toc}{section}{ANEXO B: Módulos de investigación futura (RL y CNN--LSTM)}\label{anexo:futuros}
+
+Los módulos de aprendizaje por refuerzo (RL) y de predicción CNN--LSTM se presentan como diseño conceptual y
+\textbf{no forman parte del núcleo validado} de esta tesis: no fueron entrenados ni validados fuera de
+muestra, y su desarrollo completo queda como línea futura. Se documentan aquí para sustentar la
+escalabilidad de la arquitectura.
+
+\subsection*{B.1\quad Coordinación por aprendizaje por refuerzo (A2C)}
+El problema de coordinación de varias intersecciones se formula como un proceso de decisión de Markov (MDP):
+\begin{itemize}
+\item \textbf{Estado:} vector con el ICV por dirección de cada intersección del corredor, la longitud de
+cola normalizada, la fase activa y la fracción de ciclo transcurrida.
+\item \textbf{Acción:} ajuste acotado del reparto de verde y de los desfases entre intersecciones vecinas,
+siempre dentro de los límites duros de seguridad.
+\item \textbf{Recompensa:} combinación ponderada que penaliza la demora total y la saturación de cola y
+premia el \textit{throughput} de la red.
+\end{itemize}
+Se propone un esquema actor--crítico de ventaja (Advantage Actor--Critic, A2C): una red actor que entrega la
+política de ajuste y una red crítico que estima el valor del estado. El entrenamiento requeriría episodios
+sobre escenarios SUMO calibrados, control de la distribución de datos y validación fuera de muestra antes de
+cualquier uso operativo.
+
+\subsection*{B.2\quad Predicción de congestión con CNN--LSTM}
+Para anticipar la congestión se propone una arquitectura híbrida: una etapa convolucional (CNN) que extrae
+patrones espaciales del estado de la red y una etapa recurrente (LSTM) que modela la evolución temporal del
+ICV, entregando una predicción a un horizonte corto. Esta predicción alimentaría a la capa de coordinación
+para anticipar la formación de colas. El entrenamiento y el reentrenamiento periódico exigen series
+históricas representativas, que se obtendrían de la operación del propio sistema una vez desplegado.
+
+% ---------------------------------------------------------------------
+\section*{ANEXO C: Especificaciones técnicas comparativas de componentes}
+\addcontentsline{toc}{section}{ANEXO C: Especificaciones técnicas de componentes}\label{anexo:componentes}
+
+Se incluyen las tablas comparativas y las especificaciones técnicas detalladas de los componentes
+seleccionados en los Capítulos~\ref{cap:diseno-electronico} y~\ref{cap:diseno-mecanico}.
+
+\input{build_v4/anexo_componentes}
+
+% ---------------------------------------------------------------------
+\section*{ANEXO D: Presupuesto detallado y planos}
+\addcontentsline{toc}{section}{ANEXO D: Presupuesto detallado y planos}\label{anexo:planos}
+
+El presupuesto consolidado por rubros (CAPEX y OPEX) se presenta en el Capítulo~\ref{cap:analisis-economico}.
+El desglose detallado por componente —fabricación mecánica, sistema de visión, electrónica de control,
+protección eléctrica, sensores, instalación y prorrateo de servicios de nube— se conserva como hoja de
+cálculo en el material digital de la tesis.
+
+Los planos de fabricación se conservan como archivos CAD digitales y comprenden, como mínimo: (i) el
+gabinete modular; (ii) el soporte tipo rack interno; (iii) el mecanismo de orientación de la cámara; (iv) el
+poste y el soporte del controlador semafórico; y (v) la zapata de cimentación. Los esquemáticos eléctricos
+de alimentación, distribución y de la tarjeta de control se incluyen igualmente como material digital y
+corresponden a esquemas de diseño, sin verificación de reglas de manufactura (DRC) ni archivos Gerber.

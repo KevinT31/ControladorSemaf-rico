@@ -466,9 +466,10 @@ def ejecutar_pruebas():
     print("  2. Prueba de Lógica Difusa")
     print("  3. Prueba de Estado Local")
     print("  4. Prueba de Métricas de Red")
-    print("  5. Todas las pruebas")
+    print("  5. Todas las pruebas (incluye seguridad)")
+    print("  6. Prueba de Seguridad y Ciberseguridad (NUEVO)")
 
-    opcion = input("\nSelecciona (1-5): ").strip()
+    opcion = input("\nSelecciona (1-6): ").strip()
 
     sys.path.insert(0, str(Path(__file__).parent))
 
@@ -523,6 +524,44 @@ def ejecutar_pruebas():
             paquete = estado.obtener_paquete_telemetria()
             print(f"  Variables calculadas: {len(paquete['state_matrix'])} tipos")
             print(f"  CamMask: {paquete['cam_mask']}")
+
+        if opcion in ['5', '6']:
+            print("\n=== PRUEBA 5: SEGURIDAD Y CIBERSEGURIDAD ===")
+            from nucleo.seguridad_semaforica import validador_seguridad
+            sys.path.insert(0, str(Path(__file__).parent / 'servidor-backend'))
+            from seguridad.jwt_simple import crear_token, verificar_token
+            from seguridad.passwords import hash_password, verificar_password
+            from seguridad.validador_comandos import validar_parametros_control
+
+            print("\n  Rechazo de comandos peligrosos (protección de la operación):")
+            ok200, err200 = validar_parametros_control({'t_verde_ns': 200})
+            print(f"    Verde 200 s  -> {'RECHAZADO ✅' if not ok200 else 'ACEPTADO ❌'}"
+                  f" ({err200[0] if err200 else ''})")
+            ok45, _ = validar_parametros_control({'t_verde_ns': 45})
+            print(f"    Verde 45 s   -> {'ACEPTADO ✅' if ok45 else 'RECHAZADO ❌'}")
+            ok0, _ = validar_parametros_control({'t_ambar': 0})
+            print(f"    Amarillo 0 s -> {'RECHAZADO ✅' if not ok0 else 'ACEPTADO ❌'}")
+
+            print("\n  Seguridad funcional semafórica:")
+            r = validador_seguridad.aplicar_con_seguridad(None, {'icv': float('nan')})
+            print(f"    Datos inválidos (NaN) -> {'MODO SEGURO ✅' if r['modo_seguro'] else 'NO seguro ❌'}")
+            seguro = not validador_seguridad.verificar_fases_no_conflictivas(True, True)
+            print(f"    NS+EO verde a la vez  -> {'BLOQUEADO ✅' if seguro else 'PERMITIDO ❌'}")
+            t, _ = validador_seguridad.clamp_tiempos(200, 5, 3, 2)
+            print(f"    Recorte 200 s -> {t['t_verde_ns']:.0f} s, 5 s -> {t['t_verde_eo']:.0f} s ✅")
+
+            print("\n  Autenticación (JWT HS256 + PBKDF2):")
+            tok = crear_token({'sub': 'tecnico', 'rol': 'tecnico'}, 'demo', 60)
+            jwt_ok = (verificar_token(tok, 'demo')['rol'] == 'tecnico')
+            manip_ok = False
+            try:
+                verificar_token(tok + 'x', 'demo')
+            except ValueError:
+                manip_ok = True
+            print(f"    JWT firma/verificación -> {'OK ✅' if (jwt_ok and manip_ok) else 'FALLO ❌'}")
+            h = hash_password('clave123')
+            hash_ok = verificar_password('clave123', h) and not verificar_password('mala', h)
+            print(f"    Hash de contraseña     -> {'OK ✅' if hash_ok else 'FALLO ❌'}")
 
         print("\n✅ Pruebas completadas")
 
