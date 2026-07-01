@@ -10,13 +10,12 @@ decisiones que se desarrollan en los capítulos siguientes.
 
 \section{Sensado y detección vehicular}\label{sec:sensado}
 
-Un sistema semafórico inteligente depende de la detección fiable del flujo vehicular y de actuadores
-eficientes para gestionar las señales luminosas. La detección en intersecciones se ha realizado
-tradicionalmente mediante lazos inductivos: un bucle de cable instalado bajo el pavimento que actúa como
-detector magnético, ya que el paso de un vehículo (una masa metálica) altera la inductancia del lazo y
-permite registrar su presencia (Buchanan, 2023). Estos sensores ofrecen alta precisión y respuesta
-inmediata, pero su instalación es invasiva, requiere obras en la calzada y se deteriora con las
-repavimentaciones.
+Todo esquema de semaforización inteligente se sostiene sobre dos pilares: medir con fiabilidad la demanda
+vehicular y actuar las señales con eficiencia. Durante décadas, esa medición recayó en el lazo inductivo, un
+devanado de cable embebido en la calzada cuyo principio es electromagnético: cuando un vehículo —masa
+metálica— se sitúa sobre él, modifica la inductancia del devanado y delata su presencia (Buchanan, 2023). Su
+exactitud y su respuesta casi instantánea son notables, pero el precio es alto, pues obliga a romper el
+pavimento para instalarlo y se degrada cada vez que la vía se repavimenta.
 
 En la última década se han incorporado sensores sobre la superficie para complementar o reemplazar a los
 lazos. Las cámaras de vídeo permiten una detección flexible (múltiples carriles, peatones y clasificación de
@@ -36,10 +35,10 @@ cableado y la cobertura modular de varios puntos de la intersección (Gheorghe y
   \fuente{Buchanan (2023).}
 \end{figure}
 
-En cuanto a los actuadores, los semáforos modernos emplean tecnología LED, que ofrece mayor eficiencia
-energética (consumos hasta 80--90\,\% menores), una vida útil del orden de 50\,000 horas y mejor visibilidad;
-además, los módulos con diodos redundantes conservan el aspecto visible parcialmente ante la falla de un
-diodo, mejorando la seguridad (Buchanan, 2023). Los controladores de corriente que encienden las luces deben
+Del lado de los actuadores, la señalización actual se apoya en tecnología LED, que recorta el consumo en torno
+a un 80--90\,\%, alcanza vidas útiles del orden de 50\,000 horas y se percibe con mayor nitidez; como ventaja
+añadida, los módulos con diodos redundantes siguen mostrando la indicación aunque uno de los diodos falle, lo
+que refuerza la seguridad (Buchanan, 2023). Los controladores de corriente que encienden las luces deben
 cumplir normas que eviten estados peligrosos, y los gabinetes incorporan unidades de monitoreo de
 malfuncionamiento (\emph{Malfunction Management Units}, MMU) que fuerzan al semáforo a un estado seguro de
 intermitencia ámbar cuando detectan una inconsistencia en la secuencia de luces (Buchanan, 2023). A estos
@@ -49,25 +48,25 @@ controlador la necesidad de servir la fase peatonal.
 \subsection{Métodos de visión por computadora para detección vehicular}
 
 Cuando la fuente de detección es la cámara, la información visual debe procesarse para extraer conteo,
-clasificación, velocidad y longitud de cola. Las técnicas clásicas de sustracción de fondo siguen siendo
-útiles con recursos limitados: el modelo de Mezcla de Gaussianas (MOG2) representa cada píxel como una
-combinación de distribuciones gaussianas que se adaptan a cambios graduales de iluminación, manteniendo
-buena precisión en escenas urbanas controladas (Rodriguez-Canosa et al., 2023). El descriptor HOG
-(\emph{Histogram of Oriented Gradients}) resulta apropiado para la detección de peatones en cruces
-semaforizados, aunque pierde fiabilidad ante oclusiones parciales frecuentes en intersecciones congestionadas
-(Dalal y Triggs, 2020). Los clasificadores Haar Cascade destacan por su eficiencia computacional y permiten
-estimar la velocidad vehicular con bajo error cuando se combinan con seguimiento, a costa de una mayor tasa
-de falsos positivos (Kumar et al., 2024).
+clasificación, velocidad y longitud de cola. Aun con poco cómputo, las
+técnicas clásicas de sustracción de fondo conservan utilidad: la Mezcla de Gaussianas (MOG2) describe cada
+píxel como una suma de gaussianas que se reajustan ante variaciones lentas de iluminación y mantiene buena
+precisión en escenas urbanas controladas (Zivkovic, 2004). El descriptor HOG
+(\emph{Histogram of Oriented Gradients}) rinde bien al detectar peatones en los cruces, si bien se resiente
+ante las oclusiones parciales tan habituales cuando la intersección se congestiona (Dalal y Triggs, 2005).
+Por su parte, los clasificadores Haar Cascade resultan muy livianos y, acoplados a un seguidor, estiman la
+velocidad con error bajo, aunque elevan la tasa de falsos positivos (Viola y Jones, 2001).
 
-El aprendizaje profundo ha desplazado a estas técnicas como referencia para la detección en tiempo real. La
-familia de detectores YOLO (\emph{You Only Look Once}) realiza la detección en una sola pasada de inferencia
-y alcanza precisión elevada con tasas de cuadros adecuadas para aplicaciones de tráfico, lo que la convierte
-en la opción más extendida para conteo y clasificación vehicular sobre vídeo (Liu et al., 2024). La detección
+El aprendizaje profundo relegó a estas técnicas clásicas y se erigió en la referencia para la detección en
+tiempo real. Los detectores de la familia YOLO (\emph{You Only Look Once}) resuelven la localización y la
+clasificación en una única inferencia sobre la imagen, lo que les permite sostener una precisión alta a tasas
+de cuadro compatibles con el tráfico; por esa razón se han vuelto la herramienta más difundida para contar y
+clasificar vehículos en vídeo (Redmon et al., 2016). La detección
 cuadro a cuadro se complementa con algoritmos de seguimiento que mantienen identidades consistentes a lo
-largo del tiempo; Deep SORT (\emph{Simple Online and Realtime Tracking with Deep Association Metric}) combina
-un filtro de Kalman para predecir la posición con descriptores visuales extraídos por una red neuronal,
-reduciendo de forma marcada los cambios de identidad frente al seguimiento puramente cinemático (Wojke et
-al., 2023). Esta combinación de detección y seguimiento es la que habilita la estimación de flujo, cola y
+largo del tiempo; Deep SORT (\emph{Simple Online and Realtime Tracking with Deep Association Metric}) suma a
+la predicción de posición de un filtro de Kalman una huella de apariencia que una red neuronal extrae de cada
+objeto; ese rasgo visual disminuye de forma marcada los intercambios de identidad que sufre un seguimiento
+basado solo en cinemática (Wojke et al., 2017). Esta combinación de detección y seguimiento es la que habilita la estimación de flujo, cola y
 velocidad a partir de una única cámara. La selección concreta de la arquitectura de detección y de la
 plataforma de cómputo corresponde al diseño electrónico y se aborda en los capítulos posteriores; aquí
 interesa establecer que la visión por computadora es técnicamente madura para sustituir o complementar a los
@@ -105,23 +104,22 @@ creciente autonomía y dependencia de datos —control clásico analítico, heur
 lógica difusa y aprendizaje por refuerzo—, de modo que la comparación justifique el núcleo de control
 adoptado. Los esquemas convencionales operan con planes de tiempo fijo o con control
 actuado, en el que cada fase se activa ante la demanda detectada y la duración de verde se extiende hasta un
-máximo predefinido mientras persistan vehículos. El método de Webster (1958) estableció las bases del control
-optimizado con su fórmula del ciclo óptimo $C_0 = (1{,}5L + 5)/(1 - Y)$, donde $L$ es el tiempo perdido total
-e $Y$ la suma de las razones de flujo crítico; sin embargo, sobreestima la duración del ciclo cuando la
-relación volumen/capacidad es alta, produciendo ciclos irrealmente largos que degradan el rendimiento en
-saturación (Zhang et al., 2021). El refinamiento de Akçelik (1981) amplió este marco analítico con una
+máximo predefinido mientras persistan vehículos. El método de Webster (1958) sentó las bases del temporizado
+optimizado al expresar el ciclo de mínima demora como $C_0 = (1{,}5L + 5)/(1 - Y)$, con $L$ el tiempo total
+perdido e $Y$ la suma de las razones de flujo crítico; su punto débil aparece cuando la relación
+volumen/capacidad se acerca a la unidad, pues la fórmula infla el ciclo y arroja duraciones poco realistas
+que empeoran el desempeño en saturación (Webster, 1958). El refinamiento de Akçelik (1981) amplió este marco analítico con una
 fórmula de demora dependiente del tiempo, aplicable también en régimen de sobresaturación donde la
 formulación original pierde precisión. El valor de esta familia clásica reside en su interpretabilidad y
 simplicidad analítica para intersecciones aisladas, a costa de no reaccionar a la fluctuación de la demanda
 dentro del ciclo.
 
-Sobre esa base surgieron los sistemas adaptativos comerciales. SCATS (\emph{Sydney Coordinated Adaptive
-Traffic System}) ajusta de forma cíclica el ciclo y el reparto de tiempos midiendo la saturación en la línea
-de parada (Fehon, 2016), mientras que SCOOT (\emph{Split Cycle Offset Optimization Technique}) realiza
-pequeñas correcciones en cada ciclo a partir de detectores aguas arriba, optimizando los desfases para
-generar olas verdes progresivas. Ambos operan de forma centralizada, han demostrado reducir demoras e
-incrementar capacidad, pero exigen calibración cuidadosa e inversión considerable en detección y
-comunicaciones. Como alternativa descentralizada, Surtrac (\emph{Scalable Urban Traffic Control}) hace que
+Sobre ese cimiento aparecieron los sistemas adaptativos comerciales. SCATS (\emph{Sydney Coordinated Adaptive
+Traffic System}) recalibra ciclo a ciclo la duración total y el reparto de verdes a partir de la saturación
+medida en la línea de parada (Fehon, 2016); SCOOT (\emph{Split Cycle Offset Optimization Technique}), en
+cambio, introduce ajustes finos en cada ciclo con detectores aguas arriba y afina los desfases para encadenar
+olas verdes progresivas. Ambos son de mando centralizado y acreditan menos demora y más capacidad, pero a
+cambio reclaman una calibración minuciosa y una inversión nada menor en detección y comunicaciones. Como alternativa descentralizada, Surtrac (\emph{Scalable Urban Traffic Control}) hace que
 cada intersección decida localmente de forma asíncrona y comunique a sus vecinas una proyección de su flujo
 de salida, lo que mejora la escalabilidad y la robustez ante fallos de comunicación; logró reducciones
 significativas de tiempos de viaje en pruebas de campo en Pittsburgh (Smith, Barlow, Xie y Rubinstein, 2013).
@@ -140,8 +138,9 @@ enlazado a un centro de control distrital (ITS Perú, 2024).
 Más allá de los sistemas comerciales cíclicos, las heurísticas analíticas de optimización en línea constituyen
 una familia descentralizada que prescinde de un ciclo fijo y decide la fase a servir a partir del estado
 instantáneo de las colas. El control por máxima presión (\emph{Max-Pressure}), formalizado por Varaiya (2013),
-selecciona en cada instante la fase que maximiza la diferencia de presión entre los enlaces de entrada y de
-salida, con garantía teórica de estabilidad de las colas y operación descentralizada por intersección; las
+elige en cada paso la fase cuya activación maximiza el desbalance de presión entre los enlaces que entran y
+los que salen del cruce; la política es descentralizada —cada intersección decide por sí sola— y posee
+garantía teórica de estabilidad de las colas; las
 estrategias autoorganizadas SOTL (\emph{Self-Organizing Traffic Lights}) siguen un principio análogo basado en
 umbrales de acumulación vehicular. La evidencia comparativa resulta ilustrativa para situar el resto de
 técnicas: en un marco abierto sobre SUMO con 32 semillas aleatorias, Max-Pressure igualó o superó a
@@ -153,18 +152,18 @@ interpretables como la lógica difusa.
 \subsection{Lógica difusa como núcleo del control adaptativo}
 
 Entre las técnicas de aprendizaje aplicadas al control de tráfico, la lógica difusa destaca por combinar un
-desempeño elevado con interpretabilidad. Los sistemas difusos procesan variables lingüísticas como
-\emph{tráfico pesado}, \emph{cola larga} o \emph{tiempo de espera excesivo} mediante funciones de membresía
-que mapean valores numéricos a grados de pertenencia, y aplican reglas del tipo \emph{si--entonces} para
-decidir la extensión o el cambio de fase. Esta representación reproduce el razonamiento de un ingeniero de
-tránsito y, a diferencia de los modelos de caja negra, permite inspeccionar, validar y certificar cada regla
-antes de su despliegue, lo que resulta decisivo en un sistema donde el controlador conserva la autoridad
-final sobre la seguridad.
+desempeño elevado con interpretabilidad. Un sistema difuso traduce magnitudes numéricas en grados de
+pertenencia a etiquetas lingüísticas —\emph{tráfico pesado}, \emph{cola larga}, \emph{tiempo de espera
+excesivo}— por medio de funciones de membresía, y encadena reglas \emph{si--entonces} para resolver si
+conviene extender o conmutar la fase. El esquema imita el modo en que razona un ingeniero de tránsito y,
+frente a los modelos de caja negra, deja cada regla a la vista para inspeccionarla, validarla y certificarla
+antes de operar; esa transparencia es determinante cuando la autoridad final de seguridad permanece en manos
+del controlador.
 
 En términos de desempeño, la evidencia reportada es favorable: el control difuso alcanza una mejora cercana
 al 74\,\% respecto de los controladores de tiempo fijo, superando a Q-learning (66\,\%) y a redes neuronales
 simples (71\,\%), y el proyecto europeo FUSICO lo validó como método especialmente efectivo en condiciones
-de tráfico irregular (Koukol et al., 2023). El método de Mamdani resulta más adecuado para intensidades
+de tráfico irregular (Koukol et al., 2015). El método de Mamdani resulta más adecuado para intensidades
 bajas y medias, y se han documentado reducciones de los tiempos de espera de alrededor del 35\,\% frente a
 estrategias convencionales en casos de estudio reales.
 
@@ -252,9 +251,9 @@ presión) bajo escenarios reproducibles y semillas aleatorias.
 
 \section{Arquitectura edge--nube y comunicaciones}\label{sec:arquitectura}
 
-La incorporación de la Internet de las Cosas (IoT) en el control de tráfico habilita la conectividad y la
-gestión remota de los semáforos. Un sistema habilitado para IoT consta de módulos conectados a cada
-controlador que sensan el entorno, se comunican y pueden gestionarse desde la nube. La comunicación con la
+Llevar la Internet de las Cosas (IoT) al control de tráfico aporta conectividad y gestión remota de los
+semáforos. En la práctica, un despliegue IoT añade a cada controlador un módulo que percibe su entorno, se
+comunica y queda administrable desde la nube. La comunicación con la
 nube permite enviar datos en tiempo real (conteos, estados, fallos) a servidores donde se aplican algoritmos
 intensivos, análisis y almacenamiento histórico, y desplegar de vuelta recomendaciones o parámetros
 previamente validados.
@@ -280,10 +279,10 @@ La interoperabilidad entre componentes depende de los protocolos de comunicació
 referencia para la comunicación entre dispositivos de campo y centros de gestión, define una arquitectura por
 capas que asegura la interoperabilidad entre equipos de distintos fabricantes y maneja solicitudes de
 prioridad con latencias inferiores a 500\,ms; su perfil para controladores de señales actuadas (NTCIP 1202)
-está ampliamente soportado por los controladores modernos (NTCIP, 2025). Para la telemetría IoT, el protocolo
-MQTT (\emph{Message Queuing Telemetry Transport}) ofrece una arquitectura publicar/suscribir con sobrecarga
-mínima de cabecera, ideal para transmitir datos de sensores con actualizaciones frecuentes y entrega fiable
-sobre redes urbanas (Rahman et al., 2023). Por encima de ambos, TCP/IP actúa como capa de transporte de red
+está ampliamente soportado por los controladores modernos (NTCIP, 2025). Para la telemetría IoT se recurre a
+MQTT (\emph{Message Queuing Telemetry Transport}), cuyo modelo de publicación/suscripción y sus cabeceras
+ligeras lo hacen idóneo para cursar lecturas de sensores con alta frecuencia de actualización y entrega
+confiable sobre redes urbanas (Banks y Gupta, 2014). Por encima de ambos, TCP/IP actúa como capa de transporte de red
 común a los equipos, la central y los servicios remotos. La separación de roles entre estos protocolos evita
 presentar a la nube como reemplazo del controlador certificado y preserva una jerarquía segura de decisión,
 como se resume en la Tabla~\ref{tab:protocolos}.
@@ -321,14 +320,13 @@ Bajos demostró que era posible manipular remotamente semáforos IoT enviando da
 inexistentes para forzar el cambio de luces, debido a la ausencia de autenticación robusta en la comunicación
 (Kirk, 2020; Buchanan, 2023). La ciberseguridad es, por tanto, un requisito de diseño y no un añadido.
 
-Los mecanismos de protección habituales se articulan en capas. El cifrado de extremo a extremo y los
-protocolos de capa de transporte (TLS/SSL) garantizan la confidencialidad e integridad de los datos en
-tránsito y permiten la autenticación mutua de los dispositivos. La autenticación multifactor (MFA) y el
-control de acceso basado en roles (RBAC) restringen el acceso a personal autorizado y limitan las funciones
-según el rol. Las firmas digitales verifican la autenticidad y la integridad de cada mensaje, mientras que
-las redes privadas virtuales (VPN) y los firewalls aíslan la comunicación de amenazas externas. Finalmente,
-el análisis periódico de vulnerabilidades y la aplicación oportuna de parches mantienen la protección frente
-a amenazas emergentes.
+Las defensas habituales se despliegan por capas. El cifrado de extremo a extremo, junto con los protocolos de
+transporte (TLS/SSL), preserva la confidencialidad y la integridad de los datos en tránsito y habilita la
+autenticación mutua entre dispositivos. La autenticación multifactor (MFA) y el control de acceso por roles
+(RBAC) reservan el ingreso al personal habilitado y recortan lo que cada rol puede hacer. Las firmas
+digitales dan fe del origen y de la integridad de cada mensaje, mientras que las redes privadas virtuales
+(VPN) y los cortafuegos aíslan el tráfico de amenazas externas. Por último, auditar las vulnerabilidades con
+regularidad y parchear sin demora sostiene la protección frente a amenazas nuevas.
 
 \begin{table}[H]
   \centering
@@ -407,22 +405,21 @@ La simulación por computadora permite probar estrategias y tecnologías de cont
 antes de su implementación real. Los simuladores de tráfico varían en su nivel de detalle y capacidad de
 integración con sistemas externos, criterio decisivo para validar un controlador adaptativo en lazo cerrado.
 
-PTV VISSIM es un simulador microscópico comercial de alto nivel de detalle y fidelidad, con una potente
-interfaz 3D, que modela individualmente cada vehículo y peatón y permite control adaptativo mediante APIs
-externas y módulos para comunicación V2X; se le considera un referente en calibración fina, aunque su costo
-de licencia es elevado y exige hardware potente (Bedoya Reyes, 2013). AIMSUN es un simulador híbrido
-micro-mesoscópico que opera tanto a nivel microscópico como agrupando vehículos en flujos para acelerar el
-cálculo en redes grandes; permite cargar planes SCATS o SCOOT reales y probar algoritmos mediante su API,
-pero requiere mayor experiencia de calibración (Bedoya Reyes, 2013). Synchro 8, basado en el motor del
-\emph{Highway Capacity Manual} 2010, está orientado al análisis y optimización de intersecciones y se integra
-con SimTraffic para simulación, con un alcance más cercano al análisis que al control en tiempo real
-(Trafficware, 2014).
+PTV VISSIM es un microsimulador comercial de gran detalle y fidelidad, dotado de una interfaz 3D potente, que
+representa uno a uno vehículos y peatones y admite control adaptativo a través de APIs externas y módulos
+V2X; se le reconoce como referente en calibración fina, si bien su licencia es cara y reclama hardware
+exigente (Bedoya Reyes, 2013). AIMSUN adopta un enfoque híbrido micro-mesoscópico: tan pronto sigue cada
+vehículo como lo agrupa en flujos para aligerar el cálculo en redes amplias; acepta planes reales de SCATS o
+SCOOT y permite ensayar algoritmos por su API, a costa de una calibración más experta (Bedoya Reyes, 2013).
+Synchro 8, apoyado en el motor del \emph{Highway Capacity Manual} 2010, se orienta al análisis y la
+optimización de intersecciones y se acopla a SimTraffic para la simulación, con un perfil más analítico que
+de control en tiempo real (Trafficware, 2014).
 
-SUMO (\emph{Simulation of Urban Mobility}) es un simulador microscópico de código abierto, ampliamente
-adoptado en el ámbito académico, capaz de simular redes a gran escala. Su principal ventaja es ser gratuito y
-altamente personalizable, e incorpora el módulo TraCI (\emph{Traffic Control Interface}), que habilita la
-comunicación en vivo con la simulación: un programa externo —como el módulo de control IoT— puede consultar
-el estado del tráfico e imponer acciones, como cambiar la luz de un semáforo, durante la ejecución. Esto lo
+SUMO (\emph{Simulation of Urban Mobility}) es un microsimulador de código abierto, muy asentado en la
+academia y capaz de escalar a redes extensas. A su carácter gratuito y altamente configurable suma el módulo
+TraCI (\emph{Traffic Control Interface}), que abre un canal en vivo con la simulación en marcha: un proceso
+externo —el propio módulo de control IoT, por ejemplo— puede leer el estado del tráfico e inyectar acciones,
+como forzar el cambio de una luz, mientras la corrida avanza. Esto lo
 hace idóneo para probar algoritmos de control adaptativo en lazo cerrado, y soporta además la importación de
 mapas reales (OpenStreetMap) y comunicaciones vehiculares simuladas. Como contrapartida, requiere calibración
 manual cuidadosa para reflejar condiciones reales. Por estas características, SUMO es el microsimulador de

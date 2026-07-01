@@ -74,7 +74,8 @@ por dominio de diseño, conforme a la estructura VDI 2221.
     \textbf{Aspecto} & \textbf{Carácter} & \textbf{Especificación}\\
     \midrule
     Función principal & Exigencia & Sistema de semaforización adaptativa que optimiza la gestión del tráfico en
-    tiempo real usando sensado IoT, comunicación con la nube y algoritmos de inteligencia artificial.\\
+    tiempo real usando sensado IoT, comunicación con la nube y control inteligente interpretable basado en
+    lógica difusa.\\
     Energía & Exigencia & Alimentación principal desde la red eléctrica (DC de 12\,V o 24\,V) con respaldo
     capaz de operar un mínimo de 1\,h ante corte de energía.\\
     Fuerzas & Exigencia & La estructura debe soportar el peso de placa, microcontrolador, sensores, actuadores
@@ -132,6 +133,7 @@ R-SEC01 & Ciberseguridad & Proteger comunicaciones mediante cifrado, autenticaci
 R-SEC02 & Ciberseguridad & Contemplar pérdida de conectividad, datos falsos, acceso no autorizado y manipulación de parámetros. & Amenazas registradas con mitigación y verificación. & Son escenarios plausibles en infraestructura IoT urbana. & Tabla de amenazas y pruebas negativas controladas. & M\\
 R-SEC03 & Ciberseguridad & Registrar accesos, cambios de configuración, errores y eventos relevantes. & Logs con identidad, fecha, acción y resultado. & Permite auditoría y análisis posterior de incidentes. & Inspección de registros y trazabilidad de una operación. & A\\
 R-SEC04 & Ciberseguridad & Aplicar mínimo privilegio y separación entre recomendación y actuación. & Roles diferenciados; ningún usuario del dashboard gobierna directamente las lámparas. & Limita el impacto de una cuenta comprometida. & Revisión de permisos y diagrama de confianza. & M\\
+R-SEC05 & Ciberseguridad & Someter el sistema a auditoría de seguridad, \textit{pentesting} y evaluación de conformidad con IEC 62443. & Pruebas autorizadas y evaluación normativa en fase de piloto. & La verificación formal de seguridad excede el diseño y requiere un sistema implementado. & Auditoría externa y pruebas de penetración (fuera del alcance de esta tesis). & D\\
 R-ELEC01 & Electrónico & Incorporar protecciones contra sobrecorriente, sobretensión y fallas de alimentación. & Protecciones dimensionadas por cálculo en el Capítulo~4. & El entorno vial presenta transitorios y operación continua. & Esquema eléctrico, hojas de datos y coordinación de protecciones. & M\\
 R-ELEC02 & Electrónico & Disponer de respaldo energético para apagado controlado o continuidad temporal del módulo. & Autonomía dimensionada según perfil de carga en el Capítulo~4. & Evita pérdida abrupta de registros y diagnósticos. & Balance de potencia y cálculo de batería/UPS. & A\\
 R-ELEC03 & Electrónico & Separar alimentación de potencia, señales y comunicaciones, incorporando diagnóstico interno. & Canalización y puntos de medición documentados. & Reduce interferencia y facilita mantenimiento. & Revisión de PCB, esquema y distribución interna. & A\\
@@ -143,6 +145,10 @@ R-VAL01 & Validación & Comparar el control propuesto con una estrategia fija o 
 R-VAL02 & Validación & Reportar espera, colas, velocidad, throughput, paradas, viaje, ICV y consumo/emisiones cuando estén disponibles. & Tabla comparativa con unidades y dispersión. & Evita sustentar el desempeño en una única métrica. & Exportación SUMO y procesamiento estadístico. & M\\
 R-VAL03 & Validación & Evaluar un caso de pérdida de conectividad y retorno al modo local/base. & Sin estados incompatibles ni dependencia de respuesta cloud. & Verifica la premisa de disponibilidad de la arquitectura edge. & Caso D simulado y registro de transición. & M\\
 R-COST01 & Costos & Estimar CAPEX y OPEX por intersección, separando módulo, instalación, conectividad, nube y mantenimiento. & Valores con fuente, fecha y supuestos, detallados en el Capítulo~7. & Permite evaluar viabilidad y escalamiento. & Hoja de costos y análisis de sensibilidad. & A\\
+R-CAM01 & Mecánico/Control & Orientar la cámara hacia los ejes Norte--Sur y Este--Oeste de la intersección. & Rango angular y repetibilidad de posicionamiento coherentes con la función \emph{CamMask}. & La percepción activa requiere dirigir el campo visual al eje relevante. & Revisión de diseño mecánico, rango angular y prueba de repetibilidad. & M\\
+R-CAM02 & Control/Percepción & No actualizar el ICV con cuadros capturados durante el movimiento de la cámara o antes de su estabilización. & Lógica de estados \emph{MOVING}, \emph{SETTLING} y \emph{OBSERVING}. & Evita que el desenfoque o la vibración del giro contaminen la estimación. & Revisión del algoritmo de percepción y de estados. & M\\
+R-CAM03 & Control & Asociar a cada vector de estado por eje una marca temporal y un tiempo máximo de validez. & $T_{valid}$ definido; vector vencido declarado no confiable. & Una estimación caduca no debe sustentar una recomendación. & Revisión de diseño de control y modo degradado. & M\\
+R-CAM04 & Control/Seg.\ funcional & Congelar la adaptación y retornar a modo conservador si la confianza de detección cae bajo el umbral mínimo. & Umbral $\tau_{det}$; transición determinista a plan base. & Limita el efecto de una percepción poco confiable. & Revisión de la lógica de degradación segura. & M\\
 \end{longtable}
 \fuente{Elaboración propia.}
 \end{landscape}
@@ -412,8 +418,9 @@ esté ya certificado; indica que el concepto satisface mejor los requerimientos 
 \section{Solución óptima}\label{sec:solucion-optima}
 
 La solución óptima corresponde al concepto C. Se trata de un módulo mecatrónico instalado en la intersección,
-con cámara y gabinete de protección. La altura de 6,5\,m y el grado IP65 se adoptan como objetivos de diseño y
-se confirman en la etapa de integración mecánica (Capítulo~5). La Figura~\ref{fig:bosquejo} muestra una
+con cámara y gabinete de protección. La altura de instalación (del orden de 4,8\,m, según el poste dimensionado
+en el Capítulo~5) y el grado IP65 se adoptan como objetivos de diseño y se confirman en la etapa de integración
+mecánica (Capítulo~5). La Figura~\ref{fig:bosquejo} muestra una
 visualización del concepto.
 
 El núcleo del sistema es un módulo IoT basado en \textbf{Raspberry Pi 5}, empleado como unidad de
@@ -422,25 +429,33 @@ de recomendaciones de control. El módulo no reemplaza al controlador semafóric
 autoridad final sobre los cambios de fase: lo complementa con información procesada, parámetros sugeridos y
 alertas verificables por la central semafórica. Incorpora una pantalla TFT integrada que facilita el
 diagnóstico del operario en sitio, mostrando únicamente el estado operativo de los semáforos y del controlador
-para mantenimiento básico. El monitoreo energético se realiza con el sensor de voltaje y corriente
-\textbf{INA219}, que mide hasta $+26$\,V DC y corrientes de $\pm 3{,}2$\,A con resolución de 0,8\,mA,
-alimentación de 3,0 a 5,5\,V DC, ADC interno de 12\,bits, comunicación I\textsuperscript{2}C y precisión
-típica de $\pm 0{,}5\,\%$, lo que habilita un mantenimiento preventivo del consumo del módulo.
+para mantenimiento básico. El monitoreo de corriente se apoya en el sensor de efecto Hall
+\textbf{WCS1600}, que mide corriente DC y AC sin contacto directo con el conductor (hasta $\pm 100$\,A DC y
+70\,A RMS) y aporta aislamiento galvánico para proteger a la unidad de control; como la Raspberry~Pi~5 carece
+de ADC integrado, su salida analógica se digitaliza con el \textbf{ADC MCP3008} de 10\,bits por bus SPI, lo
+que habilita un mantenimiento preventivo del consumo del módulo.
 
-El monitoreo ambiental se realiza con el sensor de temperatura y humedad \textbf{SHT31}, que opera de 2,15 a
-5,5\,V DC y ofrece precisión de $\pm 0{,}3\,^{\circ}$C y $\pm 2\,\%$ de humedad relativa (20--80\,\% RH), con
-rango de $-40$ a $+125\,^{\circ}$C, comunicación I\textsuperscript{2}C y tiempo de respuesta menor a 8\,s,
-adecuado para las condiciones de Lima Metropolitana.
+El monitoreo térmico se realiza con el sensor digital de temperatura \textbf{DS18B20}, que cubre un rango de
+$-55$ a $+125\,^{\circ}$C con precisión de $\pm 0{,}5\,^{\circ}$C y protocolo OneWire; su carácter digital le
+confiere inmunidad al ruido electromagnético de relés y contactores y permite vigilar el sobrecalentamiento
+interno del gabinete en las condiciones de Lima Metropolitana. La humedad no se mide de forma directa: el
+sellado del gabinete con grado IP65 limita su ingreso por diseño.
 
-La captura de imágenes se realiza mediante una \textbf{cámara domo IP tipo Hikvision con visión por
-computadora}, apta para exteriores y con función PTZ (\emph{pan-tilt-zoom}) motorizada integrada, que cubre
-las zonas de interés de la intersección y permite el seguimiento dinámico de vehículos de emergencia sin
-recurrir a un soporte de servomotores externo. Esta cámara, conectada por interfaz IP/Ethernet, alimenta los
-algoritmos de visión que estiman flujo vehicular, velocidad promedio y longitud de cola, y detectan vehículos
-de emergencia. La altura de 6,5\,m busca maximizar la cobertura de la zona de interés; la cobertura final se
-verifica mediante calibración geométrica de la cámara, pruebas de campo controladas y ajuste de las zonas de
-detección, en especial en intersecciones con geometrías irregulares. Esta cámara domo IP es la
-\textbf{única solución de visión} empleada de forma consistente en todo el documento.
+La captura de imágenes se realiza mediante una \textbf{cámara domo fija tipo Hikvision (formato HD-TVI)} con
+visión por computadora, apta para exteriores y \textbf{orientable mediante un mecanismo mecatrónico externo}
+(motor paso a paso NEMA~23) que dirige su campo visual hacia los accesos Norte--Sur o Este--Oeste según la
+relevancia operacional del ciclo. La cámara no incorpora un cabezal PTZ comercial integrado: su orientación es
+una \emph{variable controlada} del módulo, materializada por el sistema de movimiento que se detalla en el
+Capítulo~\ref{cap:diseno-mecanico}. La señal HD-TVI se digitaliza con un convertidor a USB
+(Capítulo~\ref{cap:diseno-electronico}) y alimenta los algoritmos de visión que estiman flujo vehicular,
+velocidad promedio y longitud de cola. La orientación preferente hacia un vehículo de emergencia se contempla
+como \textbf{capacidad habilitada por la arquitectura}, no como una función validada experimentalmente en el
+presente alcance. La altura de instalación y el grado IP65 se adoptan como objetivos de diseño y se confirman
+en la etapa de integración mecánica (Capítulo~\ref{cap:diseno-mecanico}), donde el poste se dimensiona a
+4,8\,m; la cobertura final se verifica mediante calibración geométrica de la cámara, pruebas de campo
+controladas y ajuste de las zonas de detección, en especial en intersecciones con geometrías irregulares. Esta
+cámara domo orientable es la \textbf{única solución de visión} empleada de forma consistente en todo el
+documento.
 
 \begin{figure}[H]
   \centering
@@ -474,6 +489,62 @@ gestión de identidades y accesos, MFA para operadores, registro de eventos y se
 confianza; su efectividad se verifica en un banco de integración y mediante pruebas autorizadas, sin que el
 presente diseño acredite una certificación.
 
+\subsection{Justificación de la cámara orientable como estrategia de percepción activa}
+\label{subsec:percepcion-activa}
+
+La selección de una cámara orientable no responde únicamente a la sustitución de una configuración con
+múltiples cámaras fijas, sino a la adopción de una estrategia de \emph{percepción activa}. En una intersección
+semaforizada, la información visual requerida por el sistema no tiene la misma relevancia durante todo el ciclo
+de operación: durante el rojo resulta prioritario observar la formación de colas; durante el verde, la descarga
+vehicular; y, en condiciones de saturación, el eje con mayor demanda acumulada. Por ello, la orientación de la
+cámara se incorpora como una variable controlada del módulo mecatrónico, lo que permite dirigir el campo visual
+hacia el eje de mayor relevancia operacional.
+
+Mientras una configuración de cámaras fijas vigila de forma permanente zonas predefinidas, la cámara orientable
+actualiza de manera selectiva los accesos Norte--Sur y Este--Oeste en función del estado de la intersección,
+del nivel de congestión estimado o de una condición prioritaria. Esta decisión es coherente con el
+carácter complementario del módulo, ya que el sistema no acciona directamente las luces, sino que estima
+variables de tráfico y genera recomendaciones acotadas para el controlador semafórico existente. Asimismo, la
+movilidad de la cámara permite trabajar con regiones de interés más específicas y con mejor resolución efectiva
+sobre el eje observado, en lugar de depender de una vista excesivamente amplia donde los vehículos pueden
+aparecer pequeños, parcialmente ocluidos o afectados por una perspectiva desfavorable. Al emplear un único
+sensor físico se mantiene además una cadena de visión homogénea: misma óptica, mismo detector y parámetros de
+calibración definidos por orientación, lo que evita discrepancias entre sensores distintos.
+
+En escenarios prioritarios, la arquitectura también habilita políticas de orientación preferente. Por ejemplo,
+si el sistema recibe una señal externa o una futura detección confiable asociada a un vehículo de emergencia, la
+cámara puede orientarse hacia el acceso correspondiente para verificar cola, trayectoria y condiciones de
+despeje. Esta capacidad se plantea como una extensión funcional habilitada por la arquitectura, no como una
+validación experimental dentro del presente alcance. Desde el punto de vista mecatrónico, la cámara orientable
+integra percepción, electrónica de control, mecanismo de posicionamiento, selección de actuador, rigidez
+estructural y lógica de decisión local; por tanto, no constituye un accesorio, sino un elemento que vincula los
+dominios mecánico, electrónico y de control del módulo propuesto. La Tabla~\ref{tab:camara-orientable} resume
+esta comparación funcional, sin recurrir a argumentos de costo o de cableado.
+
+\begin{table}[H]
+  \centering
+  \caption{Comparación funcional entre una configuración de cámaras fijas y una cámara orientable.}
+  \label{tab:camara-orientable}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}XX@{}}
+    \toprule
+    \textbf{Criterio} & \textbf{Dos cámaras fijas} & \textbf{Una cámara orientable}\\
+    \midrule
+    Tipo de percepción & Observación pasiva y simultánea de regiones predefinidas. & Percepción activa dirigida hacia el eje operacionalmente relevante.\\
+    Relación con el ciclo semafórico & Captura permanente, independiente de la fase. & Sincroniza la observación con la formación de cola, la descarga vehicular o la saturación.\\
+    Calidad visual por eje & Depende de una vista amplia o de condiciones de instalación distintas entre cámaras. & Enfoca regiones de interés específicas con una cadena de visión homogénea.\\
+    Consistencia de calibración & Requiere mantener la consistencia entre sensores. & Emplea el mismo sensor y una calibración definida por orientación.\\
+    Eventos prioritarios & Selecciona entre flujos de video ya existentes. & Orienta activamente el campo visual hacia el acceso prioritario.\\
+    Aporte mecatrónico & Predomina el sensado fijo y el procesamiento de video. & Integra sensado, control de orientación, mecanismo, actuador y decisión local.\\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}
+
+En consecuencia, la elección de una cámara orientable no se plantea como una solución universalmente superior a
+una arquitectura multicámara, sino como una decisión de diseño alineada con el objetivo de esta tesis: proponer
+un módulo IoT mecatrónico complementario, capaz de sensar activamente la intersección, actualizar variables
+locales y entregar recomendaciones acotadas sin sustituir la autoridad del controlador semafórico existente.
+
 \subsection{Arquitectura general y flujo del sistema}\label{sec:arquitectura-flujo}
 
 La Figura~\ref{fig:flujo-general} resume el flujo general. El controlador vial acciona las salidas de campo
@@ -497,7 +568,11 @@ El módulo IoT actúa como intermediario entre el controlador programable y la n
 y transmisión de datos del entorno local hacia el sistema de control superior. Esta intermediación permite una
 comunicación fluida incluso cuando los controladores pertenecen a distintas marcas y protocolos, mitigando la
 fragmentación tecnológica existente en Lima, donde coexisten diferentes fabricantes (SICE, SUTEC, ORIUX,
-SWARCO) y múltiples protocolos (AENOR, OPCT, NTCIP, BEFA). La Figura~\ref{fig:flujo-completo} detalla la
+SWARCO) y múltiples protocolos (AENOR, OPCT, NTCIP, BEFA). No obstante, en esta tesis no se implementa ni
+certifica la integración con un controlador comercial específico: la compatibilidad NTCIP se plantea como
+arquitectura de interfaz y la salida del módulo permanece como recomendación acotada; la interfaz física y
+protocolar con un controlador real debe verificarse en un banco \textit{hardware-in-the-loop} y en un piloto
+controlado. Las Figuras~\ref{fig:flujo-completo} y~\ref{fig:flujo-completo-b} detallan la
 lógica operativa completa: el sistema inicia con la energización y verificación de la fuente, la inicialización
 secuencial del controlador interno, la activación de la cámara, los sensores de monitoreo ambiental y
 energético y los actuadores; tras verificar la comunicación, entra en un bucle continuo que captura imágenes,
@@ -508,9 +583,18 @@ datos para su transmisión segura a la nube.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image66.png}
-  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image33.png}
-  \caption{Diagrama del flujo completo del sistema.}
+  \caption{Diagrama del flujo completo del sistema (parte~1 de~2): energización,
+  inicialización de subsistemas y verificación de la comunicación.}
   \label{fig:flujo-completo}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image33.png}
+  \caption{Diagrama del flujo completo del sistema (parte~2 de~2): bucle de captura,
+  cálculo del índice de congestión y transmisión segura hacia la nube.}
+  \label{fig:flujo-completo-b}
   \fuente{Elaboración propia.}
 \end{figure}
 
@@ -522,8 +606,8 @@ periféricos de procesamiento de imágenes cuando el desempeño de visión lo re
 Azure para análisis, almacenamiento y recomendaciones de coordinación. La alimentación parte de la red de
 220\,V AC, protegida por llaves termomagnéticas y disyuntores, convertida mediante una fuente conmutada AC/DC
 de 24\,V, complementada con batería DC de respaldo y convertidores DC/DC. El monitoreo ambiental y energético
-emplea los sensores INA219 y SHT31, y la captura visual la cámara domo IP con PTZ integrada; la comunicación
-opera con NTCIP hacia la central de control y MQTT hacia la nube Azure.
+emplea los sensores WCS1600 (con ADC MCP3008) y DS18B20, y la captura visual la cámara domo fija orientable por mecanismo externo; la
+comunicación opera con NTCIP hacia la central de control y MQTT hacia la nube Azure.
 
 \begin{figure}[H]
   \centering
@@ -618,8 +702,8 @@ OE1 & Base para todos los requerimientos & 1 y 2 & Revisión comparativa y sínt
 OE2 & R-F01 a R-COST01 & 3 & Inspección de especificación & Tabla~\ref{tab:req-verificables} con código, criterio, justificación y verificación.\\
 OE3 & R-C01, R-C02, R-C04, R-COM01, R-MEC01 & 3 & Evaluación ponderada & Caja negra, estructura funcional, matriz morfológica y concepto C.\\
 OE4 & R-ELEC01 a R-ELEC03, R-COM01 & 4 & Cálculo y revisión de diseño & Esquemas, consumo, selección de componentes y protecciones.\\
-OE5 & R-MEC01 a R-MEC03 & 5 & CAD, cálculo y simulación & Distribución, soporte, análisis térmico/estructural y factor de seguridad.\\
-OE6 & R-F02, R-C01, R-C03, R-C04 & 6 & Casos de prueba y SUMO & Membresías, reglas, superficie, saturaciones y modos degradados.\\
+OE5 & R-MEC01 a R-MEC03, R-CAM01 & 5 & CAD, cálculo y simulación & Distribución, soporte, sistema de orientación, análisis térmico/estructural y factor de seguridad.\\
+OE6 & R-F02, R-C01, R-C03, R-C04, R-CAM02--R-CAM04 & 6 & Casos de prueba y SUMO & Membresías, reglas, superficie, saturaciones, política de orientación y modos degradados.\\
 OE7 & R-COM01, R-COM02, R-NUB01 & 6 y 7 & Demostración controlada & Flujo de mensajes, histórico, alertas y prueba de desconexión.\\
 OE8 & R-SEC01 a R-SEC04 & 2, 6 y 7 & Análisis de amenazas & Tabla de amenazas, mitigaciones y evidencia de controles propuestos.\\
 OE9 & R-VAL01 a R-VAL03 & 7 & Simulación comparativa & Tabla comparativa de métricas SUMO y archivos de salida del Capítulo~7.\\
