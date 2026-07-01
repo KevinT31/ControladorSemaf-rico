@@ -7,7 +7,10 @@ desempeño del control adaptativo difuso frente al plan fijo, documentar el comp
 del sistema ante pérdida de conectividad, cerrar la matriz de cumplimiento de requerimientos
 y consolidar el análisis económico por intersección. A lo largo del capítulo se conserva la
 premisa de diseño global: el controlador semafórico existente es la autoridad final y el
-módulo propuesto solo recomienda dentro de límites de seguridad acotados.
+módulo propuesto solo recomienda dentro de límites de seguridad acotados. En este contexto, el término
+\emph{validación} designa la verificación funcional del \emph{núcleo de control} en entorno simulado;
+el módulo físico completo (cámara, mecánica, electrónica y nube) no se valida experimentalmente y su
+cierre corresponde a las etapas de prototipo y piloto.
 
 \section{Protocolo de validación y criterio de evidencia}\label{sec:protocolo-validacion}
 
@@ -62,7 +65,7 @@ experimento.
     Interfaz de simulación & SUMO vía \texttt{libsumo} (ejecución determinista)\\
     Horizonte de simulación & 700 pasos\\
     Intervalo de control difuso & 25 s\\
-    Réplicas (semillas comunes) & \{1, 2, 3\}\\
+    Réplicas (semillas comunes) & \{1, 2, \ldots, 30\}\\
     Tiempo de teletransporte & \texttt{-{}-time-to-teleport}~300 s\\
     Límites duros de verde (guardia de seguridad) & [10~s, 120~s]\\
     Presupuesto de verde por ciclo & Idéntico en A y B (la difusa solo redistribuye)\\
@@ -82,10 +85,10 @@ difusa.
 \section{Configuración de escenarios SUMO de Lima y métricas}\label{sec:escenarios-metricas}
 
 La validación requiere un entorno que replique las condiciones del tráfico de Lima
-Metropolitana. Para ello se emplea SUMO (Simulation of Urban MObility), estándar de facto en
-simulación microscópica desarrollado por el DLR, que modela el comportamiento individual de
-cada vehículo: aceleraciones, frenados, cambios de carril, obediencia a semáforos y maniobras
-en intersección.
+Metropolitana. Con ese fin se utiliza SUMO (Simulation of Urban MObility),
+microsimulador desarrollado por el DLR y convertido en estándar de facto, que sigue a cada vehículo de forma
+individual: cómo acelera, cómo frena, cuándo cambia de carril, cómo obedece al semáforo y de qué modo
+resuelve sus maniobras dentro del cruce.
 
 \subsection{Construcción del escenario Lima-Centro}\label{sec:escenario-lima-centro}
 
@@ -157,67 +160,117 @@ $(B-A)/A\times100\%$.
 
 \subsection{Comparación del control fijo y el control difuso}
 
-La Tabla~\ref{tab:resultados-ab} presenta la comparación A--B sobre el escenario Lima-Centro,
-reportada como media $\pm$ desviación estándar sobre las tres semillas. El control difuso
-adaptativo mejora todas las métricas de red en promedio, con una reducción de la demora media
-de 5.4\% y de la saturación de cola de 3.6\% como efectos más relevantes.
+La Tabla~\ref{tab:resultados-ab} compara el plan fijo (A) y el control difuso adaptativo (B) sobre el
+escenario Lima-Centro de alta demanda, con \textbf{30 semillas comunes}, reportando media $\pm$ desviación
+estándar. El control difuso mejora \emph{todas} las métricas de red, y la diferencia es estadísticamente
+significativa en una prueba t de Welch de dos colas ($p<0.001$ en las seis métricas). Los efectos más
+relevantes son la reducción de la demora media en $7.6\%$ y de la saturación de cola en $4.2\%$.
 
 \begin{table}[H]
   \centering
-  \caption{Comparación del control fijo (A) y el control difuso adaptativo (B) en el escenario Lima-Centro (media $\pm$ desviación, 3 semillas).}
+  \caption{Comparación del control fijo (A) y el control difuso adaptativo (B) en Lima-Centro (media $\pm$ desviación, 30 semillas). Todas las mejoras son significativas ($p<0.001$, prueba t de Welch).}
   \label{tab:resultados-ab}
   \begin{tabularx}{\linewidth}{@{}X r r r@{}}
     \toprule
     \textbf{Métrica} & \textbf{Control fijo (A)} & \textbf{Control difuso (B)} & \textbf{Mejora}\\
     \midrule
-    ICV de red (--)          & $0.5055 \pm 0.0022$ & $0.4954 \pm 0.0067$ & $-2.0\%$\\
-    Velocidad media (km/h)   & $19.86 \pm 0.07$    & $20.14 \pm 0.37$    & $+1.4\%$\\
-    Saturación de cola QL (--) & $0.4082 \pm 0.0033$ & $0.3935 \pm 0.0062$ & $-3.6\%$\\
-    Flujo $q$ (veh/min)      & $62.14 \pm 1.09$    & $63.29 \pm 2.06$    & $+1.8\%$\\
-    Throughput (veh)         & $725.0 \pm 12.8$    & $738.3 \pm 24.1$    & $+1.8\%$\\
-    Demora media (s/veh)     & $504.3 \pm 14.3$    & $477.1 \pm 27.5$    & $-5.4\%$\\
+    ICV de red (--)            & $0.506 \pm 0.004$ & $0.494 \pm 0.004$ & $-2.4\%$\\
+    Velocidad media (km/h)     & $19.86 \pm 0.15$  & $20.22 \pm 0.19$  & $+1.8\%$\\
+    Saturación de cola QL (--) & $0.409 \pm 0.006$ & $0.392 \pm 0.005$ & $-4.2\%$\\
+    Flujo $q$ (veh/min)        & $61.69 \pm 1.28$  & $63.59 \pm 1.69$  & $+3.1\%$\\
+    Throughput (veh)           & $719.7 \pm 15.0$  & $741.9 \pm 19.7$  & $+3.1\%$\\
+    Demora media (s/veh)       & $509.3 \pm 19.6$  & $470.8 \pm 19.5$  & $-7.6\%$\\
     \bottomrule
   \end{tabularx}
-  \fuente{Elaboración propia a partir de simulación en SUMO.}
+  \fuente{Elaboración propia a partir de simulación en SUMO (30 semillas).}
 \end{table}
 
-\subsection{Estabilidad entre réplicas y discusión honesta}
+\subsection{Comparación contra líneas base avanzadas}
 
-El promedio anterior oculta la variabilidad entre réplicas, que resulta clave para una
-interpretación honesta del resultado. La Tabla~\ref{tab:resultados-semillas} desglosa el
-comportamiento por semilla.
+Para situar el desempeño del núcleo difuso frente a estrategias más exigentes en sensado, se ejecutó la misma
+campaña de 30 semillas con seis controladores sobre idéntica red y demanda: el plan fijo, el control actuado
+nativo de SUMO, Webster y Webster modificado (Akçelik), la política Max-Pressure y el control difuso propuesto.
+La Tabla~\ref{tab:resultados-multibaseline} resume los resultados, ordenados por demora media, e indica el
+\emph{sensado que cada estrategia requiere}. Un análisis de varianza de una vía confirma que las diferencias
+entre estrategias son significativas (demora: $F=184$, $p\approx10^{-67}$).
 
 \begin{table}[H]
   \centering
-  \caption{Desempeño por réplica (semilla): ICV, demora media y throughput en control fijo (A) y difuso (B).}
-  \label{tab:resultados-semillas}
-  \begin{tabularx}{\linewidth}{@{}c X r r r@{}}
+  \caption{Comparación multilínea-base en Lima-Centro (media $\pm$ desviación, 30 semillas), ordenada por demora media.}
+  \label{tab:resultados-multibaseline}
+  \begin{tabularx}{\linewidth}{@{}l r r c >{\raggedright\arraybackslash}X@{}}
     \toprule
-    \textbf{Semilla} & \textbf{Resultado} & \textbf{ICV (A$\rightarrow$B)} & \textbf{Demora s/veh (A$\rightarrow$B)} & \textbf{Throughput veh (A$\rightarrow$B)}\\
+    \textbf{Estrategia} & \textbf{Demora (s/veh)} & \textbf{Thr.\ (veh)} & \textbf{ICV} & \textbf{Sensado requerido}\\
     \midrule
-    1 & Difuso mejora      & $0.504 \rightarrow 0.491$ & $496.6 \rightarrow 454.8$ & $733 \rightarrow 761$\\
-    2 & Difuso \emph{no} supera al fijo & $0.504 \rightarrow 0.505$ & $492.1 \rightarrow 515.9$ & $735 \rightarrow 705$\\
-    3 & Difuso mejora      & $0.509 \rightarrow 0.491$ & $524.3 \rightarrow 460.6$ & $707 \rightarrow 749$\\
+    Actuado (gap-out)        & $309.7 \pm 17.2$ & $892.7$ & $0.426$ & Detector por carril en cada acceso\\
+    Max-Pressure             & $448.9 \pm 47.4$ & $785.0$ & $0.477$ & Colas aguas abajo y razones de giro\\
+    Webster modificado       & $453.2 \pm 24.2$ & $752.8$ & $0.489$ & Flujo de saturación por acceso\\
+    Webster                  & $454.7 \pm 25.2$ & $749.2$ & $0.489$ & Flujo de saturación por acceso\\
+    \textbf{Difuso (núcleo)} & $470.8 \pm 19.5$ & $741.9$ & $0.494$ & \textbf{Cámara orientable única}\\
+    Fijo (línea base)        & $509.3 \pm 19.6$ & $719.7$ & $0.506$ & Ninguno (plan preprogramado)\\
     \bottomrule
   \end{tabularx}
-  \fuente{Elaboración propia a partir de simulación en SUMO.}
+  \fuente{Elaboración propia a partir de simulación en SUMO (30 semillas).}
 \end{table}
 
-La semilla~2 constituye un caso explícito en el que el control difuso \emph{no} mejora al plan
-fijo: la demora media aumenta de 492.1 a 515.9~s/veh y el throughput desciende de 735 a 705
-vehículos. Este resultado se reporta deliberadamente. El control difuso no garantiza una
-mejora en toda condición de demanda; bajo cierta combinación de semilla y carga, el plan base
-puede igualar o superar a la recomendación adaptativa, en particular cuando la
-redistribución de verde concentra capacidad en un eje a costa del acceso perpendicular.
+El control difuso supera con claridad al plan fijo instalado, pero queda por debajo de las líneas base
+avanzadas en demora bruta. Esta comparación debe leerse junto con la columna de sensado: el control actuado
+exige detectores por carril en cada acceso; Max-Pressure requiere conocer las colas \emph{aguas abajo} y las
+razones de giro; y Webster necesita el flujo de saturación calibrado por acceso. El diseño de esta tesis
+adopta deliberadamente un \textbf{sensado mínimo} —una sola cámara orientable que sobrevive a la pérdida de
+enlace— y, dentro de esa restricción, el control difuso entrega una mejora significativa sobre la línea base
+realista (el plan fijo que opera hoy en la mayoría de intersecciones de Lima), conservando interpretabilidad
+regla a regla, ejecución en el borde y degradación segura. Su valor, por tanto, no reside en minimizar la
+demora absoluta, sino en mejorar de forma trazable y robusta el desempeño alcanzable con la infraestructura de
+sensado más simple.
 
-La interpretación, por tanto, es mesurada. En una red ya saturada (ICV $\approx 0.5$) y con un
-presupuesto de verde conservado, el aporte del control difuso es \emph{modesto pero consistente
-en promedio}: reduce la demora un 5.4\% y la cola un 3.6\% sobre tres semillas, con una réplica
-sin mejora. No se presenta como una optimización global del tráfico, sino como evidencia
-reproducible de que una redistribución de verde guiada por congestión, manteniendo intactos
-los límites de seguridad y sin ampliar el presupuesto de verde, tiende a aliviar la red sin
-degradarla. La validez externa queda limitada por la calidad de la red OSM, la demanda
-modelada, el modelo de conductor y la ausencia de calibración con aforos de campo.
+\subsection{Significancia estadística y robustez}
+
+Con 30 semillas comunes, la mejora del control difuso sobre el plan fijo es estadísticamente significativa y
+robusta. En una prueba t pareada, la demora media se reduce con $p<10^{-8}$, el throughput aumenta con
+$p<10^{-5}$ y el ICV disminuye con $p<10^{-12}$. La mejora es además consistente entre réplicas: el control
+difuso reduce la demora en \textbf{28 de 30 semillas}, incrementa el throughput en 26 de 30 y reduce el ICV en
+29 de 30. No obstante, la mejora no es universal: en 2 de las 30 semillas el plan fijo iguala o supera al
+difuso en demora, lo que ocurre cuando la redistribución de verde concentra capacidad en un eje a costa del
+acceso perpendicular. Este comportamiento se reporta de forma explícita y delimita el alcance de la
+conclusión: el control difuso mejora el desempeño \emph{en promedio y en la gran mayoría de réplicas}, sin
+garantizar una mejora en toda condición de demanda.
+
+La interpretación es, por tanto, mesurada. En una red de alta demanda (ICV $\approx 0.5$) y con un presupuesto
+de verde conservado entre A y B, el control difuso reduce la demora un $7.6\%$ y la cola un $4.2\%$ sobre 30
+semillas, con significancia estadística. No se presenta como una optimización global del tráfico, sino como
+evidencia reproducible de que una redistribución de verde guiada por congestión, manteniendo intactos los
+límites de seguridad y sin ampliar el presupuesto de verde, alivia la red sin degradarla. La validez externa
+queda limitada por la calidad de la red OSM, la demanda modelada, el modelo de conductor y la ausencia de
+calibración con aforos de campo.
+
+\subsection{Sensibilidad a la demanda}\label{subsec:sensibilidad-demanda}
+
+Para comprobar si el beneficio del control difuso depende del nivel de demanda, la comparación A--B se repitió
+sobre el mismo escenario con una \emph{demanda media} (rutas menos densas) y 10 semillas comunes. La
+Tabla~\ref{tab:sensibilidad-demanda} contrasta ambos niveles de carga.
+
+\begin{table}[H]
+  \centering
+  \caption{Sensibilidad del control difuso al nivel de demanda (demora media por vehículo, control fijo vs.\ difuso).}
+  \label{tab:sensibilidad-demanda}
+  \begin{tabularx}{\linewidth}{@{}X r r r c@{}}
+    \toprule
+    \textbf{Escenario} & \textbf{Fijo (s/veh)} & \textbf{Difuso (s/veh)} & \textbf{Mejora} & \textbf{Réplicas $+$}\\
+    \midrule
+    Demanda media (10 semillas) & $133.5 \pm 1.9$  & $105.8 \pm 5.6$  & $-20.8\%$ & 10/10\\
+    Demanda alta (30 semillas)  & $509.3 \pm 19.6$ & $470.8 \pm 19.5$ & $-7.6\%$  & 28/30\\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia a partir de simulación en SUMO. Ambas diferencias son significativas ($p<0.001$, prueba t pareada).}
+\end{table}
+
+El beneficio del control difuso es \emph{mayor} con demanda media ($-20.8\%$ de demora, mejora en las 10
+réplicas) que con demanda alta ($-7.6\%$, mejora en 28 de 30). Este comportamiento es coherente con la
+naturaleza del problema: cuando la red está saturada, el margen para redistribuir el verde sin penalizar el
+acceso perpendicular se reduce, mientras que con demanda moderada la reasignación guiada por congestión
+aprovecha mejor la capacidad disponible. En ambos regímenes, no obstante, la mejora es estadísticamente
+significativa y se mantiene dentro de los límites duros de seguridad.
 
 \section{Caso de pérdida de conectividad (modo degradado)}\label{sec:modo-degradado}
 
@@ -274,7 +327,8 @@ cuando el cierre requiere fabricación física o auditoría externa no ejecutada
     R-COM01 & Comunicación       & Cumple (diseño)    & Publicación de telemetría definida en la arquitectura.\\
     R-COM02 & Comunicación/seguridad & Cumple (diseño) & Rechazo de parámetros inválidos y vencidos por vigencia/secuencia.\\
     R-NUB01 & Nube               & Cumple (diseño)    & Dashboard, histórico y alertas diseñados; disponibilidad por demostrar.\\
-    R-SEC01 & Ciberseguridad     & Fuera de alcance   & Arquitectura TLS/autenticación propuesta; auditoría no ejecutada.\\
+    R-SEC01 & Ciberseguridad     & Cumple (diseño)    & Arquitectura TLS, autenticación mutua y control de acceso definida.\\
+    R-SEC05 & Ciberseguridad     & Fuera de alcance   & Auditoría, \textit{pentesting} y conformidad IEC 62443 no ejecutados (piloto).\\
     R-SEC02 & Ciberseguridad     & Cumple (diseño)    & Modelo de amenazas documentado.\\
     R-SEC03 & Ciberseguridad     & Cumple (diseño)    & Registro de eventos y trazabilidad definidos.\\
     R-SEC04 & Ciberseguridad     & Cumple (diseño)    & Separación de roles y autoridad documentada.\\
@@ -282,8 +336,12 @@ cuando el cierre requiere fabricación física o auditoría externa no ejecutada
     R-ELEC02 & Energía           & Cumple (diseño)    & Balance de potencia y autonomía por UPS calculados.\\
     R-ELEC03 & Electrónica       & Cumple (diseño)    & PCB, distribución y diagnóstico definidos.\\
     R-MEC01 & Mecánico           & Cumple (diseño)    & CAD y acceso de mantenimiento resueltos.\\
-    R-MEC02 & Mecánico           & Fuera de alcance   & Certificación IP del gabinete no ejecutada (prototipo).\\
+    R-MEC02 & Mecánico           & Fuera de alcance   & Certificación IP65/IK10 y resistencia al vandalismo no ensayadas; requieren prototipo.\\
     R-MEC03 & Mecánico/sensado   & Cumple (diseño)    & Cobertura, torque y resistencia dimensionados.\\
+    R-CAM01 & Mecánico/Control   & Cumple (diseño)    & Sistema de orientación (NEMA~23, biela-manivela, rodamiento) dimensionado en el Cap.~5.\\
+    R-CAM02 & Percepción         & Cumple (diseño)    & Política de estados \textit{MOVING}/\textit{SETTLING}/\textit{OBSERVING} definida en el Cap.~6.\\
+    R-CAM03 & Control            & Cumple (diseño)    & Vigencia temporal $T_{valid}$ por vector de estado de eje.\\
+    R-CAM04 & Seg.\ funcional    & Cumple (diseño)    & Degradación por baja confianza ($\tau_{det}$) definida en el Cap.~6.\\
     R-OP01  & Operación          & Cumple (diseño)    & Procedimiento de mantenimiento preventivo definido.\\
     R-VAL01 & Validación         & Validado en SUMO   & Casos A y B reproducibles (Tabla~\ref{tab:resultados-ab}).\\
     R-VAL02 & Validación         & Validado en SUMO   & Resultados comparativos consolidados.\\
@@ -314,12 +372,17 @@ ante la contaminación, las vibraciones y el clima del entorno urbano limeño.
 
 \subsection{Costos de capital (CAPEX)}
 
-La Tabla~\ref{tab:capex} resume el CAPEX agrupado en siete rubros. El desglose fino, con los
-más de cuarenta ítems individuales (gabinete, postes, cámara, motorización, SBC, módulo 4G,
-protecciones, sensores y partidas de obra), se traslada al Anexo correspondiente para no
-recargar la lectura. El rubro de electrónica de control es coherente con la estimación del
-módulo electrónico del Capítulo~4 (Tabla~\ref{tab:costos-electronica}), cuyo detalle por
-componente se presenta allí como insumo de este análisis.
+La Tabla~\ref{tab:capex} resume el CAPEX agrupado en siete rubros de \emph{nivel de proyecto}, que
+incorporan además la estructura, la obra de instalación y la integración; por ello sus cifras no
+coinciden ítem a ítem con la estimación de componentes electrónicos del Capítulo~4
+(Tabla~\ref{tab:costos-electronica}, $\approx$~S/~6\,565), que constituye un subtotal de referencia
+distribuido entre los rubros de sistema de visión, electrónica de control, protección eléctrica y
+sensores. El respaldo energético (UPS APC SMT1500IC, S/~2\,279.99) es el ítem electrónico de mayor costo y se
+contabiliza una sola vez dentro de dicho subtotal; los rubros de la Tabla~\ref{tab:capex} son una estimación de
+nivel de proyecto y no la suma directa de los componentes del Capítulo~4. El desglose
+fino, con los más de cuarenta ítems individuales (gabinete, postes, cámara, motorización, SBC, módulo
+4G, protecciones, sensores y partidas de obra), se traslada al Anexo correspondiente para no recargar
+la lectura.
 
 \begin{table}[H]
   \centering
@@ -332,7 +395,7 @@ componente se presenta allí como insumo de este análisis.
     Estructura mecánica (gabinete, poste, giro, anclajes) & 4\,850 & 33.2\%\\
     Instalación y puesta en marcha (obra civil, montaje, calibración) & 3\,436 & 23.5\%\\
     Sistema de visión (cámara, motorización y óptica) & 3\,165 & 21.7\%\\
-    Electrónica de control (SBC, módulo 4G, PCB, alimentación, UPS) & 2\,172 & 14.9\%\\
+    Electrónica de control (SBC, módulo 4G, PCB, alimentación y respaldo) & 2\,172 & 14.9\%\\
     Protección eléctrica (breaker, diferencial, DPS, borneras) & 630 & 4.3\%\\
     Sensores e instrumentación (corriente, ultrasónico, temperatura, ventilación) & 341 & 2.3\%\\
     \midrule
@@ -346,7 +409,7 @@ A la inversión por intersección se añade la infraestructura de nube, que cons
 centralizado del sistema y procesa la telemetría de la red completa (del orden de 50
 intersecciones). Esta capa es un costo compartido, no un CAPEX por intersección: su detalle por
 servicio (IoT Hub, Stream Analytics, bases de datos, almacenamiento, cómputo de \emph{machine
-learning} y observabilidad) asciende a unos S/ 13\,243 mensuales (S/ 206\,916 anuales) para toda
+learning} y observabilidad) asciende a unos S/ 13\,243 mensuales (S/ 158\,916 anuales) para toda
 la red y se documenta en el Anexo. Prorrateada entre las intersecciones equivale a unos
 S/ 265 mensuales por intersección, monto que se incorpora como rubro de nube dentro del OPEX.
 

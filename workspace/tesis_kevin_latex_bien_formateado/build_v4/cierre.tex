@@ -35,21 +35,30 @@ saturaciones permiten revisar el comportamiento antes de emitir una recomendaci�
 sensado o del módulo, la arquitectura inhibe la adaptación y conserva el plan seguro del controlador, que
 mantiene la autoridad final sobre la actuación (OE6).
 
+\item La elección de una cámara orientable se justifica como una estrategia de \emph{percepción activa}, en
+la que el campo visual se dirige hacia el eje de mayor relevancia operacional del ciclo semafórico. Esta
+decisión integra mecánica, electrónica, percepción y control local en un mismo módulo mecatrónico, y se
+acompaña de una política de validez temporal (estados \textit{MOVING}/\textit{SETTLING}/\textit{OBSERVING} y
+vigencia $T_{valid}$) que evita que la reorientación degrade la recomendación; la salida del sistema permanece
+como recomendación acotada y no como actuación directa sobre las luces (OE5, OE6).
+
 \item La nube se delimitó como soporte para telemetría, históricos, alertas, coordinación y distribución
 autorizada de parámetros, demostrándose que la decisión local continúa sin conectividad externa. La
 ciberseguridad propuesta incorpora autenticación, cifrado, control de acceso por roles, validación de
 parámetros, registro de eventos y mínimo privilegio; estas medidas son criterios de diseño y no equivalen a
 una auditoría o certificación (OE7, OE8).
 
-\item La validación en SUMO comparó el control de tiempo fijo con el control difuso adaptativo en el
-escenario de Lima-Centro, bajo condiciones comunes y con tres semillas, conservando el mismo presupuesto de
-verde por ciclo. El control difuso redujo la demora media de 504.3 a 477.1~s/veh ($-5.4$~\%), la saturación
-de cola en $3.6$~\%, el índice de congestión de 0.5055 a 0.4954 ($-2.0$~\%), e incrementó la velocidad media
-en $1.4$~\% y el \textit{throughput} en $1.8$~\%, manteniendo en todo momento los límites duros de verde
-$[10,120]$~s. Las mejoras son modestas pero consistentes en promedio; en una de las tres semillas el control
-difuso no superó al plan fijo, lo que evidencia que el beneficio depende de la demanda y no está garantizado
-en toda condición. Estos resultados validan el núcleo de control y, a la vez, acotan honestamente su alcance
-(OE9).
+\item La verificación en SUMO comparó el control de tiempo fijo con el control difuso adaptativo en el
+escenario de alta demanda de Lima-Centro, bajo condiciones comunes y con \textbf{30 semillas}, conservando el
+mismo presupuesto de verde por ciclo. El control difuso redujo la demora media de 509.3 a 470.8~s/veh
+($-7.6$~\%) y la saturación de cola en $4.2$~\%, disminuyó el índice de congestión de 0.506 a 0.494
+($-2.4$~\%) e incrementó la velocidad media en $1.8$~\% y el \textit{throughput} en $3.1$~\%, manteniendo en
+todo momento los límites duros de verde $[10,120]$~s. Todas las mejoras son estadísticamente significativas
+(prueba t, $p<0.001$) y consistentes: el difuso supera al plan fijo en 28 de 30 semillas. La mejora no es
+universal —en 2 de 30 réplicas el plan fijo iguala o supera al difuso—, lo que se reporta de forma explícita.
+Frente a líneas base más exigentes en sensado (actuado, Webster, Max-Pressure), el difuso obtiene una mejora
+bruta menor, pero es el único que opera con una sola cámara orientable, es interpretable y tolera la pérdida
+de enlace. Estos resultados verifican el núcleo de control y acotan honestamente su alcance (OE9).
 
 \item El análisis económico preliminar separó CAPEX y OPEX y situó el costo del primer año en torno a
 S/~17~mil por intersección, dominado por la estructura mecánica y el sistema de visión. Antes de defender
@@ -75,6 +84,11 @@ cualquier intervención en vía pública.
 \textit{watchdog} en un banco de pruebas.
 \item Probar la cámara con video real de Lima en condiciones de día, noche, contraluz, lluvia y neblina
 costera, y medir la precisión de conteo, cola y velocidad.
+\item Validar experimentalmente en prototipo la política de orientación de la cámara: tiempos de giro,
+ventana de estabilización, precisión de posicionamiento, efecto de las vibraciones sobre la detección,
+umbrales de confianza visual y desempeño ante oclusiones e iluminación variable. Comparar además, en
+trabajos posteriores, la cámara orientable frente a una arquitectura multicámara bajo métricas de
+cobertura, confiabilidad, latencia y robustez.
 \item Calibrar la demanda y el comportamiento vehicular de SUMO con aforos reales, ampliar el número de
 semillas y publicar los archivos de configuración y de salida para garantizar la reproducibilidad.
 \item Integrar el módulo a un controlador semafórico comercial en un banco \textit{hardware-in-the-loop},
@@ -85,9 +99,9 @@ restauración de respaldos y respuesta ante incidentes.
 ambiental y los procedimientos municipales aplicables.
 \item Realizar un piloto controlado en una intersección o recinto cerrado, con plan de reversión,
 supervisión humana y métricas acordadas.
-\item Mantener el aprendizaje por refuerzo, la predicción CNN--LSTM y la optimización metropolitana como
-líneas futuras, hasta disponer de datos, validación fuera de muestra y criterios de aceptación
-(Anexo~\ref{anexo:futuros}).
+\item Mantener el aprendizaje por refuerzo, la predicción CNN--LSTM, la optimización metropolitana y la
+detección de vehículos de emergencia como líneas futuras, hasta disponer de datos, validación fuera de
+muestra y criterios de aceptación (Anexo~\ref{anexo:futuros}).
 \item Extender el estudio de una intersección a un corredor solo después de demostrar estabilidad local,
 interoperabilidad y un beneficio estadísticamente sustentado.
 \end{itemize}
@@ -123,30 +137,31 @@ control de SUMO. Los parámetros de reproducibilidad son los siguientes:
 \item \textbf{Horizonte:} 700 pasos de simulación por corrida.
 \item \textbf{Intervalo de control:} 25~s (cada intervalo se mide el estado, se calcula el ICV por
 dirección y la lógica difusa recalcula el verde recomendado).
-\item \textbf{Semillas:} \{1, 2, 3\}.
+\item \textbf{Semillas:} \{1, 2, \ldots, 30\} (campaña de seis controladores sobre idéntica red y demanda).
 \item \textbf{Restricciones de seguridad:} límites duros de verde $[10, 120]$~s aplicados por una guardia de
 seguridad funcional; cualquier recomendación fuera de rango se acota antes de aplicarse, registrándose el
 evento.
 \end{itemize}
 
-\noindent\textbf{Tabla A.1.} Resultados por réplica (control fijo / control difuso).
+\noindent\textbf{Tabla A.1.} Agregado de la campaña multilínea-base (media $\pm$ desviación, 30 semillas).
 \begin{center}
-\begin{tabular}{@{}lcccccc@{}}
+\begin{tabular}{@{}lccc@{}}
 \toprule
- & \multicolumn{3}{c}{\textbf{Control fijo}} & \multicolumn{3}{c}{\textbf{Control difuso}} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-7}
-\textbf{Semilla} & ICV & Demora (s) & Thr. & ICV & Demora (s) & Thr. \\
+\textbf{Estrategia} & \textbf{ICV} & \textbf{Demora (s)} & \textbf{Throughput} \\
 \midrule
-1 & 0.5039 & 496.6 & 733 & 0.4905 & 454.8 & 761 \\
-2 & 0.5040 & 492.1 & 735 & 0.5049 & 515.9 & 705 \\
-3 & 0.5086 & 524.3 & 707 & 0.4908 & 460.6 & 749 \\
-\midrule
-\textbf{Media} & 0.5055 & 504.3 & 725 & 0.4954 & 477.1 & 738 \\
+Fijo (línea base)   & $0.506 \pm 0.004$ & $509.3 \pm 19.6$ & $719.7 \pm 15.0$ \\
+Difuso (núcleo)     & $0.494 \pm 0.004$ & $470.8 \pm 19.5$ & $741.9 \pm 19.7$ \\
+Webster             & $0.489 \pm 0.004$ & $454.7 \pm 25.2$ & $749.2 \pm 23.5$ \\
+Webster modificado  & $0.489 \pm 0.005$ & $453.2 \pm 24.2$ & $752.8 \pm 22.3$ \\
+Max-Pressure        & $0.477 \pm 0.013$ & $448.9 \pm 47.4$ & $785.0 \pm 42.9$ \\
+Actuado (gap-out)   & $0.426 \pm 0.006$ & $309.7 \pm 17.2$ & $892.7 \pm 22.9$ \\
 \bottomrule
 \end{tabular}
 \end{center}
-{\footnotesize\itshape Fuente: Elaboración propia a partir de la simulación en SUMO. La semilla~2 ilustra
-una condición en la que el control difuso no supera al plan fijo.\par}
+{\footnotesize\itshape Fuente: Elaboración propia (SUMO, 30 semillas). El control difuso reduce la demora
+frente al plan fijo en 28 de 30 semillas ($p<0.001$, prueba t pareada); las líneas base avanzadas alcanzan
+menor demora a costa de un sensado más exigente (detectores por carril, colas aguas abajo o flujo de
+saturación calibrado).\par}
 
 \vspace{0.4cm}
 La discusión completa y las mejoras porcentuales agregadas se presentan en el
@@ -201,8 +216,51 @@ El desglose detallado por componente —fabricación mecánica, sistema de visi�
 protección eléctrica, sensores, instalación y prorrateo de servicios de nube— se conserva como hoja de
 cálculo en el material digital de la tesis.
 
-Los planos de fabricación se conservan como archivos CAD digitales y comprenden, como mínimo: (i) el
-gabinete modular; (ii) el soporte tipo rack interno; (iii) el mecanismo de orientación de la cámara; (iv) el
-poste y el soporte del controlador semafórico; y (v) la zapata de cimentación. Los esquemáticos eléctricos
-de alimentación, distribución y de la tarjeta de control se incluyen igualmente como material digital y
-corresponden a esquemas de diseño, sin verificación de reglas de manufactura (DRC) ni archivos Gerber.
+Los planos de fabricación generados durante el diseño se presentan a continuación, organizados por
+subsistema. Cada lámina incluye su cajetín normalizado (PUCP) con material, escala y código de plano.
+Corresponden a esquemas de diseño y de detalle; su liberación para manufactura requiere la verificación
+de reglas de fabricación (DRC) y la generación de archivos de producción, que quedan como etapa posterior.
+Los archivos CAD editables se conservan como material digital de la tesis.
+
+% ---- Planos restaurados (conjunto original del autor) ----
+\begingroup
+\captionsetup[figure]{list=no}   % no saturar el índice de figuras con las 21 láminas
+
+\subsection*{D.1\quad Vista general del módulo}
+\begin{center}
+\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image3.png}
+\end{center}
+
+\subsection*{D.2\quad Estructura interna: rack DIN, rieles y bases (Sección E)}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image138.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image94.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image62.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image137.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image32.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image121.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image59.png}\end{center}
+
+\subsection*{D.3\quad Gabinete (Sección G)}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image34.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image23.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image142.png}\end{center}
+
+\subsection*{D.4\quad Mecanismo de orientación de la cámara (Sección M)}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image135.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image98.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image38.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image119.png}\end{center}
+
+\subsection*{D.5\quad Zócalo y soporte del gabinete (Sección V)}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image123.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image63.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image92.png}\end{center}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image4.png}\end{center}
+
+\subsection*{D.6\quad Poste metálico y placa base (Sección P)}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image129.png}\end{center}
+
+\subsection*{D.7\quad Zapata de cimentación (Sección Z)}
+\begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image106.png}\end{center}
+
+\endgroup

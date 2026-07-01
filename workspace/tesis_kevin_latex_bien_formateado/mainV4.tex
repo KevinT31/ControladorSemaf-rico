@@ -19,8 +19,9 @@
 \usepackage[a4paper,left=3.0cm,right=2.5cm,top=2.7cm,bottom=2.7cm,headheight=15pt]{geometry}
 \usepackage{ragged2e}
 \justifying
-\setlength{\parindent}{1.25cm}
-\setlength{\parskip}{0.25em}
+% Párrafos en bloque: sin sangría de primera línea (se separan por espacio vertical).
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt plus 2pt minus 1pt}
 \emergencystretch=3em
 
 % ==================== Matemática y símbolos ====================
@@ -52,6 +53,16 @@
 \makeatletter
 \def\fps@figure{H}
 \def\fps@table{H}
+\makeatother
+
+% Tope de altura para TODAS las figuras: garantiza que la imagen y su leyenda
+% quepan en la página, de modo que el rótulo «Figura X.Y» nunca se salga de la hoja.
+% Con keepaspectratio la imagen se escala al menor de los dos límites (ancho o alto),
+% por lo que solo afecta a las imágenes verticales (largas); las demás no cambian.
+\makeatletter
+\let\gt@oldincludegraphics\includegraphics
+\renewcommand{\includegraphics}[2][]{%
+  \gt@oldincludegraphics[height=0.80\textheight,keepaspectratio,#1]{#2}}
 \makeatother
 
 % ==================== Listas ====================
@@ -100,7 +111,7 @@
   \addtocontents{lot}{\protect\addvspace{10pt}\protect\noindent{\bfseries CAPÍTULO #1}\protect\par}%
 }
 % Nota de fuente bajo figuras/tablas (alternativa al paréntesis en el caption)
-\newcommand{\fuente}[1]{\par\vspace{-2pt}{\footnotesize\itshape Fuente: #1\par}}
+\newcommand{\fuente}[1]{\par\vspace{3pt}{\setlength{\parskip}{0pt}\footnotesize\itshape Fuente: #1\par}}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -140,6 +151,7 @@
 % ======================================================================
 \begin{titlepage}
 \thispagestyle{empty}
+\setlength{\parskip}{0pt}
 \begin{center}
 \vspace*{0.4cm}
 {\Large\bfseries PONTIFICIA UNIVERSIDAD CATÓLICA DEL PERÚ\par}

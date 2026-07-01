@@ -1,0 +1,187 @@
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Adafruit Industries. (2016, 9 de febrero). MCP3008 \textbar{} Raspberry Pi Analog to Digital Converters. \href{https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/mcp3008}{\ul{https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/mcp3008}}
+\item
+  AdvancedPCB. (2024, 6 de agosto). Understanding High-Power PCB Requirements. \href{https://www.advancedpcb.com/en-us/resources/blog/understanding-high-power-pcb-requirements/}{\ul{https://www.advancedpcb.com/en-us/resources/blog/understanding-high-power-pcb-requirements/}}
+\item
+  Akçelik, R. (1981). \emph{Traffic signals: Capacity and timing analysis} (Australian Road Research Board Research Report ARR 123). Australian Road Research Board.
+\item
+  Aleko, D. R., \& Djahel, S. (2023). An IoT enabled traffic light controllers synchronization method for road traffic congestion mitigation. Proceedings of the 2nd International Conference on Edge Computing and Applications (ICECAA 2023), IEEE Xplore Part Number: CFP23BV8-ART. \href{https://ieeexplore.pucp.elogim.com/stamp/stamp.jsp?tp=&arnumber=9071667}{\ul{https://ieeexplore.pucp.elogim.com/stamp/stamp.jsp?tp=\&arnumber=9071667}}
+\item
+  Ali, M. E. M., Durdu, A., Celtek, S. A., \& Yilmaz, A. (2021). An adaptive method for traffic signal control based on fuzzy logic with Webster and modified Webster formula using SUMO traffic simulator. \emph{IEEE Access, 9}, 102985--102997. \href{https://doi.org/10.1109/ACCESS.2021.3094270}{\ul{https://doi.org/10.1109/ACCESS.2021.3094270}}
+\item
+  Altium. (2022, 10 de diciembre). IPC-2221 Calculator for PCB Trace Current and Heating. \href{https://resources.altium.com/p/ipc-2221-calculator-pcb-trace-current-and-heating}{\ul{https://resources.altium.com/p/ipc-2221-calculator-pcb-trace-current-and-heating}}
+\item
+  Analog Devices. (2015). DS18B20: Programmable resolution 1-Wire digital thermometer {[}Hoja de datos{]}. \href{https://www.analog.com/media/en/technical-documentation/data-sheets/ds18b20.pdf}{\ul{https://www.analog.com/media/en/technical-documentation/data-sheets/ds18b20.pdf}}
+\item
+  APC Guard. (s.f.). Smart-UPS SMT1500IC Datasheet. \href{https://www.apcguard.com.au/datasheets/Smart-UPS_SMT1500IC.pdf}{\ul{https://www.apcguard.com.au/datasheets/Smart-UPS\_SMT1500IC.pdf}}
+\item
+  Apolitical. (2019). Pittsburgh reduce el tiempo de viaje en un 25\% con semáforos inteligentes. \href{https://apolitical.co/solution-articles/es/pittsburgh-reduce-el-tiempo-de-viaje-25-semaforos-inteligentes}{\ul{https://apolitical.co/solution-articles/es/pittsburgh-reduce-el-tiempo-de-viaje-25-semaforos-inteligentes}}
+\item
+  Arshon Technology. (2025, 5 de abril). Understanding the IPC-2221 Standard: A Foundation for Reliable PCB Design. \href{https://arshon.com/blog/understanding-the-ipc-2221-standard-a-foundation-for-reliable-pcb-design/}{\ul{https://arshon.com/blog/understanding-the-ipc-2221-standard-a-foundation-for-reliable-pcb-design/}}
+\item
+  Asad, B., Saxena, N., \& Katos, V. (2020). Análisis de los riesgos y desafíos de seguridad y privacidad en el sistema de semáforos inteligentes en ciudades inteligentes. Cardiff University. \href{https://orca.cardiff.ac.uk/id/eprint/135436/1/IoT\%20paper-Final.pdf}{\ul{https://orca.cardiff.ac.uk/id/eprint/135436/1/IoT\%20paper-Final.pdf}}
+\item
+  Atlas Steels. (2021). \emph{Aluminium alloy 5052 data sheet}. Atlas Steels Technical Department. \href{https://www.atlassteels.com.au/}{\ul{https://www.atlassteels.com.au/}}
+\item
+  ATO. (2020). NEMA 23 stepper motor specifications {[}Hoja de datos{]}. \href{https://www.ato.com/Content/doc/nema-23-stepper-motor-specs.pdf}{\ul{https://www.ato.com/Content/doc/nema-23-stepper-motor-specs.pdf}}
+\item
+  Autoridad de Transporte Urbano para Lima y Callao (ATU). (2024). \emph{Características y funcionalidades técnicas de los dispositivos de monitoreo inalámbrico (GPS) para el transporte público} (Resolución Directoral N.º D-000008-2024-ATU/DIR). Diario Oficial El Peruano. \href{https://www.elperuano.pe/noticia/236055-atu-aprueba-caracteristicas-del-monitoreo-inalambrico-gps-en-el-transporte-urbano}{\ul{https://www.elperuano.pe/noticia/236055-atu-aprueba-caracteristicas-del-monitoreo-inalambrico-gps-en-el-transporte-urbano}}
+\item
+  Balasubramanian, S. B., Balaji, P., Munshi, A., Almukadi, W., Prabhu, T. N., K, V., \& Abouhawwash, M. (2023). Machine learning based IoT system for secure traffic management and accident detection in smart cities. PeerJ Computer Science, 9, e1259. \href{https://pmc.ncbi.nlm.nih.gov/articles/PMC10280433/}{\ul{https://pmc.ncbi.nlm.nih.gov/articles/PMC10280433/}}
+\item
+  Banco Mundial. (2024, 15 de octubre). Modernizing traffic management in Lima with World Bank support. \href{https://www.bancomundial.org/es/news/press-release/2024/10/15/modernizing-traffic-management-in-lima-with-world-bank-support}{\ul{https://www.bancomundial.org/es/news/press-release/2024/10/15/modernizing-traffic-management-in-lima-with-world-bank-support}}
+\item
+  Banks, A., \& Gupta, R. (Eds.). (2014). \emph{MQTT Version 3.1.1} (OASIS Standard). OASIS. \href{http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html}{\ul{http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html}}
+\item
+  BBMLED. (s.f.). How IoT enhances smart traffic light systems. \href{https://www.bbmled.com/es/a-news-how-iot-enhances-smart-traffic-light-systems}{\ul{https://www.bbmled.com/es/a-news-how-iot-enhances-smart-traffic-light-systems}}
+\item
+  BC Robotics. (s.f.). Getting Started With The Raspberry Pi 16 Channel ADC HAT. \href{https://bc-robotics.com/tutorials/getting-started-raspberry-16-channel-adc-hat/?srsltid=AfmBOoo5UNInhCebqc6AE-9IB_Cp4DineEsyD8XHiTWDtIY1t7zUg1Ld}{\ul{https://bc-robotics.com/tutorials/getting-started-raspberry-16-channel-adc-hat/?srsltid=AfmBOoo5UNInhCebqc6AE-9IB\_Cp4DineEsyD8XHiTWDtIY1t7zUg1Ld}}
+\item
+  Bedoya Reyes, A. (2013). Anexo A: Descripción de simuladores de tráfico {[}Archivo PDF{]}. Universidad de Zaragoza. \href{https://zaguan.unizar.es/record/12971/files/TAZ-TFM-2013-1124_ANE.pdf}{\ul{https://zaguan.unizar.es/record/12971/files/TAZ-TFM-2013-1124\_ANE.pdf}}
+\item
+  Bitdefender. (2020, 20 de octubre). More than 150,000 traffic lights in the US have a critical vulnerability. \href{https://www.bitdefender.com/en-us/blog/hotforsecurity/more-than-150-000-traffic-lights-in-the-us-have-a-critical-vulnerability}{\ul{https://www.bitdefender.com/en-us/blog/hotforsecurity/more-than-150-000-traffic-lights-in-the-us-have-a-critical-vulnerability}}
+\item
+  Boaz, R. W. (2009). NTCIP Center-To-Field Step by Step. Pillar Consulting, Inc. \href{https://pillarinc.com/wp-content/uploads/2019/09/Boaz_NTCIPCenterToFieldStepByStep.pdf}{\ul{https://pillarinc.com/wp-content/uploads/2019/09/Boaz\_NTCIPCenterToFieldStepByStep.pdf}}
+\item
+  Buchanan, B. (2023, 29 de enero). Traffic light hacking. ASecuritySite: When Bob Met Alice. \href{https://medium.com/asecuritysite-when-bob-met-alice/traffic-light-hacking-99638547ca33}{\ul{https://medium.com/asecuritysite-when-bob-met-alice/traffic-light-hacking-99638547ca33}}
+\item
+  Carnegie Mellon University. (2019). Traffic Moves at the Speed of Technology. \href{https://www.cmu.edu/news/stories/archives/2019/october/traffic-moves-at-speed-of-technology.html}{\ul{https://www.cmu.edu/news/stories/archives/2019/october/traffic-moves-at-speed-of-technology.html}}
+\item
+  Coral. (s.f.). Get started with the Coral USB Accelerator. \href{https://coral.ai/docs/accelerator/get-started/\#3-run-a-model-on-the-edge-tpu}{\ul{https://coral.ai/docs/accelerator/get-started/\#3-run-a-model-on-the-edge-tpu}}
+\item
+  Dalal, N., \& Triggs, B. (2005). Histograms of oriented gradients for human detection. \emph{2005 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR)}, 886--893. \href{https://doi.org/10.1109/CVPR.2005.177}{\ul{https://doi.org/10.1109/CVPR.2005.177}}
+\item
+  Diario Correo. (2020). Urge sincronizar los semáforos de Lima para agilizar tránsito. \href{https://diariocorreo.pe/edicion/lima/urge-sincronizar-los-semaforos-de-lima-para-agilizar-transito-noticia/?ref=dcr}{\ul{https://diariocorreo.pe/edicion/lima/urge-sincronizar-los-semaforos-de-lima-para-agilizar-transito-noticia/?ref=dcr}}
+\item
+  El Comercio. (2024). Congestión vehicular en Lima: La ciudad más lenta de América Latina con solo 1.45 km/h en hora punta. \href{https://elcomercio.pe/lima/congestion-vehicular-en-lima-la-ciudad-mas-lenta-de-america-latina-con-solo-145-kmh-en-hora-punta-trafico-caos-vehicular-ultimas-noticia/}{\ul{https://elcomercio.pe/lima/congestion-vehicular-en-lima-la-ciudad-mas-lenta-de-america-latina-con-solo-145-kmh-en-hora-punta-trafico-caos-vehicular-ultimas-noticia/}}
+\item
+  El Español. (2024). Un gigantesco atasco creado por hackers: así conseguirían los atacantes controlar los semáforos de una ciudad. \href{https://www.elespanol.com/omicrono/tecnologia/20240718/gigantesco-atasco-creado-hackers-conseguirian-atacantes-controlar-semaforos-ciudad/871413290_0.html}{\ul{https://www.elespanol.com/omicrono/tecnologia/20240718/gigantesco-atasco-creado-hackers-conseguirian-atacantes-controlar-semaforos-ciudad/871413290\_0.html}}
+\item
+  Fehon, K. (2016). Adaptive traffic signal systems overview and recent experience. Metropolitan Transportation Commission. \href{https://mtc.ca.gov/sites/default/files/4-Adaptive_Signal_Control_-_How_Does_It_Work.pdf}{\ul{https://mtc.ca.gov/sites/default/files/4-Adaptive\_Signal\_Control\_-\_How\_Does\_It\_Work.pdf}}
+\item
+  Finglai Electric. (s.f.). S-360-24 -- Switching Power Supply 24V 15A. \href{https://www.finglai.com/products/switching-power-supplies/general-switching-power-supplies/S-360/S-360-24.html}{\ul{https://www.finglai.com/products/switching-power-supplies/general-switching-power-supplies/S-360/S-360-24.html}}
+\item
+  Genders, W., \& Razavi, S. (2019). \emph{An open-source framework for adaptive traffic signal control} (arXiv:1909.00395) [Preprint]. arXiv. \href{https://arxiv.org/abs/1909.00395}{\ul{https://arxiv.org/abs/1909.00395}}
+\item
+  Gheorghe, C., \& Soica, A. (2025). Revolutionizing urban mobility: A systematic review of AI, IoT, and predictive analytics in adaptive traffic control systems for road networks. Electronics, 14(4), 719. \href{https://www.mdpi.com/2079-9292/14/4/719}{\ul{https://www.mdpi.com/2079-9292/14/4/719}}
+\item
+  González, J. A., \& Rodríguez, J. L. (2013). Sistema de comunicación TCP/IP para el control de una intersección semaforizada. Tecnología y Ciencias del Agua, 4(4), 11--21. \href{https://www.scielo.org.mx/scielo.php?pid=S1405-77432013000400011&script=sci_arttext}{\ul{https://www.scielo.org.mx/scielo.php?pid=S1405-77432013000400011\&script=sci\_arttext}}
+\item
+  HandsOn Technology. (s.f.). 360W 24V 15A SMPS -- Power Supply Datasheet. \href{https://www.handsontec.com/dataspecs/power\%20supply/360W-24V-15A-SMPS.pdf}{\ul{https://www.handsontec.com/dataspecs/power\%20supply/360W-24V-15A-SMPS.pdf}}
+\item
+  Hikvision. (2022). DS-2CE57H0T-VPITF: Turbo HD camera {[}Hoja de datos{]}. Ficha técnica del fabricante.
+\item
+  IPC. (2003). IPC-2221A: Generic Standard on Printed Board Design. \href{https://www-eng.lbl.gov/~shuman/NEXT/CURRENT_DESIGN/TP/MATERIALS/IPC-2221A\%28L\%29.pdf}{\ul{https://www-eng.lbl.gov/\textasciitilde shuman/NEXT/CURRENT\_DESIGN/TP/MATERIALS/IPC-2221A\%28L\%29.pdf}}
+\item
+  ITS Perú. (2024a). Semáforos inteligentes en San Isidro. \href{https://itsperu.org/articulos/semaforos-inteligentes-tek/}{\ul{https://itsperu.org/articulos/semaforos-inteligentes-tek/}}
+\item
+  ITS Perú. (2024b). ¿Quién o qué decide el ritmo de los semáforos en Lima?. \href{https://itsperu.org/articulos/quien-o-que-decide-el-ritmo-de-los-semaforos-en-lima/}{\ul{https://itsperu.org/articulos/quien-o-que-decide-el-ritmo-de-los-semaforos-en-lima/}}
+\item
+  Jitpakdeebodin, S., \& Thongprasri, P. (2024). A simple real-time traffic light control system using PLC. 2024 12th International Electrical Engineering Congress (iEECON). \href{https://ieeexplore.pucp.elogim.com/stamp/stamp.jsp?tp=&arnumber=10537877}{\ul{https://ieeexplore.pucp.elogim.com/stamp/stamp.jsp?tp=\&arnumber=10537877}}
+\item
+  Khan, A., Rahman, S. u., Ullah, F., Khattak, M. I., Bait-Suwailam, M. M., \& El Sayed, H. (2024). V2I-VTL: IoT-Enabled adaptive traffic light controller and emission reduction at intersection. PeerJ Computer Science, 10, e2507. \href{https://peerj.com/articles/cs-2507/}{\ul{https://peerj.com/articles/cs-2507/}}
+\item
+  Kirk, J. (2020, 8 de septiembre). Full Stop: Vulnerabilities in IoT Traffic Light Systems. DataBreachToday. \href{https://www.databreachtoday.com/full-stop-vulnerabilities-in-iot-traffic-light-systems-a-14945}{\ul{https://www.databreachtoday.com/full-stop-vulnerabilities-in-iot-traffic-light-systems-a-14945}}
+\item
+  Koukol, M., Zajíčková, L., Marek, L., \& Tuček, P. (2015). Fuzzy logic in traffic engineering: A review on signal control. \emph{Mathematical Problems in Engineering, 2015}, 979160. \href{https://doi.org/10.1155/2015/979160}{\ul{https://doi.org/10.1155/2015/979160}}
+\item
+  KSN PCB. (s.f.). The Ultimate Guide of Mastering PCB Design Guidelines. \href{https://ksnpcb.com/the-ultimate-of-mastering-pcb-design-guidelines/}{\ul{https://ksnpcb.com/the-ultimate-of-mastering-pcb-design-guidelines/}}
+\item
+  Little Bird Electronics. (s.f.). Using a Logic-level Shifter with Raspberry Pi. \href{https://learn.littlebirdelectronics.com.au/guides/using-a-logic-level-shifter-with-raspberry-pi}{\ul{https://learn.littlebirdelectronics.com.au/guides/using-a-logic-level-shifter-with-raspberry-pi}}
+\item
+  MatWeb. (2024). \emph{Aluminum 5052-H32}. MatWeb Material Property Data. \href{http://www.matweb.com/}{\ul{http://www.matweb.com/}}
+\item
+  Mean Well. (s.f.a). HDR-15-12 -- 15W 12V DIN Rail Power Supply. \href{https://meanwell-ps.com/products/hdr-15-12}{\ul{https://meanwell-ps.com/products/hdr-15-12}}
+\item
+  Mean Well. (s.f.b). HDR-15 Series Power Supply. \href{https://www.meanwell.com/webapp/product/search.aspx?prod=HDR-15}{\ul{https://www.meanwell.com/webapp/product/search.aspx?prod=HDR-15}}
+\item
+  Ministerio de Transportes y Comunicaciones (MTC). (2020). \emph{Manual de Sistemas Inteligentes de Transporte para la Infraestructura Vial} (Resolución Directoral N.º 017-2020-MTC/18). Gobierno del Perú. \href{https://www.gob.pe/institucion/mtc/informes-publicaciones/286952-manual-de-sistemas-inteligentes-de-transporte-para-la-infraestructura-vial}{\ul{https://www.gob.pe/institucion/mtc/informes-publicaciones/286952-manual-de-sistemas-inteligentes-de-transporte-para-la-infraestructura-vial}}
+\item
+  Mirchandani, P. B., \& Lucas, D. E. (2001). RHODES-ITMS Tempe field test project: Implementation and field testing of RHODES, a real-time traffic adaptive control system (Report No. FHWA-AZ01-447). Arizona Department of Transportation. \href{https://rosap.ntl.bts.gov/view/dot/14932}{\ul{https://rosap.ntl.bts.gov/view/dot/14932}}
+\item
+  Municipalidad Metropolitana de Lima (MML). (2022). \emph{Criterios técnicos mínimos para la implementación de equipos y sistemas de semaforización en vías de la provincia de Lima} (Decreto de Alcaldía N.º 13-2022). Diario Oficial El Peruano. \href{https://busquedas.elperuano.pe/normaslegales/aprueban-criterios-tecnicos-minimos-para-la-implementacion-decreto-de-alcaldia-no-13-2022-2121889-1/}{\ul{https://busquedas.elperuano.pe/normaslegales/aprueban-criterios-tecnicos-minimos-para-la-implementacion-decreto-de-alcaldia-no-13-2022-2121889-1/}}
+\item
+  National Electrical Manufacturers Association (NEMA). (2021). NEMA TS 2-2021: Traffic Controller Assemblies with NTCIP Requirements (Versión 03.08). \href{https://www.nema.org/docs/default-source/standards-document-library/nema-ts-2-2021-contents-and-scopeb71294ae-eb9a-45e2-a501-e5c0672dbd6b.pdf}{\ul{https://www.nema.org/docs/default-source/standards-document-library/nema-ts-2-2021-contents-and-scopeb71294ae-eb9a-45e2-a501-e5c0672dbd6b.pdf}}
+\item
+  Naylamp Mechatronics. (s.f.a). Conversor de nivel lógico 8ch TXS0108E. \href{https://naylampmechatronics.com/conversores-ttl/282-conversor-de-nivel-logico-8ch-txs0108e.html}{\ul{https://naylampmechatronics.com/conversores-ttl/282-conversor-de-nivel-logico-8ch-txs0108e.html}}
+\item
+  Naylamp Mechatronics. (s.f.b). Fuente de alimentación conmutada AC/DC 600W 24V 25A WODE. \href{https://naylampmechatronics.com/fuentes-switching-ac-dc/945-fuente-de-alimentacion-conmutada-acdc-600w-24v-25a-wode.html}{\ul{https://naylampmechatronics.com/fuentes-switching-ac-dc/945-fuente-de-alimentacion-conmutada-acdc-600w-24v-25a-wode.html}}
+\item
+  Naylamp Mechatronics. (s.f.c). Motor PAP stepper NEMA23 57H1876-420-8-21B. \href{https://naylampmechatronics.com/motores-pap-steppers/820-motor-pap-stepper-nema23-57h1876-420-8-21b.html}{\ul{https://naylampmechatronics.com/motores-pap-steppers/820-motor-pap-stepper-nema23-57h1876-420-8-21b.html}}
+\item
+  Naylamp Mechatronics. (s.f.d). Sensor de temperatura digital DS18B20. \href{https://naylampmechatronics.com/sensores-temperatura-y-humedad/16-sensor-de-temperatura-digital-ds18b20.html}{\ul{https://naylampmechatronics.com/sensores-temperatura-y-humedad/16-sensor-de-temperatura-digital-ds18b20.html}}
+\item
+  NTCIP. (2025). \emph{NTCIP 1202: Object definitions for Actuated Traffic Signal Controller (ASC) units} [Norma técnica conjunta AASHTO/ITE/NEMA]. National Transportation Communications for ITS Protocol. \href{https://www.ntcip.org/}{\ul{https://www.ntcip.org/}}
+\item
+  Pasajero7. (2023). Semáforos inteligentes: La clave para ciudades más eficientes y seguras. \href{https://www.pasajero7.com/semaforos-inteligentes-la-clave-para-ciudades-mas-eficientes-y-seguras/}{\ul{https://www.pasajero7.com/semaforos-inteligentes-la-clave-para-ciudades-mas-eficientes-y-seguras/}}
+\item
+  Pi My Life Up. (2024, 25 de septiembre). Raspberry Pi ADC (Analog to Digital Converter). \href{https://pimylifeup.com/raspberry-pi-adc/}{\ul{https://pimylifeup.com/raspberry-pi-adc/}}
+\item
+  PULS Power. (s.f.a). CD5.051 -- 5V, 10A DIN Rail Power Supply. \href{https://products.pulspower.com/en/cd5-051.html}{\ul{https://products.pulspower.com/en/cd5-051.html}}
+\item
+  PULS Power. (s.f.b). CD5.121 -- 12V, 5A DIN Rail Power Supply. \href{https://products.pulspower.com/en/cd5-121.html}{\ul{https://products.pulspower.com/en/cd5-121.html}}
+\item
+  Rafique, M. T., Mustafa, A., \& Sajid, H. (2024). \emph{Reinforcement learning for adaptive traffic signal control: Turn-based and time-based approaches to reduce congestion} (arXiv:2408.15751) [Preprint]. arXiv. \href{https://arxiv.org/abs/2408.15751}{\ul{https://arxiv.org/abs/2408.15751}}
+\item
+  Raspberry Pi Forums. (2023, 11 de marzo). Attaching 5V sensors to the Raspberry Pi?. \href{https://forums.raspberrypi.com/viewtopic.php?t=348710}{\ul{https://forums.raspberrypi.com/viewtopic.php?t=348710}}
+\item
+  Raspberry Pi Forums. (2025, 12 de enero). Multiple HATS and extra GPIO connections on RbPi5. \href{https://forums.raspberrypi.com/viewtopic.php?t=382395}{\ul{https://forums.raspberrypi.com/viewtopic.php?t=382395}}
+\item
+  Raspberry Pi Foundation. (2023). Compute Module 5 IO board datasheet {[}Hoja de datos{]}. \href{https://datasheets.raspberrypi.com/cm5/cm5io-datasheet.pdf}{\ul{https://datasheets.raspberrypi.com/cm5/cm5io-datasheet.pdf}}
+\item
+  Raspberry Pi Stack Exchange. (2014, 13 de marzo). Using 5 volts on an mcp3008. \href{https://raspberrypi.stackexchange.com/questions/14450/using-5-volts-on-an-mcp3008}{\ul{https://raspberrypi.stackexchange.com/questions/14450/using-5-volts-on-an-mcp3008}}
+\item
+  Redmon, J., Divvala, S., Girshick, R., \& Farhadi, A. (2016). You only look once: Unified, real-time object detection. \emph{2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, 779--788. \href{https://doi.org/10.1109/CVPR.2016.91}{\ul{https://doi.org/10.1109/CVPR.2016.91}}
+\item
+  S, S., Kingslin, M. T., M, S., Sivarajan, S., Josphine, C. V., \& Lakshmi, C. K. R. (2023). IoT based on smart traffic lights and streetlight system. Proceedings of the Second International Conference on Edge Computing and Applications (ICECAA 2023), IEEE Xplore Part Number: CFP23BV8-ART. \href{https://ieeexplore.pucp.elogim.com/stamp/stamp.jsp?tp=&arnumber=10212121}{\ul{https://ieeexplore.pucp.elogim.com/stamp/stamp.jsp?tp=\&arnumber=10212121}}
+\item
+  Sachan, A., \& Kumar, N. (2024). SDN-enabled quantized LQR for smart traffic light controller to optimize congestion. ACM Transactions on Internet Technology, 24(1), Article No. 7, 1-25. \href{https://acm.pucp.elogim.com/doi/10.1145/3641104}{\ul{https://acm.pucp.elogim.com/doi/10.1145/3641104}}
+\item
+  Sacyr. (s.f.). Semáforos inteligentes para reducir la contaminación. \href{https://sacyr-pre.sacyr.com/-/semaforos-inteligentes-para-reducir-la-contaminacion}{\ul{https://sacyr-pre.sacyr.com/-/semaforos-inteligentes-para-reducir-la-contaminacion}}
+\item
+  SCATS. (s.f.). Sistema de control de semáforos. \href{https://www.scats.com.au/home}{\ul{https://www.scats.com.au/home}}
+\item
+  Schneider Electric. (s.f.). APC Smart-UPS línea interactiva 1500VA, torre, 230V (SMT1500IC). \href{https://www.se.com/pe/es/product/SMT1500IC/apc-smartups-l\%C3\%ADnea-interactiva-1500va-torre-230v-8x-iec-c13-salidas-puerto-smartconnect+smartslot-avr-lcd/}{\ul{https://www.se.com/pe/es/product/SMT1500IC/apc-smartups-l\%C3\%ADnea-interactiva-1500va-torre-230v-8x-iec-c13-salidas-puerto-smartconnect+smartslot-avr-lcd/}}
+\item
+  SciELO. (2023, julio). Tecnologías emergentes en la infraestructura vial en el contexto peruano. SciELO Perú. \href{http://www.scielo.org.pe/scielo.php?script=sci_arttext&pid=S1810-99932023000200093}{\ul{http://www.scielo.org.pe/scielo.php?script=sci\_arttext\&pid=S1810-99932023000200093}}
+\item
+  SCOOT. (s.f.). Split Cycle Offset Optimization Technique. \href{https://trlsoftware.com/software/intelligent-signal-control/scoot/}{\ul{https://trlsoftware.com/software/intelligent-signal-control/scoot/}}
+\item
+  Seeed Studio. (s.f.). Getting started with Raspberry Pi 4G LTE HAT. \href{https://wiki.seeedstudio.com/es/getting_started_raspberry_pi_4g_lte_hat/}{\ul{https://wiki.seeedstudio.com/es/getting\_started\_raspberry\_pi\_4g\_lte\_hat/}}
+\item
+  Sierra Circuits. (2023, 30 de enero). IPC-2221 Standards in PCB Design. \href{https://www.protoexpress.com/blog/ipc-2221-circuit-board-design/}{\ul{https://www.protoexpress.com/blog/ipc-2221-circuit-board-design/}}
+\item
+  Sierra Circuits. (2025, 27 de enero). 7 PCB Layout Design Tips for Power Electronics. \href{https://www.protoexpress.com/blog/pcb-layout-design-tips-for-power-electronics/}{\ul{https://www.protoexpress.com/blog/pcb-layout-design-tips-for-power-electronics/}}
+\item
+  Smart Cities Dive. (2017). This AI traffic system in Pittsburgh has reduced travel time by 25\%. \href{https://www.smartcitiesdive.com/news/this-ai-traffic-system-in-pittsburgh-has-reduced-travel-time-by-25/447494/}{\ul{https://www.smartcitiesdive.com/news/this-ai-traffic-system-in-pittsburgh-has-reduced-travel-time-by-25/447494/}}
+\item
+  Smith, S. F., Barlow, G. J., Xie, X.-F., \& Rubinstein, Z. B. (2013). SURTRAC: Scalable Urban Traffic Control. The Robotics Institute, Carnegie Mellon University. \href{https://www.ri.cmu.edu/pub_files/2013/1/13-0315.pdf}{\ul{https://www.ri.cmu.edu/pub\_files/2013/1/13-0315.pdf}}
+\item
+  StepperOnline. (2020). DM542T digital stepping drive {[}Hoja de datos{]}. \href{https://5.imimg.com/data5/SELLER/Doc/2020/12/GL/TF/KS/16561264/stepperonline-dm542t-digital-stepping-drive.pdf}{\ul{https://5.imimg.com/data5/SELLER/Doc/2020/12/GL/TF/KS/16561264/stepperonline-dm542t-digital-stepping-drive.pdf}}
+\item
+  Tario, J. D., Dillmann, R., Lardoux, J., Martinez, R., White, C., Gross, N., Patel, N., \& Meyer, R. (2014). Adaptive traffic signal control for Tarrytown Road in White Plains, New York (Final Report). Prepared for New York State Energy Research and Development Authority \& New York State Department of Transportation. TransCore ITS, LLC. \href{https://www.nyserda.ny.gov/-/media/Project/Nyserda/Files/Publications/Research/Transportation/Adaptive-Traffic-Signal-Control-Tarrytown-Road.pdf}{\ul{https://www.nyserda.ny.gov/-/media/Project/Nyserda/Files/Publications/Research/Transportation/Adaptive-Traffic-Signal-Control-Tarrytown-Road.pdf}}
+\item
+  ThomasNet. (2025). \emph{All about 5052 aluminum (properties, strength and uses)}. Thomas Publishing Company. \href{https://www.thomasnet.com/articles/metals-metal-products/5052-aluminum/}{\ul{https://www.thomasnet.com/articles/metals-metal-products/5052-aluminum/}}
+\item
+  Trafficware. (2014). Summary of Version 8 releases. \href{https://online.trafficware.com/downloads/v8/Summary\%20of\%20Version\%208\%20Releases.pdf}{\ul{https://online.trafficware.com/downloads/v8/Summary\%20of\%20Version\%208\%20Releases.pdf}}
+\item
+  Varaiya, P. (2013). Max pressure control of a network of signalized intersections. \emph{Transportation Research Part C: Emerging Technologies, 36}, 177--195. \href{https://doi.org/10.1016/j.trc.2013.08.014}{\ul{https://doi.org/10.1016/j.trc.2013.08.014}}
+\item
+  Viola, P., \& Jones, M. (2001). Rapid object detection using a boosted cascade of simple features. \emph{2001 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR)}, 511--518. \href{https://doi.org/10.1109/CVPR.2001.990517}{\ul{https://doi.org/10.1109/CVPR.2001.990517}}
+\item
+  Webster, F. V. (1958). \emph{Traffic signal settings} (Road Research Technical Paper No.~39). Her Majesty's Stationery Office, Road Research Laboratory.
+\item
+  Wevolver. (2025). \emph{Selección de materiales para gabinetes electrónicos a la intemperie: aluminio frente a policarbonato}. Wevolver. \href{https://www.wevolver.com/}{\ul{https://www.wevolver.com/}}
+\item
+  Wojke, N., Bewley, A., \& Paulus, D. (2017). Simple online and realtime tracking with a deep association metric. \emph{2017 IEEE International Conference on Image Processing (ICIP)}, 3645--3649. \href{https://doi.org/10.1109/ICIP.2017.8296962}{\ul{https://doi.org/10.1109/ICIP.2017.8296962}}
+\item
+  Yalcinli, F., Akdemir, B., \& Durdu, A. (2024). Adaptive traffic management model for signalised intersections. \emph{Elektronika ir Elektrotechnika, 30}(3), 72--82. \href{https://doi.org/10.5755/j02.eie.36536}{\ul{https://doi.org/10.5755/j02.eie.36536}}
+\item
+  YouTube. (2018, 8 de abril). DS18B20 digital temperature sensor tutorial {[}Video{]}. \href{https://www.youtube.com/watch?v=pxcFjBZCGtU}{\ul{https://www.youtube.com/watch?v=pxcFjBZCGtU}}
+\item
+  YouTube. (2020, 14 de julio). Cómo conectar y usar el driver DM542T con motor NEMA 23 {[}Video{]}. \href{https://www.youtube.com/watch?v=mtWuL7NXCTA}{\ul{https://www.youtube.com/watch?v=mtWuL7NXCTA}}
+\item
+  Zivkovic, Z. (2004). Improved adaptive Gaussian mixture model for background subtraction. \emph{Proceedings of the 17th International Conference on Pattern Recognition (ICPR)}, 28--31. \href{https://doi.org/10.1109/ICPR.2004.1333992}{\ul{https://doi.org/10.1109/ICPR.2004.1333992}}
+\end{enumerate}

@@ -139,8 +139,9 @@ a los pocos metros de las interfaces CSI, reservadas como expansión futura para
 
 \subsection{Actuador de posicionamiento de cámara}\label{subsec:actuador}
 
-El sistema de desplazamiento de la cámara sobre rieles requiere un actuador con posicionamiento preciso y
-repetible y torque suficiente frente a vibraciones. Se evaluaron motor DC, servomotor y motor paso a paso,
+El sistema de posicionamiento angular de la cámara (aro giratorio accionado por biela-manivela, detallado en el
+Capítulo~\ref{cap:diseno-mecanico}) requiere un actuador con posicionamiento preciso y repetible y torque
+suficiente frente a vibraciones. Se evaluaron motor DC, servomotor y motor paso a paso,
 y se selecciona el \textbf{motor paso a paso NEMA 23} (modelo 57H1876-420-8-21B, bipolar de 4 hilos,
 200 pasos por revolución), alimentado a \textbf{24\,V DC}, con \textbf{torque máximo de 1.8\,N\ensuremath{\cdot}m}
 (18.4\,kg\ensuremath{\cdot}cm) y corriente nominal de 4.2\,A por fase. La elección frente al servomotor o al
@@ -192,6 +193,21 @@ o alarmas.
   \fuente{Adaptado de la hoja de datos del fabricante.}
 \end{figure}
 
+\paragraph{Robustez para entorno vial (criterios de diseño a confirmar en prototipo).} El entorno de
+instalación es eléctricamente ruidoso (conmutación de contactores, transitorios de red y EMI de la cámara),
+por lo que la cadena de control del motor admite mejoras de robustez que se dejan planteadas como criterio de
+diseño y deben validarse en la etapa de prototipo. En primer lugar, el convertidor TXS0108E adapta niveles de
+voltaje pero no proporciona aislamiento galvánico; para una versión de campo se recomienda intercalar
+optoacopladores rápidos —o un \emph{driver} con entradas aisladas— entre la Raspberry~Pi y el DM542T, de modo
+que un transitorio en la etapa de potencia no se propague a la lógica de control. En segundo lugar, la unidad
+de cómputo debe operar con un \textit{watchdog} que reinicie el sistema ante bloqueos, junto con
+almacenamiento de calidad industrial y arranque supervisado. Finalmente, el rango de temperatura de operación
+del driver DM542T ($-10$ a $+45$\,°C) es más estrecho que el rango ambiental de diseño ($-20$ a $+60$\,°C,
+Capítulo~\ref{cap:diseno-mecanico}); por ello la electrónica de potencia se aloja en la zona ventilada del
+gabinete y, para un despliegue real, debe seleccionarse un driver de rango industrial o garantizarse el
+acondicionamiento térmico. Estas medidas no se validan en la presente tesis y constituyen requisitos del banco
+\textit{hardware-in-the-loop} y del piloto controlado.
+
 \subsection{Comunicación con la nube}\label{subsec:comunicacion}
 
 La arquitectura requiere comunicación bidireccional de baja latencia para telemetría, configuración y
@@ -223,7 +239,7 @@ local: sigue sensando, estimando tráfico y generando recomendaciones acotadas, 
 semafórico mantiene el plan seguro y la autoridad final. De este modo la conectividad mejora la
 coordinación, pero su pérdida nunca compromete la operación de la intersección.
 
-\subsection{Unidad de control y aceleración de IA}\label{subsec:unidad-control}
+\subsection{Unidad de control y aceleración de inferencia de visión}\label{subsec:unidad-control}
 
 La unidad de control debe ejecutar simultáneamente visión por computadora, algoritmos de decisión, gestión
 de comunicaciones y control de los dispositivos electromecánicos. Se selecciona la \textbf{Raspberry Pi 5 de
@@ -402,7 +418,10 @@ banco de baterías AGM de $2\times12$\,V/12\,Ah:
 \[ t_{\mathrm{autonom\acute{i}a}} = \frac{273.6\ \mathrm{Wh}}{228.4\ \mathrm{W}} \approx 72\ \mathrm{min} \]
 El modelo seleccionado (APC SMT1500IC, 1000\,W) ofrece un margen de $1000/228.4 = 4.38$ veces la demanda del
 sistema, con salida de onda senoidal pura, lo que facilita expansiones y reduce el estrés térmico de las
-baterías. La autonomía de 72\,min es suficiente para un registro y apagado controlados.
+baterías. La autonomía de 72\,min es suficiente para un registro y apagado controlados. Por su formato de
+torre, el UPS se instala en la base del poste y alimenta el gabinete a través de la SMPS; en el rack en altura
+solo se aloja la interfaz de baterías y la gestión del respaldo, lo que evita cargar el conjunto superior con
+su masa.
 
 \begin{figure}[H]
   \centering
@@ -520,13 +539,13 @@ Capítulo~\ref{cap:diseno-mecanico}.
     Fuente conmutada S-360-24 & 1 & 180\\
     Convertidor DC-DC PULS CD5.051 (5\,V) & 1 & 320\\
     Convertidor DC-DC PULS CD5.121 (12\,V) & 1 & 380\\
-    UPS APC SMT1500IC & 1 & 2200\\
+    UPS APC SMT1500IC & 1 & 2\,280\\
     Breaker Schneider C60N-C6 & 1 & 80\\
     RCD Schneider ID K 25A 30mA & 1 & 220\\
     DPS Phoenix VAL-MS 230 + fusible F-MS 12 ST & 1 & 410\\
     PCBs personalizadas, conectores y cableado & 1 & 400\\
     \midrule
-    \textbf{Total estimado del módulo electrónico} & & \textbf{$\approx$ 6\,485}\\
+    \textbf{Total estimado del módulo electrónico} & & \textbf{$\approx$ 6\,565}\\
     \bottomrule
   \end{tabular}
   \fuente{Elaboración propia; precios referenciales del mercado peruano (2025--2026).}

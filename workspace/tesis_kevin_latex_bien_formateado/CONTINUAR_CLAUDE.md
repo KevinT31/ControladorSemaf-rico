@@ -1,6 +1,88 @@
 # CONTINUAR_CLAUDE.md — Estado de la tesis (mainV4)
 
-_Última actualización: 2026-06-26_
+_Última actualización: 2026-07-01 (sesión pulido Turnitin — 2ª pasada: fuente, planos, URLs, μ, imágenes)_
+
+## Sesión 2026-07-01 (2ª pasada) — Fuente, planos restaurados, URLs, ecuación, imágenes
+
+Continuación del pulido. Peticiones: separar «Fuente:» de la leyenda; repaso visual (gráficos
+descuadrados, textos/tablas recortadas); imágenes en HD; corregir imágenes con texto que no coincide
+con la tesis; y **restaurar planos de anexos que una pasada previa había eliminado**.
+
+- **«Fuente:» separada:** `\fuente` pasó de `\vspace{-2pt}` a `\vspace{3pt}` (antes quedaba pegada a la
+  leyenda tras el cambio a bloque). Verificado.
+- **Planos de Anexos RESTAURADOS (regresión corregida):** V4 había reemplazado los 21 planos del autor por
+  un párrafo («se conservan como CAD digital»). Se restauraron en `cierre.tex` → ANEXO D, agrupados por
+  sección igual que en `main.tex` (V1): D.1 vista general (image3); D.2 Sección E rack DIN/rieles (138,94,
+  62,137,32,121,59); D.3 Sección G gabinete (34,23,142); D.4 Sección M mecanismo cámara (135,98,38,119);
+  D.5 Sección V zócalo (123,63,92,4); D.6 Sección P poste (129); D.7 Sección Z zapata (106). Con
+  `\captionsetup[figure]{list=no}` para no saturar el índice. **NO borrar estos planos de nuevo.**
+- **URLs de bibliografía (texto recortado):** se salían del margen y se truncaban porque estaban en
+  `\href{}{\ul{}}` (soul no corta línea). Script convirtió las **89** a `\url{}` (xurl ya cargado → corta
+  en cualquier carácter y sigue clicable). `bibliografia_items.tex.bak` = respaldo.
+- **Ecuación μ (pág. 142) recortada:** μ_Bajo/μ_Medio/μ_Alto estaban lado a lado con `\;\;`; μ_Alto se
+  cortaba. Reescritas en `aligned` apiladas y alineadas al `=` (cap6, subsec. Variables lingüísticas).
+- **Imágenes con texto incongruente corregidas (edición raster PIL, Arial):**
+  `media/image66.png` (fig 3.10): «INA219, SHT31»→«WCS1600, DS18B20» y «Servomotores»→«Motor paso a paso».
+  `media/image33.png` (fig 3.11): «Procesar con Apache Spark»→«Analizar datos en la nube»; «Integrar datos
+  API Google Maps»→«Integrar datos de tráfico». Originales respaldados en scratchpad (`*_ORIG.png`) y en
+  git. Quedó SIN tocar «Enviar Datos a central vía HTTP/HTTPS» (ambiguo).
+- **Tablas apaisadas OK:** las 6 `landscape` (Tabla 3.3, matriz morfológica, evaluación, trazabilidad,
+  selección electrónica, modelo de amenazas) se ven completas; los avisos «Annotation out of page
+  boundary» son solo rectángulos de hyperlink (cosmético), no cortes.
+- **Compila EXIT=0, 202 pág (191→202: +11 por los planos), 0 refs/citas sin resolver.** `mainV4.pdf`
+  (raíz) sincronizado. **Sin commitear.**
+- **PENDIENTE HD (no se puede sin reexportar):** 12 imágenes con DPI de impresión <130 (renders CAD de
+  cap5 y algún diagrama): image130,61,13,96,109,90,83,134,149,42,111,73. No se puede añadir detalle real
+  por software; el autor debe **reexportar desde el CAD/origen a mayor resolución**. Los diagramas de flujo
+  (image66/33) también son de baja resolución; lo ideal sería rehacerlos vectoriales (TikZ) — ofrecido.
+
+## Sesión 2026-07-01 — Pulido para Turnitin (figuras que se salían + sangría "tab")
+
+Petición del usuario: perfeccionar para Turnitin, evitar fotos demasiado grandes (en especial las
+**verticales/largas** cuyo rótulo «Figura X.Y» se salía de la hoja), ubicar bien todo y **quitar el
+"tab"** (sangría) del inicio de los párrafos.
+
+- **Diagnóstico con datos (scratchpad):** 9 figuras superaban el 78 % de la altura de página; 5 pasaban
+  del 100 % (la imagen sola más alta que la hoja → leyenda perdida). Caso peor: la **Figura 3.10**
+  apilaba DOS imágenes verticales (`image66` 163 % + `image33` 124 %) en un mismo `figure` (~287 % de
+  página): `image66` desbordaba el margen inferior e `image33` **y la leyenda desaparecían por completo**.
+- **Fix 1 — tope de altura global** en el preámbulo de `mainV4.tex`: se redefine `\includegraphics` para
+  añadir `height=0.80\textheight,keepaspectratio`. Con keepaspectratio solo encoge las verticales; las
+  demás no cambian. Garantiza que imagen + leyenda quepan siempre en la página.
+- **Fix 2 — partir la Figura 3.10** en `cap3_diseno_conceptual.tex`: ahora son dos figuras independientes,
+  `fig:flujo-completo` (parte 1 de 2) y `fig:flujo-completo-b` (parte 2 de 2), cada una en su página con
+  leyenda visible; se actualizó la referencia del texto a «Las Figuras 3.10 y 3.11…». (Las figuras
+  siguientes corrieron +1 en la numeración, auto-actualizado.)
+- **Fix 3 — párrafos en bloque:** `\parindent` 1.25cm → **0pt** y `\parskip` 0.25em → **8pt** (separación
+  vertical clara, sin "tab" al inicio). `\parskip=0pt` forzado en la portada para no descuadrarla, y en
+  `\fuente` para que la línea «Fuente:» quede pegada a su leyenda.
+- **Compila EXIT=0, 191 pág (antes 187; +4 por el bloque y la figura partida), 0 refs/citas sin resolver,
+  0 overfull hbox.** `mainV4.pdf` (raíz) sincronizado. Verificación visual OK (portada, texto en bloque,
+  Fig. 3.10/3.11 partidas, Fig. 5.15 vertical). **Sin commitear** (lo decide el usuario).
+- **Nota (no era el encargo):** los rótulos DENTRO del diagrama de flujo (`image66/image33`) mencionan
+  INA219/SHT31, Apache Spark, API Google Maps y servomotores, que no coinciden con el texto (WCS1600/
+  DS18B20, MQTT/Azure). Está "quemado" en el PNG; requeriría reexportar el diagrama fuente.
+
+## Sesión 2026-06-30 — Integridad de citas (tarea retomada "a la mitad")
+
+Se cerró la limpieza de consistencia post-revisión. Los FLAGS (a) UPS y (b) sensores ya estaban
+reconciliados; el pendiente real era **FLAG (c) citas sin entrada en la bibliografía**, que resultó
+ser más amplio de lo anotado. Un audit automatizado (`scratchpad/cite_audit.py`, cruza cada cita
+autor-año del texto contra `bibliografia_items.tex`) detectó **17 citas colgadas/erróneas**; se
+resolvieron **todas** → **0 colgadas de 29**.
+
+- **14 entradas reales añadidas** + se reemplazó el huérfano MTC (s.f.) por MTC (2020). Fuentes
+  verificadas por web (sin fabricar nada): MML = Decreto de Alcaldía 13-2022; ATU = RD
+  D-000008-2024-ATU/DIR; MTC = RD 017-2020-MTC/18 (Manual ITS); Koukol et al. = 2015 (Math. Prob.
+  Eng. 979160 — de ahí salen el 74 % y FUSICO).
+- **Citas no verificables corregidas a fuentes canónicas reales** (cap2 estado del arte): MOG2 →
+  Zivkovic 2004; HOG → Dalal & Triggs **2005**; Haar → Viola & Jones 2001; YOLO → Redmon et al. 2016;
+  DeepSORT → Wojke et al. **2017**; debilidad de Webster en saturación → Webster 1958; MQTT →
+  Banks & Gupta 2014 (OASIS). Sacyr 2021 → s.f. Materiales 5052-H32: Atlas/MatWeb/ThomasNet/Wevolver.
+- **Compila EXIT=0, 187 pág, 0 referencias/citas sin resolver, 0 errores.** `mainV4.pdf` (raíz)
+  sincronizado. Sin commitear (lo decide el usuario).
+
+_Anterior:_
 
 ## Qué se hizo en esta sesión
 

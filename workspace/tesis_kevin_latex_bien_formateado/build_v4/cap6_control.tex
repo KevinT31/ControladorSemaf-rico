@@ -66,6 +66,44 @@ CamMask(I_{p},t) =
 Esta función determina qué grupo de carriles (NS o EO) está visible para el cálculo de
 métricas en un instante dado y controla la actualización de los vectores de estado local.
 
+\subsection{Política de orientación y actualización confiable de variables}\label{subsec:politica-orientacion}
+
+La función de máscara de cámara no solo identifica qué eje se encuentra visible, sino que también
+gobierna la validez temporal de las variables estimadas. Para evitar que el movimiento de la cámara
+introduzca mediciones inestables, el proceso de observación se divide en tres estados:
+\emph{movimiento}, \emph{estabilización} y \emph{observación válida}.
+
+En el estado \textit{MOVING} la cámara transita hacia la orientación objetivo; durante ese intervalo
+los cuadros no se emplean para actualizar el ICV ni las variables locales, por la posible presencia de
+desenfoque, vibración o pérdida parcial de las regiones de interés. En el estado \textit{SETTLING} la
+cámara ya alcanzó la posición objetivo, pero se respeta una breve ventana de estabilización antes de
+aceptar nuevas mediciones. Finalmente, en el estado \textit{OBSERVING} la inferencia visual se
+considera válida siempre que se cumplan los umbrales mínimos de confianza del detector y las variables
+estimadas permanezcan dentro de rangos físicos plausibles.
+
+La actualización de los vectores de estado local se realiza únicamente en el estado \textit{OBSERVING}.
+Durante \textit{MOVING} y \textit{SETTLING}, el módulo conserva el último vector válido de cada eje
+junto con su marca temporal; si la antigüedad de ese vector supera un umbral máximo de vigencia, la
+información se declara no confiable para control adaptativo y el sistema pasa a un modo conservador o
+degradado. Formalmente, el vector de estado de cada eje $d$ se actualiza según:
+\[
+X_d(t)=
+\begin{cases}
+\hat{X}_d(t), & \text{si } CamState(t)=\textit{OBSERVING}\ \wedge\ Conf(t)\geq \tau_{det},\\[2pt]
+X_d(t^{-}), & \text{si } CamState(t)\in\{\textit{MOVING},\textit{SETTLING}\}\ \wedge\ t-t_{last,d}\leq T_{valid},\\[2pt]
+\varnothing, & \text{si } t-t_{last,d}>T_{valid},
+\end{cases}
+\]
+donde $\hat{X}_d(t)$ es el vector estimado por visión, $Conf(t)$ la confianza agregada de detección,
+$\tau_{det}$ el umbral mínimo de confianza, $t_{last,d}$ el instante de la última actualización válida
+y $T_{valid}$ el tiempo máximo permitido para reutilizar una estimación previa. El caso $\varnothing$
+(sin dato vigente) activa el modo degradado descrito en la Sección~\ref{sec:modos-operacion}.
+
+Esta política evita que una detección puntual, un cuadro borroso o una medición obtenida durante la
+reorientación de la cámara modifiquen directamente la recomendación del controlador difuso. Además, el
+ICV se calcula a partir de variables agregadas en ventanas temporales y no desde una única detección
+instantánea, lo que añade robustez frente a errores transitorios de percepción.
+
 \subsection{Funciones de detección}\label{subsec:funciones-deteccion}
 
 \textbf{Cola vehicular (conteo de detenidos).} Cuantifica los vehículos prácticamente
@@ -113,8 +151,10 @@ A diferencia del modelo clásico $k=q/V_{avg}$, esta formulación calcula la den
 espacialmente contando directamente los vehículos en un área conocida, lo cual resulta más
 adecuado para sistemas de visión por computadora.
 
-\textbf{Detección de vehículos de emergencia.} Identifica ambulancias y vehículos de bomberos
-para activar protocolos de priorización:
+\textbf{Detección de vehículos de emergencia (capacidad habilitada por la arquitectura).} Se contempla
+la identificación de ambulancias y vehículos de bomberos para activar políticas de priorización; en el
+presente alcance constituye una \emph{entrada prioritaria de diseño}, no una función validada
+experimentalmente:
 \[
 EV(l,t) = \sum_{v \in V(l,t)}\delta_{emg}[v,t],
 \qquad
@@ -129,7 +169,10 @@ confianza, fijado alto para minimizar falsos positivos dado el fuerte impacto de
 activación errónea de prioridad. Una vez detectado un vehículo de emergencia, ByteTrack lo
 sigue de forma continua registrando posición, velocidad y direcciones de entrada y salida, e
 incluso reorienta la cámara de forma reactiva (mediante zonas de activación calibradas en el
-plano de la intersección) para no perder su visibilidad al girar dentro del cruce.
+plano de la intersección) para no perder su visibilidad al girar dentro del cruce. La detección
+\emph{confiable} de vehículos de emergencia —mediante visión entrenada, señal acústica o mensajería
+V2X— excede el alcance de esta tesis y se documenta como extensión futura
+(Sección~\ref{sec:capas-futuras}).
 
 Todas las variables se vectorizan según la orientación de cámara; por ejemplo, para la cola:
 \[
@@ -232,31 +275,40 @@ sin reescalamiento posterior.
 
 \subsection{Pesos, verificación por AHP y parámetros}\label{subsec:icv-pesos}
 
-Los pesos se asignan por ponderación directa a partir de conocimiento experto de tránsito,
-priorizando la cola detenida como el indicador más directo de demanda insatisfecha:
-$w_{1}=0.35$ (cola), $w_{2}=0.25$ (velocidad), $w_{3}=0.25$ (flujo) y $w_{4}=0.15$ (densidad).
-Esta asignación se verifica de forma independiente mediante el método de jerarquías analíticas
-(AHP), comparando los cuatro criterios por pares; los pesos normalizados resultantes
-(Tabla~\ref{tab:ahp}) coinciden en orden y magnitud con la ponderación directa, lo que respalda
-la consistencia de la elección. En el plan de validación del Capítulo~\ref{cap:validacion}
-estos pesos se refinan mediante búsqueda en malla sobre el simplex $\sum w_{i}=1$ en el entorno
-SUMO, tomando como criterio la minimización de la demora media por vehículo.
+Los pesos se asignan por ponderación directa a partir del criterio del autor, fundamentado en la
+literatura de ingeniería de tránsito, priorizando la cola detenida como el indicador más directo
+de demanda insatisfecha: $w_{1}=0.35$ (cola), $w_{2}=0.25$ (velocidad), $w_{3}=0.25$ (flujo) y
+$w_{4}=0.15$ (densidad). Esta asignación se verifica de forma independiente mediante el método de
+jerarquías analíticas (AHP). La matriz de comparación por pares (Tabla~\ref{tab:ahp}) se construye
+con la escala de Saaty a partir de los mismos juicios relativos: la cola se considera moderadamente
+más importante que la velocidad y el flujo (razón $1.5$) y claramente más importante que la densidad
+(razón $2.5$). El vector propio principal arroja los pesos normalizados
+$(0.362,\,0.253,\,0.253,\,0.132)$, que coinciden en orden y magnitud con la ponderación directa. La
+consistencia de los juicios se confirma con $\lambda_{\max}=4.004$, índice de consistencia
+$\mathrm{IC}=0.001$ y \textbf{razón de consistencia} $\mathrm{RC}=0.002$, muy por debajo del umbral
+de $0.1$ recomendado por Saaty. El refinamiento adicional de estos pesos mediante una búsqueda de
+optimización —por ejemplo, un barrido sobre el simplex $\sum w_{i}=1$ en SUMO que minimice la demora
+media— no se ejecuta en esta tesis y se plantea como trabajo futuro; los resultados de validación del
+Capítulo~\ref{cap:validacion} no dependen de dicho ajuste, pues emplean los pesos aquí justificados.
+Conviene precisar, además, que el ICV es la \emph{entrada} compuesta del controlador y no la métrica
+de éxito de la validación: esta se sustenta en la demora, la cola, el \textit{throughput} y la
+velocidad de red.
 
 \begin{table}[H]
   \centering
-  \caption{Verificación de los pesos del ICV mediante el método AHP.}
+  \caption{Matriz de comparación por pares (escala de Saaty) y verificación de los pesos del ICV.}
   \label{tab:ahp}
-  \begin{tabular}{@{}lcc@{}}
+  \begin{tabular}{@{}lcccccc@{}}
     \toprule
-    \textbf{Criterio} & \textbf{Ponderación directa} & \textbf{Peso AHP} \\
+    \textbf{Criterio} & \textbf{L} & \textbf{V} & \textbf{F} & \textbf{D} & \textbf{Peso AHP} & \textbf{Pond.\ directa} \\
     \midrule
-    Longitud de cola (L) & 0.35 & 0.362 \\
-    Velocidad (V)        & 0.25 & 0.253 \\
-    Flujo (F)            & 0.25 & 0.253 \\
-    Densidad (D)         & 0.15 & 0.132 \\
+    Longitud de cola (L) & 1.00 & 1.50 & 1.50 & 2.50 & 0.362 & 0.35 \\
+    Velocidad (V)        & 0.67 & 1.00 & 1.00 & 2.00 & 0.253 & 0.25 \\
+    Flujo (F)            & 0.67 & 1.00 & 1.00 & 2.00 & 0.253 & 0.25 \\
+    Densidad (D)         & 0.40 & 0.50 & 0.50 & 1.00 & 0.132 & 0.15 \\
     \bottomrule
   \end{tabular}
-  \fuente{Elaboración propia.}
+  \fuente{Elaboración propia. $\lambda_{\max}=4.004$; IC $=0.001$; RC $=0.002<0.1$ (matriz consistente).}
 \end{table}
 
 Las constantes de normalización del índice corresponden a parámetros físicos del escenario:
@@ -327,13 +379,65 @@ la verificación por AHP: las variables de mayor peso son también las de mayor 
 \subsection{Validación de la cadena cámara\,$\rightarrow$\,ICV con video real}\label{subsec:icv-video}
 
 Más allá de los casos sintéticos, la cadena completa cámara\,$\rightarrow$\,conteo/
-velocidad/cola\,$\rightarrow$\,ICV se probó sobre \emph{video real} de una intersección del
-campus PUCP. Se procesaron aproximadamente $700$ \emph{frames}, detectando entre $20$ y $35$
-vehículos por \emph{frame} y estimando velocidad y flujo por visión. El ICV calculado sobre los
-datos reales se situó en el rango $0.45$--$0.71$ (niveles medio y alto), consistente con las
-condiciones observadas de tráfico moderado a denso. Este resultado demuestra que el índice se
-calcula correctamente a partir de detecciones reales --- no de valores sintéticos --- y que la
-percepción entrega entradas físicamente coherentes al controlador difuso.
+velocidad/cola\,$\rightarrow$\,ICV se probó \emph{funcionalmente} sobre \emph{video real} de una
+intersección del campus PUCP. Se procesaron $700$ \emph{frames}, con una media de $25.6$
+vehículos por \emph{frame} (máximo $35$) y estimación de velocidad y flujo por visión. El ICV
+calculado sobre los datos reales presentó una media de $0.67$, con $697$ de los $700$ cuadros en
+nivel alto, coherente con las condiciones de tráfico denso observadas durante la toma. Este
+resultado constituye una \emph{prueba funcional}: evidencia que el índice se calcula a partir de
+detecciones reales --- no de valores sintéticos --- y que la percepción entrega entradas
+físicamente coherentes al controlador difuso. No constituye, en cambio, una validación de la
+exactitud del detector; la precisión, el \emph{recall}, el mAP y la robustez ante condiciones
+adversas se discuten, junto con el presupuesto de latencia, en la
+Sección~\ref{subsec:latencia-vision}.
+
+\subsection{Presupuesto de latencia y alcance de la prueba de visión}\label{subsec:latencia-vision}
+
+El carácter de tiempo real del módulo se sustenta en que el lazo de percepción opera con un periodo muy
+inferior al intervalo de decisión del control. La Tabla~\ref{tab:latencia} presenta un presupuesto de
+latencia construido con \emph{mediciones reales} de las etapas de cómputo y con estimaciones de hoja de datos
+para las etapas de adquisición y comunicación. Las mediciones se obtuvieron sobre una CPU de escritorio
+(Intel x86-64) con el detector YOLOv11n y seguimiento ByteTrack a resolución $640\times640$;
+\textbf{constituyen una referencia de orden de magnitud y no el desempeño del hardware de despliegue}
+(Raspberry~Pi~5 con acelerador Coral), cuya medición se plantea como trabajo de prototipo.
+
+\begin{table}[H]
+  \centering
+  \caption{Presupuesto de latencia del lazo de percepción y control (referencia en CPU de escritorio).}
+  \label{tab:latencia}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X r >{\raggedright\arraybackslash}p{3.6cm}@{}}
+    \toprule
+    \textbf{Etapa} & \textbf{Latencia (ms)} & \textbf{Origen}\\
+    \midrule
+    Captura y conversión HD-TVI\,$\rightarrow$\,USB & $\approx 30$ & Estimación (hoja de datos)\\
+    Lectura de cuadro (OpenCV) & $8.5$ & Medido (CPU)\\
+    Inferencia YOLO (detección) & $76.7\pm5.5$ & Medido (CPU)\\
+    Seguimiento ByteTrack & $9.6$ & Medido (CPU)\\
+    Cálculo de ICV y control difuso & $<1$ & Medido (aritmético)\\
+    Publicación de telemetría MQTT/TLS & $20$--$50$ & Estimación (red 4G)\\
+    \midrule
+    \textbf{Lazo de percepción (lectura + detección + seguimiento)} & $\approx 95$ & $\approx 10.5$ \emph{fps}\\
+    Intervalo de decisión del control difuso & $25\,000$ & Parámetro de diseño (25\,s)\\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia. Mediciones sobre CPU Intel de escritorio (x86-64), modelo YOLOv11n en
+  \emph{ultralytics}~8.4 a $640\times640$; \emph{no} corresponden al despliegue final en Raspberry~Pi~5 + Coral.}
+\end{table}
+
+Con estas cifras, el lazo de lectura, detección y seguimiento se completa en torno a $95$~ms
+($\approx 10.5$~\emph{fps}), holgadamente por debajo del intervalo de control difuso de $25$~s; el cálculo del
+ICV y la inferencia difusa añaden menos de $1$~ms por tratarse de operaciones aritméticas sobre vectores
+pequeños. Por tanto, el cuello de botella es la inferencia de visión y existe amplio margen temporal para la
+decisión de control, incluso si el detector se ejecutara a una fracción de la tasa medida.
+
+\paragraph{Alcance de la validación de visión.} La prueba sobre $700$ cuadros reales
+(Sección~\ref{subsec:icv-video}) verifica la \emph{coherencia funcional} de la cadena
+percepción\,$\rightarrow$\,ICV, pero no cuantifica la exactitud del detector. Una validación completa requiere
+un conjunto de cuadros anotados manualmente (\emph{ground truth}) para medir precisión, \emph{recall} y mAP del
+detector, la medición de FPS y latencia sobre el hardware de borde definitivo, y ensayos de robustez ante
+condiciones adversas (noche, lluvia, neblina costera, contraluz y oclusión). Estas tareas se documentan como
+trabajo futuro y condicionan el cierre del requisito R-F01 a nivel de prototipo, sin afectar la validación del
+núcleo de control difuso, que se sustenta en la simulación reproducible del Capítulo~\ref{cap:validacion}.
 
 \section{Control difuso local de Mamdani}\label{sec:control-difuso}
 
@@ -351,14 +455,14 @@ triangulares, elegidas por su bajo costo computacional (evaluación $O(1)$ por c
 interpretabilidad; los conjuntos adyacentes se traslapan para asegurar transiciones de control
 suaves. El ICV se mapea a tres conjuntos:
 \[
-\mu_{\text{Bajo}}(ICV)=
-\begin{cases}1,&ICV\le 0.2\\ \frac{0.4-ICV}{0.2},&0.2<ICV\le 0.4\\ 0,&ICV>0.4\end{cases}
-\;\;
-\mu_{\text{Medio}}(ICV)=
-\begin{cases}0,&ICV\le 0.2\\ \frac{ICV-0.2}{0.2},&0.2<ICV\le 0.4\\ \frac{0.7-ICV}{0.3},&0.4<ICV\le 0.7\\ 0,&ICV>0.7\end{cases}
-\;\;
-\mu_{\text{Alto}}(ICV)=
+\begin{aligned}
+\mu_{\text{Bajo}}(ICV)&=
+\begin{cases}1,&ICV\le 0.2\\ \frac{0.4-ICV}{0.2},&0.2<ICV\le 0.4\\ 0,&ICV>0.4\end{cases}\\[8pt]
+\mu_{\text{Medio}}(ICV)&=
+\begin{cases}0,&ICV\le 0.2\\ \frac{ICV-0.2}{0.2},&0.2<ICV\le 0.4\\ \frac{0.7-ICV}{0.3},&0.4<ICV\le 0.7\\ 0,&ICV>0.7\end{cases}\\[8pt]
+\mu_{\text{Alto}}(ICV)&=
 \begin{cases}0,&ICV\le 0.4\\ \frac{ICV-0.4}{0.3},&0.4<ICV\le 0.7\\ 1,&ICV>0.7\end{cases}
+\end{aligned}
 \]
 En todo el dominio se cumple $\mu_{\text{Bajo}}+\mu_{\text{Medio}}+\mu_{\text{Alto}}=1$
 (partición de Ruspini), lo que normaliza la suma de activaciones. El PI se modela de forma
@@ -409,13 +513,13 @@ La Tabla~\ref{tab:reglas-difusas} resume la base de reglas.
 
 \subsection{Mecanismo de inferencia y defuzzificación}\label{subsec:fuzzy-inferencia}
 
-La inferencia sigue el método de Mamdani en cuatro etapas. En la \textbf{fuzzificación} se
-calculan los grados de pertenencia de ICV, PI y EV. En la \textbf{aplicación de reglas}, el
-grado de activación de cada regla con antecedente conjuntivo se obtiene por la t-norma del
-mínimo, $\alpha_i=\min(\mu_{1},\ldots,\mu_{n})$. En la \textbf{agregación} los consecuentes
-escalados se combinan por la s-norma del máximo,
+La inferencia recorre las cuatro etapas del método de Mamdani. La \textbf{fuzzificación}
+evalúa los grados de pertenencia de ICV, PI y EV. La \textbf{aplicación de reglas} obtiene el
+grado de disparo de cada regla de antecedente conjuntivo mediante la t-norma del mínimo,
+$\alpha_i=\min(\mu_{1},\ldots,\mu_{n})$. La \textbf{agregación} funde los consecuentes
+escalados con la s-norma del máximo,
 $\mu_{\text{agregado}}(\Delta T)=\max_i\big(\alpha_i\cdot\mu_{\text{cons},i}(\Delta T)\big)$.
-Finalmente, la \textbf{defuzzificación} por centroide entrega el valor nítido:
+Por último, la \textbf{defuzzificación} por centroide devuelve el valor nítido:
 \[
 \Delta T_{verde}^{*}=
 \frac{\sum_{i=1}^{M}\Delta T_i\,\mu_{\text{agregado}}(\Delta T_i)}
@@ -478,7 +582,7 @@ autoridad final recae siempre en el controlador semafórico.
     Normal local & Sensado válido y configuración vigente. & Calcula ICV, ejecuta control difuso y entrega recomendación acotada. & Controlador semafórico.\\
     Asistido por nube & Recomendación remota autenticada, vigente y dentro de rangos. & Arbitra según la regla de prioridad y vuelve a validar límites. & Controlador semafórico / central autorizada.\\
     Sin conectividad & Pérdida o expiración del enlace con la nube. & Conserva configuración válida, almacena localmente y continúa con control local. & Controlador semafórico.\\
-    Sensado degradado & Video ausente, oclusión, baja confianza o variables fuera de rango. & Congela la adaptación, genera alerta y solicita plan base. & Controlador semafórico.\\
+    Sensado degradado & Video ausente, oclusión, baja confianza, variables fuera de rango, cámara en reorientación más allá del tiempo permitido o dato visual expirado. & Congela la adaptación, conserva el último estado válido solo durante $T_{valid}$, genera alerta y solicita plan base. & Controlador semafórico.\\
     Falla interna & Watchdog, sobretemperatura o error no recuperable. & Registra el evento, inhibe recomendaciones y ejecuta apagado/reinicio controlado. & Controlador semafórico.\\
     Manual / mantenimiento & Orden local autorizada. & Solo diagnóstico y telemetría; no genera ajustes. & Operador y controlador semafórico.\\
     \bottomrule
@@ -494,6 +598,43 @@ de Webster como tiempo base y posiciona la política Max-Pressure como línea ba
 comparación en el plan de validación; esta última no se adopta como núcleo porque exige conocer
 las colas \emph{aguas abajo} y las razones de giro, información no disponible de forma fiable
 con el sensado de cámara cenital única que sobrevive a la pérdida de enlace.
+
+\subsection{Mitigación de errores de percepción durante la reorientación}\label{subsec:mitigacion-percepcion}
+
+El uso de una cámara orientable introduce riesgos específicos de percepción, principalmente durante la
+transición entre orientaciones. Estos riesgos no se eliminan por completo, pero se mitigan mediante una
+política de descarte de cuadros durante el movimiento, una ventana de estabilización, umbrales mínimos de
+confianza, suavizado temporal y degradación segura ante la pérdida de validez de los datos.
+
+La cámara no constituye un elemento crítico directo del sistema semafórico: se limita a nutrir una
+estimación del estado del tráfico que pasa por una validación antes de alimentar al controlador difuso, cuya
+salida sigue siendo una recomendación acotada. Por tanto, una falla de detección no puede generar por sí sola una
+fase incompatible ni una orden directa de lámpara, ya que la autoridad final reside en el controlador
+semafórico existente. La Tabla~\ref{tab:riesgos-percepcion} resume los riesgos y sus mitigaciones.
+
+\begin{table}[H]
+  \centering
+  \caption{Riesgos de percepción asociados a la cámara orientable y mitigaciones propuestas.}
+  \label{tab:riesgos-percepcion}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}XX@{}}
+    \toprule
+    \textbf{Riesgo} & \textbf{Efecto posible} & \textbf{Mitigación propuesta}\\
+    \midrule
+    Desenfoque (\emph{blur}) durante el giro & Detección falsa, pérdida temporal de vehículos o conteo inestable. & Descartar cuadros en el estado \textit{MOVING}; no actualizar el ICV durante la transición.\\
+    Vibración al alcanzar la posición objetivo & Variación temporal del conteo o de la estimación de velocidad. & Aplicar una ventana \textit{SETTLING} antes de aceptar detecciones válidas.\\
+    Oclusión temporal por buses, camiones u objetos urbanos & Subestimación de cola o pérdida parcial de carriles visibles. & Usar ventanas temporales, último estado válido y descarte de valores físicamente inconsistentes.\\
+    Baja confianza del detector & Variables de tráfico poco confiables. & Aplicar el umbral mínimo de confianza $\tau_{det}$; invalidar la actualización si no se supera.\\
+    Dato antiguo del eje no observado & Recomendación basada en información desactualizada. & Asociar marca temporal a cada vector y aplicar el tiempo máximo de vigencia $T_{valid}$.\\
+    Falla total de cámara o video ausente & Imposibilidad de calcular un ICV confiable. & Congelar la adaptación, generar alerta y retornar al plan base o modo degradado seguro.\\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}
+
+Con esta estrategia, el movimiento de la cámara afecta únicamente la disponibilidad temporal de la
+estimación visual, pero no compromete la seguridad operacional del cruce. Si la percepción no cumple las
+condiciones mínimas de validez, el módulo deja de emitir nuevas recomendaciones adaptativas y conserva el
+funcionamiento seguro establecido por el controlador semafórico.
 
 \section{Capas de investigación futura: RL y CNN--LSTM}\label{sec:capas-futuras}
 

@@ -11,76 +11,77 @@
 \contentsline {figure}{\numberline {2.4}{\ignorespaces Interfaz del simulador de tráfico de código abierto SUMO.\relax }}{25}{figure.caption.20}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 3}\par 
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Caja negra del sistema y frontera de responsabilidad del módulo IoT complementario.\relax }}{36}{figure.caption.25}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Estructura de funciones global del sistema, organizada por dominios.\relax }}{38}{figure.caption.27}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Estructura de funciones del dominio de interfaz.\relax }}{39}{figure.caption.29}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Estructura de funciones del dominio de sensores.\relax }}{40}{figure.caption.30}%
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Estructura de funciones del dominio de energía.\relax }}{41}{figure.caption.31}%
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Estructura de funciones del dominio de control.\relax }}{42}{figure.caption.32}%
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Estructura de funciones de los dominios de actuadores y mecánico.\relax }}{42}{figure.caption.33}%
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Bosquejo del diseño de la solución óptima.\relax }}{48}{figure.caption.34}%
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Diagrama general de flujo del sistema.\relax }}{50}{figure.caption.35}%
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Diagrama del flujo completo del sistema.\relax }}{51}{figure.caption.36}%
-\contentsline {figure}{\numberline {3.11}{\ignorespaces Leyenda del diagrama de bloques del sistema.\relax }}{53}{figure.caption.37}%
-\contentsline {figure}{\numberline {3.12}{\ignorespaces Diagrama de bloques del sistema.\relax }}{54}{figure.caption.38}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Caja negra del sistema y frontera de responsabilidad del módulo IoT complementario.\relax }}{37}{figure.caption.25}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Estructura de funciones global del sistema, organizada por dominios.\relax }}{39}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Estructura de funciones del dominio de interfaz.\relax }}{40}{figure.caption.29}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Estructura de funciones del dominio de sensores.\relax }}{41}{figure.caption.30}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Estructura de funciones del dominio de energía.\relax }}{42}{figure.caption.31}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Estructura de funciones del dominio de control.\relax }}{43}{figure.caption.32}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Estructura de funciones de los dominios de actuadores y mecánico.\relax }}{43}{figure.caption.33}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Bosquejo del diseño de la solución óptima.\relax }}{49}{figure.caption.34}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Diagrama general de flujo del sistema.\relax }}{53}{figure.caption.36}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Diagrama del flujo completo del sistema (parte~1 de~2): energización, inicialización de subsistemas y verificación de la comunicación.\relax }}{54}{figure.caption.37}%
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Diagrama del flujo completo del sistema (parte~2 de~2): bucle de captura, cálculo del índice de congestión y transmisión segura hacia la nube.\relax }}{55}{figure.caption.38}%
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Leyenda del diagrama de bloques del sistema.\relax }}{56}{figure.caption.39}%
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Diagrama de bloques del sistema.\relax }}{57}{figure.caption.40}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 4}\par 
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Sensor digital de temperatura DS18B20.\relax }}{60}{figure.caption.42}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Módulo sensor de corriente de efecto Hall WCS1600.\relax }}{61}{figure.caption.43}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Sensor ultrasónico de presencia URM06 con interfaz UART.\relax }}{62}{figure.caption.44}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Cámara domo Hikvision DS-2CE57H0T-VPITF empleada para la visión por computadora.\relax }}{63}{figure.caption.45}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Convertidor de video 4-en-1 AHD/CVBS/CVI/TVI a USB para la interfaz con la unidad de control.\relax }}{63}{figure.caption.46}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Motor paso a paso NEMA 23 seleccionado como actuador de la cámara.\relax }}{64}{figure.caption.47}%
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Driver digital DM542T para el motor paso a paso.\relax }}{65}{figure.caption.48}%
-\contentsline {figure}{\numberline {4.8}{\ignorespaces Convertidor de nivel lógico bidireccional de 8 canales 5\,V/3.3\,V.\relax }}{65}{figure.caption.49}%
-\contentsline {figure}{\numberline {4.9}{\ignorespaces Módulo HAT 4G LTE con módem Quectel EG25-G sobre la Raspberry Pi.\relax }}{66}{figure.caption.50}%
-\contentsline {figure}{\numberline {4.10}{\ignorespaces Conexión del acelerador Google Coral Edge TPU a la Raspberry Pi 5.\relax }}{68}{figure.caption.53}%
-\contentsline {figure}{\numberline {4.11}{\ignorespaces Convertidor DC-DC PULS CD5.121 (24\,V a 12\,V).\relax }}{70}{figure.caption.56}%
-\contentsline {figure}{\numberline {4.12}{\ignorespaces Convertidor DC-DC PULS CD5.051 (24\,V a 5\,V).\relax }}{70}{figure.caption.57}%
-\contentsline {figure}{\numberline {4.13}{\ignorespaces Fuente de alimentación conmutada AC/DC S-360-24 (360\,W, 24\,V, 15\,A).\relax }}{71}{figure.caption.58}%
-\contentsline {figure}{\numberline {4.14}{\ignorespaces Sistema de alimentación ininterrumpida (UPS) de respaldo.\relax }}{72}{figure.caption.59}%
-\contentsline {figure}{\numberline {4.15}{\ignorespaces Interruptor termomagnético Schneider Electric C60N-C6.\relax }}{73}{figure.caption.60}%
-\contentsline {figure}{\numberline {4.16}{\ignorespaces Dispositivo de protección contra sobretensiones Phoenix Contact VAL-MS 230 con fusible F-MS 12 ST.\relax }}{73}{figure.caption.61}%
-\contentsline {figure}{\numberline {4.17}{\ignorespaces Interruptor diferencial Schneider Electric ID K 25A 30mA.\relax }}{74}{figure.caption.62}%
-\contentsline {figure}{\numberline {4.18}{\ignorespaces Circuito de protecciones eléctricas coordinadas (breaker, RCD y DPS).\relax }}{75}{figure.caption.63}%
-\contentsline {figure}{\numberline {4.19}{\ignorespaces Esquemático del sistema de alimentación y protecciones.\relax }}{77}{figure.caption.66}%
-\contentsline {figure}{\numberline {4.20}{\ignorespaces Esquemático de la línea de distribución de 5\,V.\relax }}{78}{figure.caption.67}%
-\contentsline {figure}{\numberline {4.21}{\ignorespaces Esquemático de la línea de distribución de 12\,V.\relax }}{78}{figure.caption.68}%
-\contentsline {figure}{\numberline {4.22}{\ignorespaces PCB de distribución de alimentación (diseño, sin verificación de manufactura).\relax }}{79}{figure.caption.69}%
-\contentsline {figure}{\numberline {4.23}{\ignorespaces Esquemático de la PCB del controlador semafórico.\relax }}{80}{figure.caption.70}%
-\contentsline {figure}{\numberline {4.24}{\ignorespaces PCB del controlador semafórico (diseño, sin verificación de manufactura).\relax }}{80}{figure.caption.71}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Sensor digital de temperatura DS18B20.\relax }}{63}{figure.caption.44}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Módulo sensor de corriente de efecto Hall WCS1600.\relax }}{64}{figure.caption.45}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Sensor ultrasónico de presencia URM06 con interfaz UART.\relax }}{65}{figure.caption.46}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Cámara domo Hikvision DS-2CE57H0T-VPITF empleada para la visión por computadora.\relax }}{66}{figure.caption.47}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Convertidor de video 4-en-1 AHD/CVBS/CVI/TVI a USB para la interfaz con la unidad de control.\relax }}{66}{figure.caption.48}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Motor paso a paso NEMA 23 seleccionado como actuador de la cámara.\relax }}{67}{figure.caption.49}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Driver digital DM542T para el motor paso a paso.\relax }}{68}{figure.caption.50}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Convertidor de nivel lógico bidireccional de 8 canales 5\,V/3.3\,V.\relax }}{68}{figure.caption.51}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Módulo HAT 4G LTE con módem Quectel EG25-G sobre la Raspberry Pi.\relax }}{70}{figure.caption.53}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Conexión del acelerador Google Coral Edge TPU a la Raspberry Pi 5.\relax }}{71}{figure.caption.56}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Convertidor DC-DC PULS CD5.121 (24\,V a 12\,V).\relax }}{74}{figure.caption.59}%
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Convertidor DC-DC PULS CD5.051 (24\,V a 5\,V).\relax }}{74}{figure.caption.60}%
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Fuente de alimentación conmutada AC/DC S-360-24 (360\,W, 24\,V, 15\,A).\relax }}{75}{figure.caption.61}%
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Sistema de alimentación ininterrumpida (UPS) de respaldo.\relax }}{76}{figure.caption.62}%
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Interruptor termomagnético Schneider Electric C60N-C6.\relax }}{77}{figure.caption.63}%
+\contentsline {figure}{\numberline {4.16}{\ignorespaces Dispositivo de protección contra sobretensiones Phoenix Contact VAL-MS 230 con fusible F-MS 12 ST.\relax }}{77}{figure.caption.64}%
+\contentsline {figure}{\numberline {4.17}{\ignorespaces Interruptor diferencial Schneider Electric ID K 25A 30mA.\relax }}{78}{figure.caption.65}%
+\contentsline {figure}{\numberline {4.18}{\ignorespaces Circuito de protecciones eléctricas coordinadas (breaker, RCD y DPS).\relax }}{79}{figure.caption.66}%
+\contentsline {figure}{\numberline {4.19}{\ignorespaces Esquemático del sistema de alimentación y protecciones.\relax }}{81}{figure.caption.69}%
+\contentsline {figure}{\numberline {4.20}{\ignorespaces Esquemático de la línea de distribución de 5\,V.\relax }}{82}{figure.caption.70}%
+\contentsline {figure}{\numberline {4.21}{\ignorespaces Esquemático de la línea de distribución de 12\,V.\relax }}{82}{figure.caption.71}%
+\contentsline {figure}{\numberline {4.22}{\ignorespaces PCB de distribución de alimentación (diseño, sin verificación de manufactura).\relax }}{83}{figure.caption.72}%
+\contentsline {figure}{\numberline {4.23}{\ignorespaces Esquemático de la PCB del controlador semafórico.\relax }}{84}{figure.caption.73}%
+\contentsline {figure}{\numberline {4.24}{\ignorespaces PCB del controlador semafórico (diseño, sin verificación de manufactura).\relax }}{84}{figure.caption.74}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 5}\par 
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Vista del controlador semafórico instalado en una intersección vehicular.\relax }}{84}{figure.caption.73}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Vista general del controlador semafórico propuesto.\relax }}{84}{figure.caption.74}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Sistema completo ensamblado (sin poste de soporte).\relax }}{85}{figure.caption.75}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Gabinete sin componentes internos.\relax }}{86}{figure.caption.76}%
-\contentsline {figure}{\numberline {5.5}{\ignorespaces Rack interno completo de soporte de la electrónica.\relax }}{87}{figure.caption.77}%
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Conjunto cámara domo, soporte y biela de transmisión.\relax }}{89}{figure.caption.78}%
-\contentsline {figure}{\numberline {5.7}{\ignorespaces Vista del aro de giro y el rodamiento de Ø120~mm.\relax }}{90}{figure.caption.79}%
-\contentsline {figure}{\numberline {5.8}{\ignorespaces Vista del rodamiento, la biela y el motor paso a paso.\relax }}{90}{figure.caption.80}%
-\contentsline {figure}{\numberline {5.9}{\ignorespaces Diagrama de cuerpo libre del sistema de vigilancia.\relax }}{91}{figure.caption.81}%
-\contentsline {figure}{\numberline {5.10}{\ignorespaces Rack con todos sus componentes electrónicos montados.\relax }}{94}{figure.caption.82}%
-\contentsline {figure}{\numberline {5.11}{\ignorespaces Conexión entre el rack/gabinete y el poste de acero de sección cuadrada.\relax }}{95}{figure.caption.83}%
-\contentsline {figure}{\numberline {5.12}{\ignorespaces Refuerzos triangulares superiores en la conexión gabinete-poste.\relax }}{96}{figure.caption.84}%
-\contentsline {figure}{\numberline {5.13}{\ignorespaces Refuerzos triangulares inferiores en la transición poste-zapata.\relax }}{97}{figure.caption.85}%
-\contentsline {figure}{\numberline {5.14}{\ignorespaces Zapata de cimentación de hormigón armado.\relax }}{98}{figure.caption.86}%
-\contentsline {figure}{\numberline {5.15}{\ignorespaces Detalle de la conexión entre el poste y la zapata de cimentación.\relax }}{99}{figure.caption.87}%
-\contentsline {figure}{\numberline {5.16}{\ignorespaces Distribución de tensión de Von Mises en el sistema completo.\relax }}{101}{figure.caption.88}%
-\contentsline {figure}{\numberline {5.17}{\ignorespaces Tensión de Von Mises, vista inferior del gabinete.\relax }}{101}{figure.caption.89}%
-\contentsline {figure}{\numberline {5.18}{\ignorespaces Distribución de la primera tensión principal.\relax }}{102}{figure.caption.90}%
-\contentsline {figure}{\numberline {5.19}{\ignorespaces Distribución de la tercera tensión principal.\relax }}{103}{figure.caption.91}%
-\contentsline {figure}{\numberline {5.20}{\ignorespaces Campo de desplazamientos totales del sistema.\relax }}{104}{figure.caption.92}%
-\contentsline {figure}{\numberline {5.21}{\ignorespaces Desplazamientos en el gabinete.\relax }}{105}{figure.caption.93}%
-\contentsline {figure}{\numberline {5.22}{\ignorespaces Distribución del factor de seguridad en el sistema.\relax }}{106}{figure.caption.94}%
-\contentsline {figure}{\numberline {5.23}{\ignorespaces Factor de seguridad enfocado en el gabinete.\relax }}{107}{figure.caption.95}%
-\contentsline {figure}{\numberline {5.24}{\ignorespaces Vista del ventilador y la salida de aire caliente del gabinete.\relax }}{109}{figure.caption.96}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Vista del controlador semafórico instalado en una intersección vehicular.\relax }}{88}{figure.caption.76}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Vista general del controlador semafórico propuesto.\relax }}{89}{figure.caption.77}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Sistema completo ensamblado (sin poste de soporte).\relax }}{90}{figure.caption.78}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Gabinete sin componentes internos.\relax }}{91}{figure.caption.79}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Rack interno completo de soporte de la electrónica.\relax }}{92}{figure.caption.80}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Conjunto cámara domo, soporte y biela de transmisión.\relax }}{95}{figure.caption.82}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Vista del aro de giro y el rodamiento de Ø120~mm.\relax }}{95}{figure.caption.83}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Vista del rodamiento, la biela y el motor paso a paso.\relax }}{96}{figure.caption.84}%
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Diagrama de cuerpo libre del sistema de vigilancia.\relax }}{97}{figure.caption.85}%
+\contentsline {figure}{\numberline {5.10}{\ignorespaces Rack con todos sus componentes electrónicos montados.\relax }}{100}{figure.caption.86}%
+\contentsline {figure}{\numberline {5.11}{\ignorespaces Conexión entre el rack/gabinete y el poste de acero de sección cuadrada.\relax }}{101}{figure.caption.87}%
+\contentsline {figure}{\numberline {5.12}{\ignorespaces Refuerzos triangulares superiores en la conexión gabinete-poste.\relax }}{102}{figure.caption.88}%
+\contentsline {figure}{\numberline {5.13}{\ignorespaces Refuerzos triangulares inferiores en la transición poste-zapata.\relax }}{103}{figure.caption.89}%
+\contentsline {figure}{\numberline {5.14}{\ignorespaces Zapata de cimentación de hormigón armado.\relax }}{104}{figure.caption.90}%
+\contentsline {figure}{\numberline {5.15}{\ignorespaces Detalle de la conexión entre el poste y la zapata de cimentación.\relax }}{105}{figure.caption.91}%
+\contentsline {figure}{\numberline {5.16}{\ignorespaces Distribución de tensión de Von Mises en el sistema completo.\relax }}{107}{figure.caption.92}%
+\contentsline {figure}{\numberline {5.17}{\ignorespaces Tensión de Von Mises, vista inferior del gabinete.\relax }}{107}{figure.caption.93}%
+\contentsline {figure}{\numberline {5.18}{\ignorespaces Distribución de la primera tensión principal.\relax }}{108}{figure.caption.94}%
+\contentsline {figure}{\numberline {5.19}{\ignorespaces Distribución de la tercera tensión principal.\relax }}{109}{figure.caption.95}%
+\contentsline {figure}{\numberline {5.20}{\ignorespaces Campo de desplazamientos totales del sistema.\relax }}{110}{figure.caption.96}%
+\contentsline {figure}{\numberline {5.21}{\ignorespaces Desplazamientos en el gabinete.\relax }}{111}{figure.caption.97}%
+\contentsline {figure}{\numberline {5.22}{\ignorespaces Distribución del factor de seguridad en el sistema.\relax }}{112}{figure.caption.98}%
+\contentsline {figure}{\numberline {5.23}{\ignorespaces Factor de seguridad enfocado en el gabinete.\relax }}{113}{figure.caption.99}%
+\contentsline {figure}{\numberline {5.24}{\ignorespaces Vista del ventilador y la salida de aire caliente del gabinete.\relax }}{115}{figure.caption.100}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 6}\par 
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Relación de las variables locales: las cinco funciones de detección alimentan los índices integrados PI e ICV de cada carril.\relax }}{115}{figure.caption.97}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Relación de las variables locales con la matriz de estado local transmitida a la nube.\relax }}{115}{figure.caption.98}%
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Relación de las variables locales: las cinco funciones de detección alimentan los índices integrados PI e ICV de cada carril.\relax }}{122}{figure.caption.101}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Relación de las variables locales con la matriz de estado local transmitida a la nube.\relax }}{123}{figure.caption.102}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 7}\par 
-\contentsline {figure}{\numberline {7.1}{\ignorespaces Mapa SUMO de las intersecciones del escenario Lima-Centro (entorno PUCP).\relax }}{132}{figure.caption.107}%
-\contentsline {figure}{\numberline {7.2}{\ignorespaces Vista de una intersección del escenario con tránsito en simulación.\relax }}{132}{figure.caption.108}%
-\contentsline {figure}{\numberline {7.3}{\ignorespaces Escenario Lima-Amplio para validación a escala metropolitana.\relax }}{133}{figure.caption.109}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Mapa SUMO de las intersecciones del escenario Lima-Centro (entorno PUCP).\relax }}{143}{figure.caption.114}%
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Vista de una intersección del escenario con tránsito en simulación.\relax }}{143}{figure.caption.115}%
+\contentsline {figure}{\numberline {7.3}{\ignorespaces Escenario Lima-Amplio para validación a escala metropolitana.\relax }}{144}{figure.caption.116}%
