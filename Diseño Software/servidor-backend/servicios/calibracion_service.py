@@ -87,6 +87,9 @@ def calibrar(traci) -> dict:
         'jam_avg_here': round(_target['jam_avg'], 2) if _target['jam_avg'] is not None else None,
         'escala': round(_estado['escala'], 2),
         'calibrado': objetivo is not None,
+        # Origen: con referencia HERE la comparación incluye medición real;
+        # sin ella solo queda la parte simulada (SUMO).
+        'origen_datos': 'real_here' if objetivo is not None else 'sumo',
     }
 
     if objetivo is not None and (ahora - _estado['ts_cal'] >= INTERVALO_CAL):
@@ -116,4 +119,4 @@ def ultima_comparacion() -> dict:
     if _estado['ultimo'] is not None:
         return _estado['ultimo']
     return {'icv_sumo': None, 'objetivo_here': None, 'escala': _estado['escala'],
-            'calibrado': False, 'coincidencia': None}
+            'calibrado': False, 'coincidencia': None, 'origen_datos': 'estimado'}

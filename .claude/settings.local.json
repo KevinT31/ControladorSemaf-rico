@@ -34,7 +34,12 @@
       "Bash(python -m pip install eclipse-sumo traci sumolib scikit-fuzzy ultralytics)",
       "Bash(curl -s -m 15 -o /dev/null -w \"overpass-api.de: HTTP %{http_code} en %{time_total}s\\\\n\" \"https://overpass-api.de/api/status\")",
       "Bash(curl -s -m 15 -o /dev/null -w \"api.openstreetmap.org: HTTP %{http_code}\\\\n\" \"https://api.openstreetmap.org/api/0.6/map?bbox=-77.04,-12.05,-77.03,-12.04\")",
-      "Bash(python *)"
+      "Bash(python *)",
+      "Bash(head -c 1500 \"data/processed/manifiesto.json\")",
+      "Bash(head -3 \"data/fases_lima_centro.csv\")",
+      "Bash(wc -l \"data/fases_lima_centro.csv\")",
+      "Bash(pip install *)",
+      "Bash(node --check \"C:\\\\Users\\\\P5PractTI\\\\Desktop\\\\OverLeaf_Local\\\\Diseño Software\\\\interfaz-web\\\\app_mejorado.js\")"
     ]
   }
 }

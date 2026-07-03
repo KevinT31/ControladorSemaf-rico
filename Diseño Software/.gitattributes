@@ -1,0 +1,1 @@
+integracion-sumo/escenarios/lima-metropolitano/*.xml filter=lfs diff=lfs merge=lfs -text

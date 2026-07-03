@@ -3,6 +3,7 @@ Configuración del Sistema
 """
 
 from pathlib import Path
+import secrets
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -21,7 +22,9 @@ class Settings(BaseSettings):
     DEBUG: bool = Field(default=False, description="Modo debug - configurable por .env")
 
     # Base de datos
-    DATABASE_URL: str = "sqlite:///./base-datos/semaforos.db"
+    DATABASE_URL: str = (
+        f"sqlite:///{(Path(__file__).parent.parent / 'base-datos' / 'semaforos.db').as_posix()}"
+    )
     # Para PostgreSQL/TimescaleDB:
     # DATABASE_URL: str = "postgresql://user:password@localhost:5432/semaforos"
 
@@ -37,11 +40,23 @@ class Settings(BaseSettings):
     # ==================== Ciberseguridad ====================
     # Clave de firma JWT (HS256). En producción: definir SECRET_KEY en .env / KeyVault.
     SECRET_KEY: str = Field(
-        default="cambia-esta-clave-en-produccion-tesis-pucp-2026",
-        description="Clave HMAC-SHA256 para firmar tokens JWT")
+        default_factory=lambda: secrets.token_urlsafe(48),
+        description=("Clave HMAC-SHA256 para firmar tokens JWT. Definir "
+                     "SECRET_KEY en el entorno para conservar sesiones entre reinicios"))
     TOKEN_EXP_MIN: int = Field(default=480, description="Expiración del token en minutos")
     AUTH_ENABLED: bool = Field(
         default=True, description="Exigir autenticación en la API (desactivar solo para depurar)")
+
+    # ==================== Control adaptativo (SUMO) ====================
+    # Ejecuta el controlador canónico ControladorDifusoIA
+    # (integracion-sumo/difuso_ia.py) sobre la simulación SUMO del backend.
+    # Valores (env var CONTROL_ADAPTATIVO):
+    #   'off'           : sin control adaptativo (comportamiento actual, defecto)
+    #   'difuso_ia_off' : difuso acíclico puro (modo_ia='off', sin CNN-LSTM)
+    #   'difuso_ia'     : difuso + guardia CNN-LSTM (modo_ia='guardia')
+    CONTROL_ADAPTATIVO: str = Field(
+        default='off',
+        description="Controlador adaptativo sobre SUMO: 'off' | 'difuso_ia_off' | 'difuso_ia'")
 
     # WebSocket
     WS_HEARTBEAT_INTERVAL: int = 30  # segundos

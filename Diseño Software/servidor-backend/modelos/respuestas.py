@@ -33,6 +33,8 @@ class EstadoSistemaResponse(BaseModel):
     sumo_activo: bool = False
     websocket_conexiones: int = Field(default=0, ge=0)
     timestamp: datetime = Field(default_factory=datetime.now)
+    # Origen honesto de las métricas: 'sumo' | 'simulador_demo' | 'real_here' | 'estimado'
+    origen_datos: str = Field(default='estimado', description="Origen de los datos servidos")
 
 
 class PaginacionResponse(BaseModel):

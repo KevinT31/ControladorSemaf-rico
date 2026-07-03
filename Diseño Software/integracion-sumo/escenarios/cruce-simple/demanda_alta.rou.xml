@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Demanda ALTA (constante, cerca de saturación). Ver nota en demanda_media.rou.xml -->
+<routes>
+    <vType id="coche" accel="2.6" decel="4.5" length="5.0" minGap="2.5"
+           maxSpeed="16.67" speedDev="0.10" sigma="0.5"/>
+
+    <flow id="ns_th" type="coche" begin="0" end="3600" probability="0.16" from="N_C" to="C_S" departLane="best" departSpeed="max"/>
+    <flow id="sn_th" type="coche" begin="0" end="3600" probability="0.16" from="S_C" to="C_N" departLane="best" departSpeed="max"/>
+    <flow id="ew_th" type="coche" begin="0" end="3600" probability="0.12" from="E_C" to="C_W" departLane="best" departSpeed="max"/>
+    <flow id="we_th" type="coche" begin="0" end="3600" probability="0.12" from="W_C" to="C_E" departLane="best" departSpeed="max"/>
+    <flow id="n_r" type="coche" begin="0" end="3600" probability="0.04" from="N_C" to="C_W" departLane="best" departSpeed="max"/>
+    <flow id="n_l" type="coche" begin="0" end="3600" probability="0.03" from="N_C" to="C_E" departLane="best" departSpeed="max"/>
+    <flow id="s_r" type="coche" begin="0" end="3600" probability="0.04" from="S_C" to="C_E" departLane="best" departSpeed="max"/>
+    <flow id="s_l" type="coche" begin="0" end="3600" probability="0.03" from="S_C" to="C_W" departLane="best" departSpeed="max"/>
+    <flow id="e_r" type="coche" begin="0" end="3600" probability="0.04" from="E_C" to="C_N" departLane="best" departSpeed="max"/>
+    <flow id="e_l" type="coche" begin="0" end="3600" probability="0.03" from="E_C" to="C_S" departLane="best" departSpeed="max"/>
+    <flow id="w_r" type="coche" begin="0" end="3600" probability="0.04" from="W_C" to="C_S" departLane="best" departSpeed="max"/>
+    <flow id="w_l" type="coche" begin="0" end="3600" probability="0.03" from="W_C" to="C_N" departLane="best" departSpeed="max"/>
+</routes>

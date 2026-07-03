@@ -2,7 +2,7 @@
 %                  CONCLUSIONES Y RECOMENDACIONES
 % ======================================================================
 \chapter*{CONCLUSIONES Y RECOMENDACIONES}
-\addcontentsline{toc}{chapter}{CONCLUSIONES Y RECOMENDACIONES}\label{cap:conclusiones}
+\addcontentsline{toc}{chapter}{CONCLUSIONES Y RECOMENDACIONES}\label{cap:conclusiones}\markboth{CONCLUSIONES Y RECOMENDACIONES}{CONCLUSIONES Y RECOMENDACIONES}
 
 \section*{Conclusiones}
 
@@ -35,12 +35,16 @@ saturaciones permiten revisar el comportamiento antes de emitir una recomendaci�
 sensado o del módulo, la arquitectura inhibe la adaptación y conserva el plan seguro del controlador, que
 mantiene la autoridad final sobre la actuación (OE6).
 
-\item La elección de una cámara orientable se justifica como una estrategia de \emph{percepción activa}, en
-la que el campo visual se dirige hacia el eje de mayor relevancia operacional del ciclo semafórico. Esta
-decisión integra mecánica, electrónica, percepción y control local en un mismo módulo mecatrónico, y se
-acompaña de una política de validez temporal (estados \textit{MOVING}/\textit{SETTLING}/\textit{OBSERVING} y
-vigencia $T_{valid}$) que evita que la reorientación degrade la recomendación; la salida del sistema permanece
-como recomendación acotada y no como actuación directa sobre las luces (OE5, OE6).
+\item La elección de una cámara orientable no se justifica por costo, sino como una estrategia de
+\emph{percepción activa} que convierte la dirección de observación en una \emph{variable controlada} del
+sistema: el módulo no solo captura video, sino que decide hacia dónde mirar según la fase, la cola, la
+descarga vehicular, la saturación o eventos prioritarios como un vehículo de emergencia, dirigiendo el campo
+visual hacia el eje de mayor relevancia operacional del ciclo semafórico. Esta decisión integra mecánica,
+electrónica, percepción y control local en un mismo módulo mecatrónico ---y no como una arquitectura
+multicámara pasiva---, y se acompaña de una política de validez temporal (estados
+\textit{MOVING}/\textit{SETTLING}/\textit{OBSERVING} y vigencia $T_{valid}$) que evita que la reorientación
+degrade la recomendación; la salida del sistema permanece como recomendación acotada y no como actuación
+directa sobre las luces (OE5, OE6).
 
 \item La nube se delimitó como soporte para telemetría, históricos, alertas, coordinación y distribución
 autorizada de parámetros, demostrándose que la decisión local continúa sin conectividad externa. La
@@ -48,23 +52,43 @@ ciberseguridad propuesta incorpora autenticación, cifrado, control de acceso po
 parámetros, registro de eventos y mínimo privilegio; estas medidas son criterios de diseño y no equivalen a
 una auditoría o certificación (OE7, OE8).
 
-\item La verificación en SUMO comparó el control de tiempo fijo con el control difuso adaptativo en el
-escenario de alta demanda de Lima-Centro, bajo condiciones comunes y con \textbf{30 semillas}, conservando el
-mismo presupuesto de verde por ciclo. El control difuso redujo la demora media de 509.3 a 470.8~s/veh
-($-7.6$~\%) y la saturación de cola en $4.2$~\%, disminuyó el índice de congestión de 0.506 a 0.494
-($-2.4$~\%) e incrementó la velocidad media en $1.8$~\% y el \textit{throughput} en $3.1$~\%, manteniendo en
-todo momento los límites duros de verde $[10,120]$~s. Todas las mejoras son estadísticamente significativas
-(prueba t, $p<0.001$) y consistentes: el difuso supera al plan fijo en 28 de 30 semillas. La mejora no es
-universal —en 2 de 30 réplicas el plan fijo iguala o supera al difuso—, lo que se reporta de forma explícita.
-Frente a líneas base más exigentes en sensado (actuado, Webster, Max-Pressure), el difuso obtiene una mejora
-bruta menor, pero es el único que opera con una sola cámara orientable, es interpretable y tolera la pérdida
-de enlace. Estos resultados verifican el núcleo de control y acotan honestamente su alcance (OE9).
+\item La verificación en SUMO evaluó el controlador final de la tesis
+---un control difuso adaptativo que integra selección acíclica de fase con salto de fases vacías,
+\emph{gap-out}, extensión difusa del verde, protección anti-inanición y transiciones seguras--- frente a seis estrategias
+sobre el escenario Lima-Centro, con semillas comunes y el mismo aparato de medición. \textbf{El controlador
+propuesto obtuvo el segundo menor valor de demora media tanto en demanda alta (30 semillas: 332.4~s/veh,
+detrás del actuado con 309.7) como en demanda media (10 semillas: 33.0~s/veh, detrás del actuado con
+29.8)}; la afirmación se limita a ese escenario y protocolo, sin extrapolación a otras redes o demandas.
+Frente al plan fijo redujo la demora media un $34.7$~\% (de 509.3 a 332.4~s/veh), incrementó el
+\textit{throughput} un $20.4$~\% y disminuyó el índice de congestión un $13.2$~\% (de 0.506 a 0.439), con
+$p\approx10^{-25}$ (prueba t pareada) y ventaja en \textbf{30 de 30 semillas}; frente a Max-Pressure redujo
+la demora un $29.2$~\% en demanda alta. Frente al control actuado ---que exige detectores por carril en
+cada acceso--- quedó por debajo de forma significativa ($+7.3$~\% de demora), lo que se reporta con la
+misma claridad: dentro de la restricción deliberada de sensado mínimo (una sola cámara orientable), el
+controlador es el mejor del conjunto evaluado, manteniendo en todo momento los límites duros de verde
+$[10,120]$~s. Estos resultados verifican el núcleo de control y acotan honestamente su alcance (OE9).
 
-\item El análisis económico preliminar separó CAPEX y OPEX y situó el costo del primer año en torno a
-S/~17~mil por intersección, dominado por la estructura mecánica y el sistema de visión. Antes de defender
-una cifra definitiva deben actualizarse cotizaciones, tipo de cambio, consumo real y prorrateo de los
-servicios de nube; la certificación, la obra civil y el piloto deben presupuestarse como etapas posteriores
-(OE10).
+\item Una campaña controlada sobre una intersección aislada, con cuatro niveles de demanda y diseño pareado,
+precisó los límites del beneficio del lazo difuso de reparto: mejora de forma marcada y significativa en los
+regímenes de flujo libre a moderado y en la punta (espera media hasta $-29$~\%), pero bajo saturación
+sostenida el beneficio se diluye e incluso invierte agregadamente (el ICV sube $3.7$~\% y la velocidad cae
+$7.5$~\% al priorizar el vaciado de la cola dominante). La capa predictiva CNN--LSTM, ya implementada y
+entrenada, se evaluó por ablación pareada en ambos marcos con un hallazgo negativo que se reporta con
+transparencia: en la campaña Lima-Centro permaneció operativamente inactiva (en demanda alta el controlador
+con y sin capa predictiva produce exactamente el mismo resultado; en media, $-0.81$~\%, no significativo),
+de modo que \textbf{el desempeño alcanzado es atribuible al núcleo difuso endurecido y no a la predicción};
+en la intersección aislada tampoco mejora de forma estadísticamente significativa al lazo reactivo. Se
+conserva como módulo opcional con degradación segura verificada. Finalmente, una suite de \textbf{26 pruebas automatizadas (todas
+satisfactorias)} verificó los invariantes de seguridad funcional ---acotamiento del verde, transiciones con
+ámbar y todo-rojo, no simultaneidad de fases incompatibles--- y la reproducibilidad determinista del aparato
+experimental, aportando evidencia ejecutable de la premisa de seguridad por diseño (OE9).
+
+\item El análisis económico preliminar separó CAPEX y OPEX y situó el costo del primer año por intersección
+en unos S/~16{,}5~mil \emph{sin} la fracción prorrateada de nube ---redondeados a la cifra de referencia de
+S/~17~mil--- y unos S/~19{,}7~mil \emph{con} ella, dominado por la estructura mecánica y el sistema de visión.
+Antes de defender una cifra definitiva deben actualizarse cotizaciones, tipo de cambio, consumo real y
+prorrateo de los servicios de nube; la certificación, la obra civil y el piloto deben presupuestarse como
+etapas posteriores (OE10).
 
 \item La principal limitación del trabajo es la ausencia de fabricación, de calibración con aforos reales,
 de integración con un controlador comercial certificado, de prueba vial y de auditoría de ciberseguridad.
@@ -99,23 +123,37 @@ restauración de respaldos y respuesta ante incidentes.
 ambiental y los procedimientos municipales aplicables.
 \item Realizar un piloto controlado en una intersección o recinto cerrado, con plan de reversión,
 supervisión humana y métricas acordadas.
-\item Mantener el aprendizaje por refuerzo, la predicción CNN--LSTM, la optimización metropolitana y la
-detección de vehículos de emergencia como líneas futuras, hasta disponer de datos, validación fuera de
-muestra y criterios de aceptación (Anexo~\ref{anexo:futuros}).
+\item Extender la capa predictiva CNN--LSTM ---ya implementada y evaluada en la intersección aislada, sin
+mejora significativa (Sección~\ref{subsec:ia-evaluacion})--- a corredores coordinados con latencia de
+comunicación, donde se espera su mayor aporte, y madurar el aprendizaje por refuerzo, la optimización
+metropolitana y la detección de vehículos de emergencia como líneas futuras, hasta disponer de datos,
+validación fuera de muestra y criterios de aceptación (Anexo~B).
 \item Extender el estudio de una intersección a un corredor solo después de demostrar estabilidad local,
 interoperabilidad y un beneficio estadísticamente sustentado.
+\item Evolucionar el controlador hacia un esquema \emph{difuso--presión coordinado}: conservar el
+\emph{gap-out}, la protección anti-inanición y las transiciones seguras actuales, incorporar la presión
+aguas arriba--aguas abajo en la selección de fase ---aprovechando que Max-Pressure ofrece garantías de
+estabilidad con información local adyacente (Varaiya, 2013) y que variantes como Smoothing-MP añaden
+coordinación de corredor sin perder esa región de estabilidad (Xu et al., 2024)--- y reservar la inferencia
+de Mamdani para el cálculo de la duración del verde, añadiendo offsets de ola verde entre intersecciones
+vecinas.
+\item Para que la competitividad del controlador sea publicable: evaluarlo en varias redes y demandas no
+vistas, calibrar SUMO con aforos reales, compararlo en marcos abiertos de \emph{benchmarking} como LibSignal
+(Mei et al., 2023) o RESCO (Ault y Sharon, 2021), añadir pruebas específicas de \emph{gap-out}, salto de
+fase, anti-inanición y control de acceso, y reportar intervalos de confianza al 95~\%, tamaño de efecto,
+equidad entre accesos, emisiones y demoras peatonales.
 \end{itemize}
 
 % ======================================================================
 %                          BIBLIOGRAFÍA
 % ======================================================================
-\chapter*{BIBLIOGRAFÍA}\addcontentsline{toc}{chapter}{BIBLIOGRAFÍA}\label{bibliografia}
+\chapter*{BIBLIOGRAFÍA}\addcontentsline{toc}{chapter}{BIBLIOGRAFÍA}\label{bibliografia}\markboth{BIBLIOGRAFÍA}{BIBLIOGRAFÍA}
 \input{build_v4/bibliografia_items}
 
 % ======================================================================
 %                            ANEXOS
 % ======================================================================
-\chapter*{ANEXOS}\addcontentsline{toc}{chapter}{ANEXOS}\label{anexos}
+\chapter*{ANEXOS}\addcontentsline{toc}{chapter}{ANEXOS}\label{anexos}\markboth{ANEXOS}{ANEXOS}
 
 \noindent Los archivos de programación, simulación, esquemas CAD y recursos complementarios se conservan
 como material digital de soporte de la tesis. A continuación se incluyen los anexos referenciados a lo largo
@@ -125,9 +163,9 @@ del documento.
 \section*{ANEXO A: Reproducibilidad de la validación en SUMO}
 \addcontentsline{toc}{section}{ANEXO A: Reproducibilidad de la validación en SUMO}\label{anexo:sumo}
 
-La comparación entre el control de tiempo fijo y el control difuso adaptativo se ejecutó sobre el mismo
-escenario y demanda, conservando el presupuesto de verde por ciclo, de modo que la única diferencia entre
-ambas corridas es la política de reparto del tiempo de verde. Las métricas provienen de la simulación real
+La campaña multilínea-base ejecutó las siete estrategias (incluido el controlador propuesto) sobre el mismo
+escenario, demanda, semillas y aparato de medición, de modo que la única diferencia entre corridas es la
+política de control. Las métricas provienen de la simulación real
 (no se utilizan números aleatorios sintéticos): se obtienen a nivel de vehículo mediante la interfaz de
 control de SUMO. Los parámetros de reproducibilidad son los siguientes:
 
@@ -137,46 +175,53 @@ control de SUMO. Los parámetros de reproducibilidad son los siguientes:
 \item \textbf{Horizonte:} 700 pasos de simulación por corrida.
 \item \textbf{Intervalo de control:} 25~s (cada intervalo se mide el estado, se calcula el ICV por
 dirección y la lógica difusa recalcula el verde recomendado).
-\item \textbf{Semillas:} \{1, 2, \ldots, 30\} (campaña de seis controladores sobre idéntica red y demanda).
+\item \textbf{Semillas:} \{1, \ldots, 30\} en demanda alta y \{1, \ldots, 10\} en demanda media (campaña de
+siete estrategias sobre idéntica red, demanda y aparato de medición, con ablación pareada de la capa
+predictiva).
 \item \textbf{Restricciones de seguridad:} límites duros de verde $[10, 120]$~s aplicados por una guardia de
 seguridad funcional; cualquier recomendación fuera de rango se acota antes de aplicarse, registrándose el
 evento.
 \end{itemize}
 
-\noindent\textbf{Tabla A.1.} Agregado de la campaña multilínea-base (media $\pm$ desviación, 30 semillas).
+\noindent\textbf{Tabla A.1.} Agregado de la campaña multilínea-base en demanda alta (media $\pm$ desviación,
+30 semillas comunes).
 \begin{center}
 \begin{tabular}{@{}lccc@{}}
 \toprule
 \textbf{Estrategia} & \textbf{ICV} & \textbf{Demora (s)} & \textbf{Throughput} \\
 \midrule
-Fijo (línea base)   & $0.506 \pm 0.004$ & $509.3 \pm 19.6$ & $719.7 \pm 15.0$ \\
-Difuso (núcleo)     & $0.494 \pm 0.004$ & $470.8 \pm 19.5$ & $741.9 \pm 19.7$ \\
-Webster             & $0.489 \pm 0.004$ & $454.7 \pm 25.2$ & $749.2 \pm 23.5$ \\
-Webster modificado  & $0.489 \pm 0.005$ & $453.2 \pm 24.2$ & $752.8 \pm 22.3$ \\
-Max-Pressure        & $0.477 \pm 0.013$ & $448.9 \pm 47.4$ & $785.0 \pm 42.9$ \\
-Actuado (gap-out)   & $0.426 \pm 0.006$ & $309.7 \pm 17.2$ & $892.7 \pm 22.9$ \\
+Fijo (línea base)   & $0.506 \pm 0.004$ & $509.3 \pm 19.2$ & $719.7 \pm 14.7$ \\
+Difuso de reparto (previo) & $0.496 \pm 0.006$ & $484.3 \pm 26.4$ & $729.9 \pm 21.5$ \\
+Max-Pressure        & $0.484 \pm 0.010$ & $469.6 \pm 42.9$ & $766.4 \pm 37.5$ \\
+Webster             & $0.489 \pm 0.004$ & $454.7 \pm 24.7$ & $749.2 \pm 23.1$ \\
+Webster modificado  & $0.489 \pm 0.005$ & $453.2 \pm 23.8$ & $752.8 \pm 21.9$ \\
+Difuso adaptativo (propuesto) & $0.439 \pm 0.005$ & $332.4 \pm 17.6$ & $866.3 \pm 20.7$ \\
+Actuado (gap-out)   & $0.426 \pm 0.006$ & $309.7 \pm 16.9$ & $892.7 \pm 22.6$ \\
 \bottomrule
 \end{tabular}
 \end{center}
-{\footnotesize\itshape Fuente: Elaboración propia (SUMO, 30 semillas). El control difuso reduce la demora
-frente al plan fijo en 28 de 30 semillas ($p<0.001$, prueba t pareada); las líneas base avanzadas alcanzan
-menor demora a costa de un sensado más exigente (detectores por carril, colas aguas abajo o flujo de
-saturación calibrado).\par}
+{\footnotesize\itshape Fuente: Elaboración propia (SUMO, 30 semillas comunes). El controlador propuesto
+reduce la demora frente al plan fijo, a Max-Pressure y al difuso de reparto en 30 de 30 semillas
+($p<0.001$, prueba t pareada) y queda por debajo del actuado, que exige detectores por carril en cada
+acceso. La variante con la capa predictiva desactivada (\texttt{difuso\_ia\_off}) produce el mismo
+resultado que el propuesto en las 30 semillas. En demanda media (10 semillas) el ordenamiento de los dos
+primeros se repite: actuado 29.8, propuesto 33.0, Max-Pressure 34.3~s/veh.\par}
 
 \vspace{0.4cm}
 La discusión completa y las mejoras porcentuales agregadas se presentan en el
 Capítulo~\ref{cap:validacion}.
 
 % ---------------------------------------------------------------------
-\section*{ANEXO B: Formulación de los módulos de investigación futura}
-\addcontentsline{toc}{section}{ANEXO B: Módulos de investigación futura (RL y CNN--LSTM)}\label{anexo:futuros}
+\section*{ANEXO B: Capa predictiva CNN--LSTM y módulo futuro de aprendizaje por refuerzo}
+\addcontentsline{toc}{section}{ANEXO B: Capa predictiva CNN--LSTM y módulo futuro (RL)}\label{anexo:futuros}
 
-Los módulos de aprendizaje por refuerzo (RL) y de predicción CNN--LSTM se presentan como diseño conceptual y
-\textbf{no forman parte del núcleo validado} de esta tesis: no fueron entrenados ni validados fuera de
-muestra, y su desarrollo completo queda como línea futura. Se documentan aquí para sustentar la
-escalabilidad de la arquitectura.
+Este anexo documenta las dos extensiones de alcance global de la arquitectura. Difieren en madurez y así se
+declara: la predicción CNN--LSTM \textbf{se implementó, entrenó y evaluó} como capa opcional (su resultado se
+reporta en el Capítulo~\ref{cap:validacion}), mientras que la coordinación por aprendizaje por refuerzo (RL)
+se presenta como \textbf{diseño conceptual no entrenado}. Ninguna forma parte del núcleo validado ni
+condiciona el objetivo general; se documentan para sustentar la escalabilidad y las líneas de continuidad.
 
-\subsection*{B.1\quad Coordinación por aprendizaje por refuerzo (A2C)}
+\subsection*{B.1\quad Coordinación por aprendizaje por refuerzo (A2C, trabajo futuro)}
 El problema de coordinación de varias intersecciones se formula como un proceso de decisión de Markov (MDP):
 \begin{itemize}
 \item \textbf{Estado:} vector con el ICV por dirección de cada intersección del corredor, la longitud de
@@ -191,12 +236,18 @@ política de ajuste y una red crítico que estima el valor del estado. El entren
 sobre escenarios SUMO calibrados, control de la distribución de datos y validación fuera de muestra antes de
 cualquier uso operativo.
 
-\subsection*{B.2\quad Predicción de congestión con CNN--LSTM}
-Para anticipar la congestión se propone una arquitectura híbrida: una etapa convolucional (CNN) que extrae
+\subsection*{B.2\quad Predicción de congestión con CNN--LSTM (implementada y evaluada)}
+Para anticipar la congestión se implementó una arquitectura híbrida: una etapa convolucional (CNN) que extrae
 patrones espaciales del estado de la red y una etapa recurrente (LSTM) que modela la evolución temporal del
-ICV, entregando una predicción a un horizonte corto. Esta predicción alimentaría a la capa de coordinación
-para anticipar la formación de colas. El entrenamiento y el reentrenamiento periódico exigen series
-históricas representativas, que se obtendrían de la operación del propio sistema una vez desplegado.
+ICV, entregando una predicción a un horizonte corto. El modelo se entrenó sobre series generadas en SUMO
+---con su escalador de normalización y sus artefactos de configuración--- y se integró al controlador como
+capa predictiva activable, que alimenta la decisión de reparto de verde. Sobre el escenario controlado se
+ejecutó una campaña pareada (difuso predictivo frente a difuso puro, mismas semillas, cuatro niveles de
+demanda) cuyo resultado ---sin mejora estadísticamente significativa en la intersección aislada--- se detalla
+en la Sección~\ref{subsec:ia-evaluacion}. La capa incorpora degradación segura: ante la ausencia del modelo o
+una normalización de entrada desalineada se desactiva sin detener el control (verificado en la suite de
+pruebas). El reentrenamiento periódico y su evaluación en corredores coordinados ---donde se espera su mayor
+aporte--- quedan como continuidad natural del trabajo.
 
 % ---------------------------------------------------------------------
 \section*{ANEXO C: Especificaciones técnicas comparativas de componentes}

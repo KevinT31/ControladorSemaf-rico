@@ -1,0 +1,54 @@
+{
+  "entrenado_en": "2026-07-01T17:49:17",
+  "datos": "C:\\Users\\P5PractTI\\Desktop\\OverLeaf_Local\\Diseño Software\\data\\fases_lima_centro.csv",
+  "ventana": 8,
+  "caracteristicas": [
+    "cola_n",
+    "nveh_n",
+    "ocupacion",
+    "vel_n",
+    "verde_activa",
+    "espera_fase_n"
+  ],
+  "objetivo": "cola_n",
+  "normalizacion": {
+    "cola_veh": 30.0,
+    "nveh": 40.0,
+    "vel_kmh": 50.0,
+    "espera_s": 120.0
+  },
+  "hiperparametros": {
+    "n_caracteristicas": 6,
+    "canales": 16,
+    "oculto": 32,
+    "capas_lstm": 1,
+    "dropout": 0.1,
+    "n_salidas": 1
+  },
+  "optimizacion": {
+    "lr": 0.001,
+    "batch": 256,
+    "epocas_max": 60,
+    "paciencia": 10,
+    "semilla": 7,
+    "mejor_epoca": 55,
+    "mejor_val_mse": 0.001306
+  },
+  "secuencias": {
+    "train": 66144,
+    "val": 8268,
+    "test": 8268
+  },
+  "metricas_test": {
+    "mse": 0.001244,
+    "mae": 0.01419,
+    "rmse": 0.035268
+  },
+  "baseline_persistencia_test": {
+    "mse": 0.002337,
+    "mae": 0.018494,
+    "rmse": 0.048344
+  },
+  "supera_persistencia": true,
+  "duracion_s": 205.4
+}

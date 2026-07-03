@@ -25,6 +25,11 @@ npm-debug.log*
 # Salidas de procesamiento de video y outputs misc
 /datos/
 Diseño Software/datos/resultados-video/
+# Plataforma experimental (corridas/datasets/modelos regenerables con
+# experimentos.campania -> experimentos.dataset -> ia.entrenamiento)
+Diseño Software/results/
+Diseño Software/data/
+Diseño Software/base-datos/experimentos.db
 # Logs temporales del dashboard
 _dashboard*.log
 _srv*.log

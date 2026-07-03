@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Configuración por defecto (demanda media). El runner experimental
+     normalmente compone sus propios argumentos (-n/-r/(dash)(dash)seed). -->
+<configuration>
+    <input>
+        <net-file value="cruce.net.xml"/>
+        <route-files value="demanda_media.rou.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="3600"/>
+    </time>
+    <report>
+        <no-step-log value="true"/>
+    </report>
+</configuration>

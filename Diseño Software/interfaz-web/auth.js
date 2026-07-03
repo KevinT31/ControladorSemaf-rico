@@ -15,6 +15,17 @@
     var TOKEN_KEY = 'cs_token';
     var USER_KEY = 'cs_user';
 
+    // Los eventos de auditoría contienen datos procedentes de solicitudes de
+    // red. Escapar todos sus campos antes de construir las filas HTML.
+    function escaparHtml(valor) {
+        return String(valor == null ? '' : valor)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     // ---- 1) Interceptar fetch: adjuntar Authorization a /api/* ----
     var fetchOriginal = window.fetch.bind(window);
     window.fetch = function (input, init) {
@@ -104,14 +115,20 @@
             var ev = (data && data.eventos) || [];
             if (!ev.length) { tb.innerHTML = '<tr><td colspan="6">Sin eventos registrados</td></tr>'; return; }
             tb.innerHTML = ev.map(function (e) {
-                var ts = (e.timestamp || '').replace('T', ' ').slice(0, 19);
-                var motivo = (e.motivo || '').replace(/</g, '&lt;');
+                var ts = escaparHtml(String(e.timestamp || '').replace('T', ' ').slice(0, 19));
+                var usuario = escaparHtml(e.usuario);
+                var rol = escaparHtml(e.rol);
+                var accion = escaparHtml(e.accion);
+                var resultadoRaw = String(e.resultado || '');
+                var resultado = escaparHtml(resultadoRaw);
+                var resultadoClase = resultadoRaw.replace(/[^A-Za-z0-9_-]/g, '');
+                var motivo = escaparHtml(e.motivo);
                 return '<tr>' +
                     '<td>' + ts + '</td>' +
-                    '<td>' + (e.usuario || '') + '</td>' +
-                    '<td>' + (e.rol || '') + '</td>' +
-                    '<td>' + (e.accion || '') + '</td>' +
-                    '<td class="res-' + (e.resultado || '') + '">' + (e.resultado || '') + '</td>' +
+                    '<td>' + usuario + '</td>' +
+                    '<td>' + rol + '</td>' +
+                    '<td>' + accion + '</td>' +
+                    '<td class="res-' + resultadoClase + '">' + resultado + '</td>' +
                     '<td>' + motivo + '</td>' +
                     '</tr>';
             }).join('');

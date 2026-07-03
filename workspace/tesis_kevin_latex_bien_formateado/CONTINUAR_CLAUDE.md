@@ -1,6 +1,45 @@
 # CONTINUAR_CLAUDE.md — Estado de la tesis (mainV4)
 
-_Última actualización: 2026-07-01 (sesión pulido Turnitin — 2ª pasada: fuente, planos, URLs, μ, imágenes)_
+_Última actualización: 2026-07-02 (sesión REDACCIÓN: integrar software/pruebas/gráficos + 2ª pasada Turnitin)_
+
+## Sesión 2026-07-02 — Integrar el diseño software (pruebas, gráficos) y bajar Turnitin
+
+El usuario pidió dedicarse **solo a la redacción**: actualizar la tesis con la información vigente de
+«Diseño Software» (pruebas, gráficos), dejarla lo más lista posible y con **bajo Turnitin como prioridad**.
+Todo verificado; **compila EXIT=0, 209 pág, 0 refs/citas sin resolver, 0 placeholders**. `mainV4.pdf` (raíz)
+sincronizado. **Sin commitear** (lo decide el usuario).
+
+- **Cap. 7 ampliado** con datos reales nuevos de `Diseño Software/`:
+  - **§7.3.4 (reescrita) — campaña controlada `cruce-simple`**: 4 niveles de demanda (baja/media/alta/punta),
+    10 semillas pareadas, con IC95 y p-valores (t pareada). Tabla 7.5 + Figura 7.4. Fuente:
+    `results/control_comparison/cruce-simple_baja-media-alta-punta_n10_datosv1/estadistica.json`. **Honesto:**
+    el difuso gana fuerte en baja/media/punta (espera −25/−14/−29 %), pero **bajo saturación (alta) empeora en
+    agregado** (ICV +3.7 %, velocidad −7.5 %, ambos significativos) al priorizar el vaciado de cola.
+  - **§7.3.5 (nueva) — capa predictiva CNN-LSTM**: comparación pareada `fuzzy_predictive_ai` vs difuso (base
+    difuso, mismas semillas). Tabla 7.6 + Figura 7.5. **Hallazgo negativo honesto: sin diferencia
+    significativa en ninguna demanda (todos p>0.05; IC95 cruza 0).** Fuente: `..._n10_ia_vs_difuso/`.
+  - **§7.4 (nueva) — Verificación del software de control**: suite `Diseño Software/tests/` = **26 pytest, 26
+    pasan** (verificado corriendo `python -m pytest -q`). Tabla 7.7 por familias (seguridad funcional,
+    transición segura, invariantes sobre SUMO, degradación de la IA, métricas/reproducibilidad).
+- **3 figuras nuevas** (subagente, matplotlib, 220 DPI, **punto decimal** para igualar tablas, paleta
+  CVD-safe) en `media/`: `fig_campania_demanda.png`, `fig_ia_nula.png`, `fig_multibaseline.png`. Generadas
+  leyendo los JSON/CSV reales (sin transcribir números). Script en scratchpad `make_figs.py`.
+- **IA reencuadrada** de «solo trabajo futuro» → «implementada, entrenada y evaluada; capa opcional con
+  degradación segura»: cap6 §6.6 (retitulada «Capa predictiva CNN-LSTM y línea futura de RL»), cap6 §6.7
+  (nube), `cierre.tex` Anexo B (retitulado + B.2 reescrito), cap3 tabla de niveles de alcance, y una
+  conclusión nueva. **El RL sigue siendo trabajo futuro** (no entrenado).
+- **2ª pasada Turnitin** (voz propia, **citas/números/ecuaciones/labels intactos**): reescritas las
+  definiciones canónicas de mayor riesgo que quedaban — lazo inductivo, LED, MOG2/HOG/Haar, YOLO, DeepSORT,
+  Webster, SCATS/SCOOT, Max-Pressure, lógica difusa, IoT, edge, NTCIP, MQTT, ciberseguridad, SUMO/TraCI, y
+  además **inferencia Mamdani** (cap6), **Von Mises** (cap5) y **VDI 2221/2206** (cap1). Un subagente
+  read-only priorizó los 22 pasajes; se aplicaron ~17 (todos los «Alto»).
+- **Decisión de alcance:** la validación **Lima-Centro** (multibaseline 30 semillas, `integracion-sumo/
+  resultados/`) se **mantiene** como red realista; la campaña `cruce-simple` es escenario **controlado
+  complementario**. Ambos con datos reales. El objetivo previo de recortar a ≤110 págs quedó **superado** por
+  la instrucción explícita de dejar la tesis «super completa».
+- **Pendiente del usuario:** completar en el «Informe de Similitud» los datos reales (% Turnitin, DNI, ORCID,
+  fecha) — siguen como líneas en blanco a propósito.
+
 
 ## Sesión 2026-07-01 (2ª pasada) — Fuente, planos restaurados, URLs, ecuación, imágenes
 

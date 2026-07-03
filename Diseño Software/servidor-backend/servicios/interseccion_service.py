@@ -74,7 +74,10 @@ class InterseccionService:
             'icv': resultado_icv['icv'],
             'clasificacion_icv': resultado_icv['clasificacion'],
             'color_icv': resultado_icv['color'],
-            'fuente': estado_sistema.modo
+            'fuente': estado_sistema.modo,
+            # Estas métricas SIEMPRE provienen del SimuladorLima (sintético
+            # de demo), independientemente del modo activo del sistema.
+            'origen_datos': 'simulador_demo'
         }
 
     @staticmethod

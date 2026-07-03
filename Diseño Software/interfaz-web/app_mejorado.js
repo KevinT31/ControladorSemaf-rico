@@ -849,6 +849,36 @@ function generarMetricasSimuladas() {
     return resultados;
 }
 
+// ==================== BADGE DE ORIGEN DE DATOS ====================
+// Etiquetado honesto: muestra de dónde provienen las métricas visibles.
+//   'sumo'           = simulación SUMO real (azul)
+//   'simulador_demo' = valores sintéticos de demostración (ámbar)
+//   'real_here'      = tráfico real de HERE (verde)
+//   'estimado'       = valores derivados/placeholder (gris claro)
+// Si el payload no trae origen_datos, se muestra "origen no etiquetado" (gris).
+const ORIGEN_DATOS_INFO = {
+    sumo: { texto: 'SUMO (simulación)', clase: 'origen-sumo' },
+    simulador_demo: { texto: 'DEMO sintético', clase: 'origen-demo' },
+    real_here: { texto: 'Tráfico real (HERE)', clase: 'origen-real' },
+    estimado: { texto: 'Estimado', clase: 'origen-estimado' }
+};
+
+function actualizarBadgeOrigen(origen) {
+    const badge = document.getElementById('origen-datos-badge');
+    const texto = document.getElementById('origen-datos-texto');
+    if (!badge || !texto) return;
+    badge.classList.remove('origen-sumo', 'origen-demo', 'origen-real',
+        'origen-estimado', 'origen-desconocido');
+    const info = ORIGEN_DATOS_INFO[origen];
+    if (info) {
+        badge.classList.add(info.clase);
+        texto.textContent = info.texto;
+    } else {
+        badge.classList.add('origen-desconocido');
+        texto.textContent = 'origen no etiquetado';
+    }
+}
+
 // ==================== ACTUALIZACIÓN UNIFICADA DE DATOS ====================
 /**
  * Función unificada para actualizar todos los componentes de la interfaz
@@ -856,6 +886,11 @@ function generarMetricasSimuladas() {
  * @param {String} origen - Origen de los datos: 'backend' o 'local'
  */
 function actualizarDatosInterfaz(metricas, origen = 'backend') {
+    // 0. Simulación local del navegador = datos sintéticos de demostración
+    if (origen === 'local') {
+        actualizarBadgeOrigen('simulador_demo');
+    }
+
     // 1. Si es backend, detener simulación local
     if (origen === 'backend') {
         if (!estado.backendConectado) {
@@ -2168,6 +2203,9 @@ async function actualizarEstadoSUMO() {
         const resp = await fetch(`${API_URL}/api/sumo/estado`);
         const data = await resp.json();
 
+        // Badge de origen: refleja lo que el backend declaró en el payload
+        actualizarBadgeOrigen(data.origen_datos);
+
         if (!data.conectado) {
             console.warn('⚠️ SUMO no conectado');
             // Forzar caída de métricas a 0 en modo SUMO
@@ -2225,6 +2263,9 @@ async function actualizarTraficoSUMO() {
     try {
         const response = await fetch(`${API_URL}/api/sumo/trafico`);
         const data = await response.json();
+
+        // Badge de origen: refleja lo que el backend declaró en el payload
+        actualizarBadgeOrigen(data.origen_datos);
 
         if (!data.calles || data.calles.length === 0) {
             return;
@@ -2622,6 +2663,8 @@ function procesarMensajeWebSocket(mensaje) {
 
     switch (tipo) {
         case 'metricas_actualizadas':
+            // Badge de origen: el backend etiqueta el mensaje completo
+            actualizarBadgeOrigen(mensaje.origen_datos);
             // En modo simulador (demo visual), ignorar métricas backend para evitar sobrescritura
             if (estado.modoActual === 'simulador') {
                 console.log('[WebSocket] Ignorado en modo simulador (demo visual sin backend)');

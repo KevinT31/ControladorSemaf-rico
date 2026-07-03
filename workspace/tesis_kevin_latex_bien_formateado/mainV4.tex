@@ -225,7 +225,7 @@ Y a mi asesor, por su orientación y disposición constante durante el desarroll
 \clearpage
 \pagestyle{fancy}
 \pagenumbering{roman}
-\chapter*{RESUMEN}\addcontentsline{toc}{chapter}{RESUMEN}\label{resumen}
+\chapter*{RESUMEN}\addcontentsline{toc}{chapter}{RESUMEN}\label{resumen}\markboth{RESUMEN}{RESUMEN}
 
 La congestión vehicular en Lima Metropolitana evidencia una limitación de ingeniería en las intersecciones
 que operan con planes semafóricos fijos o con capacidad reducida de adaptación: los tiempos de fase no
@@ -248,16 +248,60 @@ El desarrollo sigue la metodología VDI 2221 para la clarificación de la tarea,
 requerimientos, la estructura funcional, la matriz morfológica y la selección técnico-económica; la VDI
 2206 se emplea para integrar los dominios mecánico, electrónico, de control, de comunicaciones y de
 software. La verificación se realiza mediante revisión de diseño, cálculos eléctricos y mecánicos, análisis
-de amenazas y simulaciones reproducibles en SUMO que comparan el control de tiempo fijo con el control
-difuso adaptativo. El módulo difuso, evaluado sobre escenarios de Lima en SUMO, reduce el índice de
-congestión y mejora la velocidad media de la red respecto del plan de tiempo fijo, manteniendo en todo
-momento los límites duros de seguridad sobre los tiempos de verde. El trabajo constituye una base técnica
+de amenazas y simulaciones reproducibles en SUMO que comparan el controlador propuesto con el plan de
+tiempo fijo y con cinco líneas base de la ingeniería de tránsito (actuado, Webster, Webster modificado,
+Max-Pressure y un difuso de reparto previo). En el escenario Lima-Centro, el controlador difuso propuesto
+obtuvo el segundo menor valor de demora media del conjunto evaluado ---tanto en demanda alta, con 30
+semillas comunes, como en demanda media, con 10---, reduciendo frente al plan fijo la demora media en
+34.7~\%, elevando el \emph{throughput} en 20.4~\% y disminuyendo el índice de congestión en 13.2~\%,
+manteniendo en todo momento los límites duros de seguridad sobre los tiempos de verde. El trabajo constituye una base técnica
 trazable para fabricar un prototipo y ejecutar un piloto posterior; no incluye instalación vial, pruebas
 con tráfico real, certificación de seguridad funcional ni auditoría formal de ciberseguridad.
 
 \vspace{0.4cm}
 \noindent\textbf{Palabras clave:} congestión vehicular, sistema semafórico adaptativo, IoT, computación en
 el borde, nube, ciberseguridad, control difuso, visión por computadora, VDI 2221, SUMO.
+
+% ======================================================================
+%                            ABSTRACT
+% ======================================================================
+\cleardoublepage
+\chapter*{ABSTRACT}\addcontentsline{toc}{chapter}{ABSTRACT}\label{abstract}\markboth{ABSTRACT}{ABSTRACT}
+
+\begingroup
+Vehicular congestion in Metropolitan Lima reveals an engineering limitation at intersections operating with
+fixed-time signal plans or with a reduced capacity for adaptation: phase times do not respond in a timely
+manner to directional variations in demand, incidents or queue formation. Sole reliance on a remote control
+centre is likewise unsuitable for low-latency decisions, owing to the variable availability of communications
+and the risk of introducing a single point of failure. In this context, connecting sensors and supervision
+platforms widens the attack surface and makes it necessary to consider cybersecurity from the very definition
+of the architecture.
+
+This thesis designs and establishes a validation procedure, in a simulated environment, for a complementary
+mechatronic IoT module attached to the existing traffic-signal controller. The module integrates a camera to
+estimate traffic variables, local edge processing, the computation of a vehicular congestion index (ICV), a
+Mamdani-type fuzzy controller that generates recommended phase parameters, secure communication with a cloud
+platform and information-protection measures. The existing traffic-signal controller retains final authority
+over lamps, interlocks, incompatible phases, clearance times and safe modes; the proposal therefore neither
+replaces a certified controller nor directly actuates critical states.
+
+The development follows the VDI 2221 methodology for task clarification, requirement definition, functional
+structure, the morphological matrix and the technical–economic selection, while VDI 2206 is used to integrate
+the mechanical, electronic, control, communications and software domains. Verification is carried out through
+design review, electrical and mechanical calculations, threat analysis and reproducible SUMO simulations that
+compare the proposed controller against the fixed-time plan and five traffic-engineering baselines (actuated,
+Webster, modified Webster, Max-Pressure and an earlier green-splitting fuzzy controller). In the Lima-Centro
+scenario, the proposed fuzzy controller achieved the second-lowest mean delay of the evaluated set ---both
+under high demand, with 30 common seeds, and under medium demand, with 10--- reducing mean delay by 34.7\%,
+raising throughput by 20.4\% and lowering the congestion index by 13.2\% relative to the fixed-time plan,
+while keeping the hard green-time safety limits at all times. The work constitutes a traceable technical basis
+for building a prototype and running a subsequent pilot; it does not include on-road installation, real-traffic
+testing, functional-safety certification or a formal cybersecurity audit.
+
+\vspace{0.4cm}
+\noindent\textbf{Keywords:} vehicular congestion, adaptive traffic-signal system, IoT, edge computing, cloud,
+cybersecurity, fuzzy control, computer vision, VDI 2221, SUMO.
+\endgroup
 
 % ======================================================================
 %                            ÍNDICES
@@ -276,6 +320,60 @@ el borde, nube, ciberseguridad, control difuso, visión por computadora, VDI 222
 \phantomsection
 \addcontentsline{toc}{chapter}{ÍNDICE DE FIGURAS}
 \listoffigures
+
+% ======================================================================
+%                      LISTA DE SIGLAS Y ACRÓNIMOS
+% ======================================================================
+\cleardoublepage
+\phantomsection
+\chapter*{LISTA DE SIGLAS Y ACRÓNIMOS}
+\addcontentsline{toc}{chapter}{LISTA DE SIGLAS Y ACRÓNIMOS}\label{siglas}\markboth{LISTA DE SIGLAS Y ACRÓNIMOS}{LISTA DE SIGLAS Y ACRÓNIMOS}
+
+\begin{longtable}{@{}p{0.16\linewidth}p{0.80\linewidth}@{}}
+\toprule
+\textbf{Sigla} & \textbf{Significado}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Sigla} & \textbf{Significado}\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+A2C    & Actor--crítico de ventaja (\emph{Advantage Actor--Critic})\\
+ADC    & Convertidor analógico-digital (\emph{Analog-to-Digital Converter})\\
+AHP    & Proceso de análisis jerárquico (\emph{Analytic Hierarchy Process})\\
+ATU    & Autoridad de Transporte Urbano para Lima y Callao\\
+CAPEX  & Gastos de capital (\emph{Capital Expenditure})\\
+CNN    & Red neuronal convolucional (\emph{Convolutional Neural Network})\\
+GPIO   & Entrada/salida de propósito general (\emph{General-Purpose Input/Output})\\
+ICV    & Índice de Congestión Vehicular\\
+IK10   & Grado de protección frente a impactos mecánicos (norma IEC 62262)\\
+IoT    & Internet de las cosas (\emph{Internet of Things})\\
+IP65   & Grado de protección frente a polvo y agua (norma IEC 60529)\\
+ITS    & Sistemas Inteligentes de Transporte (\emph{Intelligent Transportation Systems})\\
+LSTM   & Memoria de largo y corto plazo (\emph{Long Short-Term Memory})\\
+MDP    & Proceso de decisión de Markov (\emph{Markov Decision Process})\\
+MML    & Municipalidad Metropolitana de Lima\\
+MQTT   & \emph{Message Queuing Telemetry Transport}\\
+MTC    & Ministerio de Transportes y Comunicaciones\\
+NEMA   & \emph{National Electrical Manufacturers Association}\\
+NTCIP  & \emph{National Transportation Communications for ITS Protocol}\\
+OPEX   & Gastos operativos (\emph{Operational Expenditure})\\
+OSM    & OpenStreetMap\\
+PCB    & Placa de circuito impreso (\emph{Printed Circuit Board})\\
+PI     & Parámetro de Intensidad\\
+QL     & Saturación de cola (\emph{Queue Length})\\
+RBAC   & Control de acceso basado en roles (\emph{Role-Based Access Control})\\
+RL     & Aprendizaje por refuerzo (\emph{Reinforcement Learning})\\
+SBC    & Computador de placa única (\emph{Single-Board Computer})\\
+SPI    & Interfaz periférica serial (\emph{Serial Peripheral Interface})\\
+SUMO   & Simulación de movilidad urbana (\emph{Simulation of Urban MObility})\\
+TLS    & Seguridad de la capa de transporte (\emph{Transport Layer Security})\\
+TraCI  & Interfaz de control de tráfico (\emph{Traffic Control Interface})\\
+UPS    & Sistema de alimentación ininterrumpida (\emph{Uninterruptible Power Supply})\\
+VDI    & Asociación de Ingenieros Alemanes (\emph{Verein Deutscher Ingenieure})\\
+\end{longtable}
 
 % ======================================================================
 %                          INTRODUCCIÓN

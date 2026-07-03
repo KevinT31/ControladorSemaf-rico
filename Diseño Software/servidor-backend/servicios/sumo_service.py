@@ -53,6 +53,105 @@ def _config_y_geojson_preferidos():
     return None, None
 
 
+class ControlAdaptativoSUMO:
+    """Adaptador que ejecuta el controlador CANÓNICO del proyecto
+    (ControladorDifusoIA de integracion-sumo/difuso_ia.py) sobre la MISMA
+    conexión SUMO del backend (comparten conector_sumo, sea libsumo o traci).
+
+    Se activa solo si settings.CONTROL_ADAPTATIVO != 'off'. Ante cualquier
+    fallo al construirlo se loguea el error y el backend sigue SIN control
+    (comportamiento actual); nunca se tumba el servidor.
+    """
+
+    def __init__(self):
+        self.ctrl = None          # instancia de ControladorDifusoIA
+        self.medidor = None       # ContadorCruces (flujo real por ventana)
+        self.paso_actual = 0      # índice de paso pasado a ctrl.paso(i)
+        self.fallo = False        # construcción fallida: no reintentar por paso
+        self.modo_cfg = 'off'     # valor de CONTROL_ADAPTATIVO aplicado
+
+    def asegurar(self):
+        """Construye el controlador si la configuración lo pide y SUMO está
+        conectado. Idempotente y barata cuando ya está construido o falló."""
+        if self.ctrl is not None or self.fallo:
+            return
+        try:
+            from config import settings
+            modo_cfg = str(getattr(settings, 'CONTROL_ADAPTATIVO', 'off'))
+        except Exception as e_cfg:
+            logger.warning(f"No se pudo leer CONTROL_ADAPTATIVO: {e_cfg}")
+            return
+        if modo_cfg not in ('difuso_ia', 'difuso_ia_off'):
+            return
+        conector = getattr(estado_sistema, 'conector_sumo', None)
+        if not conector or not getattr(conector, 'conectado', False):
+            return
+        try:
+            import sys
+            integracion_path = Path(__file__).parent.parent.parent / 'integracion-sumo'
+            if str(integracion_path) not in sys.path:
+                sys.path.insert(0, str(integracion_path))
+            # difuso_ia y comparacion_sumo importan conector_sumo.traci, el
+            # mismo módulo de conexión que usa el conector del backend.
+            import comparacion_sumo as C
+            import difuso_ia as D
+
+            # Programa estático conocido antes de mapear fases (requisito de
+            # _mapear_semaforos) y punto de partida honesto para el control.
+            C._forzar_tiempo_fijo(t_verde=30.0)
+            info = C._mapear_semaforos()
+            medidor = C.ContadorCruces(
+                [l for d in info.values() for g in d['fases_verdes'] for l in g['lanes']])
+            modo_ia = 'guardia' if modo_cfg == 'difuso_ia' else 'off'
+            self.ctrl = D.ControladorDifusoIA(
+                info, {'modo_ia': modo_ia, 'medidor_flujo': medidor})
+            self.medidor = medidor
+            self.modo_cfg = modo_cfg
+            self.paso_actual = 0
+            logger.info(f"✓ Controlador difuso-IA canónico activo "
+                        f"(CONTROL_ADAPTATIVO={modo_cfg}, modo_ia={modo_ia}, "
+                        f"{len(info)} semáforos)")
+        except Exception as e:
+            self.fallo = True
+            logger.error(f"No se pudo construir el controlador difuso-IA; "
+                         f"se continúa SIN control adaptativo: {e}")
+
+    def paso(self):
+        """Llamar UNA vez tras cada simular_paso(). No hace nada sin controlador."""
+        if self.ctrl is None:
+            return
+        try:
+            if self.medidor is not None:
+                self.medidor.actualizar()
+            self.ctrl.paso(self.paso_actual)
+            self.paso_actual += 1
+        except Exception as e:
+            logger.error(f"Error en paso del controlador difuso-IA: {e}")
+
+    def reset(self):
+        """Descarta el controlador (al desconectar/reconectar SUMO)."""
+        self.ctrl = None
+        self.medidor = None
+        self.paso_actual = 0
+        self.fallo = False
+        self.modo_cfg = 'off'
+
+    def estado_api(self) -> Dict:
+        """Campos para /api/sumo/estado: controlador_activo y resumen_ia."""
+        if self.ctrl is None:
+            return {'controlador_activo': 'ninguno'}
+        out = {'controlador_activo': self.modo_cfg}
+        try:
+            out['resumen_ia'] = self.ctrl.resumen_ia()
+        except Exception as e:
+            out['resumen_ia'] = {'error': str(e)}
+        return out
+
+
+# Singleton compartido por main.py (bucle auto-step) y este servicio (polls)
+control_adaptativo = ControlAdaptativoSUMO()
+
+
 class SumoService:
     """Servicio para operaciones con SUMO"""
 
@@ -79,18 +178,24 @@ class SumoService:
         el tráfico evolucione y los colores reflejen congestión real cambiante.
         """
         if estado_sistema.modo != 'sumo':
-            return {'calles': [], 'mensaje': 'Modo SUMO no activo'}
+            # Sin datos medidos: payload placeholder, no proviene de SUMO
+            return {'calles': [], 'mensaje': 'Modo SUMO no activo',
+                    'origen_datos': 'estimado'}
 
         conector = estado_sistema.conector_sumo
         if not conector or not getattr(conector, 'conectado', False):
-            return {'calles': [], 'mensaje': 'SUMO no conectado'}
+            return {'calles': [], 'mensaje': 'SUMO no conectado',
+                    'origen_datos': 'estimado'}
 
         try:
+            # Controlador adaptativo canónico (opcional, CONTROL_ADAPTATIVO)
+            control_adaptativo.asegurar()
             # Avanzar la simulación (libsumo es in-process; este endpoint es
             # async -> corre en el hilo del event loop, sin condición de carrera).
             for _ in range(SumoService.PASOS_POR_POLL):
                 if not conector.simular_paso():
                     break
+                control_adaptativo.paso()
 
             estados = conector.obtener_estado_calles(limite=2000)
             activas = [e for e in estados if e.get('vehiculos', 0) > 0]
@@ -107,13 +212,14 @@ class SumoService:
             return {
                 'calles': estados,
                 'fuente': 'sumo_real',
+                'origen_datos': 'sumo',  # medición real de la simulación SUMO
                 'calles_con_trafico': len(activas),
                 'icv_red_promedio': round(icv_prom, 3),
                 'timestamp': datetime.now().isoformat()
             }
         except Exception as e:
             logger.error(f"Error obteniendo tráfico SUMO: {e}")
-            return {'calles': [], 'error': str(e)}
+            return {'calles': [], 'error': str(e), 'origen_datos': 'estimado'}
 
     @staticmethod
     def conectar(ruta_config: str, usar_gui: bool = False):
@@ -124,6 +230,8 @@ class SumoService:
 
         from conector_sumo import ConectorSUMO
 
+        # Conexión nueva: descartar cualquier controlador de la anterior
+        control_adaptativo.reset()
         estado_sistema.conector_sumo = ConectorSUMO(
             ruta_config_sumo=ruta_config,
             usar_gui=usar_gui
@@ -137,6 +245,7 @@ class SumoService:
         if estado_sistema.conector_sumo:
             estado_sistema.conector_sumo.desconectar()
             estado_sistema.conector_sumo = None
+            control_adaptativo.reset()
             logger.info("SUMO desconectado")
 
     @staticmethod
@@ -360,7 +469,7 @@ class SumoService:
                 except Exception as e_import:
                     logger.warning(f"No se pudo importar CalculadorICV del núcleo: {e_import}")
 
-                return {
+                respuesta = {
                     'conectado': True,
                     'gui_visible': getattr(conector, 'usar_gui', False),
                     'semaforos': len(getattr(conector, 'intersecciones', {})),
@@ -372,8 +481,12 @@ class SumoService:
                     'icv_red_promedio': round(icv_red_promedio, 3),
                     'tiempo_simulado_s': tiempo_simulado_s,
                     'intersecciones': metricas_intersecciones,
-                    'fuente': 'sumo_real'
+                    'fuente': 'sumo_real',
+                    'origen_datos': 'sumo'  # medición real de la simulación SUMO
                 }
+                # Estado del controlador adaptativo canónico (si está activo)
+                respuesta.update(control_adaptativo.estado_api())
+                return respuesta
 
             # No conectado: razón
             razon = 'desconocida'
@@ -410,11 +523,15 @@ class SumoService:
                 'tiempo_simulado_s': 0.0,
                 'razon': razon,
                 'icv_red_promedio': 0.0,
-                'intersecciones': intersecciones_verdes
+                'intersecciones': intersecciones_verdes,
+                # Placeholder (todo en 0/verde), no es medición de SUMO
+                'origen_datos': 'estimado',
+                'controlador_activo': 'ninguno'
             }
         except Exception as e:
             logger.error(f"Error obteniendo estado SUMO: {e}")
-            return {'conectado': False, 'error': str(e)}
+            return {'conectado': False, 'error': str(e),
+                    'origen_datos': 'estimado', 'controlador_activo': 'ninguno'}
 
     @staticmethod
     def inicializar_modo_sumo():
