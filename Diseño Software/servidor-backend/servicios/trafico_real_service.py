@@ -54,7 +54,7 @@ def obtener_trafico_real(bbox=None) -> dict:
     """
     key = _leer_api_key()
     if not key:
-        return {'disponible': False, 'segmentos': [],
+        return {'disponible': False, 'segmentos': [], 'origen_datos': 'estimado',
                 'mensaje': 'Falta API key de HERE (env HERE_API_KEY o here_api_key.txt)'}
 
     w, s, e, n = bbox or BBOX_DEFECTO
@@ -75,11 +75,12 @@ def obtener_trafico_real(bbox=None) -> dict:
         except Exception:
             pass
         logger.error(f"HERE HTTP {ex.code}: {detalle}")
-        return {'disponible': False, 'segmentos': [],
+        return {'disponible': False, 'segmentos': [], 'origen_datos': 'estimado',
                 'mensaje': f'HERE respondió {ex.code}. Revisa la API key o el área. {detalle}'}
     except Exception as ex:
         logger.error(f"Error consultando HERE: {ex}")
-        return {'disponible': False, 'segmentos': [], 'mensaje': f'Error consultando HERE: {ex}'}
+        return {'disponible': False, 'segmentos': [], 'origen_datos': 'estimado',
+                'mensaje': f'Error consultando HERE: {ex}'}
 
     segmentos = []
     for r in data.get('results', []):
@@ -108,4 +109,5 @@ def obtener_trafico_real(bbox=None) -> dict:
         'segmentos': segmentos,
         'num_segmentos': len(segmentos),
         'fuente': 'here_v7',
+        'origen_datos': 'real_here',  # medición REAL de tráfico (HERE v7)
     }

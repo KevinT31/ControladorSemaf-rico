@@ -53,6 +53,9 @@ class MetricasInterseccion(BaseModel):
     clasificacion_icv: str = Field(..., description="Fluido, Moderado, o Congestionado")
     color_icv: str = Field(..., description="Color para visualización")
     fuente: str = Field(default="simulador", description="Origen de datos")
+    # Origen honesto: 'sumo' | 'simulador_demo' | 'real_here' | 'estimado'
+    origen_datos: str = Field(default='simulador_demo',
+                              description="Origen real de las métricas servidas")
 
     @field_validator('clasificacion_icv')
     @classmethod

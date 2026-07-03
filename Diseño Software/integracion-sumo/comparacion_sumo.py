@@ -14,9 +14,10 @@ Devuelve dos listas de MetricasRed listas para SistemaComparacion.
 
 import sys
 import logging
+from collections import deque
 from pathlib import Path
 from datetime import datetime, timedelta
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 # Núcleo
 _RAIZ = Path(__file__).parent.parent
@@ -41,11 +42,18 @@ import sumolib  # noqa: E402
 VEL_LIBRE_MS = 13.89  # ~50 km/h
 
 
-def _iniciar(ruta_cfg: str):
-    """Arranca SUMO headless con la configuración dada."""
+def _iniciar(ruta_cfg: str, seed: Optional[int] = None):
+    """Arranca SUMO headless con la configuración dada.
+
+    `seed` fija la semilla de SUMO (reproducibilidad); sin ella SUMO usa la
+    del .sumocfg o la por defecto y la corrida NO es semilla-controlada.
+    """
     sumo_bin = sumolib.checkBinary('sumo')
-    traci.start([sumo_bin, '-c', str(ruta_cfg), '--start', '--quit-on-end',
-                 '--no-warnings', 'true'])
+    cmd = [sumo_bin, '-c', str(ruta_cfg), '--start', '--quit-on-end',
+           '--no-warnings', 'true']
+    if seed is not None:
+        cmd += ['--seed', str(int(seed))]
+    traci.start(cmd)
 
 
 def _forzar_tiempo_fijo(t_verde: float = 30.0):
@@ -101,7 +109,10 @@ def _metricas_instante(ts: datetime, num_int: int) -> Tuple[MetricasRed, int, in
         vavg_ms = suma_vel_ms / n_veh
         vavg = vavg_ms * 3.6  # km/h
         ql_red = halting / n_veh
-        # ICV de red: mezcla de fracción detenida y caída de velocidad (real)
+        # ICV_red: PROXY de red de 2 términos (fracción detenida + caída de
+        # velocidad). NO es el ICV de 4 componentes del núcleo (ese opera por
+        # intersección dentro del lazo de control); al reportarlo debe
+        # etiquetarse como "ICV de red (proxy)" para no confundirlos.
         icv_red = 0.5 * ql_red + 0.5 * (1.0 - min(1.0, vavg_ms / VEL_LIBRE_MS))
     else:
         vavg = 0.0
@@ -126,6 +137,100 @@ def _metricas_instante(ts: datetime, num_int: int) -> Tuple[MetricasRed, int, in
         intersecciones_congestionadas=congestionadas,
     )
     return metrica, halting, arrived
+
+
+class ContadorCruces:
+    """FLUJO REAL por carril: vehículos que SALEN del carril (cruzan la línea
+    de parada / avanzan al siguiente tramo) contados por diferencia de
+    conjuntos de IDs, agregados en una ventana móvil.
+
+    Corrige el cálculo anterior, que usaba vehículos PRESENTES por paso: con
+    Δt≈1 s, 1 solo vehículo presente ya daba 60 veh/min y saturaba el cap de
+    30 veh/min del ICV, dejando el término de flujo constante. Aquí el flujo
+    es un conteo de CRUCES por ventana temporal (misma técnica que el
+    acumulador de Webster en comparacion_multibaseline).
+
+    `actualizar()` debe llamarse UNA vez por paso de simulación.
+    """
+
+    def __init__(self, lanes: List[str], ventana_s: int = 60):
+        lanes = list(dict.fromkeys(lanes))
+        self.ventana = max(1, int(ventana_s))
+        self.vistos = {ln: set() for ln in lanes}
+        self.hist = {ln: deque(maxlen=self.ventana) for ln in lanes}
+        self.fallos_sensor = 0   # lecturas TraCI fallidas (trazabilidad)
+
+    def actualizar(self):
+        for ln, antes in self.vistos.items():
+            try:
+                ahora = set(traci.lane.getLastStepVehicleIDs(ln))
+            except Exception:
+                self.fallos_sensor += 1
+                ahora = set()
+            self.hist[ln].append(len(antes - ahora))
+            self.vistos[ln] = ahora
+
+    def flujo_veh_min(self, lanes: List[str]) -> float:
+        """veh/min que cruzaron los carriles dados en la ventana móvil."""
+        total = 0
+        seg = 0
+        for ln in lanes:
+            h = self.hist.get(ln)
+            if h:
+                total += sum(h)
+                seg = max(seg, len(h))
+        return (total / seg) * 60.0 if seg else 0.0
+
+
+# ----------------------------------------------------------------------
+# Transición segura entre fases (compartido por difuso_ia y max-pressure)
+# ----------------------------------------------------------------------
+def _estado_ambar(estado_actual: str, estado_objetivo: str) -> str:
+    """Estado de ámbar SINTÉTICO cuando el programa del TLS no trae fase 'y':
+    toda señal que pierde el verde pasa a 'y'; el resto conserva su color.
+    Garantiza que nunca haya un cambio directo verde->verde sin despeje.
+    """
+    out = []
+    for a, b in zip(estado_actual, estado_objetivo):
+        out.append('y' if (a in 'Gg' and b not in 'Gg') else a)
+    return ''.join(out)
+
+
+def _fase_todo_rojo_tras(logic, idx_ambar: int) -> Optional[int]:
+    """Índice de la fase de despeje (todo-rojo) inmediatamente posterior al
+    ámbar, si el programa la define (sin 'g' ni 'y'). El controlador debe
+    servirla en vez de saltar directo al verde objetivo."""
+    n = len(logic.phases)
+    j = (idx_ambar + 1) % n
+    st = logic.phases[j].state.lower()
+    if 'g' not in st and 'y' not in st:
+        return j
+    return None
+
+
+def _eventos_paso() -> dict:
+    """Eventos de VALIDEZ del paso actual (auditoría del experimento):
+    - teleports: vehículos que SUMO teletransporta (gridlock 'rescatado';
+      --time-to-teleport). Si difieren mucho entre estrategias, sesgan
+      demora/throughput y deben reportarse.
+    - backlog: vehículos pendientes de inserción (la red no los admite);
+      no aparecen en getIDList y por eso NO cuentan en la demora por halting.
+    - departed: vehículos insertados este paso (denominador honesto de la
+      demora por vehículo).
+    """
+    try:
+        tele = int(traci.simulation.getStartingTeleportNumber())
+    except Exception:
+        tele = 0
+    try:
+        backlog = len(traci.simulation.getPendingVehicles())
+    except Exception:
+        backlog = 0
+    try:
+        dep = int(traci.simulation.getDepartedNumber())
+    except Exception:
+        dep = 0
+    return {'teleports': tele, 'backlog': backlog, 'departed': dep}
 
 
 def _mapear_semaforos() -> dict:
@@ -171,8 +276,16 @@ def _mapear_semaforos() -> dict:
     return info
 
 
-def _demanda_fase(lanes, calc_icv) -> Tuple[float, float]:
+def _demanda_fase(lanes, calc_icv,
+                  medidor: Optional[ContadorCruces] = None) -> Tuple[float, float]:
     """ICV y PI (eficiencia) reales de una fase desde sus carriles entrantes.
+
+    DEFINICIÓN ÚNICA DE FLUJO: vehículos que CRUZAN (salen del carril) por
+    ventana temporal, medidos por `medidor` (ContadorCruces). El cálculo
+    anterior usaba vehículos PRESENTES/Δt y saturaba el cap de 30 veh/min con
+    un solo vehículo, dejando el término de flujo del ICV constante (bug).
+    Sin medidor, el flujo se reporta 0 (término neutro) en vez de inventar
+    un valor saturado.
 
     PI sigue la idea del Cap. 6 (PI = Vavg_movimiento / detenidos): es ALTO en
     flujo libre (eficiente) y BAJO bajo congestión (ineficiente). Se acota a
@@ -196,8 +309,7 @@ def _demanda_fase(lanes, calc_icv) -> Tuple[float, float]:
         except Exception:
             continue
     vel_mov = sum(vels) / len(vels) if vels else 0.0
-    paso_s = max(1.0, traci.simulation.getDeltaT())
-    flujo = (n_total / paso_s) * 60.0
+    flujo = medidor.flujo_veh_min(lanes) if medidor is not None else 0.0
     icv = calc_icv.calcular(
         longitud_cola=cola_m,
         velocidad_promedio=vel_mov,
@@ -214,7 +326,8 @@ def _demanda_fase(lanes, calc_icv) -> Tuple[float, float]:
 def _redistribuir_verde(info: dict, calc_icv: CalculadorICV,
                         difuso: ControladorDifusoCapitulo6,
                         ema: dict = None, alpha: float = 0.4,
-                        gamma: float = 2.0):
+                        gamma: float = 2.0,
+                        medidor: Optional[ContadorCruces] = None):
     """Control adaptativo POR DIRECCIÓN: reparte el MISMO presupuesto de verde
     del ciclo entre las fases proporcionalmente a su demanda difusa. El ciclo
     total NO cambia (comparación justa); las fases congestionadas reciben más
@@ -235,7 +348,7 @@ def _redistribuir_verde(info: dict, calc_icv: CalculadorICV,
             # Verde deseado por fase según ICV+PI reales -> difusa Mamdani
             deseados = []
             for g in gps:
-                icv, pi = _demanda_fase(g['lanes'], calc_icv)
+                icv, pi = _demanda_fase(g['lanes'], calc_icv, medidor=medidor)
                 delta = difuso.calcular_ajuste_verde(icv=icv, pi=pi, ev=0.0)['delta_t_porcentaje']
                 d = difuso.calcular_tiempo_verde_ajustado(
                     T_base=g['base'], delta_t_porcentaje=delta)
@@ -285,7 +398,11 @@ def _redistribuir_verde(info: dict, calc_icv: CalculadorICV,
                 ph.minDur = float(nv)
                 ph.maxDur = float(nv)
             traci.trafficlight.setProgramLogic(tls, logic)
-        except Exception:
+        except Exception as e:
+            # El control de este TLS falló: se conserva el programa previo
+            # (estado seguro conocido) y el fallo queda TRAZADO, no oculto.
+            logger.warning(f"[difuso] fallo de control en TLS {tls}: "
+                           f"{type(e).__name__}: {e}")
             continue
 
 
@@ -308,8 +425,9 @@ def ejecutar_comparacion_real(
     max_tls_adaptativo: int = None,
     gamma: float = 5.0,
     alpha: float = 0.35,
+    seed: Optional[int] = None,
 ) -> Tuple[List[MetricasRed], List[MetricasRed], dict]:
-    """Ejecuta las dos simulaciones reales.
+    """Ejecuta las dos simulaciones reales (misma semilla si se indica).
 
     Devuelve (metricas_fijo, metricas_adapt, resumen) donde `resumen` tiene
     métricas de desempeño global por estrategia: throughput y demora media.
@@ -317,7 +435,7 @@ def ejecutar_comparacion_real(
     params = ParametrosInterseccion()
 
     # ---- Corrida 1: TIEMPO FIJO ----
-    _iniciar(ruta_cfg)
+    _iniciar(ruta_cfg, seed=seed)
     n_int = len(traci.trafficlight.getIDList())
     _forzar_tiempo_fijo(t_verde=30.0)
     metricas_fijo: List[MetricasRed] = []
@@ -335,11 +453,13 @@ def ejecutar_comparacion_real(
     # ---- Corrida 2: ADAPTATIVO (ICV + difusa Mamdani Cap.6, por dirección) ----
     calc_icv = CalculadorICV(params)
     difuso = ControladorDifusoCapitulo6()
-    _iniciar(ruta_cfg)
+    _iniciar(ruta_cfg, seed=seed)
     # Partimos del MISMO programa estático que el fijo y mapeamos sus fases,
     # así el presupuesto de verde por ciclo es idéntico al del caso base.
     _forzar_tiempo_fijo(t_verde=30.0)
     info = _mapear_semaforos()
+    medidor = ContadorCruces([l for d in info.values()
+                              for g in d['fases_verdes'] for l in g['lanes']])
     ema = {}  # PALANCA 1: estado de suavizado por semáforo
     metricas_adapt: List[MetricasRed] = []
     demora_a = 0
@@ -347,9 +467,11 @@ def ejecutar_comparacion_real(
     base2 = datetime.now()
     for i in range(pasos):
         traci.simulationStep()
+        medidor.actualizar()
         if i % intervalo_control == 0:
             _redistribuir_verde(info, calc_icv, difuso,
-                                ema=ema, alpha=alpha, gamma=gamma)
+                                ema=ema, alpha=alpha, gamma=gamma,
+                                medidor=medidor)
         met, halting, arrived = _metricas_instante(base2 + timedelta(seconds=i), n_int)
         metricas_adapt.append(met)
         demora_a += halting

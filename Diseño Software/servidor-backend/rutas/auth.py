@@ -7,7 +7,7 @@ Rutas de Autenticación y Auditoría
 """
 
 from fastapi import APIRouter, HTTPException, Request, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from config import settings
 from seguridad.usuarios import autenticar
@@ -19,8 +19,12 @@ router = APIRouter(prefix="/api/auth", tags=["Autenticación"])
 
 
 class LoginRequest(BaseModel):
-    username: str
-    password: str
+    username: str = Field(
+        min_length=1,
+        max_length=64,
+        pattern=r"^[A-Za-z0-9_.@-]+$",
+    )
+    password: str = Field(min_length=1, max_length=256)
 
 
 @router.post("/login")

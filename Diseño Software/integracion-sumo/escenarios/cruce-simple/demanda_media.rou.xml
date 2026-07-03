@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Demanda MEDIA (constante). Flujos de inserción Bernoulli (`probability` =
+prob. de insertar un vehículo por segundo): la REALIZACIÓN depende de la
+semilla (sumo (dash)(dash)seed), que es la fuente de variabilidad entre corridas.
+-->
+<routes>
+    <vType id="coche" accel="2.6" decel="4.5" length="5.0" minGap="2.5"
+           maxSpeed="16.67" speedDev="0.10" sigma="0.5"/>
+
+    <!-- Eje Norte-Sur: pasadas -->
+    <flow id="ns_th" type="coche" begin="0" end="3600" probability="0.10" from="N_C" to="C_S" departLane="best" departSpeed="max"/>
+    <flow id="sn_th" type="coche" begin="0" end="3600" probability="0.10" from="S_C" to="C_N" departLane="best" departSpeed="max"/>
+    <!-- Eje Este-Oeste: pasadas -->
+    <flow id="ew_th" type="coche" begin="0" end="3600" probability="0.08" from="E_C" to="C_W" departLane="best" departSpeed="max"/>
+    <flow id="we_th" type="coche" begin="0" end="3600" probability="0.08" from="W_C" to="C_E" departLane="best" departSpeed="max"/>
+    <!-- Giros (derecha/izquierda por acceso) -->
+    <flow id="n_r" type="coche" begin="0" end="3600" probability="0.03" from="N_C" to="C_W" departLane="best" departSpeed="max"/>
+    <flow id="n_l" type="coche" begin="0" end="3600" probability="0.02" from="N_C" to="C_E" departLane="best" departSpeed="max"/>
+    <flow id="s_r" type="coche" begin="0" end="3600" probability="0.03" from="S_C" to="C_E" departLane="best" departSpeed="max"/>
+    <flow id="s_l" type="coche" begin="0" end="3600" probability="0.02" from="S_C" to="C_W" departLane="best" departSpeed="max"/>
+    <flow id="e_r" type="coche" begin="0" end="3600" probability="0.03" from="E_C" to="C_N" departLane="best" departSpeed="max"/>
+    <flow id="e_l" type="coche" begin="0" end="3600" probability="0.02" from="E_C" to="C_S" departLane="best" departSpeed="max"/>
+    <flow id="w_r" type="coche" begin="0" end="3600" probability="0.03" from="W_C" to="C_S" departLane="best" departSpeed="max"/>
+    <flow id="w_l" type="coche" begin="0" end="3600" probability="0.02" from="W_C" to="C_N" departLane="best" departSpeed="max"/>
+</routes>

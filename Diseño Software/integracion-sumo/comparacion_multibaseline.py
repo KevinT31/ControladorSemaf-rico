@@ -30,6 +30,7 @@ import csv
 import logging
 import random
 import statistics as st
+import subprocess
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple
@@ -54,6 +55,29 @@ VEL_LIBRE_MS = 13.89  # ~50 km/h
 
 T_MIN = float(_LIM.T_VERDE_MIN)   # 10 s
 T_MAX = float(_LIM.T_VERDE_MAX)   # 120 s
+TIME_TO_TELEPORT = 300            # s: SUMO teletransporta vehículos atascados
+                                  # más de esto (rescata gridlock). Se REPORTA
+                                  # el número de teleports por corrida porque
+                                  # sesga demora/throughput si difiere entre
+                                  # estrategias.
+
+
+def _git_hash() -> str:
+    """Hash corto del commit actual (trazabilidad del experimento)."""
+    try:
+        return subprocess.check_output(
+            ['git', 'rev-parse', '--short', 'HEAD'], cwd=str(_RAIZ),
+            stderr=subprocess.DEVNULL, text=True).strip()
+    except Exception:
+        return ''
+
+
+def _pct(vals: List[float], p: float) -> float:
+    """Percentil p (0-1) por orden simple (suficiente para reporte)."""
+    if not vals:
+        return 0.0
+    s = sorted(vals)
+    return float(s[min(len(s) - 1, int(p * len(s)))])
 
 
 # ----------------------------------------------------------------------
@@ -63,7 +87,7 @@ def _iniciar(ruta_cfg: str, seed: int, actuated: bool = False):
     sumo_bin = sumolib.checkBinary('sumo')
     cmd = [sumo_bin, '-c', str(ruta_cfg), '--start', '--quit-on-end',
            '--no-warnings', 'true', '--seed', str(seed),
-           '--time-to-teleport', '300']
+           '--time-to-teleport', str(TIME_TO_TELEPORT)]
     traci.start(cmd)
 
 
@@ -119,7 +143,8 @@ def _acumular_webster(info: dict, estado: dict):
             for lane in g['lanes']:
                 try:
                     ahora = set(traci.lane.getLastStepVehicleIDs(lane))
-                except Exception:
+                except Exception as e:
+                    logger.debug(f'[webster] carril ilegible {lane}: {e}')
                     ahora = set()
                 antes = st_tls['vistos'].get(lane, set())
                 st_tls['count'][lane] = st_tls['count'].get(lane, 0) + len(antes - ahora)
@@ -168,7 +193,9 @@ def _aplicar_webster(info: dict, estado: dict, update_freq: int,
             traci.trafficlight.setProgramLogic(tls, logic)
             # reiniciar ventana
             estado[tls]['count'] = {l: 0 for g in gps for l in g['lanes']}
-        except Exception:
+        except Exception as e:
+            logger.warning(f'[webster] fallo de control en TLS {tls}: '
+                           f'{type(e).__name__}: {e}')
             continue
 
 
@@ -203,27 +230,43 @@ def _init_maxpressure(info: dict) -> dict:
                 vueltas += 1
             amber_de[g['idx']] = j if 'y' in logic.phases[j].state.lower() else None
         estado[tls] = {'t': 0, 'fase_idx': gps[0]['idx'], 'amber_de': amber_de,
-                       'pendiente': None}
+                       'trans': []}
     return estado
+
+
+def _aplicar_trans_mp(tls: str, tipo: str, val, dur: float, stt: dict):
+    """Aplica un paso de transición de max-pressure (fase/estado/verde)."""
+    if tipo == 'fase':
+        traci.trafficlight.setPhase(tls, int(val))
+        traci.trafficlight.setPhaseDuration(tls, float(dur))
+    elif tipo == 'estado':
+        traci.trafficlight.setRedYellowGreenState(tls, str(val))
+    else:  # 'verde'
+        traci.trafficlight.setPhase(tls, int(val))
+        traci.trafficlight.setPhaseDuration(tls, float(dur))
+        stt['fase_idx'] = int(val)
+    stt['t'] = dur
 
 
 def _paso_maxpressure(info: dict, estado: dict, green_t: float = 12.0,
                       yellow_t: float = 3.0):
-    """Cada paso: por semáforo, mantiene fase; al expirar elige la de mayor presión."""
+    """Cada paso: por semáforo, mantiene fase; al expirar elige la de mayor presión.
+
+    Transición SEGURA idéntica a la del controlador propuesto: siempre ámbar
+    entre verdes distintos (sintetizado si el programa no trae fase 'y') y
+    respeto del todo-rojo que el programa defina. Así la comparación no
+    favorece a nadie en el manejo de transiciones.
+    """
     for tls, d in info.items():
         try:
             stt = estado[tls]
             stt['t'] -= 1
             if stt['t'] > 0:
                 continue
-            # ¿hay un verde pendiente tras el ámbar?
-            if stt['pendiente'] is not None:
-                idx_v, dur = stt['pendiente']
-                traci.trafficlight.setPhase(tls, idx_v)
-                traci.trafficlight.setPhaseDuration(tls, dur)
-                stt['t'] = dur
-                stt['fase_idx'] = idx_v
-                stt['pendiente'] = None
+            # ¿pasos de transición pendientes (ámbar/todo-rojo/verde)?
+            if stt['trans']:
+                tipo, val, dur = stt['trans'].pop(0)
+                _aplicar_trans_mp(tls, tipo, val, dur, stt)
                 continue
             gps = d['fases_verdes']
             presiones = []
@@ -238,20 +281,36 @@ def _paso_maxpressure(info: dict, estado: dict, green_t: float = 12.0,
                 cand = [i for i, p in enumerate(presiones) if p == mejor]
                 k = random.choice(cand)
             objetivo = gps[k]['idx']
-            actual = traci.trafficlight.getPhase(tls)
-            if objetivo != stt['fase_idx'] and objetivo != actual:
+            if objetivo != stt['fase_idx']:
+                logic = d['logic']
+                trans = []
                 amber = stt['amber_de'].get(stt['fase_idx'])
                 if amber is not None:
-                    traci.trafficlight.setPhase(tls, amber)
-                    traci.trafficlight.setPhaseDuration(tls, yellow_t)
-                    stt['t'] = yellow_t
-                    stt['pendiente'] = (objetivo, green_t)
-                    continue
+                    trans.append(('fase', amber, yellow_t))
+                    allred = C._fase_todo_rojo_tras(logic, amber)
+                    if allred is not None:
+                        dur_ar = max(float(logic.phases[allred].duration),
+                                     _LIM.T_TODO_ROJO_MIN)
+                        trans.append(('fase', allred, dur_ar))
+                else:
+                    # programa sin fase 'y': ámbar SINTÉTICO, nunca cambio
+                    # directo verde->verde (antes era un hueco de seguridad)
+                    est_act = logic.phases[stt['fase_idx']].state
+                    est_obj = logic.phases[objetivo].state
+                    trans.append(('estado', C._estado_ambar(est_act, est_obj),
+                                  yellow_t))
+                trans.append(('verde', objetivo, green_t))
+                tipo, val, dur = trans.pop(0)
+                _aplicar_trans_mp(tls, tipo, val, dur, stt)
+                stt['trans'] = trans
+                continue
             traci.trafficlight.setPhase(tls, objetivo)
             traci.trafficlight.setPhaseDuration(tls, green_t)
             stt['t'] = green_t
             stt['fase_idx'] = objetivo
-        except Exception:
+        except Exception as e:
+            logger.warning(f'[maxpressure] fallo de control en TLS {tls}: '
+                           f'{type(e).__name__}: {e}')
             continue
 
 
@@ -259,12 +318,17 @@ def _paso_maxpressure(info: dict, estado: dict, green_t: float = 12.0,
 # Runner genérico de una estrategia
 # ----------------------------------------------------------------------
 def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
-                        intervalo: int = 25, webster_freq: int = 150) -> dict:
+                        intervalo: int = 25, webster_freq: int = 150,
+                        params_ia: dict = None) -> dict:
     """Corre una estrategia sobre (cfg, seed) y devuelve métricas agregadas reales."""
     random.seed(seed)
     params = ParametrosInterseccion()
     es_actuated = (estrategia == 'actuated')
     _iniciar(ruta_cfg, seed, actuated=es_actuated)
+    try:
+        sumo_version = traci.getVersion()[1]
+    except Exception:
+        sumo_version = ''
 
     n_int = len(traci.trafficlight.getIDList())
 
@@ -278,7 +342,15 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
     # preparación por estrategia
     estado = None
     calc_icv = difuso = None
+    ctrl_ia = None
+    medidor = None
     ema = {}
+    if estrategia in ('difuso', 'difuso_ia'):
+        # flujo REAL (cruces por ventana) para el término de flujo del ICV;
+        # sustituye el conteo de presentes que saturaba el cap (bug corregido)
+        medidor = C.ContadorCruces([l for dd in info.values()
+                                    for g in dd['fases_verdes']
+                                    for l in g['lanes']])
     if estrategia in ('webster', 'webster_mod'):
         estado = _init_webster(info)
     elif estrategia == 'maxpressure':
@@ -286,16 +358,28 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
     elif estrategia == 'difuso':
         calc_icv = CalculadorICV(params)
         difuso = ControladorDifusoCapitulo6()
+    elif estrategia == 'difuso_ia':
+        import difuso_ia as DIA
+        p_ia = dict(params_ia or {})
+        p_ia.setdefault('serie_prefix', f's{seed}')
+        p_ia.setdefault('medidor_flujo', medidor)
+        ctrl_ia = DIA.ControladorDifusoIA(info, p_ia)
 
     metricas: List = []
     demora_total = 0
     arrivals = 0
     travel = []
     depart_t: Dict[str, int] = {}
+    teleports = 0
+    backlog_sum = 0
+    backlog_max = 0
+    departed = 0
     base = datetime.now()
 
     for i in range(pasos):
         traci.simulationStep()
+        if medidor is not None:
+            medidor.actualizar()
 
         # tiempos de viaje por vehículo (MOE principal, como Genders 2019)
         try:
@@ -318,7 +402,9 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
         elif estrategia == 'difuso':
             if i % intervalo == 0:
                 C._redistribuir_verde(info, calc_icv, difuso, ema=ema,
-                                      alpha=0.35, gamma=5.0)
+                                      alpha=0.35, gamma=5.0, medidor=medidor)
+        elif estrategia == 'difuso_ia':
+            ctrl_ia.paso(i)
         # 'fijo' y 'actuated' no requieren intervención por paso
 
         met, halting, arrived = C._metricas_instante(base + timedelta(seconds=i), n_int)
@@ -326,6 +412,15 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
         demora_total += halting
         arrivals += arrived
 
+        # auditoría de validez: teleports y backlog de inserción
+        ev = C._eventos_paso()
+        teleports += ev['teleports']
+        backlog_sum += ev['backlog']
+        backlog_max = max(backlog_max, ev['backlog'])
+        departed += ev['departed']
+
+    if ctrl_ia is not None:
+        ctrl_ia.cerrar()
     traci.close()
 
     def _ag(attr):
@@ -333,47 +428,106 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
         return st.mean(vals) if vals else 0.0
 
     res = {
+        # ICV_red es el PROXY de red de 2 términos de _metricas_instante
+        # (fracción detenida + caída de velocidad), NO el ICV de 4 componentes
+        # del núcleo (ese vive dentro del lazo de control por intersección).
         'ICV_red': _ag('ICV_red'),
         'Vavg_red': _ag('Vavg_red'),
         'QL_red': _ag('QL_red'),
         'q_red': _ag('q_red'),
         'throughput': arrivals,
+        # demora_media_s: veh·s detenidos / ARRIBOS (métrica histórica; ojo:
+        # castiga doble a la estrategia con menos throughput). Se mantiene por
+        # continuidad con resultados previos.
         'demora_media_s': (demora_total / arrivals) if arrivals else 0.0,
+        # demora_media_veh_s: veh·s detenidos / vehículos INSERTADOS
+        # (denominador honesto e igual entre estrategias pareadas).
+        'demora_media_veh_s': (demora_total / departed) if departed else 0.0,
+        'demora_total_veh_s': demora_total,
         'tviaje_media_s': st.mean(travel) if travel else 0.0,
         'tviaje_mediana_s': st.median(travel) if travel else 0.0,
+        'tviaje_p90_s': _pct(travel, 0.90),
+        'tviaje_p95_s': _pct(travel, 0.95),
         'tviaje_sd_s': st.pstdev(travel) if len(travel) > 1 else 0.0,
         'n_arribos': arrivals,
+        'vehiculos_insertados': departed,
+        # teleports: gridlock "rescatado" por SUMO (--time-to-teleport);
+        # si difiere entre estrategias, el throughput/demora está sesgado.
+        'teleports': teleports,
+        'backlog_medio': backlog_sum / pasos if pasos else 0.0,
+        'backlog_max': backlog_max,
+        'sumo_version': sumo_version,
     }
+    if medidor is not None:
+        res['fallos_sensor_flujo'] = medidor.fallos_sensor
+    if ctrl_ia is not None:
+        res['ia'] = ctrl_ia.resumen_ia()
     return res
 
 
 # ----------------------------------------------------------------------
 # Campaña completa: todas las estrategias x N semillas
 # ----------------------------------------------------------------------
-ESTRATEGIAS = ['fijo', 'actuated', 'webster', 'webster_mod', 'maxpressure', 'difuso']
+ESTRATEGIAS = ['fijo', 'actuated', 'webster', 'webster_mod', 'maxpressure',
+               'difuso', 'difuso_ia']
+
+
+def _params_difuso_ia_efectivos(params_ia: dict = None) -> dict:
+    """Parámetros difuso_ia REALMENTE usados (serializables), para el JSON."""
+    import difuso_ia as DIA
+    p = dict(DIA.PARAMS_DEFECTO)
+    p.update(params_ia or {})
+    return {k: v for k, v in p.items()
+            if k not in ('recolector', 'medidor_flujo', 'log_ia')}
 
 
 def ejecutar_campana(ruta_cfg: str, semillas: List[int], pasos: int = 700,
-                     intervalo: int = 25, estrategias: List[str] = None) -> dict:
+                     intervalo: int = 25, estrategias: List[str] = None,
+                     params_ia: dict = None) -> dict:
     estrategias = estrategias or ESTRATEGIAS
     salida = {'generado': datetime.now().isoformat(),
               'cfg': Path(ruta_cfg).name, 'pasos': pasos,
               'intervalo_control': intervalo, 'semillas': semillas,
               'motor': 'libsumo' if USANDO_LIBSUMO else 'traci',
-              'limites_verde': [T_MIN, T_MAX], 'por_estrategia': {}}
+              'limites_verde': [T_MIN, T_MAX],
+              # metadatos de reproducibilidad
+              'git_hash': _git_hash(),
+              'time_to_teleport': TIME_TO_TELEPORT,
+              'params_estrategia': {
+                  'fijo': {'t_verde': 30.0},
+                  'actuated': {'minDur': T_MIN, 'maxDur': 60.0},
+                  'webster': {'freq_s': 150, 'sat_flow': 0.44, 'Y_max': 0.85},
+                  'webster_mod': {'freq_s': 150, 'sat_flow': 0.44,
+                                  'Y_max': 0.85, 'akcelik': True},
+                  'maxpressure': {'green_t': 12.0, 'yellow_t': 3.0},
+                  'difuso': {'intervalo': intervalo, 'alpha': 0.35,
+                             'gamma': 5.0, 't_verde_base': 30.0},
+                  'difuso_ia': _params_difuso_ia_efectivos(params_ia),
+              },
+              'por_estrategia': {}}
     for est in estrategias:
         reps = []
         for s in semillas:
             try:
-                r = ejecutar_estrategia(ruta_cfg, s, pasos, est, intervalo)
+                r = ejecutar_estrategia(ruta_cfg, s, pasos, est, intervalo,
+                                        params_ia=params_ia)
                 r['seed'] = s
                 reps.append(r)
+                if not salida.get('sumo_version'):
+                    salida['sumo_version'] = r.get('sumo_version', '')
                 print(f"[{est:12s} seed {s:>3}] ICV={r['ICV_red']:.4f} "
                       f"Vavg={r['Vavg_red']:.2f} demora={r['demora_media_s']:.1f} "
-                      f"tviaje={r['tviaje_media_s']:.1f} thr={r['throughput']}",
+                      f"tviaje={r['tviaje_media_s']:.1f} thr={r['throughput']} "
+                      f"tele={r['teleports']}",
                       flush=True)
             except Exception as e:
-                print(f"[{est} seed {s}] ERROR: {e}", flush=True)
+                # la corrida fallida queda registrada EXPLÍCITAMENTE: una
+                # estrategia con n_semillas menor es visible en el agregado
+                print(f"[{est} seed {s}] ERROR: {type(e).__name__}: {e}",
+                      flush=True)
+                salida.setdefault('corridas_fallidas', []).append(
+                    {'estrategia': est, 'seed': s,
+                     'error': f'{type(e).__name__}: {e}'})
                 try:
                     traci.close()
                 except Exception:
@@ -386,7 +540,9 @@ def _agregar(reps: List[dict]) -> dict:
     if not reps:
         return {}
     keys = ['ICV_red', 'Vavg_red', 'QL_red', 'q_red', 'throughput',
-            'demora_media_s', 'tviaje_media_s', 'tviaje_mediana_s']
+            'demora_media_s', 'demora_media_veh_s', 'tviaje_media_s',
+            'tviaje_mediana_s', 'tviaje_p90_s', 'tviaje_p95_s',
+            'teleports', 'backlog_medio']
     out = {}
     for k in keys:
         vals = [r[k] for r in reps if k in r]

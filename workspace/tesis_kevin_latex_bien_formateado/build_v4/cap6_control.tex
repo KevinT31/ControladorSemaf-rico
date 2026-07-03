@@ -260,18 +260,26 @@ ICV(l,t) =
 0, & \text{si } N_{total}(l,t)=0\\[6pt]
 w_{1}\dfrac{SC(l,t)}{SC_{MAX}}
 + w_{2}\!\left(1-\dfrac{V_{avg}(l,t)}{V_{MAX}}\right)
-+ w_{3}\!\left(1-\dfrac{q(l,t)}{q_{MAX}}\right)
++ w_{3}\dfrac{q(l,t)}{q_{MAX}}
 + w_{4}\dfrac{k(l,t)}{k_{MAX}}, & \text{si } N_{total}(l,t)>0
 \end{cases}
 \]
 
-La compuerta por demanda ($ICV=0$ cuando no hay vehículos) es necesaria porque un flujo bajo
-es ambiguo: una vía vacía y una vía bloqueada producen ambas $q\approx 0$, pero solo la segunda
-está congestionada. Al condicionar el índice a la presencia de vehículos detectados, el término
-$1-q/q_{MAX}$ mide \emph{demanda insatisfecha} y no penaliza la simple ausencia de demanda. La
-restricción de convexidad $\sum_{i=1}^{4}w_{i}=1$, $w_{i}\geq 0$, garantiza que el ICV sea una
-combinación convexa de términos acotados en $[0,1]$ y, por lo tanto, quede acotado en $[0,1]$
-sin reescalamiento posterior.
+En esta formulación $q_{MAX}$ es el flujo de saturación del acceso, de modo que el término
+$q/q_{MAX}$ es el \emph{grado de saturación} (razón volumen--capacidad), un indicador clásico de
+congestión en ingeniería de tránsito: cuanto más se aproxima el flujo servido a la capacidad del
+acceso, mayor es la presión de demanda y el término crece hacia $1$. Así, los cuatro sumandos
+aumentan de forma coherente con la congestión ---cola detenida, retención de velocidad, grado de
+saturación y ocupación espacial---, tal como confirman los casos de prueba de la
+Sección~\ref{subsec:icv-casos} y el análisis de sensibilidad de la
+Sección~\ref{subsec:icv-sensibilidad}, donde un aumento del flujo eleva el ICV. La compuerta por
+demanda ($ICV=0$ cuando no hay vehículos) resuelve la ambigüedad del flujo bajo: una vía vacía y
+una vía bloqueada producen ambas $q\approx 0$, pero solo la segunda está congestionada; al
+condicionar el índice a la presencia de vehículos detectados, la vía vacía no registra congestión,
+mientras que la vía bloqueada queda correctamente capturada por los términos de cola, velocidad y
+densidad. La restricción de convexidad $\sum_{i=1}^{4}w_{i}=1$, $w_{i}\geq 0$, garantiza que el
+ICV sea una combinación convexa de términos acotados en $[0,1]$ y, por lo tanto, quede acotado en
+$[0,1]$ sin reescalamiento posterior.
 
 \subsection{Pesos, verificación por AHP y parámetros}\label{subsec:icv-pesos}
 
@@ -376,7 +384,7 @@ la verificación por AHP: las variables de mayor peso son también las de mayor 
   \fuente{Elaboración propia, a partir de los resultados de cálculo del repositorio.}
 \end{table}
 
-\subsection{Validación de la cadena cámara\,$\rightarrow$\,ICV con video real}\label{subsec:icv-video}
+\subsection{Prueba funcional de la cadena cámara\,$\rightarrow$\,ICV con video real}\label{subsec:icv-video}
 
 Más allá de los casos sintéticos, la cadena completa cámara\,$\rightarrow$\,conteo/
 velocidad/cola\,$\rightarrow$\,ICV se probó \emph{funcionalmente} sobre \emph{video real} de una
@@ -513,13 +521,14 @@ La Tabla~\ref{tab:reglas-difusas} resume la base de reglas.
 
 \subsection{Mecanismo de inferencia y defuzzificación}\label{subsec:fuzzy-inferencia}
 
-La inferencia recorre las cuatro etapas del método de Mamdani. La \textbf{fuzzificación}
-evalúa los grados de pertenencia de ICV, PI y EV. La \textbf{aplicación de reglas} obtiene el
-grado de disparo de cada regla de antecedente conjuntivo mediante la t-norma del mínimo,
-$\alpha_i=\min(\mu_{1},\ldots,\mu_{n})$. La \textbf{agregación} funde los consecuentes
-escalados con la s-norma del máximo,
-$\mu_{\text{agregado}}(\Delta T)=\max_i\big(\alpha_i\cdot\mu_{\text{cons},i}(\Delta T)\big)$.
-Por último, la \textbf{defuzzificación} por centroide devuelve el valor nítido:
+El controlador resuelve cada decisión con inferencia de Mamdani, particularizada a sus tres
+entradas. Primero traduce ICV, PI y EV en grados de pertenencia (\textbf{fuzzificación}); luego,
+para cada regla de antecedente conjuntivo, adopta el mínimo de esos grados como nivel de
+activación, $\alpha_i=\min(\mu_{1},\ldots,\mu_{n})$. Los consecuentes ponderados por ese nivel se
+\textbf{agregan} tomando el máximo punto a punto,
+$\mu_{\text{agregado}}(\Delta T)=\max_i\big(\alpha_i\cdot\mu_{\text{cons},i}(\Delta T)\big)$, y el
+resultado difuso se convierte en un valor nítido mediante el centroide del área agregada
+(\textbf{defuzzificación}):
 \[
 \Delta T_{verde}^{*}=
 \frac{\sum_{i=1}^{M}\Delta T_i\,\mu_{\text{agregado}}(\Delta T_i)}
@@ -557,6 +566,51 @@ semafórico existente es la autoridad final} de actuación y conserva sus enclav
 separación entre recomendación y actuación se mantiene en todos los modos de operación
 (Sección~\ref{sec:modos-operacion}) y es la garantía central de que el sistema degrada de forma
 segura ante cualquier falla o entrada anómala.
+
+\subsection{Control difuso adaptativo integrado (controlador final)}\label{subsec:controlador-final}
+
+El diseño difuso descrito en las secciones anteriores se consolidó en una implementación
+ejecutable única ---el \textbf{control difuso adaptativo} que constituye el controlador
+final de esta tesis y es el que se evalúa en el Capítulo~\ref{cap:validacion}---. Su núcleo
+de decisión es la lógica difusa de Mamdani; en el repositorio de software la implementación
+recibe el identificador histórico \texttt{ControladorDifusoIA}, heredado de una etapa previa
+en la que se exploró una capa predictiva CNN--LSTM. Es importante subrayar, para evitar
+sobrestimar el papel de esa capa, que \textbf{la mejora de desempeño obtenida proviene del
+núcleo difuso endurecido y no de la predicción}: como demuestra la ablación del
+Capítulo~\ref{cap:validacion}, la CNN--LSTM permanece operativamente inactiva y activarla o
+desactivarla no altera el resultado. El motor de inferencia Mamdani de este capítulo
+conserva la responsabilidad de calcular la \emph{duración} del verde; sobre él, el
+controlador integra cinco mecanismos operativos tomados de la práctica del control actuado y
+acotados por la misma guardia de seguridad:
+
+\begin{itemize}
+  \item \textbf{Selección acíclica de fase con salto de fases vacías:} las fases se
+  recorren por rotación, pero una fase sin demanda detectada (por debajo de un umbral de
+  cola) se omite, evitando servir verdes a accesos vacíos.
+  \item \textbf{Terminación anticipada por brecha (\emph{gap-out}):} si durante el verde
+  deja de cruzar tráfico por un intervalo mayor que la brecha máxima admitida (2~s), la
+  fase termina de forma anticipada una vez cumplido el verde mínimo.
+  \item \textbf{Extensión del verde según cola:} la duración de cada verde la entrega el
+  motor difuso de Mamdani a partir del ICV y del parámetro de intensidad, acotada al rango
+  operativo $[10,45]$~s, subconjunto de los límites duros $[10,120]$~s.
+  \item \textbf{Protección anti-inanición:} ninguna fase con demanda puede esperar
+  indefinidamente; la cota de espera (45~s) se re-evalúa cada 5~s \emph{durante} el verde
+  en curso, de modo que la espera efectiva queda acotada aun cuando el verde activo sea
+  largo.
+  \item \textbf{Transiciones seguras:} todo cambio de fase atraviesa un ámbar de al menos
+  3~s ---sintetizado por el controlador cuando el programa semafórico no lo define--- y
+  sirve el todo-rojo del programa; nunca se pasa de un verde a otro verde de fases
+  incompatibles.
+\end{itemize}
+
+La capa predictiva CNN--LSTM (Sección~\ref{sec:capas-futuras}) se integra en este
+controlador únicamente como un \emph{veto opcional} sobre la decisión de salto de fase, con
+compuerta por régimen de tráfico, margen de confianza y traza de cada inferencia; su
+ausencia, desactivación o una normalización de entrada desalineada no alteran ninguno de
+los cinco mecanismos anteriores (degradación segura verificada por la suite de pruebas del
+Capítulo~\ref{cap:validacion}). Toda salida del controlador, con o sin capa predictiva,
+atraviesa la capa de límites duros y las transiciones seguras descritas en la
+Sección~\ref{subsec:fuzzy-seguridad}.
 
 \section{Modos de operación y degradación segura}\label{sec:modos-operacion}
 
@@ -636,19 +690,36 @@ estimación visual, pero no compromete la seguridad operacional del cruce. Si la
 condiciones mínimas de validez, el módulo deja de emitir nuevas recomendaciones adaptativas y conserva el
 funcionamiento seguro establecido por el controlador semafórico.
 
-\section{Capas de investigación futura: RL y CNN--LSTM}\label{sec:capas-futuras}
+\section{Capa predictiva CNN--LSTM y línea futura de aprendizaje por refuerzo}\label{sec:capas-futuras}
 
-Sobre el núcleo difuso validable se plantean dos capas de optimización y predicción de alcance
-global, alojadas en la nube. Es fundamental precisar su estatus: \textbf{ninguna de estas dos
-capas se encuentra entrenada ni validada} en esta tesis. Se documentan como diseño de trabajo
-futuro y \textbf{no constituyen condición del objetivo general}, que se demuestra íntegramente
-con el control difuso local y su verificación. Su formulación detallada --- el modelo de
-decisión de Markov, los espacios de estados y acciones, la función de recompensa y los
-protocolos de entrenamiento --- se traslada al Anexo para no recargar el cuerpo del documento;
-aquí solo se enuncian su propósito y sus limitaciones.
+Sobre el núcleo difuso validable se contemplan dos extensiones de alcance global, alojadas en la
+nube y subordinadas en todo caso a la validación local de límites y a la autoridad final del
+controlador semafórico. Difieren en su grado de madurez y es fundamental precisarlo: la
+predicción de congestión mediante CNN--LSTM se \textbf{implementó, entrenó y evaluó} como capa
+opcional ---su resultado se reporta en el Capítulo~\ref{cap:validacion}---, mientras que la
+coordinación por aprendizaje por refuerzo permanece como \textbf{diseño de trabajo futuro}, no
+entrenado. \textbf{Ninguna de las dos constituye condición del objetivo general}, que se
+demuestra íntegramente con el control difuso local y su verificación. Su formulación detallada
+---el modelo de decisión de Markov, los espacios de estados y acciones, la función de recompensa
+y los protocolos de entrenamiento--- se traslada al Anexo~B para no recargar el
+cuerpo del documento.
 
-\textbf{Optimización mediante aprendizaje por refuerzo (RL).} Se plantea un agente de
-aprendizaje por refuerzo profundo (arquitectura Actor--Critic) que, entrenado en simulación
+\textbf{Predicción de congestión mediante CNN--LSTM (capa opcional implementada).} Se implementó
+un modelo híbrido que combina una etapa convolucional ---para capturar la correlación espacial de
+la congestión entre accesos e intersecciones vecinas--- y una etapa recurrente LSTM ---para las
+dependencias temporales---, entrenado sobre series generadas en SUMO con el fin de anticipar el
+ICV a un horizonte corto. La capa se integró al controlador como módulo predictivo activable (el
+\emph{difuso predictivo}) y se sometió a una campaña pareada frente al difuso puro. El hallazgo,
+reportado con transparencia en la Sección~\ref{subsec:ia-evaluacion}, es que en la intersección
+aislada la predicción no mejora de forma estadísticamente significativa al lazo difuso reactivo;
+su beneficio esperable corresponde a escenarios coordinados con latencia de comunicación. Por
+diseño, la capa degrada de forma segura: su ausencia o una normalización de entrada desalineada
+la desactivan sin detener el control, comportamiento verificado en la suite de pruebas
+automatizadas (Sección~\ref{sec:verificacion-software}). Se conserva, por tanto, como módulo
+opcional y extensible, y no como un requisito del núcleo.
+
+\textbf{Optimización mediante aprendizaje por refuerzo (RL, trabajo futuro).} Se plantea un agente
+de aprendizaje por refuerzo profundo (arquitectura Actor--Critic) que, entrenado en simulación
 SUMO, aprendería políticas de \emph{recomendación} de ajustes de fase coordinados a nivel de
 red, integrando además la priorización de vehículos de emergencia. El sistema se modela como un
 proceso de decisión de Markov sobre un estado global que concatena los estados locales, las
@@ -656,16 +727,9 @@ métricas de red y la topología; la función de recompensa pondera throughput, 
 direcciones, priorización de emergencias y suavidad de control. Su salida sería siempre una
 recomendación sujeta a la validación local de límites y a la autoridad final del controlador.
 La limitación que impide adoptarlo como núcleo es clara: requiere conjuntos de entrenamiento,
-validación fuera de muestra y control de distribución que no están cerrados en esta tesis.
-
-\textbf{Predicción de congestión mediante CNN--LSTM.} Se plantea un modelo híbrido que combina
-redes convolucionales (para capturar la correlación espacial de la congestión entre
-intersecciones vecinas) y redes LSTM (para las dependencias temporales), con el fin de anticipar
-el ICV y el PI a un horizonte corto y habilitar acciones preventivas (alertas tempranas,
-preacondicionamiento de olas verdes). Al igual que el módulo de RL, se trata de una propuesta de
-diseño no entrenada: su validación, métricas de error y protocolo de reentrenamiento quedan como
-trabajo futuro descrito en el Anexo. Ambas capas comparten el mismo principio de seguridad: son
-módulos de soporte cuya indisponibilidad o inmadurez no compromete la operación del lazo local.
+validación fuera de muestra y control de distribución que no están cerrados en esta tesis. Ambas
+capas comparten el mismo principio de seguridad: son módulos de soporte cuya indisponibilidad o
+inmadurez no compromete la operación del lazo local.
 
 \section{Arquitectura de ciberseguridad propuesta}\label{sec:ciberseguridad}
 
@@ -678,9 +742,8 @@ Tabla~\ref{tab:amenazas} resume el modelo de amenazas y los mecanismos de mitiga
 
 \begin{landscape}
 \footnotesize
-\begin{table}[H]
-  \centering
-  \caption{Modelo de amenazas y mecanismos de mitigación propuestos.}
+\begin{center}
+  \captionof{table}{Modelo de amenazas y mecanismos de mitigación propuestos.}
   \label{tab:amenazas}
   \begin{tabular}{@{}p{3.6cm}p{3.0cm}p{3.0cm}p{1.8cm}p{5.4cm}p{3.6cm}@{}}
 \toprule
@@ -699,7 +762,7 @@ Corrupción de datos históricos & Base de datos y reportes & Pérdida de trazab
 \bottomrule
   \end{tabular}
   \fuente{Elaboración propia.}
-\end{table}
+\end{center}
 \end{landscape}
 
 La medida arquitectónica principal es la separación entre \emph{recomendación} y \emph{acción
@@ -729,8 +792,8 @@ funcionales:
   de baja latencia y el registro estático de ubicaciones GPS; Azure Data Lake almacena video y
   telemetría histórica; Azure SQL Database soporta consultas estructuradas y reportes.
 \item \textbf{Inteligencia artificial.} Azure Machine Learning aloja el entrenamiento y
-  despliegue (como \emph{endpoints} REST) de las capas experimentales de RL y CNN--LSTM
-  descritas en la Sección~\ref{sec:capas-futuras}.
+  despliegue (como \emph{endpoints} REST) de la capa predictiva CNN--LSTM y del módulo futuro de
+  aprendizaje por refuerzo descritos en la Sección~\ref{sec:capas-futuras}.
 \item \textbf{Análisis de big data.} Azure Synapse Analytics integra SQL y Apache Spark para el
   análisis histórico, la identificación de patrones recurrentes y la calibración de parámetros a
   largo plazo.

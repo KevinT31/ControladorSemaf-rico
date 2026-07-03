@@ -3,25 +3,34 @@ Configuración base de SQLAlchemy
 """
 
 from sqlalchemy import create_engine
+from sqlalchemy.engine import make_url
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
 import logging
 
+from config import settings
+
 logger = logging.getLogger(__name__)
 
 # Ruta a la base de datos
-BASE_DIR = Path(__file__).parent.parent.parent
-DB_PATH = BASE_DIR / "base-datos" / "semaforos.db"
-DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+_url = make_url(settings.DATABASE_URL)
+DB_PATH = None
+if _url.drivername.startswith("sqlite") and _url.database not in (None, "", ":memory:"):
+    DB_PATH = Path(_url.database)
+    if not DB_PATH.is_absolute():
+        DB_PATH = (settings.BASE_DIR / DB_PATH).resolve()
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    _url = _url.set(database=DB_PATH.as_posix())
 
-# URL de conexión
-DATABASE_URL = f"sqlite:///{DB_PATH}"
+DATABASE_URL = _url.render_as_string(hide_password=False)
+_CONNECT_ARGS = ({"check_same_thread": False}
+                 if _url.drivername.startswith("sqlite") else {})
 
 # Motor SQLAlchemy
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False},  # Solo para SQLite
+    connect_args=_CONNECT_ARGS,
     echo=False  # True para debug SQL
 )
 
@@ -52,7 +61,8 @@ def init_db():
     """
     Inicializa todas las tablas de la base de datos
     """
-    logger.info(f"Inicializando base de datos en: {DB_PATH}")
+    destino = str(DB_PATH) if DB_PATH else _url.render_as_string(hide_password=True)
+    logger.info(f"Inicializando base de datos en: {destino}")
 
     # Importar todos los modelos para que SQLAlchemy los registre
     from . import interseccion, metrica, ola_verde, deteccion_video, usuario, evento_auditoria

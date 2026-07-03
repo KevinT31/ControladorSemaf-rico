@@ -96,13 +96,24 @@ estado_sistema = {
 async def avanzar_sumo_automaticamente():
     """Avanza la simulación SUMO automáticamente en background"""
     logger.info("🚀 Iniciando avance automático de SUMO...")
+    # Controlador adaptativo canónico (opcional, ver CONTROL_ADAPTATIVO en
+    # config.py). Si no se puede importar, se sigue sin control (como hoy).
+    try:
+        from servicios.sumo_service import control_adaptativo
+    except Exception as e_ctrl:
+        logger.error(f"Control adaptativo no disponible: {e_ctrl}")
+        control_adaptativo = None
     while True:
         try:
             if estado_sistema.get('conector_sumo') and estado_sistema['conector_sumo'].conectado:
+                if control_adaptativo is not None:
+                    control_adaptativo.asegurar()
                 continuar = estado_sistema['conector_sumo'].simular_paso()
                 if not continuar:
                     logger.warning("⚠️  Simulación SUMO terminada")
                     break
+                if control_adaptativo is not None:
+                    control_adaptativo.paso()
                 await asyncio.sleep(0.1)  # 100ms entre pasos = velocidad 10x
             else:
                 await asyncio.sleep(1)  # Esperar si no está conectado
@@ -524,7 +535,9 @@ async def obtener_metricas(interseccion_id: str):
         'longitud_cola': estado.longitud_cola,
         'icv': resultado_icv['icv'],
         'clasificacion_icv': resultado_icv['clasificacion'],
-        'color_icv': resultado_icv['color']
+        'color_icv': resultado_icv['color'],
+        # Estas métricas provienen del SimuladorLima (sintético de demo)
+        'origen_datos': 'simulador_demo'
     }
 
 
@@ -580,7 +593,9 @@ async def obtener_metricas_red():
             'q_red': 0.0,
             'ICV_red': 0.0,
             'clasificacion_red': 'sin_trafico',
-            'mensaje': 'No hay intersecciones con trafico activo'
+            'mensaje': 'No hay intersecciones con trafico activo',
+            # Placeholder en cero: no hay medición
+            'origen_datos': 'estimado'
         }
 
     # Calcular promedios de red
@@ -608,7 +623,9 @@ async def obtener_metricas_red():
         'ICV_red': round(ICV_red, 3),
         'clasificacion_red': clasificacion_red,
         'metricas_por_interseccion': metricas_intersecciones,
-        'formula': 'Capitulo_6.3.4'
+        'formula': 'Capitulo_6.3.4',
+        # Todas estas métricas salen del SimuladorLima (sintético de demo)
+        'origen_datos': 'simulador_demo'
     }
 
 
@@ -651,6 +668,9 @@ async def cambiar_modo(modo: str, request: Request,
             
             estado_sistema['conector_sumo'].desconectar()
             estado_sistema['conector_sumo'] = None
+            # Descartar el controlador adaptativo ligado a esa conexión
+            from servicios.sumo_service import control_adaptativo
+            control_adaptativo.reset()
             logger.info("Conector SUMO desconectado")
         except:
             pass
@@ -795,10 +815,11 @@ async def obtener_trafico_sumo():
                 'vehiculos_totales': total_vehiculos,
                 'timestamp': asyncio.get_event_loop().time(),
                 'fuente': 'sumo_real',
+                'origen_datos': 'sumo',  # medición real de la simulación SUMO
                 'icv_red_promedio': round(icv_promedio, 3),
                 'flujo_promedio': round(flujo_promedio, 2)
             }
-        
+
         # SUMO no conectado: NO se generan datos sintéticos (tesis exige data real).
         # Se devuelve vacío con la razón; el frontend mostrará "esperando SUMO".
         import time
@@ -806,6 +827,7 @@ async def obtener_trafico_sumo():
             'calles': [],
             'timestamp': time.time(),
             'fuente': 'sin_datos',
+            'origen_datos': 'estimado',  # placeholder sin medición
             'mensaje': 'SUMO no conectado: sin datos de tráfico (no se simula sintéticamente).',
             'icv_red_promedio': 0.0,
             'flujo_promedio': 0.0
@@ -813,7 +835,7 @@ async def obtener_trafico_sumo():
 
     except Exception as e:
         logger.error(f"Error obteniendo tráfico SUMO: {e}")
-        return {'calles': [], 'error': str(e)}
+        return {'calles': [], 'error': str(e), 'origen_datos': 'estimado'}
 
 
 @app.get("/api/sumo/estado")
@@ -910,8 +932,8 @@ async def obtener_estado_sumo():
                 pass
             
             logger.info(f"📊 Estado SUMO: {total_vehiculos} veh, {len(calles_con_trafico)} calles activas")
-            
-            return {
+
+            respuesta = {
                 'conectado': True,
                 'gui_visible': conector_sumo.usar_gui,
                 'semaforos': len(conector_sumo.intersecciones),
@@ -921,8 +943,16 @@ async def obtener_estado_sumo():
                 'velocidad_promedio': round(velocidad_promedio, 1),
                 'congestion_promedio': round(congestion_promedio, 2),
                 'tiempo_simulado_s': tiempo_simulado_s,
-                'fuente': 'sumo_real'
+                'fuente': 'sumo_real',
+                'origen_datos': 'sumo'  # medición real de la simulación SUMO
             }
+            # Estado del controlador adaptativo canónico (si está activo)
+            try:
+                from servicios.sumo_service import control_adaptativo
+                respuesta.update(control_adaptativo.estado_api())
+            except Exception as e_ctrl:
+                logger.warning(f"No se pudo leer estado del controlador: {e_ctrl}")
+            return respuesta
         else:
             # Diagnóstico de razón de desconexión
             razon = 'desconocida'
@@ -941,11 +971,14 @@ async def obtener_estado_sumo():
             return {
                 'conectado': False,
                 'razon': razon,
-                'mensaje': 'SUMO no está conectado. Cambia a Modo SUMO para iniciar.'
+                'mensaje': 'SUMO no está conectado. Cambia a Modo SUMO para iniciar.',
+                'origen_datos': 'estimado',  # sin conexión no hay medición
+                'controlador_activo': 'ninguno'
             }
     except Exception as e:
         logger.error(f"Error obteniendo estado SUMO: {e}")
-        return {'conectado': False, 'error': str(e)}
+        return {'conectado': False, 'error': str(e),
+                'origen_datos': 'estimado', 'controlador_activo': 'ninguno'}
 
 
 @app.post("/api/video/procesar")
@@ -1371,6 +1404,9 @@ async def bucle_simulacion():
                 logger.info(f"Enviando {len(metricas_actualizadas)} métricas por WebSocket...")
                 await broadcast_mensaje({
                     'tipo': 'metricas_actualizadas',
+                    # Este bucle solo corre en modo simulador: valores sintéticos
+                    # de demostración (SimuladorLima + clamp), no mediciones.
+                    'origen_datos': 'simulador_demo',
                     'datos': metricas_actualizadas
                 })
                 logger.debug("Métricas enviadas correctamente")

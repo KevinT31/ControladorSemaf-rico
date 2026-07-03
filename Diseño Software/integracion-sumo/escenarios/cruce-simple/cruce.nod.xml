@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Escenario experimental canónico: UNA intersección semaforizada de 4 accesos
+(ejes Norte-Sur y Este-Oeste). Pensado para experimentos REPRODUCIBLES:
+la red es pequeña, versionable en git y se reconstruye con netconvert.
+
+Reconstrucción:  python generar_red.py   (o ver README del escenario)
+-->
+<nodes>
+    <node id="C" x="0.0" y="0.0" type="traffic_light" tl="C"/>
+    <node id="N" x="0.0" y="300.0" type="priority"/>
+    <node id="S" x="0.0" y="-300.0" type="priority"/>
+    <node id="E" x="300.0" y="0.0" type="priority"/>
+    <node id="W" x="-300.0" y="0.0" type="priority"/>
+</nodes>

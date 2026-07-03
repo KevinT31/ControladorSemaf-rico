@@ -172,6 +172,50 @@ body {
 
 .header-center {
     flex: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* ============================================
+   BADGE DE ORIGEN DE DATOS (etiquetado honesto)
+   ============================================ */
+.origen-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(148, 163, 184, 0.12);
+    color: #94a3b8; /* gris: origen no etiquetado */
+}
+
+.origen-badge.origen-sumo {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #3b82f6; /* azul: SUMO (simulación) */
+}
+
+.origen-badge.origen-demo {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #f59e0b; /* ámbar: DEMO sintético */
+}
+
+.origen-badge.origen-real {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #10b981; /* verde: tráfico real (HERE) */
+}
+
+.origen-badge.origen-estimado {
+    background: rgba(148, 163, 184, 0.12);
+    border-color: rgba(148, 163, 184, 0.35);
+    color: #cbd5e1; /* gris claro: valores estimados/placeholder */
 }
 
 .status-indicator {

@@ -1,7 +1,7 @@
 \chapter{DISEÑO MECÁNICO DEL SISTEMA}\label{cap:diseno-mecanico}
 \listasdecapitulo{5}
 
-El subsistema mecánico cumple una función operativa directa: condiciona la calidad del sensado de la cámara, la temperatura de la electrónica, la mantenibilidad del conjunto y la resistencia a manipulación y a las solicitaciones ambientales de Lima Metropolitana. Este capítulo desarrolla los requerimientos verificables, la presentación general y la selección de materiales, el sistema de movimiento de la cámara, el gabinete con su rack interno, el soporte del controlador semafórico, y la verificación estructural y térmica del conjunto. La cámara empleada es una cámara domo fija (tipo Hikvision, formato HD-TVI) que opera con visión por computadora; el sistema de movimiento descrito tiene como único propósito orientar dicha cámara, mediante un mecanismo mecatrónico externo, para dirigir activamente la percepción hacia el eje de mayor relevancia de la intersección.
+El subsistema mecánico cumple una función operativa directa: condiciona la calidad del sensado de la cámara, la temperatura de la electrónica, la mantenibilidad del conjunto y la resistencia a manipulación y a las solicitaciones ambientales de Lima Metropolitana. Este capítulo desarrolla los requerimientos verificables, la presentación general y la selección de materiales, el sistema de movimiento de la cámara, el gabinete con su rack interno, el soporte del módulo IoT complementario, y la verificación estructural y térmica del conjunto. La cámara empleada es una cámara domo fija (tipo Hikvision, formato HD-TVI) que opera con visión por computadora; el sistema de movimiento descrito tiene como único propósito orientar dicha cámara, mediante un mecanismo mecatrónico externo, para dirigir activamente la percepción hacia el eje de mayor relevancia de la intersección.
 
 \section{Requerimientos mecánicos verificables}\label{sec:requerimientos-mecanicos}
 
@@ -56,7 +56,7 @@ El sistema mecánico integra cuatro subsistemas: el gabinete de aluminio 5052-H3
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\linewidth,keepaspectratio]{media/image30.png}
-  \caption{Vista del controlador semafórico instalado en una intersección vehicular.}
+  \caption{Vista del módulo IoT complementario instalado en una intersección vehicular.}
   \label{fig:sistema-interseccion}
   \fuente{Elaboración propia.}
 \end{figure}
@@ -64,7 +64,7 @@ El sistema mecánico integra cuatro subsistemas: el gabinete de aluminio 5052-H3
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\linewidth,keepaspectratio]{media/image64.png}
-  \caption{Vista general del controlador semafórico propuesto.}
+  \caption{Vista general del módulo IoT propuesto.}
   \label{fig:controlador-vista}
   \fuente{Elaboración propia.}
 \end{figure}
@@ -251,9 +251,9 @@ El rack mide 466~mm $\times$ 440~mm $\times$ 539~mm y emplea rieles DIN estánda
   \fuente{Elaboración propia.}
 \end{figure}
 
-\section{Soporte del controlador semafórico}\label{sec:soporte-controlador}
+\section{Soporte del módulo IoT complementario}\label{sec:soporte-controlador}
 
-El soporte fija el gabinete a 4.8~m de altura sobre el nivel del terreno mediante un poste tubular de acero (Figura~\ref{fig:conexion-poste}). El peso total del gabinete genera una carga vertical de $W = 47.126 \times 9.81 = 462$~N; sin embargo, para el análisis estructural se adopta una carga simplificada conservadora de 35~kg ($\approx 350$~N), considerando que parte de la masa corresponde a componentes removibles durante el mantenimiento.
+El soporte fija el gabinete a 4.8~m de altura sobre el nivel del terreno mediante un poste tubular de acero (Figura~\ref{fig:conexion-poste}). El peso total del conjunto genera una carga vertical de $W = 47.126 \times 9.81 = 462$~N, que se adopta \emph{íntegra} como carga vertical de diseño ($W_{\text{diseño}} = 462$~N), sin descontar componentes removibles. Como se muestra a continuación, esta carga gravitatoria resulta de todos modos insignificante frente a la capacidad del poste: el dimensionamiento lo gobiernan las cargas laterales de viento y la rigidez (deflexiones), no la compresión axial.
 
 \begin{figure}[H]
   \centering
@@ -280,10 +280,10 @@ r = \sqrt{I/A} = \sqrt{11\,600\,000/4\,800} = 49.2~\text{mm}
 El esfuerzo normal por compresión axial y su factor de seguridad respecto a la fluencia son:
 
 \begin{equation}
-\sigma_{\text{comp}} = \frac{W_{\text{diseño}}}{A} = \frac{350}{4\,800} = 0.073~\text{MPa}, \qquad FS_{\text{comp}} = \frac{f_y}{\sigma_{\text{comp}}} = \frac{250}{0.073} \approx 3\,425
+\sigma_{\text{comp}} = \frac{W_{\text{diseño}}}{A} = \frac{462}{4\,800} = 0.096~\text{MPa}, \qquad FS_{\text{comp}} = \frac{f_y}{\sigma_{\text{comp}}} = \frac{250}{0.096} \approx 2\,600
 \end{equation}
 
-Este factor de seguridad confirma que la carga gravitatoria pura es insignificante: el dimensionamiento del poste está controlado por las cargas laterales de viento y la rigidez (deflexiones), no por la compresión axial. El gabinete se posiciona de modo que su centro de masa quede próximo al eje del poste; con el punto de apoyo a 110~mm desde el frente, la excentricidad es $e = 273.2 - 110 \approx 160$~mm y el momento flector adicional asociado $M = 350 \times 0.160 = 56$~N·m, menor que si el gabinete estuviera centrado geométricamente.
+Este factor de seguridad confirma que la carga gravitatoria pura es insignificante: el dimensionamiento del poste está controlado por las cargas laterales de viento y la rigidez (deflexiones), no por la compresión axial. El gabinete se posiciona de modo que su centro de masa quede próximo al eje del poste; con el punto de apoyo a 110~mm desde el frente, la excentricidad es $e = 273.2 - 110 \approx 160$~mm y el momento flector adicional asociado $M = 462 \times 0.160 = 74$~N·m, moderado y cubierto con holgura por la sección del poste.
 
 \subsection{Refuerzos y zapata de cimentación}\label{subsec:refuerzos-zapata}
 
@@ -337,7 +337,7 @@ Las cargas de viento se basan en la NTE E.020 (SENCICO) complementada con AASHTO
 
 \subsection{Tensiones de Von Mises}\label{subsec:von-mises}
 
-La tensión de Von Mises es el criterio de falla más utilizado para materiales dúctiles, pues predice el inicio de la fluencia plástica. La tensión máxima del sistema, de \textbf{46.28~MPa}, se localiza en la transición entre el aro estructural del sistema de vigilancia y el poste (Figuras~\ref{fig:vm-completo} y~\ref{fig:vm-inferior}), debido a la discontinuidad geométrica entre el perfil cuadrado y la geometría circular del aro (Ø420~mm), que actúa como ménsula soportando cargas gravitatorias y laterales. Este valor está muy por debajo de los límites elásticos del aluminio 5052-H32 (193~MPa) y del acero A36 (250~MPa), confirmando operación en rango elástico. En el resto de la estructura las tensiones son bajas, con elevaciones locales en las esquinas de conexión y en las fijaciones de los componentes pesados del rack (UPS, SMPS).
+Evaluada como indicador del inicio de fluencia en los materiales dúctiles del conjunto, la tensión equivalente de Von Mises alcanza un máximo de \textbf{46.28~MPa}, localizado en la transición entre el aro estructural del sistema de vigilancia y el poste (Figuras~\ref{fig:vm-completo} y~\ref{fig:vm-inferior}), debido a la discontinuidad geométrica entre el perfil cuadrado y la geometría circular del aro (Ø420~mm), que actúa como ménsula soportando cargas gravitatorias y laterales. Este valor está muy por debajo de los límites elásticos del aluminio 5052-H32 (193~MPa) y del acero A36 (250~MPa), confirmando operación en rango elástico. En el resto de la estructura las tensiones son bajas, con elevaciones locales en las esquinas de conexión y en las fijaciones de los componentes pesados del rack (UPS, SMPS).
 
 \begin{figure}[H]
   \centering
@@ -425,7 +425,7 @@ El factor de seguridad calculado por el software (Figuras~\ref{fig:fs-sistema} y
 
 \section{Análisis térmico}\label{sec:analisis-termico}
 
-El análisis térmico verifica que la temperatura interna del gabinete permanezca dentro de los límites operativos de los componentes. Los más sensibles (Raspberry~Pi~5, HAT~4G~LTE) admiten 70--85\,°C, mientras que los de potencia (SMPS, UPS, driver) toleran hasta 105\,°C en puntos calientes internos.
+El análisis térmico verifica que la temperatura interna del gabinete permanezca dentro de los límites operativos de los componentes. Los más sensibles (Raspberry~Pi~5, HAT~4G~LTE) admiten 70--85\,°C y las fuentes de potencia (SMPS, UPS) toleran hasta 105\,°C en puntos calientes internos; el componente térmicamente \emph{limitante} es el \emph{driver} DM542T, cuyo rango de operación nominal ($-10$ a $+45$\,°C) es más estrecho que el del resto, según se discute en el Capítulo~\ref{cap:diseno-electronico}.
 
 \subsection{Generación de calor y ventilación}\label{subsec:generacion-calor}
 
@@ -444,7 +444,7 @@ Para evacuar estos 150~W se implementa ventilación forzada mediante un ventilad
 \Delta T = \frac{Q}{\dot{m}\,c_p} = \frac{150}{0.06 \times 1\,005} = \frac{150}{60.3} = 2.5~^\circ\text{C}
 \end{equation}
 
-El aire se calienta solo 2.5\,°C al atravesar el gabinete a caudal nominal. En el caso más desfavorable de temperatura ambiente de 60\,°C, el aire expulsado alcanzaría $\approx 62.5$\,°C y la temperatura interna promedio se mantendría en torno a 61\,°C, dentro del rango operativo de todos los componentes.
+El aire se calienta solo 2.5\,°C al atravesar el gabinete a caudal nominal. En el caso más desfavorable de temperatura ambiente de 60\,°C, el aire expulsado alcanzaría $\approx 62.5$\,°C y la temperatura interna promedio rondaría los 61\,°C. Este valor se mantiene dentro del rango de la mayoría de los componentes (SBC, módulo 4G y fuentes de potencia), pero \textbf{excede el máximo nominal del \emph{driver} DM542T ($+45$\,°C)}; por ello, para un despliegue de campo con ambiente extremo debe adoptarse el \emph{driver} de rango industrial o el acondicionamiento térmico activo señalados en el Capítulo~\ref{cap:diseno-electronico}, requisitos que se verificarán en el banco de prototipo. En las condiciones ambientales típicas de Lima (máximas cercanas a 30\,°C), la temperatura interna estimada ($\approx 32.5$\,°C) queda holgadamente dentro del rango de todos los componentes, incluido el \emph{driver}.
 
 \begin{figure}[H]
   \centering
@@ -466,7 +466,7 @@ El diseño mecánico se documenta mediante un conjunto de planos técnicos organ
   \item \textbf{Gabinete de aluminio 5052-H32:} geometría de cubo hueco, espesores de pared, rejillas de ventilación, sellos y puntos de fijación al rack.
   \item \textbf{Rack interno de soporte:} perfiles de 30$\times$30~mm, bandejas perforadas, rieles DIN y distribución vertical de componentes en los cuatro niveles funcionales.
   \item \textbf{Soporte de movimiento de la cámara:} aro estructural giratorio, rodamiento de Ø120~mm, biela, conector cámara-biela y montaje del motor NEMA~23.
-  \item \textbf{Poste y soporte del controlador semafórico:} perfil tubular de acero A36 (130$\times$130$\times$10~mm), refuerzos triangulares superiores e inferiores y placa base.
+  \item \textbf{Poste y soporte del módulo IoT:} perfil tubular de acero A36 (130$\times$130$\times$10~mm), refuerzos triangulares superiores e inferiores y placa base.
   \item \textbf{Zapata de cimentación:} geometría escalonada (pedestal y zapata), armadura de refuerzo y detalle de anclaje del poste.
 \end{enumerate}
 

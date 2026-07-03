@@ -3,57 +3,60 @@
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 1}\par 
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 2}\par 
-\contentsline {table}{\numberline {2.1}{\ignorespaces Comparativa de tecnologías de detección vehicular en intersecciones.\relax }}{13}{table.caption.11}%
-\contentsline {table}{\numberline {2.2}{\ignorespaces Resultados reportados por la literatura de control adaptativo.\relax }}{17}{table.caption.13}%
-\contentsline {table}{\numberline {2.3}{\ignorespaces Comparativa de estrategias de control semafórico.\relax }}{18}{table.caption.14}%
-\contentsline {table}{\numberline {2.4}{\ignorespaces Rol de los protocolos principales en la arquitectura propuesta.\relax }}{20}{table.caption.16}%
-\contentsline {table}{\numberline {2.5}{\ignorespaces Mecanismos de ciberseguridad para semáforos inteligentes IoT.\relax }}{22}{table.caption.17}%
-\contentsline {table}{\numberline {2.6}{\ignorespaces Modelo de amenazas del sistema IoT semafórico.\relax }}{23}{table.caption.18}%
-\contentsline {table}{\numberline {2.7}{\ignorespaces Criterios de seguridad funcional para el módulo propuesto.\relax }}{24}{table.caption.19}%
-\contentsline {table}{\numberline {2.8}{\ignorespaces Comparativa de simuladores de tráfico.\relax }}{26}{table.caption.21}%
-\contentsline {table}{\numberline {2.9}{\ignorespaces Síntesis del estado del arte y criterios adoptados para la solución propuesta.\relax }}{27}{table.caption.22}%
+\contentsline {table}{\numberline {2.1}{\ignorespaces Comparativa de tecnologías de detección vehicular en intersecciones.\relax }}{13}{table.caption.14}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Resultados reportados por la literatura de control adaptativo.\relax }}{17}{table.caption.16}%
+\contentsline {table}{\numberline {2.3}{\ignorespaces Comparativa de estrategias de control semafórico.\relax }}{18}{table.caption.17}%
+\contentsline {table}{\numberline {2.4}{\ignorespaces Rol de los protocolos principales en la arquitectura propuesta.\relax }}{20}{table.caption.19}%
+\contentsline {table}{\numberline {2.5}{\ignorespaces Mecanismos de ciberseguridad para semáforos inteligentes IoT.\relax }}{22}{table.caption.20}%
+\contentsline {table}{\numberline {2.6}{\ignorespaces Modelo de amenazas del sistema IoT semafórico.\relax }}{23}{table.caption.21}%
+\contentsline {table}{\numberline {2.7}{\ignorespaces Criterios de seguridad funcional para el módulo propuesto.\relax }}{24}{table.caption.22}%
+\contentsline {table}{\numberline {2.8}{\ignorespaces Comparativa de simuladores de tráfico.\relax }}{26}{table.caption.24}%
+\contentsline {table}{\numberline {2.9}{\ignorespaces Síntesis del estado del arte y criterios adoptados para la solución propuesta.\relax }}{27}{table.caption.25}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 3}\par 
-\contentsline {table}{\numberline {3.1}{\ignorespaces Actores clave del sistema y sus necesidades principales.\relax }}{29}{table.caption.23}%
-\contentsline {table}{\numberline {3.2}{\ignorespaces Resumen de exigencias y deseos por dominio de diseño.\relax }}{30}{table.caption.24}%
+\contentsline {table}{\numberline {3.1}{\ignorespaces Actores clave del sistema y sus necesidades principales.\relax }}{29}{table.caption.26}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Resumen de exigencias y deseos por dominio de diseño.\relax }}{30}{table.caption.27}%
 \contentsline {table}{\numberline {3.3}{\ignorespaces Requerimientos verificables del módulo IoT semafórico.\relax }}{32}{table.3.3}%
-\contentsline {table}{\numberline {3.4}{\ignorespaces Entradas y salidas del módulo IoT y su uso dentro de la arquitectura.\relax }}{38}{table.caption.26}%
-\contentsline {table}{\numberline {3.5}{\ignorespaces Significado de las señales internas de la estructura de funciones.\relax }}{40}{table.caption.28}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Entradas y salidas del módulo IoT y su uso dentro de la arquitectura.\relax }}{38}{table.caption.29}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces Significado de las señales internas de la estructura de funciones.\relax }}{40}{table.caption.31}%
 \contentsline {table}{\numberline {3.6}{\ignorespaces Matriz morfológica del sistema.\relax }}{44}{table.3.6}%
 \contentsline {table}{\numberline {3.7}{\ignorespaces Evaluación ponderada de conceptos de solución.\relax }}{46}{table.3.7}%
-\contentsline {table}{\numberline {3.8}{\ignorespaces Comparación funcional entre una configuración de cámaras fijas y una cámara orientable.\relax }}{52}{table.caption.35}%
-\contentsline {table}{\numberline {3.9}{\ignorespaces Niveles de alcance del sistema y evidencia esperada.\relax }}{58}{table.caption.41}%
-\contentsline {table}{\numberline {3.10}{\ignorespaces Riesgos y limitaciones del concepto edge--nube y sus mitigaciones.\relax }}{59}{table.caption.42}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces Comparación funcional entre una configuración de cámaras fijas y una cámara orientable.\relax }}{52}{table.caption.38}%
+\contentsline {table}{\numberline {3.9}{\ignorespaces Niveles de alcance del sistema y evidencia esperada.\relax }}{58}{table.caption.44}%
+\contentsline {table}{\numberline {3.10}{\ignorespaces Riesgos y limitaciones del concepto edge--nube y sus mitigaciones.\relax }}{59}{table.caption.45}%
 \contentsline {table}{\numberline {3.11}{\ignorespaces Trazabilidad entre objetivos, requerimientos y evidencia.\relax }}{60}{table.3.11}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 4}\par 
-\contentsline {table}{\numberline {4.1}{\ignorespaces Selección trazable de componentes electrónicos.\relax }}{62}{table.caption.43}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Comparación técnica de las unidades de control evaluadas.\relax }}{71}{table.caption.55}%
-\contentsline {table}{\numberline {4.3}{\ignorespaces Consumo energético por componente.\relax }}{72}{table.caption.57}%
-\contentsline {table}{\numberline {4.4}{\ignorespaces Consumo teórico de diseño por nivel de voltaje.\relax }}{73}{table.caption.58}%
-\contentsline {table}{\numberline {4.5}{\ignorespaces Lista de componentes del sistema de alimentación y protecciones.\relax }}{79}{table.caption.67}%
-\contentsline {table}{\numberline {4.6}{\ignorespaces Estimación de costos por componente del módulo electrónico (valores referenciales).\relax }}{80}{table.caption.68}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Selección trazable de componentes electrónicos.\relax }}{62}{table.caption.46}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Comparación técnica de las unidades de control evaluadas.\relax }}{71}{table.caption.58}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Consumo energético por componente.\relax }}{72}{table.caption.60}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Consumo teórico de diseño por nivel de voltaje.\relax }}{73}{table.caption.61}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Lista de componentes del sistema de alimentación y protecciones.\relax }}{79}{table.caption.70}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Estimación de costos por componente del módulo electrónico (valores referenciales).\relax }}{80}{table.caption.71}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 5}\par 
-\contentsline {table}{\numberline {5.1}{\ignorespaces Requerimientos mecánicos verificables del sistema.\relax }}{86}{table.caption.75}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Requerimientos mecánicos verificables del sistema.\relax }}{86}{table.caption.78}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 6}\par 
-\contentsline {table}{\numberline {6.1}{\ignorespaces Matriz de comparación por pares (escala de Saaty) y verificación de los pesos del ICV.\relax }}{124}{table.caption.103}%
-\contentsline {table}{\numberline {6.2}{\ignorespaces Casos de prueba del ICV con sus variables de entrada y nivel resultante.\relax }}{125}{table.caption.104}%
-\contentsline {table}{\numberline {6.3}{\ignorespaces Análisis de sensibilidad del ICV ante un incremento del $10\%$ en cada variable (caso base $ICV\approx 0.669$).\relax }}{126}{table.caption.105}%
-\contentsline {table}{\numberline {6.4}{\ignorespaces Presupuesto de latencia del lazo de percepción y control (referencia en CPU de escritorio).\relax }}{127}{table.caption.106}%
-\contentsline {table}{\numberline {6.5}{\ignorespaces Base de reglas difusas organizada por nivel de prioridad.\relax }}{129}{table.caption.108}%
-\contentsline {table}{\numberline {6.6}{\ignorespaces Modos de operación y degradación segura del módulo de control.\relax }}{132}{table.caption.109}%
-\contentsline {table}{\numberline {6.7}{\ignorespaces Riesgos de percepción asociados a la cámara orientable y mitigaciones propuestas.\relax }}{134}{table.caption.110}%
-\contentsline {table}{\numberline {6.8}{\ignorespaces Modelo de amenazas y mecanismos de mitigación propuestos.\relax }}{137}{table.caption.111}%
+\contentsline {table}{\numberline {6.1}{\ignorespaces Matriz de comparación por pares (escala de Saaty) y verificación de los pesos del ICV.\relax }}{124}{table.caption.106}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Casos de prueba del ICV con sus variables de entrada y nivel resultante.\relax }}{125}{table.caption.107}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Análisis de sensibilidad del ICV ante un incremento del $10\%$ en cada variable (caso base $ICV\approx 0.669$).\relax }}{126}{table.caption.108}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Presupuesto de latencia del lazo de percepción y control (referencia en CPU de escritorio).\relax }}{127}{table.caption.109}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces Base de reglas difusas organizada por nivel de prioridad.\relax }}{129}{table.caption.111}%
+\contentsline {table}{\numberline {6.6}{\ignorespaces Modos de operación y degradación segura del módulo de control.\relax }}{133}{table.caption.112}%
+\contentsline {table}{\numberline {6.7}{\ignorespaces Riesgos de percepción asociados a la cámara orientable y mitigaciones propuestas.\relax }}{135}{table.caption.113}%
+\contentsline {table}{\numberline {6.8}{\ignorespaces Modelo de amenazas y mecanismos de mitigación propuestos.\relax }}{138}{table.6.8}%
 \addvspace {10\p@ }
 \addvspace {10pt}\noindent {\bfseries CAPÍTULO 7}\par 
-\contentsline {table}{\numberline {7.1}{\ignorespaces Casos de validación comparativa en SUMO.\relax }}{141}{table.caption.112}%
-\contentsline {table}{\numberline {7.2}{\ignorespaces Parámetros de reproducibilidad de la validación SUMO.\relax }}{142}{table.caption.113}%
-\contentsline {table}{\numberline {7.3}{\ignorespaces Comparación del control fijo (A) y el control difuso adaptativo (B) en Lima-Centro (media $\pm $ desviación, 30 semillas). Todas las mejoras son significativas ($p<0.001$, prueba t de Welch).\relax }}{146}{table.caption.117}%
-\contentsline {table}{\numberline {7.4}{\ignorespaces Comparación multilínea-base en Lima-Centro (media $\pm $ desviación, 30 semillas), ordenada por demora media.\relax }}{146}{table.caption.118}%
-\contentsline {table}{\numberline {7.5}{\ignorespaces Sensibilidad del control difuso al nivel de demanda (demora media por vehículo, control fijo vs.\ difuso).\relax }}{148}{table.caption.119}%
-\contentsline {table}{\numberline {7.6}{\ignorespaces Comportamiento del sistema ante fallas y modo degradado.\relax }}{149}{table.caption.120}%
-\contentsline {table}{\numberline {7.7}{\ignorespaces Matriz de cumplimiento de requerimientos del sistema.\relax }}{150}{table.caption.121}%
-\contentsline {table}{\numberline {7.8}{\ignorespaces CAPEX por intersección, agrupado por rubro.\relax }}{152}{table.caption.122}%
-\contentsline {table}{\numberline {7.9}{\ignorespaces OPEX anual por intersección.\relax }}{153}{table.caption.123}%
+\contentsline {table}{\numberline {7.1}{\ignorespaces Casos de validación comparativa en SUMO.\relax }}{144}{table.caption.114}%
+\contentsline {table}{\numberline {7.2}{\ignorespaces Parámetros de reproducibilidad de la validación SUMO.\relax }}{145}{table.caption.115}%
+\contentsline {table}{\numberline {7.3}{\ignorespaces Comparación del plan fijo (A) y el controlador propuesto (B) en Lima-Centro de alta demanda (media $\pm $ desviación, 30 semillas comunes). Todas las mejoras son significativas ($p<0.001$, prueba t pareada).\relax }}{149}{table.caption.119}%
+\contentsline {table}{\numberline {7.4}{\ignorespaces Comparación multilínea-base en Lima-Centro de \textbf {demanda alta} (media $\pm $ desviación, 30 semillas comunes), ordenada por demora media.\relax }}{150}{table.caption.120}%
+\contentsline {table}{\numberline {7.5}{\ignorespaces Comparación multilínea-base en Lima-Centro de \textbf {demanda media} (media $\pm $ desviación, 10 semillas comunes), ordenada por demora media.\relax }}{151}{table.caption.121}%
+\contentsline {table}{\numberline {7.6}{\ignorespaces Variación del control difuso frente al fijo por nivel de demanda en el escenario controlado \emph {cruce-simple} (10 semillas pareadas). Reducción favorable en demora/espera/cola/ICV; incremento favorable en velocidad.\relax }}{153}{table.caption.123}%
+\contentsline {table}{\numberline {7.7}{\ignorespaces Aporte de la capa predictiva CNN--LSTM sobre el control difuso (escenario \emph {cruce-simple}, 10 semillas pareadas). Variación del difuso predictivo respecto del difuso puro.\relax }}{155}{table.caption.125}%
+\contentsline {table}{\numberline {7.8}{\ignorespaces Suite de verificación automatizada del núcleo de control (26 pruebas, 26 satisfactorias).\relax }}{157}{table.caption.127}%
+\contentsline {table}{\numberline {7.9}{\ignorespaces Comportamiento del sistema ante fallas y modo degradado.\relax }}{158}{table.caption.128}%
+\contentsline {table}{\numberline {7.10}{\ignorespaces Matriz de cumplimiento de requerimientos del sistema.\relax }}{159}{table.7.10}%
+\contentsline {table}{\numberline {7.11}{\ignorespaces CAPEX por intersección, agrupado por rubro.\relax }}{161}{table.caption.129}%
+\contentsline {table}{\numberline {7.12}{\ignorespaces OPEX anual por intersección, con subtotal local y total con nube prorrateada.\relax }}{162}{table.caption.130}%

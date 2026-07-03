@@ -1,0 +1,64 @@
+{
+  "entrenado_en": "2026-07-01T17:06:59",
+  "ventana": 8,
+  "caracteristicas": [
+    "icv_ns",
+    "icv_ew",
+    "pi_ns",
+    "pi_ew",
+    "queue_ns",
+    "queue_ew",
+    "waiting_ns",
+    "waiting_ew",
+    "speed_ns",
+    "speed_ew",
+    "flow_ns",
+    "flow_ew",
+    "occupancy_ns",
+    "occupancy_ew",
+    "green_ns",
+    "green_ew"
+  ],
+  "objetivos": [
+    "icv_ns",
+    "icv_ew"
+  ],
+  "hiperparametros": {
+    "n_caracteristicas": 16,
+    "canales": 32,
+    "oculto": 64,
+    "capas_lstm": 1,
+    "dropout": 0.1,
+    "n_salidas": 2
+  },
+  "optimizacion": {
+    "lr": 0.001,
+    "batch": 64,
+    "epocas_max": 150,
+    "paciencia": 20,
+    "semilla": 7,
+    "mejor_epoca": 126,
+    "mejor_val_mse": 0.003148
+  },
+  "secuencias": {
+    "train": 7616,
+    "val": 2176,
+    "test": 1088
+  },
+  "metricas_test": {
+    "mse": 0.003168,
+    "mae": 0.043947,
+    "rmse": 0.056289,
+    "mae_icv_ns": 0.04417,
+    "mae_icv_ew": 0.043725
+  },
+  "baseline_persistencia_test": {
+    "mse": 0.023584,
+    "mae": 0.125658,
+    "rmse": 0.15357,
+    "mae_icv_ns": 0.126608,
+    "mae_icv_ew": 0.124709
+  },
+  "supera_persistencia": true,
+  "duracion_s": 152.8
+}

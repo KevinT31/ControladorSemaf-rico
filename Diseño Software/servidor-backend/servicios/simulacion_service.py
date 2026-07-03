@@ -47,6 +47,10 @@ class SimulacionService:
                     icv_val = 0.0
                     clas = 'Fluido'
 
+            # OJO: jitter + clamp = valores SINTÉTICOS de DEMOSTRACIÓN, no son
+            # mediciones. En modo simulador el ICV se fuerza a la banda
+            # [0.50, 0.60] solo para que la demo visual se vea estable; por eso
+            # el payload sale etiquetado con origen_datos='simulador_demo'.
             # Jitter leve por intersección para diversidad
             jitter = ((idx % 7) - 3) * 0.005
             icv_val = icv_val * (1.0 + jitter)
@@ -72,6 +76,11 @@ class SimulacionService:
 
         resumen['intersecciones'] = inter_out
         resumen['icv_red_promedio'] = round(icv_prom, 3)
+        # Etiquetado honesto del origen: en modo simulador estos valores son
+        # sintéticos de demo (jitter + clamp); en otros modos este servicio
+        # tampoco lee SUMO, así que se marcan como estimados.
+        resumen['origen_datos'] = (
+            'simulador_demo' if resumen.get('modo') == 'simulador' else 'estimado')
         return resumen
 
     @staticmethod

@@ -42,6 +42,7 @@ env/
 # Variables de entorno
 .env
 .env.local
+servidor-backend/here_api_key.txt
 
 # Logs
 *.log
@@ -129,6 +130,8 @@ coverage.xml
 
 # Resultados generados (no versionar)
 datos/resultados-video/**
+/results/
+/integracion-sumo/resultados/
 
 # SUMO - outputs de escenarios
 integracion-sumo/escenarios/lima-amplio/*.xml

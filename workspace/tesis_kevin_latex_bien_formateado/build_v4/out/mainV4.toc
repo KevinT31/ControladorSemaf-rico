@@ -1,8 +1,10 @@
 \babel@toc {spanish}{}\relax 
 \contentsline {chapter}{RESUMEN}{\es@scroman {i}}{chapter*.3}%
-\contentsline {chapter}{ÍNDICE DE TABLAS}{\es@scroman {vii}}{section*.5}%
-\contentsline {chapter}{ÍNDICE DE FIGURAS}{\es@scroman {ix}}{section*.6}%
-\contentsline {chapter}{INTRODUCCIÓN}{1}{chapter*.7}%
+\contentsline {chapter}{ABSTRACT}{\es@scroman {iii}}{chapter*.4}%
+\contentsline {chapter}{ÍNDICE DE TABLAS}{\es@scroman {ix}}{section*.6}%
+\contentsline {chapter}{ÍNDICE DE FIGURAS}{\es@scroman {xii}}{section*.7}%
+\contentsline {chapter}{LISTA DE SIGLAS Y ACRÓNIMOS}{\es@scroman {xv}}{chapter*.9}%
+\contentsline {chapter}{INTRODUCCIÓN}{1}{chapter*.10}%
 \contentsline {chapter}{\numberline {1}ANTECEDENTES}{3}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Descripción de la problemática}{5}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Propuesta de solución}{6}{section.1.2}%
@@ -17,7 +19,7 @@
 \contentsline {section}{\numberline {2.2}Control adaptativo}{14}{section.2.2}%
 \contentsline {subsection}{\numberline {2.2.1}Lógica difusa como núcleo del control adaptativo}{15}{subsection.2.2.1}%
 \contentsline {section}{\numberline {2.3}Arquitectura edge--nube y comunicaciones}{19}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Ciberseguridad y confiabilidad}{21}{section.2.4}%
+\contentsline {section}{\numberline {2.4}Ciberseguridad y confiabilidad}{20}{section.2.4}%
 \contentsline {section}{\numberline {2.5}Validación por simulación}{24}{section.2.5}%
 \contentsline {chapter}{\numberline {3}DISEÑO CONCEPTUAL}{28}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Actores clave y necesidades}{28}{section.3.1}%
@@ -45,9 +47,9 @@
 \contentsline {subsection}{\numberline {4.2.2}Actuador de posicionamiento de cámara}{66}{subsection.4.2.2}%
 \contentsline {subsubsection}{\numberline {4.2.2.1}Driver del motor}{67}{subsubsection.4.2.2.1}%
 \contentsline {subsubsection}{\numberline {4.2.2.2}Convertidor de nivel lógico}{68}{subsubsection.4.2.2.2}%
-\contentsline {paragraph}{Robustez para entorno vial (criterios de diseño a confirmar en prototipo).}{68}{paragraph*.52}%
+\contentsline {paragraph}{Robustez para entorno vial (criterios de diseño a confirmar en prototipo).}{68}{paragraph*.55}%
 \contentsline {subsection}{\numberline {4.2.3}Comunicación con la nube}{69}{subsection.4.2.3}%
-\contentsline {paragraph}{Viabilidad de conectividad 4G/LTE en Lima.}{70}{paragraph*.54}%
+\contentsline {paragraph}{Viabilidad de conectividad 4G/LTE en Lima.}{70}{paragraph*.57}%
 \contentsline {subsection}{\numberline {4.2.4}Unidad de control y aceleración de inferencia de visión}{70}{subsection.4.2.4}%
 \contentsline {section}{\numberline {4.3}Dimensionamiento energético y protecciones}{72}{section.4.3}%
 \contentsline {subsection}{\numberline {4.3.1}Consumo por componente y por nivel de voltaje}{72}{subsection.4.3.1}%
@@ -59,7 +61,7 @@
 \contentsline {section}{\numberline {4.5}Diagramas esquemáticos}{80}{section.4.5}%
 \contentsline {subsection}{\numberline {4.5.1}Sistema de alimentación y protecciones}{81}{subsection.4.5.1}%
 \contentsline {subsection}{\numberline {4.5.2}PCB de distribución de alimentación}{81}{subsection.4.5.2}%
-\contentsline {subsection}{\numberline {4.5.3}PCB del controlador semafórico}{83}{subsection.4.5.3}%
+\contentsline {subsection}{\numberline {4.5.3}PCB de control e interfaces del módulo IoT}{83}{subsection.4.5.3}%
 \contentsline {chapter}{\numberline {5}DISEÑO MECÁNICO DEL SISTEMA}{85}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Requerimientos mecánicos verificables}{85}{section.5.1}%
 \contentsline {subsection}{\numberline {5.1.1}Requerimientos estructurales globales}{86}{subsection.5.1.1}%
@@ -68,13 +70,13 @@
 \contentsline {subsection}{\numberline {5.2.1}Masa y centro de masa del sistema}{90}{subsection.5.2.1}%
 \contentsline {subsection}{\numberline {5.2.2}Criterios de selección de materiales}{93}{subsection.5.2.2}%
 \contentsline {section}{\numberline {5.3}Sistema de movimiento de la cámara}{94}{section.5.3}%
-\contentsline {paragraph}{Finalidad funcional del sistema de orientación.}{94}{paragraph*.81}%
+\contentsline {paragraph}{Finalidad funcional del sistema de orientación.}{94}{paragraph*.84}%
 \contentsline {subsection}{\numberline {5.3.1}Diagrama de cuerpo libre y datos del mecanismo}{96}{subsection.5.3.1}%
 \contentsline {subsection}{\numberline {5.3.2}Verificación del motor paso a paso seleccionado}{98}{subsection.5.3.2}%
 \contentsline {subsection}{\numberline {5.3.3}Análisis estructural de la biela}{98}{subsection.5.3.3}%
 \contentsline {section}{\numberline {5.4}Gabinete y soporte tipo rack}{99}{section.5.4}%
 \contentsline {subsection}{\numberline {5.4.1}Arquitectura de distribución vertical en el rack}{99}{subsection.5.4.1}%
-\contentsline {section}{\numberline {5.5}Soporte del controlador semafórico}{100}{section.5.5}%
+\contentsline {section}{\numberline {5.5}Soporte del módulo IoT complementario}{100}{section.5.5}%
 \contentsline {subsection}{\numberline {5.5.1}Poste de acero y propiedades de la sección}{101}{subsection.5.5.1}%
 \contentsline {subsection}{\numberline {5.5.2}Refuerzos y zapata de cimentación}{102}{subsection.5.5.2}%
 \contentsline {section}{\numberline {5.6}Análisis estructural por elementos finitos}{106}{section.5.6}%
@@ -100,40 +102,43 @@
 \contentsline {subsection}{\numberline {6.3.2}Pesos, verificación por AHP y parámetros}{124}{subsection.6.3.2}%
 \contentsline {subsection}{\numberline {6.3.3}Casos de prueba}{125}{subsection.6.3.3}%
 \contentsline {subsection}{\numberline {6.3.4}Análisis de sensibilidad}{125}{subsection.6.3.4}%
-\contentsline {subsection}{\numberline {6.3.5}Validación de la cadena cámara\,$\rightarrow $\,ICV con video real}{126}{subsection.6.3.5}%
+\contentsline {subsection}{\numberline {6.3.5}Prueba funcional de la cadena cámara\,$\rightarrow $\,ICV con video real}{126}{subsection.6.3.5}%
 \contentsline {subsection}{\numberline {6.3.6}Presupuesto de latencia y alcance de la prueba de visión}{126}{subsection.6.3.6}%
-\contentsline {paragraph}{Alcance de la validación de visión.}{127}{paragraph*.107}%
+\contentsline {paragraph}{Alcance de la validación de visión.}{127}{paragraph*.110}%
 \contentsline {section}{\numberline {6.4}Control difuso local de Mamdani}{128}{section.6.4}%
 \contentsline {subsection}{\numberline {6.4.1}Variables lingüísticas de entrada}{128}{subsection.6.4.1}%
 \contentsline {subsection}{\numberline {6.4.2}Variable de salida y base de reglas}{129}{subsection.6.4.2}%
 \contentsline {subsection}{\numberline {6.4.3}Mecanismo de inferencia y defuzzificación}{129}{subsection.6.4.3}%
 \contentsline {subsection}{\numberline {6.4.4}Restricciones de fase y autoridad de seguridad}{130}{subsection.6.4.4}%
-\contentsline {section}{\numberline {6.5}Modos de operación y degradación segura}{130}{section.6.5}%
-\contentsline {subsection}{\numberline {6.5.1}Mitigación de errores de percepción durante la reorientación}{133}{subsection.6.5.1}%
-\contentsline {section}{\numberline {6.6}Capas de investigación futura: RL y CNN--LSTM}{134}{section.6.6}%
-\contentsline {section}{\numberline {6.7}Arquitectura de ciberseguridad propuesta}{135}{section.6.7}%
-\contentsline {section}{\numberline {6.8}Subsistema de nube y comunicación}{138}{section.6.8}%
-\contentsline {subsection}{\numberline {6.8.1}Coordinación global y analítica de red}{139}{subsection.6.8.1}%
-\contentsline {chapter}{\numberline {7}INTEGRACIÓN, VALIDACIÓN Y ANÁLISIS DE COSTOS}{140}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Protocolo de validación y criterio de evidencia}{140}{section.7.1}%
-\contentsline {subsection}{\numberline {7.1.1}Reproducibilidad}{141}{subsection.7.1.1}%
-\contentsline {section}{\numberline {7.2}Configuración de escenarios SUMO de Lima y métricas}{142}{section.7.2}%
-\contentsline {subsection}{\numberline {7.2.1}Construcción del escenario Lima-Centro}{142}{subsection.7.2.1}%
-\contentsline {subsection}{\numberline {7.2.2}Arquitectura de integración y métricas}{144}{subsection.7.2.2}%
-\contentsline {section}{\numberline {7.3}Resultados y discusión}{145}{section.7.3}%
-\contentsline {subsection}{\numberline {7.3.1}Comparación del control fijo y el control difuso}{145}{subsection.7.3.1}%
-\contentsline {subsection}{\numberline {7.3.2}Comparación contra líneas base avanzadas}{146}{subsection.7.3.2}%
-\contentsline {subsection}{\numberline {7.3.3}Significancia estadística y robustez}{147}{subsection.7.3.3}%
-\contentsline {subsection}{\numberline {7.3.4}Sensibilidad a la demanda}{147}{subsection.7.3.4}%
-\contentsline {section}{\numberline {7.4}Caso de pérdida de conectividad (modo degradado)}{148}{section.7.4}%
-\contentsline {section}{\numberline {7.5}Matriz de cumplimiento de requerimientos}{149}{section.7.5}%
-\contentsline {section}{\numberline {7.6}Análisis de costos}{151}{section.7.6}%
-\contentsline {subsection}{\numberline {7.6.1}Costos de capital (CAPEX)}{151}{subsection.7.6.1}%
-\contentsline {subsection}{\numberline {7.6.2}Costos operativos anuales (OPEX)}{152}{subsection.7.6.2}%
-\contentsline {chapter}{CONCLUSIONES Y RECOMENDACIONES}{154}{chapter*.124}%
-\contentsline {chapter}{BIBLIOGRAFÍA}{158}{chapter*.125}%
-\contentsline {chapter}{ANEXOS}{166}{chapter*.126}%
-\contentsline {section}{ANEXO A: Reproducibilidad de la validación en SUMO}{166}{chapter*.126}%
-\contentsline {section}{ANEXO B: Módulos de investigación futura (RL y CNN--LSTM)}{167}{chapter*.126}%
-\contentsline {section}{ANEXO C: Especificaciones técnicas de componentes}{168}{chapter*.126}%
-\contentsline {section}{ANEXO D: Presupuesto detallado y planos}{178}{table.7.29}%
+\contentsline {subsection}{\numberline {6.4.5}Control difuso adaptativo integrado (controlador final)}{131}{subsection.6.4.5}%
+\contentsline {section}{\numberline {6.5}Modos de operación y degradación segura}{132}{section.6.5}%
+\contentsline {subsection}{\numberline {6.5.1}Mitigación de errores de percepción durante la reorientación}{134}{subsection.6.5.1}%
+\contentsline {section}{\numberline {6.6}Capa predictiva CNN--LSTM y línea futura de aprendizaje por refuerzo}{135}{section.6.6}%
+\contentsline {section}{\numberline {6.7}Arquitectura de ciberseguridad propuesta}{136}{section.6.7}%
+\contentsline {section}{\numberline {6.8}Subsistema de nube y comunicación}{141}{section.6.8}%
+\contentsline {subsection}{\numberline {6.8.1}Coordinación global y analítica de red}{142}{subsection.6.8.1}%
+\contentsline {chapter}{\numberline {7}INTEGRACIÓN, VALIDACIÓN Y ANÁLISIS DE COSTOS}{143}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Protocolo de validación y criterio de evidencia}{143}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}Reproducibilidad}{144}{subsection.7.1.1}%
+\contentsline {section}{\numberline {7.2}Configuración de escenarios SUMO de Lima y métricas}{145}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}Construcción del escenario Lima-Centro}{146}{subsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.2.2}Arquitectura de integración y métricas}{148}{subsection.7.2.2}%
+\contentsline {section}{\numberline {7.3}Resultados y discusión}{149}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Comparación del plan fijo y el controlador propuesto}{149}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Comparación contra líneas base avanzadas}{150}{subsection.7.3.2}%
+\contentsline {subsection}{\numberline {7.3.3}Significancia estadística y robustez}{152}{subsection.7.3.3}%
+\contentsline {subsection}{\numberline {7.3.4}Campaña controlada de sensibilidad a la demanda}{153}{subsection.7.3.4}%
+\contentsline {subsection}{\numberline {7.3.5}Capa predictiva CNN--LSTM: evaluación y resultado}{154}{subsection.7.3.5}%
+\contentsline {section}{\numberline {7.4}Verificación del software de control}{156}{section.7.4}%
+\contentsline {section}{\numberline {7.5}Caso de pérdida de conectividad (modo degradado)}{158}{section.7.5}%
+\contentsline {section}{\numberline {7.6}Matriz de cumplimiento de requerimientos}{158}{section.7.6}%
+\contentsline {section}{\numberline {7.7}Análisis de costos}{160}{section.7.7}%
+\contentsline {subsection}{\numberline {7.7.1}Costos de capital (CAPEX)}{161}{subsection.7.7.1}%
+\contentsline {subsection}{\numberline {7.7.2}Costos operativos anuales (OPEX)}{162}{subsection.7.7.2}%
+\contentsline {chapter}{CONCLUSIONES Y RECOMENDACIONES}{163}{chapter*.131}%
+\contentsline {chapter}{BIBLIOGRAFÍA}{168}{chapter*.132}%
+\contentsline {chapter}{ANEXOS}{177}{chapter*.133}%
+\contentsline {section}{ANEXO A: Reproducibilidad de la validación en SUMO}{177}{chapter*.133}%
+\contentsline {section}{ANEXO B: Capa predictiva CNN--LSTM y módulo futuro (RL)}{178}{chapter*.133}%
+\contentsline {section}{ANEXO C: Especificaciones técnicas de componentes}{179}{chapter*.133}%
+\contentsline {section}{ANEXO D: Presupuesto detallado y planos}{190}{table.7.32}%
