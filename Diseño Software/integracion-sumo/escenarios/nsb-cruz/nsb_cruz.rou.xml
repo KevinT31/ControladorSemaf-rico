@@ -1,0 +1,16 @@
+<routes>
+    <vType id="auto" accel="2.6" decel="4.5" length="5" maxSpeed="13.89"/>
+
+    <flow id="f_NS" type="auto" begin="0" end="3600" vehsPerHour="500"
+          from="NC" to="CS" departPos="base"/>
+    <flow id="f_SN" type="auto" begin="0" end="3600" vehsPerHour="450"
+          from="SC" to="CN" departPos="base"/>
+    <flow id="f_EO" type="auto" begin="0" end="3600" vehsPerHour="180"
+          from="EC" to="CO" departPos="base"/>
+    <flow id="f_OE" type="auto" begin="0" end="3600" vehsPerHour="150"
+          from="OC" to="CE" departPos="base"/>
+    <flow id="f_NE" type="auto" begin="0" end="3600" vehsPerHour="80"
+          from="NC" to="CE" departPos="base"/>
+    <flow id="f_SO" type="auto" begin="0" end="3600" vehsPerHour="70"
+          from="SC" to="CO" departPos="base"/>
+</routes>

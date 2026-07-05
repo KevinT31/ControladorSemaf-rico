@@ -1,0 +1,10 @@
+<additional>
+    <tlLogic id="nsb_cruz_tls" type="static" programID="nsb" offset="0">
+        <phase duration="30" state="GGGrrrGGGrrr"/>
+        <phase duration="3" state="yyyrrryyyrrr"/>
+        <phase duration="2" state="rrrrrrrrrrrr"/>
+        <phase duration="30" state="rrrGGGrrrGGG"/>
+        <phase duration="3" state="rrryyyrrryyy"/>
+        <phase duration="2" state="rrrrrrrrrrrr"/>
+    </tlLogic>
+</additional>

@@ -106,6 +106,15 @@ class TscEmulator:
             logger.warning("TSC: MODO SEGURO programado (%s)",
                            self._safe_mode_reason)
 
+    def enter_safe_mode(self, reason: str) -> None:
+        """Entrada EXPLÍCITA a modo seguro (p. ej. pérdida del enlace HIL,
+        spec §26-B). Programa CONFIG_SEGURA; se sale con la próxima
+        recomendación aceptada."""
+        self._safe_mode = True
+        self._safe_mode_reason = reason
+        self._fsm.request_plan(PLAN_SEGURO)
+        logger.warning("TSC: MODO SEGURO explícito (%s)", reason)
+
     def _salir_de_safe_mode(self) -> None:
         self._silence_count = 0
         if self._safe_mode:

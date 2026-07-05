@@ -58,8 +58,8 @@ def _parser() -> argparse.ArgumentParser:
                      help="ruta a node.yaml")
     run.add_argument("--mode", choices=sorted(_MODOS_CLI),
                      help="override del modo (direct-lab exige triple compuerta)")
-    run.add_argument("--source", choices=["manual", "replay"],
-                     help="override de la fuente (hil/video en fases F2/F4)")
+    run.add_argument("--source", choices=["manual", "replay", "sumo_hil"],
+                     help="override de la fuente (video llega en F4)")
     run.add_argument("--input", help="JSONL de entrada (source=replay)")
     run.add_argument("--escenario", default="uniforme",
                      help="escenario de la fuente manual")
@@ -82,6 +82,20 @@ def _parser() -> argparse.ArgumentParser:
                          help="digest SHA-256 determinista de las decisiones "
                               "de una corrida grabada")
     dig.add_argument("jsonl", help="archivo JSONL grabado con --record")
+
+    gw = sub.add_parser("gateway",
+                        help="HIL Gateway: SUMO + servidor TCP step-sync")
+    gw.add_argument("--config", default="config/nsb/gateway.yaml")
+
+    be = sub.add_parser("bench",
+                        help="benchmark real de latencias del núcleo")
+    be.add_argument("--corpus", default="tests/golden/data/corpus.jsonl")
+    be.add_argument("--out", required=True, help="JSON de resultados")
+    be.add_argument("--repeticiones", type=int, default=5)
+
+    de = sub.add_parser("demo", help="demos reproducibles de la spec §43")
+    de.add_argument("--id", type=int, required=True,
+                    help="número de demo (1,2,5,6,7,9,10,12)")
 
     return p
 
@@ -132,6 +146,7 @@ def _cmd_run(args) -> int:
     cli_mode: Optional[Mode] = _MODOS_CLI[args.mode] if args.mode else None
     source_kind = SourceKind(args.source) if args.source else cfg.source
 
+    fuente = None
     if source_kind is SourceKind.REPLAY:
         if not args.input:
             print("ERROR: source=replay requiere --input", file=sys.stderr)
@@ -144,9 +159,11 @@ def _cmd_run(args) -> int:
             escenario=args.escenario, pasos=args.pasos,
             experiment_id=exp_id,
             control_interval_s=cfg.control_interval_s)
+    elif source_kind is SourceKind.SUMO_HIL:
+        exp_id = args.experiment_id or "hil-node"
     else:
-        print(f"ERROR: fuente {source_kind.value} disponible en fases "
-              f"posteriores (F2: sumo_hil, F4: video)", file=sys.stderr)
+        print(f"ERROR: fuente {source_kind.value} disponible en F4 (video)",
+              file=sys.stderr)
         return 1
 
     try:
@@ -157,6 +174,24 @@ def _cmd_run(args) -> int:
     except PermissionError as e:
         print(f"DENEGADO: {e}", file=sys.stderr)
         return 1
+
+    if source_kind is SourceKind.SUMO_HIL:
+        # Cliente HIL: el gateway marca el ritmo; no hay fuente iterable local
+        from nsb.hil.node_client import HilNodeClient
+        try:
+            cs = HilNodeClient(node, cfg.hil, cfg.node_id).run()
+        except Exception as e:
+            logger.exception("fallo del cliente HIL")
+            print(f"ERROR de ejecución: {e}", file=sys.stderr)
+            return 2
+        finally:
+            node.shutdown()
+        print(f"modo             : {node.mode.value}")
+        print(f"estados          : {cs.estados}")
+        print(f"reconexiones     : {cs.reconexiones}")
+        print(f"errores protocolo: {cs.errores_protocolo}")
+        print(f"cierre limpio    : {cs.terminado_por_bye}")
+        return 0 if cs.terminado_por_bye else 2
 
     writer = ReplayWriter(args.record) if args.record else None
     try:
@@ -183,6 +218,60 @@ def _cmd_run(args) -> int:
     return 0
 
 
+def _cmd_gateway(args) -> int:
+    from nsb.config import load_gateway_config
+    from nsb.hil.gateway import GatewayAbort, HilGateway
+
+    try:
+        cfg = load_gateway_config(args.config)
+    except (OSError, ValueError) as e:
+        print(f"ERROR de configuración: {e}", file=sys.stderr)
+        return 1
+    try:
+        s = HilGateway(cfg).run()
+    except GatewayAbort as e:
+        print(f"CORRIDA ABORTADA: {e}", file=sys.stderr)
+        return 2
+    print(f"experimento        : {s.experiment_id}")
+    print(f"puntos de control  : {s.puntos_control}")
+    print(f"decisiones aplicadas: {s.decisiones_aplicadas}")
+    print(f"veredictos         : {s.verdicts}")
+    print(f"timeouts           : {s.timeouts}")
+    print(f"reconexiones       : {s.reconexiones}")
+    print(f"stale descartados  : {s.stale_descartados}")
+    if s.record_path:
+        from nsb.sources.replay import digest_decisiones
+        print(f"grabado            : {s.record_path}")
+        print(f"digest decisiones  : {digest_decisiones(s.record_path)}")
+    return 0
+
+
+def _cmd_bench(args) -> int:
+    from nsb.cli.bench import run_bench
+
+    try:
+        r = run_bench(args.corpus, args.out, args.repeticiones)
+    except FileNotFoundError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 1
+    lat = r["latencias_ms"]
+    print(f"plataforma : {r['plataforma']['sistema']} "
+          f"{r['plataforma']['maquina']} (python {r['plataforma']['python']})")
+    for nombre, stats in lat.items():
+        linea = (f"{nombre:22s} n={stats['n']:5d} p50={stats['p50']:.3f}ms "
+                 f"p95={stats['p95']:.3f}ms")
+        if "p99" in stats:
+            linea += f" p99={stats['p99']:.3f}ms"
+        print(linea)
+    print(f"resultados -> {args.out}")
+    return 0
+
+
+def _cmd_demo(args) -> int:
+    from nsb.cli.demos import run_demo
+    return run_demo(args.id)
+
+
 def main(argv: Optional[list] = None) -> int:
     args = _parser().parse_args(argv)
     _configurar_logging(getattr(args, "log_level", "INFO"))
@@ -192,4 +281,10 @@ def main(argv: Optional[list] = None) -> int:
         return _cmd_record(args)
     if args.cmd == "digest":
         return _cmd_digest(args)
+    if args.cmd == "gateway":
+        return _cmd_gateway(args)
+    if args.cmd == "bench":
+        return _cmd_bench(args)
+    if args.cmd == "demo":
+        return _cmd_demo(args)
     return 1

@@ -1,0 +1,47 @@
+{
+  "bench": "nsb-core-latency",
+  "version_nsb": "2.1.0",
+  "ejecutado_en": "2026-07-05T18:10:17+00:00",
+  "plataforma": {
+    "sistema": "Windows",
+    "maquina": "AMD64",
+    "procesador": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+    "python": "3.12.5",
+    "nota": "MEDIDO en esta plataforma; NO extrapolable a otra (Pi 4B se mide en la Pi 4B)"
+  },
+  "sistema": {
+    "cpu_percent": 26.5,
+    "ram_mb": 14138.98828125,
+    "ram_percent": 90.2,
+    "temperature_c": null
+  },
+  "latencias_ms": {
+    "icv_pi_por_acceso": {
+      "n": 1010,
+      "min": 0.0017000020307023078,
+      "max": 0.17579999985173345,
+      "mean": 0.033907326716943506,
+      "p50": 0.03179999839630909,
+      "p95": 0.05690000034519471,
+      "p99": 0.09239999781129882
+    },
+    "inferencia_difusa": {
+      "n": 255,
+      "min": 1.1526999987836462,
+      "max": 3.967599997849902,
+      "mean": 1.5074243135185337,
+      "p50": 1.2998999991395976,
+      "p95": 2.271699999255361,
+      "p99": 2.5432000002183486
+    },
+    "pipeline_completo": {
+      "n": 500,
+      "min": 1.281199998629745,
+      "max": 113.18390000087675,
+      "mean": 2.127893800061429,
+      "p50": 1.8517999997129664,
+      "p95": 3.0260000021371525,
+      "p99": 4.057199999806471
+    }
+  }
+}
