@@ -56,8 +56,12 @@ su evidencia; nada se borra silenciosamente.
 
 ## Visión y datos
 
-17. **F4 pendiente:** `VideoStateSource`, ground truth y demo 11 NOT RUN
-    (`drone_video_validation.md` fija los criterios por adelantado).
+17. **Visión sin ejecutar con video real:** F4 está implementado y testeado
+    con proveedores sintéticos, pero el repo no contiene videos de dron ni
+    pesos YOLO (gitignored, ausentes): demo 11 y las métricas de conteo
+    quedan NOT RUN (`drone_video_validation.md`). El proveedor dual-ROI
+    carga el modelo YOLO dos veces (una por ROI) — costo de RAM aceptado
+    para procesamiento offline (D-J).
 18. Los escenarios lima-* usan estructuras de fase OSM arbitrarias; el HIL
     usa el cruce dedicado `nsb-cruz` (D-12). Extrapolar de un cruce único a
     una red real no está soportado por esta evidencia.

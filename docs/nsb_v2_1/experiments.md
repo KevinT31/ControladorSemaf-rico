@@ -19,7 +19,7 @@ Jamás se marca VERIFIED algo no ejecutado (spec §50).
 | 8 | pérdida MQTT | `python -m nsb demo --id 8` | VERIFIED (Windows, 2026-07-05) |
 | 9 | pérdida HIL / silencio | `python -m nsb demo --id 9` | VERIFIED (Windows) |
 | 10 | EV en fase incompatible | `python -m nsb demo --id 10` | VERIFIED (Windows) |
-| 11 | video real shadow mode | F4 | NOT RUN (F4 pendiente) |
+| 11 | video real shadow mode | ver `drone_video_validation.md` | IMPLEMENTED / NOT RUN (sin video ni pesos en el repo) |
 | 12 | replay determinista | `python -m nsb demo --id 12` | VERIFIED (Windows) |
 
 ## Experimento A — HIL con SUMO real (escenario `nsb-cruz`)
@@ -36,9 +36,11 @@ Jamás se marca VERIFIED algo no ejecutado (spec §50).
 0 timeouts, digest determinista. Con la Pi: mismo procedimiento, nodo en la
 Pi (`hil.host` = IP de la PC) — REQUIRES HARDWARE.
 
-## Experimento B — video de dron (F4)
+## Experimento B — video de dron
 
-Ver `drone_video_validation.md` — pendiente de F4. Solo ADVISORY.
+Implementado (solo ADVISORY, spec §15): `--source video` + `gt-sample` +
+`gt-eval`. Comandos exactos y estado honesto en `drone_video_validation.md`.
+Sin video real ni pesos YOLO en el repo: NOT RUN hasta tenerlos.
 
 ## Experimento C — replay reproducible
 

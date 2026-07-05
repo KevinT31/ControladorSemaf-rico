@@ -162,6 +162,19 @@ empíricamente con broker real). Identidad por nodo vía mTLS: CN del cert =
 node_id = usuario de la ACL (`pattern write nsb/%u/#`); el sink no suscribe
 ningún tópico (coherente con D-H: MQTT no puede elevar el modo).
 
+## D-J Video: dual-ROI reutilizando ProcesadorVideo sin modificarlo
+
+La fuente de video necesita métricas POR DIRECCIÓN (NS/EO) y el pipeline
+existente (`ProcesadorVideo`: YOLO + ByteTrack + colas) es mono-ROI con
+estado interno de tracking. Decisión: UN decodificado del video alimenta DOS
+instancias (una por ROI), cada una con su tracker. Costo: el modelo YOLO se
+carga dos veces (RAM), aceptable para procesamiento offline ADVISORY.
+Alternativa descartada: partir detecciones de una sola pasada por ROI —
+exigiría invadir el tracker y las colas del código canónico de visión.
+Los flags de calidad (`camera_moving`, `calibrated`) los DECLARA el operador
+(spec §16: no se inventan calibraciones ni detección de movimiento de
+cámara). Ventana sin frames ⇒ `quality.valid=False` ⇒ el guard la rechaza.
+
 ## D-H El modo de autoridad solo puede degradarse en runtime
 
 El modo se fija al construir el proceso (config+CLI+env) y únicamente puede

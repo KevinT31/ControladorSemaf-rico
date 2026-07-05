@@ -31,7 +31,8 @@ envuelve TODA salida hacia actuación; ninguna recomendación lo puentea.
 | `tsc/` | PhaseFSM (transiciones seguras), TscEmulator, relojes inyectables (D-B) |
 | `authority/` | resolución de modo + triple compuerta direct-lab (D-H) |
 | `actuation/` | SimulatedActuator (Windows) / GPIOActuator (Pi, import perezoso) |
-| `sources/` | manual, replay; video llega en F4 |
+| `sources/` | manual, replay, video (F4, solo ADVISORY) |
+| `vision/` | proveedor dual-ROI sobre el pipeline YOLO existente + ground truth (F4) |
 | `hil/` | protocolo TCP JSON-lines, gateway SUMO, cliente del nodo (D-03) |
 | `telemetry/` | eventos correlacionables, JSONL (siempre), HTTP opcional |
 | `comms/` | sink MQTT TLS opcional (plano de telemetría — D-02, D-F) |

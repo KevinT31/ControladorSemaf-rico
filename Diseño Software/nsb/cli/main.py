@@ -58,9 +58,20 @@ def _parser() -> argparse.ArgumentParser:
                      help="ruta a node.yaml")
     run.add_argument("--mode", choices=sorted(_MODOS_CLI),
                      help="override del modo (direct-lab exige triple compuerta)")
-    run.add_argument("--source", choices=["manual", "replay", "sumo_hil"],
-                     help="override de la fuente (video llega en F4)")
-    run.add_argument("--input", help="JSONL de entrada (source=replay)")
+    run.add_argument("--source", choices=["manual", "replay", "sumo_hil",
+                                          "video"],
+                     help="override de la fuente")
+    run.add_argument("--input", help="JSONL (source=replay) o video "
+                                     "(source=video)")
+    # source=video (F4): SOLO ADVISORY; ROIs en píxeles x,y,w,h
+    run.add_argument("--roi-ns", help="ROI NS del video: x,y,w,h")
+    run.add_argument("--roi-eo", help="ROI EO del video: x,y,w,h")
+    run.add_argument("--stride", type=int, default=15,
+                     help="procesar 1 de cada N frames (video)")
+    run.add_argument("--px-per-m", type=float, default=None,
+                     help="calibración px/metro (activa quality.calibrated)")
+    run.add_argument("--camera-moving", action="store_true",
+                     help="dron móvil: velocidades no confiables (spec §16)")
     run.add_argument("--escenario", default="uniforme",
                      help="escenario de la fuente manual")
     run.add_argument("--pasos", type=int, default=40,
@@ -95,7 +106,27 @@ def _parser() -> argparse.ArgumentParser:
 
     de = sub.add_parser("demo", help="demos reproducibles de la spec §43")
     de.add_argument("--id", type=int, required=True,
-                    help="número de demo (1,2,5,6,7,9,10,12)")
+                    help="número de demo (1,2,5,6,7,8,9,10,12)")
+
+    gts = sub.add_parser("gt-sample",
+                         help="muestrear frames de un video para anotar "
+                              "ground truth a mano (spec §17)")
+    gts.add_argument("--input", required=True, help="video de entrada")
+    gts.add_argument("--out", required=True, help="directorio de salida")
+    gts.add_argument("--every-s", type=float, default=5.0,
+                     help="segundos de video entre frames muestreados")
+    gts.add_argument("--max", type=int, default=None,
+                     help="máximo de frames a extraer")
+
+    gte = sub.add_parser("gt-eval",
+                         help="evaluar conteos anotados vs. estados grabados "
+                              "(MAE/RMSE por acceso)")
+    gte.add_argument("--manifest", required=True,
+                     help="manifest.csv ANOTADO de gt-sample")
+    gte.add_argument("--states", required=True,
+                     help="JSONL grabado con run --source video --record")
+    gte.add_argument("--tol-s", type=float, default=12.5,
+                     help="tolerancia de emparejamiento temporal")
 
     return p
 
@@ -131,6 +162,20 @@ def _cmd_digest(args) -> int:
     return 0
 
 
+def _parse_roi(texto: str):
+    """"x,y,w,h" → tupla de 4 enteros (w,h > 0)."""
+    partes = texto.split(",")
+    if len(partes) != 4:
+        raise ValueError(f"ROI inválida {texto!r}: se esperaba x,y,w,h")
+    try:
+        x, y, w, h = (int(p.strip()) for p in partes)
+    except ValueError:
+        raise ValueError(f"ROI inválida {texto!r}: valores no enteros")
+    if x < 0 or y < 0 or w <= 0 or h <= 0:
+        raise ValueError(f"ROI inválida {texto!r}: x,y >= 0 y w,h > 0")
+    return (x, y, w, h)
+
+
 def _cmd_run(args) -> int:
     from nsb.config import load_node_config
     from nsb.node import NsbNode
@@ -161,8 +206,43 @@ def _cmd_run(args) -> int:
             control_interval_s=cfg.control_interval_s)
     elif source_kind is SourceKind.SUMO_HIL:
         exp_id = args.experiment_id or "hil-node"
+    elif source_kind is SourceKind.VIDEO:
+        # SOLO ADVISORY (spec §15): el video jamás actúa sobre semáforos
+        modo_efectivo = cli_mode if cli_mode is not None else cfg.mode
+        if modo_efectivo is not Mode.ADVISORY:
+            print("ERROR: source=video solo admite ADVISORY (spec §15); "
+                  "use --mode advisory", file=sys.stderr)
+            return 1
+        if not (args.input and args.roi_ns and args.roi_eo):
+            print("ERROR: source=video requiere --input, --roi-ns y --roi-eo",
+                  file=sys.stderr)
+            return 1
+        try:
+            roi_ns = _parse_roi(args.roi_ns)
+            roi_eo = _parse_roi(args.roi_eo)
+        except ValueError as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            return 1
+        from nsb.sources.video import VideoStateSource
+        from nsb.vision.provider import DualRoiVideoProvider
+        try:
+            provider = DualRoiVideoProvider(
+                args.input, roi_ns=roi_ns, roi_eo=roi_eo,
+                stride=args.stride, px_per_m=args.px_per_m)
+        except (RuntimeError, FileNotFoundError, ValueError) as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            return 1
+        exp_id = args.experiment_id or f"video-{Path(args.input).stem}"
+        fuente = VideoStateSource(
+            provider, experiment_id=exp_id,
+            intersection_id=cfg.intersection_id,
+            control_interval_s=cfg.control_interval_s,
+            camera_moving=args.camera_moving,
+            calibrated=args.px_per_m is not None,
+            metadata={"video": Path(args.input).name,
+                      "stride": str(args.stride)})
     else:
-        print(f"ERROR: fuente {source_kind.value} disponible en F4 (video)",
+        print(f"ERROR: fuente {source_kind.value} no soportada",
               file=sys.stderr)
         return 1
 
@@ -272,6 +352,38 @@ def _cmd_demo(args) -> int:
     return run_demo(args.id)
 
 
+def _cmd_gt_sample(args) -> int:
+    from nsb.vision.ground_truth import sample_frames
+
+    try:
+        manifest = sample_frames(args.input, args.out,
+                                 every_s=args.every_s, max_frames=args.max)
+    except (RuntimeError, OSError, ValueError) as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 1
+    print(f"manifest -> {manifest}")
+    print("Anote count_ns/count_eo A MANO (spec §17: ground truth humano; "
+          "SUMO no es ground truth de video real).")
+    return 0
+
+
+def _cmd_gt_eval(args) -> int:
+    import json as _json
+
+    from nsb.vision.ground_truth import evaluar_conteos
+
+    try:
+        r = evaluar_conteos(args.manifest, args.states, tol_s=args.tol_s)
+    except (OSError, ValueError) as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 1
+    print(_json.dumps(r, indent=2, ensure_ascii=False))
+    print(f"NS: MAE={r['ns']['mae']:.2f} RMSE={r['ns']['rmse']:.2f} | "
+          f"EO: MAE={r['eo']['mae']:.2f} RMSE={r['eo']['rmse']:.2f} "
+          f"(n={r['n_emparejadas']}/{r['n_anotaciones']})")
+    return 0
+
+
 def main(argv: Optional[list] = None) -> int:
     args = _parser().parse_args(argv)
     _configurar_logging(getattr(args, "log_level", "INFO"))
@@ -287,4 +399,8 @@ def main(argv: Optional[list] = None) -> int:
         return _cmd_bench(args)
     if args.cmd == "demo":
         return _cmd_demo(args)
+    if args.cmd == "gt-sample":
+        return _cmd_gt_sample(args)
+    if args.cmd == "gt-eval":
+        return _cmd_gt_eval(args)
     return 1
