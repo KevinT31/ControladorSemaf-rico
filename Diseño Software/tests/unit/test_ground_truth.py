@@ -80,7 +80,9 @@ def test_sample_frames_video_sintetico(tmp_path):
         vw.write(frame)
     vw.release()
 
-    out = tmp_path / "gt"
+    # el directorio lleva "ñ" a propósito: imwrite falla con rutas no-ASCII
+    # en Windows (hallazgo del red team); imencode+tofile no
+    out = tmp_path / "gt-año"
     manifest = sample_frames(video, out, every_s=1.0)
     filas = list(csv.DictReader(open(manifest, encoding="utf-8")))
     assert len(filas) == 3                    # t = 0, 1, 2 s

@@ -12,6 +12,7 @@ módulo jamás falla en plataformas sin visión (mismo patrón que GPIO, §23).
 from __future__ import annotations
 
 import logging
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Optional, Tuple
@@ -45,15 +46,28 @@ def _ev_confidence(detecciones) -> float:
     return min(1.0, mejor)
 
 
+def _finito(x, nombre: str) -> float:
+    """Sanea NaN/inf del pipeline de visión → 0.0 con warning.
+
+    Un frame degenerado no debe tumbar toda la corrida: los contratos NSB
+    rechazan no-finitos (D-G) y aquí la política es descartar el valor,
+    no el video completo (hallazgo del red team F3/F4)."""
+    v = float(x)
+    if not math.isfinite(v) or v < 0.0:
+        logger.warning("visión produjo %s=%r; se registra 0.0", nombre, x)
+        return 0.0
+    return v
+
+
 def _a_metrics(resultado, t_s: float) -> FrameMetrics:
     """ResultadoFrame (pipeline existente) → FrameMetrics NSB."""
     return FrameMetrics(
         t_s=t_s,
         num_vehicles=int(resultado.num_vehiculos),
         stopped_vehicles=int(resultado.cola_vehiculos_count),
-        queue_m=max(0.0, float(resultado.longitud_cola)),
-        speed_kmh=max(0.0, float(resultado.velocidad_promedio)),
-        flow_veh_min=max(0.0, float(resultado.flujo_vehicular)),
+        queue_m=_finito(resultado.longitud_cola, "queue_m"),
+        speed_kmh=_finito(resultado.velocidad_promedio, "speed_kmh"),
+        flow_veh_min=_finito(resultado.flujo_vehicular, "flow_veh_min"),
         ev_confidence=(_ev_confidence(resultado.detecciones_emergencia)
                        if resultado.hay_emergencia else 0.0),
     )

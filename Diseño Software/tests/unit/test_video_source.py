@@ -106,6 +106,23 @@ def test_nodo_advisory_consume_fuente_de_video(tmp_path):
     assert summary.verdicts.get("accept", 0) == 3
 
 
+# ------------------------------------------- saneo de NaN/inf (red team)
+def test_metricas_no_finitas_se_sanean_a_cero():
+    """Un frame degenerado del pipeline (inf/NaN) no tumba la corrida."""
+    from types import SimpleNamespace
+
+    from nsb.vision.provider import _a_metrics
+
+    r = SimpleNamespace(num_vehiculos=3, cola_vehiculos_count=1,
+                        longitud_cola=float("inf"),
+                        velocidad_promedio=float("nan"),
+                        flujo_vehicular=-5.0,
+                        hay_emergencia=False, detecciones_emergencia=[])
+    m = _a_metrics(r, t_s=1.0)
+    assert m.queue_m == 0.0 and m.speed_kmh == 0.0 and m.flow_veh_min == 0.0
+    assert m.num_vehicles == 3
+
+
 # ----------------------------------------------------------- CLI / ROI
 def test_parse_roi_valida():
     assert _parse_roi("0, 0, 640, 360") == (0, 0, 640, 360)

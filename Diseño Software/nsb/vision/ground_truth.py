@@ -61,8 +61,12 @@ def sample_frames(video_path: str | Path, out_dir: str | Path,
             if n % paso == 0:
                 t_s = n / fps
                 nombre = f"frame_{n:07d}.png"
-                if not cv2.imwrite(str(out / nombre), frame):
-                    raise OSError(f"no se pudo escribir {out / nombre}")
+                # imencode+tofile y no imwrite: imwrite falla silenciosamente
+                # con rutas no-ASCII en Windows (p. ej. "Diseño Software")
+                ok, buf = cv2.imencode(".png", frame)
+                if not ok:
+                    raise OSError(f"no se pudo codificar {nombre}")
+                buf.tofile(str(out / nombre))
                 filas.append({"frame_idx": str(n), "t_s": f"{t_s:.3f}",
                               "archivo": nombre,
                               "count_ns": "", "count_eo": "", "notas": ""})
