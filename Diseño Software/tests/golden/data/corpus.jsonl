@@ -1,0 +1,1311 @@
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.0, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.05, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.1, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.15, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.25, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.3, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.35, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.5, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.55, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.6, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.65, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.75, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.8, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.95, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.05, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.05, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.1, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.1, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.15, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.15, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.2, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.2, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.25, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.25, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.35, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.35, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.4, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.4, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.45, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.45, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.55, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.55, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.6, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.6, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.65, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.65, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.7, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.7, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.75, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.75, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.85, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.85, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.9, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.9, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.95, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 0.95, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 1.0, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 1.0, "pi": 1.0, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.3, "ev": 0.5}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.5, "ev": 0.5}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.8, "ev": 0.5}}
+{"kind": "fuzzy", "in": {"icv": 0.2, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.3, "ev": 0.5}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.5, "ev": 0.5}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.8, "ev": 0.5}}
+{"kind": "fuzzy", "in": {"icv": 0.4, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.3, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.3, "ev": 0.5}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.3, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.5, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.5, "ev": 0.5}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.5, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.8, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.8, "ev": 0.5}}
+{"kind": "fuzzy", "in": {"icv": 0.7, "pi": 0.8, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.900073, "pi": 0.332964, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.172523, "pi": 0.443963, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.920363, "pi": 0.918604, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.53857, "pi": 0.854603, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.702188, "pi": 0.695729, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.314085, "pi": 0.178789, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.399892, "pi": 0.867636, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.429331, "pi": 0.069637, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.378001, "pi": 0.809852, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.250585, "pi": 0.463445, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.896854, "pi": 0.381917, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.120867, "pi": 0.021297, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.31001, "pi": 0.187039, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.980539, "pi": 0.905715, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.704888, "pi": 0.365869, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.551841, "pi": 0.490145, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.830171, "pi": 0.45496, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.086646, "pi": 0.357144, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.926185, "pi": 0.29133, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.9114, "pi": 0.337424, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.044391, "pi": 0.918834, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.362704, "pi": 0.694142, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.690852, "pi": 0.385673, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.453593, "pi": 0.200974, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.132849, "pi": 0.320604, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.060015, "pi": 0.716611, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.079958, "pi": 0.131091, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.774385, "pi": 0.12924, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.66255, "pi": 0.493444, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.27364, "pi": 0.84631, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.461826, "pi": 0.368273, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.783002, "pi": 0.657191, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.814269, "pi": 0.714886, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.910546, "pi": 0.3915, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.440077, "pi": 0.451247, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.401499, "pi": 0.817504, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.263909, "pi": 0.503936, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.697677, "pi": 0.717806, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.319344, "pi": 0.825269, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.514082, "pi": 0.412666, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.247166, "pi": 0.066305, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.829914, "pi": 0.15633, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.783168, "pi": 0.375922, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.148031, "pi": 0.881525, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.083544, "pi": 0.321655, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.293508, "pi": 0.2781, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.752937, "pi": 0.303223, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.270325, "pi": 0.825441, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.587342, "pi": 0.683165, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.498021, "pi": 0.274953, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.739262, "pi": 0.761141, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.944385, "pi": 0.358597, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.910467, "pi": 0.014147, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.85159, "pi": 0.646552, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.999925, "pi": 0.786735, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.444585, "pi": 0.972793, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.896192, "pi": 0.584276, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.687175, "pi": 0.507931, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.558731, "pi": 0.974799, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.102582, "pi": 0.589828, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.37097, "pi": 0.639151, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.424207, "pi": 0.718764, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.001996, "pi": 0.949965, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.214913, "pi": 0.565446, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.600073, "pi": 0.985249, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.959728, "pi": 0.518109, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.254743, "pi": 0.604551, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.868866, "pi": 0.196654, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.927041, "pi": 0.939503, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.527407, "pi": 0.420925, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.385059, "pi": 0.862589, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.339658, "pi": 0.853827, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.958634, "pi": 0.100258, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.100537, "pi": 0.084182, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.179366, "pi": 0.883159, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.002035, "pi": 0.262002, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.279173, "pi": 0.119471, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.289138, "pi": 0.09303, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.235087, "pi": 0.335977, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.30356, "pi": 0.730545, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.02625, "pi": 0.734613, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.085895, "pi": 0.701969, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.016347, "pi": 0.938886, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.069524, "pi": 0.083565, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.329993, "pi": 0.196878, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.221259, "pi": 0.301359, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.727662, "pi": 0.929749, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.159948, "pi": 0.133005, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.060762, "pi": 0.98444, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.470057, "pi": 0.884356, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.191887, "pi": 0.355314, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.196658, "pi": 0.497451, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.613261, "pi": 0.223698, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.910036, "pi": 0.601223, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.595063, "pi": 0.773413, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.911167, "pi": 0.062026, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.881343, "pi": 0.070735, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.499713, "pi": 0.923818, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.947653, "pi": 0.60645, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.579742, "pi": 0.444146, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.771652, "pi": 0.372407, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.307225, "pi": 0.396315, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.801668, "pi": 0.287505, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.485238, "pi": 0.272497, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.997877, "pi": 0.103232, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.858529, "pi": 0.068252, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.101523, "pi": 0.381955, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.574296, "pi": 0.97905, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.299387, "pi": 0.939783, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.044492, "pi": 0.90662, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.228163, "pi": 0.148684, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.269995, "pi": 0.103688, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.473139, "pi": 0.976615, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.151107, "pi": 0.940888, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.833193, "pi": 0.660144, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.661081, "pi": 0.659494, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.712675, "pi": 0.745801, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.281549, "pi": 0.072074, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.680826, "pi": 0.566482, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.369843, "pi": 0.149771, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.085487, "pi": 0.595028, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.526693, "pi": 0.898535, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.269854, "pi": 0.538046, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.895302, "pi": 0.111818, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.20485, "pi": 0.063183, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.494498, "pi": 0.484202, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.378863, "pi": 0.023808, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.052953, "pi": 0.371249, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.611072, "pi": 0.52095, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.100995, "pi": 0.695746, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.753503, "pi": 0.192375, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.762735, "pi": 0.123429, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.331494, "pi": 0.132901, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.698036, "pi": 0.527217, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.649919, "pi": 0.587989, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.697041, "pi": 0.398231, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.258776, "pi": 0.061304, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.714365, "pi": 0.976027, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.718229, "pi": 0.15862, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.419468, "pi": 0.071294, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.814986, "pi": 0.634149, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.749998, "pi": 0.200629, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.056339, "pi": 0.248764, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.915879, "pi": 0.124598, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.394496, "pi": 0.796742, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.768123, "pi": 0.023174, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.120889, "pi": 0.290459, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.129245, "pi": 0.572374, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.004459, "pi": 0.310295, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.147196, "pi": 0.068806, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.567279, "pi": 0.70063, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.340848, "pi": 0.127029, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.665834, "pi": 0.341989, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.706615, "pi": 0.885024, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.83143, "pi": 0.486423, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.58245, "pi": 0.295369, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.078532, "pi": 0.551679, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.658431, "pi": 0.037432, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.868749, "pi": 0.880834, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.355532, "pi": 0.472985, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.402614, "pi": 0.232728, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.161077, "pi": 0.881348, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.45697, "pi": 0.486073, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.343073, "pi": 0.574371, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.616259, "pi": 0.156375, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.921467, "pi": 0.068918, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.56869, "pi": 0.730712, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.874029, "pi": 0.204643, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.354614, "pi": 0.295374, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.649094, "pi": 0.222793, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.396765, "pi": 0.450689, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.378544, "pi": 0.344972, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.324012, "pi": 0.589436, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.03871, "pi": 0.595801, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.739366, "pi": 0.172441, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.724687, "pi": 0.569042, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.23138, "pi": 0.037048, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.791235, "pi": 0.924411, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.918576, "pi": 0.053402, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.591746, "pi": 0.967188, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.661474, "pi": 0.099859, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.870661, "pi": 0.411846, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.930498, "pi": 0.031563, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.493803, "pi": 0.369776, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.855186, "pi": 0.280794, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.669793, "pi": 0.804373, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.207721, "pi": 0.505953, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.386024, "pi": 0.869855, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.124434, "pi": 0.423862, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.239013, "pi": 0.62151, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.590753, "pi": 0.253835, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.695257, "pi": 0.080665, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.946456, "pi": 0.204734, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.84229, "pi": 0.033158, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.562351, "pi": 0.564745, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.369943, "pi": 0.189401, "ev": 1.0}}
+{"kind": "fuzzy", "in": {"icv": 0.709352, "pi": 0.271919, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.651374, "pi": 0.139878, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.659906, "pi": 0.334576, "ev": 0.0}}
+{"kind": "fuzzy", "in": {"icv": 0.774107, "pi": 0.878358, "ev": 1.0}}
+{"kind": "state", "in": {"queue_m": 0, "speed_kmh": 0, "flow_veh_min": 0, "num_vehicles": 0, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 500, "speed_kmh": 0.1, "flow_veh_min": 30, "num_vehicles": 60, "stopped_vehicles": 60}}
+{"kind": "state", "in": {"queue_m": 126.125, "speed_kmh": 10.009, "flow_veh_min": 30.972, "num_vehicles": 1, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 40.783, "speed_kmh": 57.922, "flow_veh_min": 30.727, "num_vehicles": 15, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 144.044, "speed_kmh": 10.406, "flow_veh_min": 1.71, "num_vehicles": 48, "stopped_vehicles": 11}}
+{"kind": "state", "in": {"queue_m": 260.307, "speed_kmh": 42.29, "flow_veh_min": 31.632, "num_vehicles": 4, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 13.626, "speed_kmh": 38.909, "flow_veh_min": 15.993, "num_vehicles": 15, "stopped_vehicles": 9}}
+{"kind": "state", "in": {"queue_m": 265.971, "speed_kmh": 15.077, "flow_veh_min": 7.781, "num_vehicles": 42, "stopped_vehicles": 39}}
+{"kind": "state", "in": {"queue_m": 252.536, "speed_kmh": 45.322, "flow_veh_min": 28.801, "num_vehicles": 17, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 222.158, "speed_kmh": 49.442, "flow_veh_min": 11.734, "num_vehicles": 44, "stopped_vehicles": 16}}
+{"kind": "state", "in": {"queue_m": 288.471, "speed_kmh": 59.202, "flow_veh_min": 15.513, "num_vehicles": 27, "stopped_vehicles": 27}}
+{"kind": "state", "in": {"queue_m": 255.476, "speed_kmh": 15.076, "flow_veh_min": 21.494, "num_vehicles": 34, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 118.788, "speed_kmh": 20.616, "flow_veh_min": 16.01, "num_vehicles": 29, "stopped_vehicles": 21}}
+{"kind": "state", "in": {"queue_m": 265.493, "speed_kmh": 51.216, "flow_veh_min": 35.404, "num_vehicles": 46, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 93.951, "speed_kmh": 50.897, "flow_veh_min": 21.582, "num_vehicles": 49, "stopped_vehicles": 33}}
+{"kind": "state", "in": {"queue_m": 13.642, "speed_kmh": 49.749, "flow_veh_min": 2.281, "num_vehicles": 48, "stopped_vehicles": 17}}
+{"kind": "state", "in": {"queue_m": 294.883, "speed_kmh": 68.28, "flow_veh_min": 27.452, "num_vehicles": 29, "stopped_vehicles": 10}}
+{"kind": "state", "in": {"queue_m": 205.073, "speed_kmh": 62.928, "flow_veh_min": 20.465, "num_vehicles": 39, "stopped_vehicles": 10}}
+{"kind": "state", "in": {"queue_m": 253.681, "speed_kmh": 54.867, "flow_veh_min": 26.424, "num_vehicles": 3, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 134.796, "speed_kmh": 37.014, "flow_veh_min": 17.173, "num_vehicles": 42, "stopped_vehicles": 33}}
+{"kind": "state", "in": {"queue_m": 134.325, "speed_kmh": 15.667, "flow_veh_min": 25.468, "num_vehicles": 39, "stopped_vehicles": 36}}
+{"kind": "state", "in": {"queue_m": 259.718, "speed_kmh": 5.445, "flow_veh_min": 4.786, "num_vehicles": 15, "stopped_vehicles": 8}}
+{"kind": "state", "in": {"queue_m": 161.254, "speed_kmh": 13.677, "flow_veh_min": 11.357, "num_vehicles": 50, "stopped_vehicles": 33}}
+{"kind": "state", "in": {"queue_m": 198.085, "speed_kmh": 36.95, "flow_veh_min": 38.021, "num_vehicles": 25, "stopped_vehicles": 9}}
+{"kind": "state", "in": {"queue_m": 123.222, "speed_kmh": 53.644, "flow_veh_min": 36.914, "num_vehicles": 11, "stopped_vehicles": 8}}
+{"kind": "state", "in": {"queue_m": 129.198, "speed_kmh": 43.584, "flow_veh_min": 35.987, "num_vehicles": 46, "stopped_vehicles": 19}}
+{"kind": "state", "in": {"queue_m": 1.279, "speed_kmh": 3.662, "flow_veh_min": 7.217, "num_vehicles": 4, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 70.317, "speed_kmh": 24.45, "flow_veh_min": 12.707, "num_vehicles": 41, "stopped_vehicles": 19}}
+{"kind": "state", "in": {"queue_m": 164.241, "speed_kmh": 64.597, "flow_veh_min": 1.472, "num_vehicles": 25, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 102.355, "speed_kmh": 16.468, "flow_veh_min": 9.082, "num_vehicles": 20, "stopped_vehicles": 13}}
+{"kind": "state", "in": {"queue_m": 162.912, "speed_kmh": 75.763, "flow_veh_min": 4.012, "num_vehicles": 25, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 229.033, "speed_kmh": 68.861, "flow_veh_min": 9.502, "num_vehicles": 41, "stopped_vehicles": 23}}
+{"kind": "state", "in": {"queue_m": 21.647, "speed_kmh": 58.261, "flow_veh_min": 10.457, "num_vehicles": 50, "stopped_vehicles": 19}}
+{"kind": "state", "in": {"queue_m": 52.308, "speed_kmh": 12.212, "flow_veh_min": 20.692, "num_vehicles": 15, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 244.769, "speed_kmh": 2.14, "flow_veh_min": 4.252, "num_vehicles": 11, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 140.687, "speed_kmh": 68.885, "flow_veh_min": 5.935, "num_vehicles": 24, "stopped_vehicles": 20}}
+{"kind": "state", "in": {"queue_m": 254.366, "speed_kmh": 8.719, "flow_veh_min": 15.616, "num_vehicles": 31, "stopped_vehicles": 15}}
+{"kind": "state", "in": {"queue_m": 29.458, "speed_kmh": 70.841, "flow_veh_min": 28.216, "num_vehicles": 42, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 289.141, "speed_kmh": 25.253, "flow_veh_min": 15.231, "num_vehicles": 11, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 251.588, "speed_kmh": 20.395, "flow_veh_min": 36.273, "num_vehicles": 26, "stopped_vehicles": 9}}
+{"kind": "state", "in": {"queue_m": 255.942, "speed_kmh": 16.183, "flow_veh_min": 13.205, "num_vehicles": 18, "stopped_vehicles": 13}}
+{"kind": "state", "in": {"queue_m": 64.253, "speed_kmh": 73.965, "flow_veh_min": 38.403, "num_vehicles": 29, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 3.261, "speed_kmh": 60.464, "flow_veh_min": 23.357, "num_vehicles": 6, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 113.796, "speed_kmh": 1.298, "flow_veh_min": 15.449, "num_vehicles": 28, "stopped_vehicles": 5}}
+{"kind": "state", "in": {"queue_m": 145.235, "speed_kmh": 34.554, "flow_veh_min": 31.618, "num_vehicles": 29, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 149.074, "speed_kmh": 0.616, "flow_veh_min": 23.994, "num_vehicles": 43, "stopped_vehicles": 8}}
+{"kind": "state", "in": {"queue_m": 126.311, "speed_kmh": 33.981, "flow_veh_min": 16.499, "num_vehicles": 35, "stopped_vehicles": 16}}
+{"kind": "state", "in": {"queue_m": 1.96, "speed_kmh": 19.841, "flow_veh_min": 30.206, "num_vehicles": 43, "stopped_vehicles": 40}}
+{"kind": "state", "in": {"queue_m": 283.747, "speed_kmh": 21.143, "flow_veh_min": 6.48, "num_vehicles": 8, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 286.314, "speed_kmh": 5.059, "flow_veh_min": 15.995, "num_vehicles": 20, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 246.584, "speed_kmh": 4.247, "flow_veh_min": 22.304, "num_vehicles": 18, "stopped_vehicles": 15}}
+{"kind": "state", "in": {"queue_m": 230.976, "speed_kmh": 51.368, "flow_veh_min": 23.415, "num_vehicles": 5, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 136.674, "speed_kmh": 1.343, "flow_veh_min": 12.636, "num_vehicles": 31, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 130.192, "speed_kmh": 40.848, "flow_veh_min": 33.763, "num_vehicles": 17, "stopped_vehicles": 8}}
+{"kind": "state", "in": {"queue_m": 142.309, "speed_kmh": 66.178, "flow_veh_min": 13.031, "num_vehicles": 48, "stopped_vehicles": 18}}
+{"kind": "state", "in": {"queue_m": 15.092, "speed_kmh": 37.633, "flow_veh_min": 17.448, "num_vehicles": 49, "stopped_vehicles": 48}}
+{"kind": "state", "in": {"queue_m": 290.433, "speed_kmh": 12.024, "flow_veh_min": 2.749, "num_vehicles": 23, "stopped_vehicles": 20}}
+{"kind": "state", "in": {"queue_m": 230.127, "speed_kmh": 38.986, "flow_veh_min": 2.117, "num_vehicles": 44, "stopped_vehicles": 43}}
+{"kind": "state", "in": {"queue_m": 57.943, "speed_kmh": 41.593, "flow_veh_min": 27.868, "num_vehicles": 10, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 69.495, "speed_kmh": 7.956, "flow_veh_min": 1.38, "num_vehicles": 15, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 164.338, "speed_kmh": 54.593, "flow_veh_min": 2.568, "num_vehicles": 14, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 130.905, "speed_kmh": 76.871, "flow_veh_min": 20.366, "num_vehicles": 32, "stopped_vehicles": 13}}
+{"kind": "state", "in": {"queue_m": 244.482, "speed_kmh": 61.325, "flow_veh_min": 8.109, "num_vehicles": 19, "stopped_vehicles": 12}}
+{"kind": "state", "in": {"queue_m": 286.504, "speed_kmh": 3.054, "flow_veh_min": 33.621, "num_vehicles": 9, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 196.574, "speed_kmh": 5.883, "flow_veh_min": 39.065, "num_vehicles": 43, "stopped_vehicles": 30}}
+{"kind": "state", "in": {"queue_m": 225.827, "speed_kmh": 13.578, "flow_veh_min": 12.39, "num_vehicles": 38, "stopped_vehicles": 14}}
+{"kind": "state", "in": {"queue_m": 170.586, "speed_kmh": 26.334, "flow_veh_min": 26.976, "num_vehicles": 6, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 111.003, "speed_kmh": 45.759, "flow_veh_min": 33.822, "num_vehicles": 45, "stopped_vehicles": 43}}
+{"kind": "state", "in": {"queue_m": 14.759, "speed_kmh": 75.131, "flow_veh_min": 18.686, "num_vehicles": 26, "stopped_vehicles": 22}}
+{"kind": "state", "in": {"queue_m": 80.134, "speed_kmh": 43.648, "flow_veh_min": 24.108, "num_vehicles": 46, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 226.297, "speed_kmh": 56.745, "flow_veh_min": 19.376, "num_vehicles": 49, "stopped_vehicles": 46}}
+{"kind": "state", "in": {"queue_m": 22.558, "speed_kmh": 71.903, "flow_veh_min": 33.941, "num_vehicles": 14, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 224.082, "speed_kmh": 23.242, "flow_veh_min": 7.205, "num_vehicles": 27, "stopped_vehicles": 14}}
+{"kind": "state", "in": {"queue_m": 245.543, "speed_kmh": 58.504, "flow_veh_min": 22.679, "num_vehicles": 15, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 14.683, "speed_kmh": 37.523, "flow_veh_min": 20.969, "num_vehicles": 16, "stopped_vehicles": 16}}
+{"kind": "state", "in": {"queue_m": 29.851, "speed_kmh": 65.02, "flow_veh_min": 5.998, "num_vehicles": 41, "stopped_vehicles": 23}}
+{"kind": "state", "in": {"queue_m": 130.87, "speed_kmh": 52.138, "flow_veh_min": 21.87, "num_vehicles": 42, "stopped_vehicles": 39}}
+{"kind": "state", "in": {"queue_m": 282.573, "speed_kmh": 63.212, "flow_veh_min": 4.878, "num_vehicles": 29, "stopped_vehicles": 9}}
+{"kind": "state", "in": {"queue_m": 27.571, "speed_kmh": 26.456, "flow_veh_min": 11.031, "num_vehicles": 10, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 88.799, "speed_kmh": 0.012, "flow_veh_min": 3.438, "num_vehicles": 39, "stopped_vehicles": 35}}
+{"kind": "state", "in": {"queue_m": 64.09, "speed_kmh": 45.715, "flow_veh_min": 0.408, "num_vehicles": 17, "stopped_vehicles": 14}}
+{"kind": "state", "in": {"queue_m": 47.879, "speed_kmh": 8.843, "flow_veh_min": 33.133, "num_vehicles": 24, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 197.86, "speed_kmh": 46.702, "flow_veh_min": 36.422, "num_vehicles": 42, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 225.574, "speed_kmh": 14.682, "flow_veh_min": 2.845, "num_vehicles": 43, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 60.492, "speed_kmh": 19.642, "flow_veh_min": 25.725, "num_vehicles": 28, "stopped_vehicles": 20}}
+{"kind": "state", "in": {"queue_m": 86.297, "speed_kmh": 78.644, "flow_veh_min": 38.182, "num_vehicles": 28, "stopped_vehicles": 18}}
+{"kind": "state", "in": {"queue_m": 129.673, "speed_kmh": 44.738, "flow_veh_min": 36.5, "num_vehicles": 22, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 30.515, "speed_kmh": 21.68, "flow_veh_min": 29.754, "num_vehicles": 5, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 265.237, "speed_kmh": 44.68, "flow_veh_min": 11.012, "num_vehicles": 3, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 87.587, "speed_kmh": 41.791, "flow_veh_min": 27.257, "num_vehicles": 34, "stopped_vehicles": 31}}
+{"kind": "state", "in": {"queue_m": 265.853, "speed_kmh": 42.789, "flow_veh_min": 39.062, "num_vehicles": 27, "stopped_vehicles": 21}}
+{"kind": "state", "in": {"queue_m": 239.5, "speed_kmh": 31.151, "flow_veh_min": 12.711, "num_vehicles": 41, "stopped_vehicles": 23}}
+{"kind": "state", "in": {"queue_m": 142.83, "speed_kmh": 30.573, "flow_veh_min": 14.822, "num_vehicles": 12, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 95.387, "speed_kmh": 47.931, "flow_veh_min": 28.178, "num_vehicles": 11, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 85.512, "speed_kmh": 46.019, "flow_veh_min": 2.199, "num_vehicles": 0, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 288.158, "speed_kmh": 72.329, "flow_veh_min": 1.061, "num_vehicles": 0, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 60.312, "speed_kmh": 70.317, "flow_veh_min": 31.472, "num_vehicles": 37, "stopped_vehicles": 22}}
+{"kind": "state", "in": {"queue_m": 215.809, "speed_kmh": 26.859, "flow_veh_min": 20.561, "num_vehicles": 45, "stopped_vehicles": 12}}
+{"kind": "state", "in": {"queue_m": 20.565, "speed_kmh": 72.6, "flow_veh_min": 21.429, "num_vehicles": 6, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 267.477, "speed_kmh": 50.635, "flow_veh_min": 5.529, "num_vehicles": 14, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 104.462, "speed_kmh": 61.419, "flow_veh_min": 18.064, "num_vehicles": 21, "stopped_vehicles": 9}}
+{"kind": "state", "in": {"queue_m": 206.017, "speed_kmh": 77.221, "flow_veh_min": 18.643, "num_vehicles": 36, "stopped_vehicles": 27}}
+{"kind": "state", "in": {"queue_m": 79.54, "speed_kmh": 7.494, "flow_veh_min": 38.636, "num_vehicles": 22, "stopped_vehicles": 18}}
+{"kind": "state", "in": {"queue_m": 33.884, "speed_kmh": 55.351, "flow_veh_min": 17.834, "num_vehicles": 18, "stopped_vehicles": 12}}
+{"kind": "state", "in": {"queue_m": 27.553, "speed_kmh": 70.068, "flow_veh_min": 18.6, "num_vehicles": 7, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 149.435, "speed_kmh": 3.9, "flow_veh_min": 30.802, "num_vehicles": 30, "stopped_vehicles": 18}}
+{"kind": "state", "in": {"queue_m": 273.535, "speed_kmh": 60.263, "flow_veh_min": 26.901, "num_vehicles": 28, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 219.559, "speed_kmh": 34.727, "flow_veh_min": 14.076, "num_vehicles": 11, "stopped_vehicles": 11}}
+{"kind": "state", "in": {"queue_m": 179.874, "speed_kmh": 69.337, "flow_veh_min": 24.691, "num_vehicles": 24, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 268.198, "speed_kmh": 31.683, "flow_veh_min": 37.304, "num_vehicles": 24, "stopped_vehicles": 20}}
+{"kind": "state", "in": {"queue_m": 130.281, "speed_kmh": 39.811, "flow_veh_min": 0.457, "num_vehicles": 41, "stopped_vehicles": 11}}
+{"kind": "state", "in": {"queue_m": 99.822, "speed_kmh": 10.317, "flow_veh_min": 28.174, "num_vehicles": 13, "stopped_vehicles": 9}}
+{"kind": "state", "in": {"queue_m": 118.513, "speed_kmh": 44.726, "flow_veh_min": 24.23, "num_vehicles": 15, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 144.289, "speed_kmh": 9.159, "flow_veh_min": 29.172, "num_vehicles": 47, "stopped_vehicles": 22}}
+{"kind": "state", "in": {"queue_m": 188.541, "speed_kmh": 32.045, "flow_veh_min": 9.797, "num_vehicles": 38, "stopped_vehicles": 14}}
+{"kind": "state", "in": {"queue_m": 239.406, "speed_kmh": 62.395, "flow_veh_min": 0.982, "num_vehicles": 28, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 211.335, "speed_kmh": 41.65, "flow_veh_min": 27.334, "num_vehicles": 39, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 183.598, "speed_kmh": 40.966, "flow_veh_min": 38.915, "num_vehicles": 16, "stopped_vehicles": 15}}
+{"kind": "state", "in": {"queue_m": 209.431, "speed_kmh": 31.184, "flow_veh_min": 26.716, "num_vehicles": 24, "stopped_vehicles": 20}}
+{"kind": "state", "in": {"queue_m": 10.262, "speed_kmh": 76.038, "flow_veh_min": 25.942, "num_vehicles": 1, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 118.006, "speed_kmh": 60.277, "flow_veh_min": 21.806, "num_vehicles": 28, "stopped_vehicles": 10}}
+{"kind": "state", "in": {"queue_m": 89.686, "speed_kmh": 3.36, "flow_veh_min": 13.292, "num_vehicles": 12, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 8.17, "speed_kmh": 34.986, "flow_veh_min": 29.913, "num_vehicles": 33, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 39.05, "speed_kmh": 31.251, "flow_veh_min": 26.007, "num_vehicles": 48, "stopped_vehicles": 34}}
+{"kind": "state", "in": {"queue_m": 294.692, "speed_kmh": 33.562, "flow_veh_min": 12.862, "num_vehicles": 33, "stopped_vehicles": 30}}
+{"kind": "state", "in": {"queue_m": 164.344, "speed_kmh": 14.587, "flow_veh_min": 23.421, "num_vehicles": 29, "stopped_vehicles": 18}}
+{"kind": "state", "in": {"queue_m": 0.218, "speed_kmh": 35.276, "flow_veh_min": 30.51, "num_vehicles": 5, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 93.284, "speed_kmh": 42.732, "flow_veh_min": 22.36, "num_vehicles": 2, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 201.374, "speed_kmh": 2.456, "flow_veh_min": 35.621, "num_vehicles": 5, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 228.011, "speed_kmh": 47.291, "flow_veh_min": 0.033, "num_vehicles": 11, "stopped_vehicles": 10}}
+{"kind": "state", "in": {"queue_m": 289.369, "speed_kmh": 49.769, "flow_veh_min": 0.128, "num_vehicles": 7, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 77.188, "speed_kmh": 54.626, "flow_veh_min": 33.422, "num_vehicles": 46, "stopped_vehicles": 37}}
+{"kind": "state", "in": {"queue_m": 181.833, "speed_kmh": 18.621, "flow_veh_min": 14.423, "num_vehicles": 33, "stopped_vehicles": 20}}
+{"kind": "state", "in": {"queue_m": 238.439, "speed_kmh": 18.691, "flow_veh_min": 30.043, "num_vehicles": 36, "stopped_vehicles": 21}}
+{"kind": "state", "in": {"queue_m": 177.401, "speed_kmh": 18.045, "flow_veh_min": 9.666, "num_vehicles": 41, "stopped_vehicles": 23}}
+{"kind": "state", "in": {"queue_m": 95.797, "speed_kmh": 38.3, "flow_veh_min": 32.4, "num_vehicles": 18, "stopped_vehicles": 7}}
+{"kind": "state", "in": {"queue_m": 3.902, "speed_kmh": 36.466, "flow_veh_min": 35.172, "num_vehicles": 18, "stopped_vehicles": 5}}
+{"kind": "state", "in": {"queue_m": 191.672, "speed_kmh": 75.842, "flow_veh_min": 26.379, "num_vehicles": 35, "stopped_vehicles": 21}}
+{"kind": "state", "in": {"queue_m": 11.883, "speed_kmh": 7.664, "flow_veh_min": 23.228, "num_vehicles": 48, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 82.726, "speed_kmh": 12.697, "flow_veh_min": 21.929, "num_vehicles": 35, "stopped_vehicles": 34}}
+{"kind": "state", "in": {"queue_m": 161.045, "speed_kmh": 70.651, "flow_veh_min": 8.667, "num_vehicles": 25, "stopped_vehicles": 25}}
+{"kind": "state", "in": {"queue_m": 58.264, "speed_kmh": 49.605, "flow_veh_min": 24.483, "num_vehicles": 12, "stopped_vehicles": 5}}
+{"kind": "state", "in": {"queue_m": 134.448, "speed_kmh": 51.325, "flow_veh_min": 29.56, "num_vehicles": 44, "stopped_vehicles": 38}}
+{"kind": "state", "in": {"queue_m": 214.362, "speed_kmh": 77.69, "flow_veh_min": 12.405, "num_vehicles": 37, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 72.585, "speed_kmh": 79.865, "flow_veh_min": 2.131, "num_vehicles": 47, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 287.965, "speed_kmh": 61.299, "flow_veh_min": 7.336, "num_vehicles": 0, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 3.0, "speed_kmh": 0.448, "flow_veh_min": 20.999, "num_vehicles": 34, "stopped_vehicles": 15}}
+{"kind": "state", "in": {"queue_m": 121.665, "speed_kmh": 42.217, "flow_veh_min": 26.79, "num_vehicles": 10, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 21.322, "speed_kmh": 32.722, "flow_veh_min": 15.191, "num_vehicles": 8, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 32.803, "speed_kmh": 51.894, "flow_veh_min": 14.933, "num_vehicles": 25, "stopped_vehicles": 11}}
+{"kind": "state", "in": {"queue_m": 285.853, "speed_kmh": 58.385, "flow_veh_min": 10.517, "num_vehicles": 35, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 255.098, "speed_kmh": 19.89, "flow_veh_min": 4.415, "num_vehicles": 35, "stopped_vehicles": 32}}
+{"kind": "state", "in": {"queue_m": 240.339, "speed_kmh": 67.79, "flow_veh_min": 8.547, "num_vehicles": 46, "stopped_vehicles": 39}}
+{"kind": "state", "in": {"queue_m": 166.361, "speed_kmh": 42.803, "flow_veh_min": 10.391, "num_vehicles": 12, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 51.362, "speed_kmh": 53.598, "flow_veh_min": 39.08, "num_vehicles": 34, "stopped_vehicles": 11}}
+{"kind": "state", "in": {"queue_m": 112.192, "speed_kmh": 33.971, "flow_veh_min": 27.649, "num_vehicles": 50, "stopped_vehicles": 49}}
+{"kind": "state", "in": {"queue_m": 133.192, "speed_kmh": 46.796, "flow_veh_min": 19.046, "num_vehicles": 26, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 143.695, "speed_kmh": 41.069, "flow_veh_min": 39.491, "num_vehicles": 2, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 145.506, "speed_kmh": 50.276, "flow_veh_min": 24.517, "num_vehicles": 34, "stopped_vehicles": 26}}
+{"kind": "state", "in": {"queue_m": 208.636, "speed_kmh": 11.051, "flow_veh_min": 3.602, "num_vehicles": 39, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 0.161, "speed_kmh": 65.836, "flow_veh_min": 1.081, "num_vehicles": 19, "stopped_vehicles": 7}}
+{"kind": "state", "in": {"queue_m": 288.415, "speed_kmh": 66.282, "flow_veh_min": 39.426, "num_vehicles": 38, "stopped_vehicles": 36}}
+{"kind": "state", "in": {"queue_m": 275.463, "speed_kmh": 46.352, "flow_veh_min": 11.343, "num_vehicles": 4, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 163.156, "speed_kmh": 57.684, "flow_veh_min": 18.869, "num_vehicles": 42, "stopped_vehicles": 6}}
+{"kind": "state", "in": {"queue_m": 163.309, "speed_kmh": 18.19, "flow_veh_min": 14.003, "num_vehicles": 15, "stopped_vehicles": 15}}
+{"kind": "state", "in": {"queue_m": 50.953, "speed_kmh": 17.85, "flow_veh_min": 27.547, "num_vehicles": 16, "stopped_vehicles": 9}}
+{"kind": "state", "in": {"queue_m": 50.239, "speed_kmh": 56.034, "flow_veh_min": 39.242, "num_vehicles": 17, "stopped_vehicles": 4}}
+{"kind": "state", "in": {"queue_m": 44.736, "speed_kmh": 10.247, "flow_veh_min": 30.318, "num_vehicles": 44, "stopped_vehicles": 24}}
+{"kind": "state", "in": {"queue_m": 56.236, "speed_kmh": 78.551, "flow_veh_min": 24.839, "num_vehicles": 37, "stopped_vehicles": 21}}
+{"kind": "state", "in": {"queue_m": 280.71, "speed_kmh": 17.593, "flow_veh_min": 27.194, "num_vehicles": 1, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 160.522, "speed_kmh": 41.133, "flow_veh_min": 12.694, "num_vehicles": 27, "stopped_vehicles": 8}}
+{"kind": "state", "in": {"queue_m": 116.647, "speed_kmh": 76.384, "flow_veh_min": 20.993, "num_vehicles": 40, "stopped_vehicles": 11}}
+{"kind": "state", "in": {"queue_m": 236.232, "speed_kmh": 59.769, "flow_veh_min": 37.166, "num_vehicles": 22, "stopped_vehicles": 14}}
+{"kind": "state", "in": {"queue_m": 63.427, "speed_kmh": 77.216, "flow_veh_min": 16.617, "num_vehicles": 12, "stopped_vehicles": 9}}
+{"kind": "state", "in": {"queue_m": 224.671, "speed_kmh": 19.569, "flow_veh_min": 4.082, "num_vehicles": 32, "stopped_vehicles": 9}}
+{"kind": "state", "in": {"queue_m": 30.78, "speed_kmh": 27.245, "flow_veh_min": 8.812, "num_vehicles": 24, "stopped_vehicles": 5}}
+{"kind": "state", "in": {"queue_m": 207.492, "speed_kmh": 23.139, "flow_veh_min": 12.503, "num_vehicles": 36, "stopped_vehicles": 24}}
+{"kind": "state", "in": {"queue_m": 126.619, "speed_kmh": 31.472, "flow_veh_min": 11.589, "num_vehicles": 42, "stopped_vehicles": 8}}
+{"kind": "state", "in": {"queue_m": 14.814, "speed_kmh": 54.372, "flow_veh_min": 11.302, "num_vehicles": 3, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 208.819, "speed_kmh": 50.044, "flow_veh_min": 32.434, "num_vehicles": 15, "stopped_vehicles": 13}}
+{"kind": "state", "in": {"queue_m": 93.4, "speed_kmh": 51.467, "flow_veh_min": 37.867, "num_vehicles": 17, "stopped_vehicles": 7}}
+{"kind": "state", "in": {"queue_m": 237.746, "speed_kmh": 56.441, "flow_veh_min": 25.708, "num_vehicles": 44, "stopped_vehicles": 11}}
+{"kind": "state", "in": {"queue_m": 64.174, "speed_kmh": 4.432, "flow_veh_min": 5.928, "num_vehicles": 35, "stopped_vehicles": 11}}
+{"kind": "state", "in": {"queue_m": 260.746, "speed_kmh": 49.237, "flow_veh_min": 31.105, "num_vehicles": 6, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 22.788, "speed_kmh": 74.044, "flow_veh_min": 26.435, "num_vehicles": 3, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 232.785, "speed_kmh": 67.238, "flow_veh_min": 39.722, "num_vehicles": 1, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 108.196, "speed_kmh": 74.319, "flow_veh_min": 9.157, "num_vehicles": 39, "stopped_vehicles": 12}}
+{"kind": "state", "in": {"queue_m": 26.658, "speed_kmh": 72.354, "flow_veh_min": 7.953, "num_vehicles": 4, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 204.493, "speed_kmh": 48.64, "flow_veh_min": 39.851, "num_vehicles": 4, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 136.783, "speed_kmh": 30.695, "flow_veh_min": 30.42, "num_vehicles": 6, "stopped_vehicles": 3}}
+{"kind": "state", "in": {"queue_m": 229.91, "speed_kmh": 53.673, "flow_veh_min": 22.678, "num_vehicles": 37, "stopped_vehicles": 25}}
+{"kind": "state", "in": {"queue_m": 259.845, "speed_kmh": 0.04, "flow_veh_min": 38.676, "num_vehicles": 4, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 219.846, "speed_kmh": 32.832, "flow_veh_min": 6.555, "num_vehicles": 32, "stopped_vehicles": 11}}
+{"kind": "state", "in": {"queue_m": 279.499, "speed_kmh": 77.36, "flow_veh_min": 18.78, "num_vehicles": 39, "stopped_vehicles": 8}}
+{"kind": "state", "in": {"queue_m": 101.453, "speed_kmh": 12.768, "flow_veh_min": 15.605, "num_vehicles": 43, "stopped_vehicles": 15}}
+{"kind": "state", "in": {"queue_m": 284.955, "speed_kmh": 28.576, "flow_veh_min": 4.047, "num_vehicles": 0, "stopped_vehicles": 0}}
+{"kind": "state", "in": {"queue_m": 251.725, "speed_kmh": 13.328, "flow_veh_min": 37.751, "num_vehicles": 50, "stopped_vehicles": 12}}
+{"kind": "state", "in": {"queue_m": 176.732, "speed_kmh": 51.997, "flow_veh_min": 39.746, "num_vehicles": 46, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 136.185, "speed_kmh": 41.662, "flow_veh_min": 15.167, "num_vehicles": 17, "stopped_vehicles": 2}}
+{"kind": "state", "in": {"queue_m": 63.638, "speed_kmh": 13.054, "flow_veh_min": 25.813, "num_vehicles": 39, "stopped_vehicles": 16}}
+{"kind": "state", "in": {"queue_m": 280.532, "speed_kmh": 70.952, "flow_veh_min": 24.064, "num_vehicles": 5, "stopped_vehicles": 1}}
+{"kind": "state", "in": {"queue_m": 194.224, "speed_kmh": 35.664, "flow_veh_min": 32.67, "num_vehicles": 44, "stopped_vehicles": 11}}

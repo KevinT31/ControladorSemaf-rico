@@ -79,6 +79,7 @@ class SafetyTimingConfig(BaseModel):
     t_base_verde_eo: float = 30.0
     t_ambar: float = 3.0
     t_todo_rojo: float = 2.0
+    t_ciclo: float = 90.0                 # mismo default que el difuso canónico
     max_silence_cycles: Annotated[int, Field(ge=1)] = 3  # sin recs válidas → plan seguro
 
     @model_validator(mode="after")
@@ -98,6 +99,10 @@ class SafetyTimingConfig(BaseModel):
             errores.append(
                 f"t_todo_rojo={self.t_todo_rojo:g}s fuera de "
                 f"[{LIMITES.T_TODO_ROJO_MIN:g}, {T_TODO_ROJO_MAX:g}]s")
+        if not (LIMITES.T_CICLO_MIN <= self.t_ciclo <= LIMITES.T_CICLO_MAX):
+            errores.append(
+                f"t_ciclo={self.t_ciclo:g}s fuera de "
+                f"[{LIMITES.T_CICLO_MIN:g}, {LIMITES.T_CICLO_MAX:g}]s")
         if errores:
             raise ValueError("; ".join(errores))
         return self

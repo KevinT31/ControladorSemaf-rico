@@ -115,11 +115,24 @@ para demos de espejo.
 `fail_fast` (aborta la corrida — campañas de métricas, donde un timeout
 contamina el determinismo y no debe mezclarse en resultados publicables).
 
-## D-D PI del nodo = fórmula canónica del Cap. 6
+## D-D PI del nodo = el PI que produjo los resultados de la tesis
 
-Existen dos fórmulas de PI en el repo. El nodo y el golden master usan
-`calcular_parametro_intensidad(vavg, stopped)` (canónica), no la variante
-ad-hoc de `comparacion_sumo._demanda_fase`.
+Existen TRES variantes de PI en el repo:
+1. Canónica cruda del Cap. 6 (`indice_congestion.calcular_parametro_intensidad`,
+   PI = Vavg/(SC+δ)) — **no acotada** (puede valer cientos), mientras el difuso
+   define sus conjuntos de PI en el universo [0,1].
+2. Normalización de `estado_local.calcular_parametro_intensidad` (divide por
+   V_MAX/δ con δ=1e-6) — colapsa a ≈0 en cuanto SC≥1: comportamiento casi
+   binario que NO alimentó los resultados versionados.
+3. La de `comparacion_sumo._demanda_fase`: PI = 0.5·frac_movimiento +
+   0.5·min(1, v/50) — acotada [0,1], y es **la que alimentó al difuso en las
+   corridas multibaseline** cuyos resultados están versionados en
+   `integracion-sumo/resultados/`.
+
+NSB usa la variante 3 (misma referencia de 50 km/h), porque preserva el
+comportamiento del sistema que generó la evidencia experimental de la tesis y
+respeta el universo [0,1] del difuso. No se inventa una normalización nueva.
+El golden master usa la misma, de modo que la equivalencia queda bien definida.
 
 ## D-E Piso de sintaxis Python 3.11
 

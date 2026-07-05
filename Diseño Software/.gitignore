@@ -134,3 +134,7 @@ datos/resultados-video/**
 integracion-sumo/escenarios/lima-amplio/*.xml
  
 # Excluir cualquier rastro local de herramientas externas
+
+# NSB v2.1 - telemetria y grabaciones locales (no versionar)
+datos/logs-sistema/nsb/
+*.events.jsonl
