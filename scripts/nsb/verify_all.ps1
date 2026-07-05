@@ -12,7 +12,7 @@ python -m pytest tests -q
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "=== 3/4 demos criticas ==="
-foreach ($id in 6, 7, 10, 12) {
+foreach ($id in 6, 7, 8, 10, 12) {
     python -m nsb demo --id $id
     if ($LASTEXITCODE -ne 0) { Write-Error "DEMO $id fallo"; exit 2 }
 }

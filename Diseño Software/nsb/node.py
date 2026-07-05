@@ -46,11 +46,13 @@ class NsbNode:
     """Nodo semafórico de borde (una intersección)."""
 
     def __init__(self, cfg: NodeConfig, authority: Authority,
-                 clock: Clock, sink: Optional[JsonlSink]):
+                 clock: Clock, sink: Optional[JsonlSink],
+                 mqtt_sink=None):
         self._cfg = cfg
         self._authority = authority
         self._clock = clock
         self._sink = sink
+        self._mqtt = mqtt_sink   # MqttTelemetrySink opcional (D-F, spec §28)
 
     # ------------------------------------------------------------------ #
     @classmethod
@@ -106,7 +108,13 @@ class NsbNode:
 
         sink = JsonlSink(cfg.telemetry.jsonl_dir, cfg.node_id,
                          experiment_id=experiment_id)
-        node = cls(cfg, authority, reloj, sink)
+        mqtt_sink = None
+        if cfg.telemetry.mqtt_enabled:
+            # Import perezoso: la base no exige paho-mqtt (spec §23 análogo).
+            # Config TLS inválida falla AQUÍ (arranque), no en runtime.
+            from nsb.comms.mqtt_telemetry import MqttTelemetrySink
+            mqtt_sink = MqttTelemetrySink(cfg.telemetry, cfg.node_id)
+        node = cls(cfg, authority, reloj, sink, mqtt_sink=mqtt_sink)
         node._emit(evento("node_start", cfg.node_id, INFO,
                           mode=mode.value, source=cfg.source.value,
                           actuator=cfg.actuator.type))
@@ -125,9 +133,16 @@ class NsbNode:
     def mode(self) -> Mode:
         return self._authority.mode
 
+    @property
+    def mqtt_sink(self):
+        """Sink MQTT opcional (None si mqtt_enabled=false)."""
+        return self._mqtt
+
     def _emit(self, ev) -> None:
         if self._sink is not None:
             self._sink.emit(ev)
+        if self._mqtt is not None:
+            self._mqtt.emit(ev)   # best-effort; jamás lanza (comms.mqtt)
 
     # ------------------------------------------------------------------ #
     def process_one(self, state: TrafficState,
@@ -184,13 +199,18 @@ class NsbNode:
                 writer.close()
             if self._sink is not None and self._sink.path is not None:
                 summary.events_path = str(self._sink.path)
-            self._emit(evento("node_stop", self._cfg.node_id, INFO,
-                              estados=summary.estados,
-                              verdicts=summary.verdicts,
-                              violaciones_gate=summary.violaciones_gate))
+            self._emit(evento(
+                "node_stop", self._cfg.node_id, INFO,
+                estados=summary.estados,
+                verdicts=summary.verdicts,
+                violaciones_gate=summary.violaciones_gate,
+                mqtt_connected=(self._mqtt.connected if self._mqtt else None),
+                mqtt_dropped=(self._mqtt.dropped if self._mqtt else None)))
         return summary
 
     def shutdown(self) -> None:
         self._authority.shutdown()
+        if self._mqtt is not None:
+            self._mqtt.close()
         if self._sink is not None:
             self._sink.close()

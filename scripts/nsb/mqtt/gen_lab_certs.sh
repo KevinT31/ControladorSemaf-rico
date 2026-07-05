@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Genera la PKI de LABORATORIO para MQTT+TLS (spec §28) — equivalente Linux/Pi
+# de gen_lab_certs.ps1. SOLO PARA LABORATORIO; no commitear claves privadas.
+#
+# Uso:
+#   ./gen_lab_certs.sh                                  # nodos por defecto
+#   NODES="nsb-node-01 nsb-observer" SERVER_SANS="192.168.1.50" ./gen_lab_certs.sh
+#   FORCE=1 ./gen_lab_certs.sh                          # rota la CA
+set -euo pipefail
+
+NODES="${NODES:-nsb-node-01 nsb-pi-01 nsb-observer}"
+SERVER_SANS="${SERVER_SANS:-}"
+DIAS_CA="${DIAS_CA:-730}"
+DIAS="${DIAS:-365}"
+
+command -v openssl >/dev/null || { echo "ERROR: openssl no instalado" >&2; exit 1; }
+# Un OPENSSL_CONF heredado roto tumba todo openssl
+if [[ -n "${OPENSSL_CONF:-}" && ! -f "$OPENSSL_CONF" ]]; then unset OPENSSL_CONF; fi
+
+raiz="$(cd "$(dirname "$0")/../../.." && pwd)"
+dir="$raiz/config/nsb/mosquitto/certs"
+mkdir -p "$dir"
+cd "$dir"
+
+# --- CA de laboratorio ------------------------------------------------------
+if [[ -f ca.key && -f ca.crt && "${FORCE:-0}" != "1" ]]; then
+    echo "CA existente conservada (FORCE=1 para rotarla)."
+else
+    [[ -f ca.key ]] && echo "ROTACION: regenerando CA — certs previos dejan de valer."
+    openssl genrsa -out ca.key 2048
+    openssl req -x509 -new -key ca.key -sha256 -days "$DIAS_CA" -out ca.crt \
+        -subj "/CN=nsb-lab-ca"
+    echo "CA de laboratorio: ca.crt (valida $DIAS_CA dias)"
+fi
+
+# --- Certificado del broker -------------------------------------------------
+san="DNS:localhost,IP:127.0.0.1"
+for extra in $SERVER_SANS; do
+    if [[ "$extra" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        san="$san,IP:$extra"
+    else
+        san="$san,DNS:$extra"
+    fi
+done
+printf 'subjectAltName=%s\nextendedKeyUsage=serverAuth\n' "$san" > server_ext.cnf
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -out server.csr -subj "/CN=localhost"
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
+    -out server.crt -days "$DIAS" -sha256 -extfile server_ext.cnf
+echo "Broker: server.crt (SAN: $san)"
+
+# --- Certificados de cliente por nodo ---------------------------------------
+printf 'extendedKeyUsage=clientAuth\n' > client_ext.cnf
+for nodo in $NODES; do
+    openssl genrsa -out "$nodo.key" 2048
+    openssl req -new -key "$nodo.key" -out "$nodo.csr" -subj "/CN=$nodo"
+    openssl x509 -req -in "$nodo.csr" -CA ca.crt -CAkey ca.key -CAcreateserial \
+        -out "$nodo.crt" -days "$DIAS" -sha256 -extfile client_ext.cnf
+    echo "Cliente: $nodo.crt (CN=$nodo)"
+done
+
+rm -f ./*.csr server_ext.cnf client_ext.cnf
+echo ""
+echo "Certificados en: $dir"
+echo "Para la Pi copie SOLO: ca.crt + <nodo>.crt + <nodo>.key"

@@ -1,0 +1,23 @@
+# Unidad systemd del nodo NSB (Raspberry Pi 4B — prototipo de laboratorio).
+#
+# systemd mejora la RECUPERACIÓN DEL PROCESO (reinicio ante crash). NO
+# constituye seguridad física independiente (spec §39): el estado seguro
+# ante fallos depende del Safety Kernel y, en un despliegue real, de un
+# controlador de conflictos hardware que este prototipo NO tiene.
+[Unit]
+Description=NSB v2.1 edge node (prototipo de laboratorio, 12 LEDs)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/nsb-node
+ExecStart=/home/pi/nsb-node/.venv/bin/python -m nsb run --config config/nsb/node.pi.yaml
+Restart=on-failure
+RestartSec=3
+# El nodo solo DEGRADA su modo en runtime (D-H); un reinicio arranca con el
+# modo de la config, nunca elevado por vía remota.
+
+[Install]
+WantedBy=multi-user.target

@@ -25,6 +25,15 @@ telemetry:
   jsonl_dir: datos/logs-sistema/nsb
   http_enabled: false
   mqtt_enabled: false
+  # Para telemetría MQTT+TLS hacia el broker Mosquitto de la PC:
+  # (deploy_pi.ps1 deja ca.crt + nsb-pi-01.crt/.key en certs/)
+  # mqtt_enabled: true
+  # mqtt_host: 192.168.1.100
+  # mqtt_port: 8883
+  # mqtt_tls: true
+  # mqtt_ca_cert: certs/ca.crt
+  # mqtt_client_cert: certs/nsb-pi-01.crt
+  # mqtt_client_key: certs/nsb-pi-01.key
 
 safety:
   t_base_verde_ns: 30.0

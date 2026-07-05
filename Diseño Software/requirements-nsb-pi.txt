@@ -1,0 +1,23 @@
+# Dependencias MINIMAS del nodo NSB en Raspberry Pi 4B (Pi OS Bookworm,
+# Python 3.11, piwheels). Solo lo que el nodo edge necesita: nada de FastAPI,
+# ultralytics ni SUMO (eso vive en la PC — spec §37).
+#
+# Instalar con scripts de scripts/nsb/pi/install_pi.sh (crea venv).
+
+# Núcleo científico (ICV + difuso Cap. 6)
+numpy==1.26.3
+
+# Contratos y configuración NSB
+pydantic==2.5.3
+pydantic-settings==2.1.0
+PyYAML>=6.0,<7
+
+# Métricas de sistema (CPU/RAM/temperatura en telemetría)
+psutil>=5.9,<6
+
+# Telemetría MQTT opcional (TLS de laboratorio)
+paho-mqtt==2.1.0
+
+# GPIO (12 LEDs). gpiozero usa lgpio como backend en Bookworm.
+gpiozero>=2.0
+lgpio>=0.2 ; platform_machine == "aarch64" or platform_machine == "armv7l"

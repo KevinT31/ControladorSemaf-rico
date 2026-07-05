@@ -151,6 +151,17 @@ entradas no finitas exigida por la spec (§11) sería inefectiva. Payloads
 científicos con `extra="forbid"`; envelope de transporte con `extra="ignore"`
 (forward-compat).
 
+## D-I Telemetría MQTT: QoS 0 + esperas acotadas fuera del lazo de control
+
+El sink MQTT publica QoS 0 best-effort (sin broker: descarta y cuenta, jamás
+encola ni espera — el JSONL local es la fuente de verdad, D-F). Las únicas
+esperas son acotadas y están FUERA del lazo de control: 2 s de conexión
+inicial al construir el nodo y 2 s de drenado al cerrar (sin ellas, las
+corridas cortas pierden los primeros/últimos eventos — verificado
+empíricamente con broker real). Identidad por nodo vía mTLS: CN del cert =
+node_id = usuario de la ACL (`pattern write nsb/%u/#`); el sink no suscribe
+ningún tópico (coherente con D-H: MQTT no puede elevar el modo).
+
 ## D-H El modo de autoridad solo puede degradarse en runtime
 
 El modo se fija al construir el proceso (config+CLI+env) y únicamente puede

@@ -4,8 +4,9 @@ Cada demo imprime su procedimiento, el resultado observado y el estado
 honesto (VERIFIED aquí = ejecutada con éxito en ESTA máquina).
 
 Demos que requieren hardware físico (4: LEDs TSC, 5-físico: LEDs direct-lab)
-o infraestructura externa (8: broker MQTT) se documentan en
-docs/nsb_v2_1/experiments.md con su estado REQUIRES HARDWARE / NOT RUN.
+se documentan en docs/nsb_v2_1/experiments.md con su estado
+REQUIRES HARDWARE / NOT RUN. La demo 8 (pérdida MQTT) corre SIN broker a
+propósito: demuestra que el control no depende de la telemetría.
 """
 from __future__ import annotations
 
@@ -132,6 +133,31 @@ def demo_7(tmp: Path) -> bool:
     return ok
 
 
+def demo_8(tmp: Path) -> bool:
+    """Pérdida MQTT → el control NO se ve afectado (fail-safe §26-A)."""
+    print("DEMO 8 — pérdida MQTT (broker inaccesible; el control continúa)")
+    cfg = NodeConfig(mode=Mode.TSC_EMULATED, source=SourceKind.MANUAL,
+                     telemetry={"jsonl_dir": str(tmp / "telemetria"),
+                                "mqtt_enabled": True, "mqtt_tls": False,
+                                "mqtt_host": "127.0.0.1",
+                                "mqtt_port": 18830})  # puerto muerto a propósito
+    node = NsbNode.from_config(cfg, experiment_id="demo8")
+    summary = node.run(ManualTestStateSource("uniforme", pasos=10,
+                                             experiment_id="demo8"))
+    conectado = node.mqtt_sink.connected
+    dropped = node.mqtt_sink.dropped
+    node.shutdown()
+    ok = (summary.estados == 10 and not conectado and dropped > 0
+          and summary.verdicts.get("reject", 0) == 0
+          and summary.violaciones_gate == 0
+          and not summary.safe_mode_final)
+    print(f"  broker caido: conectado={conectado}, descartados={dropped}, "
+          f"veredictos={summary.verdicts} -> {'OK' if ok else 'FALLO'}")
+    print("  (entrega real con broker TLS verificada en "
+          "tests/integration/test_mqtt_local.py)")
+    return ok
+
+
 def demo_9(tmp: Path) -> bool:
     """Pérdida de fuente (silencio) → CONFIG_SEGURA (fail-safe §26-G)."""
     print("DEMO 9 — silencio del edge → plan seguro")
@@ -189,7 +215,7 @@ def demo_12(tmp: Path) -> bool:
 
 
 DEMOS = {1: demo_1, 2: demo_2, 5: demo_5, 6: demo_6, 7: demo_7,
-         9: demo_9, 10: demo_10, 12: demo_12}
+         8: demo_8, 9: demo_9, 10: demo_10, 12: demo_12}
 
 
 def run_demo(numero: int) -> int:
@@ -198,7 +224,7 @@ def run_demo(numero: int) -> int:
         print(f"demo {numero} no ejecutable localmente; disponibles: "
               f"{disponibles}. Las demos 3 (HIL SUMO) usan 'nsb gateway'+"
               f"'nsb run --source hil'; 4/5-físico requieren Raspberry Pi; "
-              f"8 requiere broker MQTT; 11 requiere video (F4).")
+              f"11 requiere video (F4).")
         return 1
     with tempfile.TemporaryDirectory(prefix="nsb-demo-") as tmp:
         ok = DEMOS[numero](Path(tmp))
