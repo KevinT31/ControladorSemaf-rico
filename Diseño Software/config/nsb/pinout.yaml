@@ -1,0 +1,32 @@
+# Pinout GPIO de la maqueta de 12 LEDs (4 accesos x rojo/ámbar/verde).
+#
+# NUMERACIÓN: BCM (la que usa gpiozero), NO el número físico del header.
+# Este mapeo es un BORRADOR razonable — verificar contra el cableado real
+# antes de conectar. Ver docs/nsb_v2_1/gpio_wiring.md para resistencias,
+# límites de corriente y precauciones (NO conectar sin leerlo).
+#
+# PROTOTIPO DE LABORATORIO: LEDs de baja potencia únicamente.
+
+numbering: BCM
+
+groups:
+  north:
+    red: 17      # físico 11
+    yellow: 27   # físico 13
+    green: 22    # físico 15
+  south:
+    red: 5       # físico 29
+    yellow: 6    # físico 31
+    green: 13    # físico 33
+  east:
+    red: 23      # físico 16
+    yellow: 24   # físico 18
+    green: 25    # físico 22
+  west:
+    red: 16      # físico 36
+    yellow: 20   # físico 38
+    green: 21    # físico 40
+
+# Nivel lógico que enciende el LED (true = active-high, ánodo al GPIO
+# a través de resistencia, cátodo a GND).
+active_high: true

@@ -1,0 +1,36 @@
+# Overrides para Raspberry Pi 4B (se pasa este archivo en lugar de node.yaml).
+# PLATAFORMA EXPERIMENTAL: Pi 4B NO es el target de diseño final de la tesis;
+# los resultados medidos aquí se etiquetan como Pi 4B, sin extrapolar.
+
+node_id: nsb-pi-01
+intersection_id: interseccion-01
+mode: tsc_emulated
+source: sumo_hil
+control_interval_s: 25.0
+allow_direct_lab: false
+
+actuator:
+  type: gpio
+  pinout_path: config/nsb/pinout.yaml
+
+hil:
+  # IP de la PC con SUMO + gateway en la LAN del laboratorio.
+  host: 192.168.1.100
+  port: 9500
+  connect_timeout_s: 5.0
+  read_timeout_s: 30.0
+  reconnect_max_s: 30.0
+
+telemetry:
+  jsonl_dir: datos/logs-sistema/nsb
+  http_enabled: false
+  mqtt_enabled: false
+
+safety:
+  t_base_verde_ns: 30.0
+  t_base_verde_eo: 30.0
+  t_ambar: 3.0
+  t_todo_rojo: 2.0
+  max_silence_cycles: 3
+
+log_level: INFO

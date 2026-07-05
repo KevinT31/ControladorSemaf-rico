@@ -1,0 +1,40 @@
+# Configuración del HIL Gateway (PC con SUMO).
+# Overrides por entorno: NSB_GW_SEED, NSB_GW_BIND_HOST, etc.
+
+# Escenario mínimo dedicado (cruce único NS/EO, generado con seed).
+# Se crea en F2 con integracion-sumo/escenarios/nsb-cruz/generar_escenario.py
+sumo_cfg: integracion-sumo/escenarios/nsb-cruz/nsb_cruz.sumocfg
+
+seed: 42
+sumo_binary: sumo            # sumo-gui para demo visual
+control_interval_s: 25.0     # canónico de la tesis
+max_control_points: 28       # 28 x 25 s = 700 s como el multibaseline
+
+# Mapeo EXPLÍCITO de fases del TLS de SUMO al modelo NS/EO de la tesis.
+# Declarado, nunca inferido por heurística. Los índices corresponden al
+# programa del escenario nsb-cruz.
+phase_map:
+  tls_id: nsb_cruz_tls
+  ns_green_index: 0
+  eo_green_index: 2
+
+# 127.0.0.1 = solo local (sin prompt de firewall). Para la Pi por LAN,
+# cambiar a la IP de la interfaz y abrir regla de entrada (ver docs).
+bind_host: 127.0.0.1
+bind_port: 9500
+
+node_timeout_s: 2.0
+# fallback = mantiene plan vigente (demos) | fail_fast = aborta (campañas)
+timeout_policy: fallback
+max_consecutive_timeouts: 3
+max_wait_reconnect_s: 60.0
+
+# control_only = SUMO avanza y solo se comunica en puntos de control.
+# per_step = envía tick cada paso (espejo de LEDs en demos).
+tick_mode: control_only
+
+# Ruta JSONL para grabar TrafficState+Decision de la corrida (replay/regresión)
+record_jsonl: null
+
+# Autogenerado (incluye seed + digest del escenario) si null.
+experiment_id: null

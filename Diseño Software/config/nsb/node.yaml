@@ -1,0 +1,52 @@
+# Configuración del nodo NSB (desarrollo en Windows, actuador simulado).
+# Overrides por entorno: NSB_MODE, NSB_HIL__PORT, NSB_TELEMETRY__MQTT_ENABLED, etc.
+# Ver nsb/config.py para el esquema completo y .env.example para variables.
+
+node_id: nsb-node-01
+intersection_id: interseccion-01
+
+# advisory | tsc_emulated | automated_direct_lab
+mode: tsc_emulated
+
+# manual | replay | sumo_hil | video
+source: manual
+
+# Intervalo de control canónico de la tesis (mismo valor que los resultados
+# multibaseline). NO cambiar para corridas comparables.
+control_interval_s: 25.0
+
+# Primera compuerta de AUTOMATED_DIRECT_LAB. Aunque sea true, el modo exige
+# además el flag CLI --mode automated-direct-lab Y la variable de entorno
+# NSB_CONFIRM_DIRECT_LAB=<node_id>. Jamás activable por MQTT/HTTP.
+allow_direct_lab: false
+
+actuator:
+  type: simulated        # simulated | gpio (gpio solo en la Pi)
+  render: false          # true => render de consola de los 12 LEDs
+
+hil:
+  host: 127.0.0.1
+  port: 9500
+  connect_timeout_s: 5.0
+  read_timeout_s: 30.0
+  reconnect_max_s: 30.0
+
+telemetry:
+  jsonl_dir: datos/logs-sistema/nsb
+  http_enabled: false    # POST al backend FastAPI existente (puerto 8000)
+  http_url: http://127.0.0.1:8000/api/estado-local/ingresar
+  mqtt_enabled: false    # se habilita en F3 con broker local TLS
+  mqtt_host: 127.0.0.1
+  mqtt_port: 8883
+  mqtt_tls: true
+
+safety:
+  # Validados al arrancar contra nucleo.seguridad_semaforica.LIMITES
+  # (verde 10-120 s) y los techos de clamp (ámbar<=6 s, todo-rojo<=5 s).
+  t_base_verde_ns: 30.0
+  t_base_verde_eo: 30.0
+  t_ambar: 3.0
+  t_todo_rojo: 2.0
+  max_silence_cycles: 3
+
+log_level: INFO
