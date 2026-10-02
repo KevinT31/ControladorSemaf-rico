@@ -59,7 +59,7 @@ Las contraseñas no se versionan. Configura `.env` a partir de `.env.example` an
 ## 5) Se comunica con la nube
 - El backend (FastAPI + WebSocket) es el plano de nube local: telemetría en vivo (WebSocket),
   recepción de parámetros (`PUT /api/control/parametros`), histórico/auditoría en BD (SQLite).
-- *Defensa*: "Es la arquitectura de la tesis (Azure IoT Hub / MQGT-TLS) ejecutada localmente para la demo;
+- *Defensa*: "Es la arquitectura de la tesis (Azure IoT Hub / MQTT-TLS) ejecutada localmente para la demo;
   el flujo telemetría↑ / parámetros↓ es el mismo."
 
 ## 6) Incorpora ciberseguridad  ★ (está en el título de la tesis)
