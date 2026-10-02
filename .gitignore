@@ -34,3 +34,19 @@ here_api_key.txt
 **/here_api_key.txt
 .env
 config_local.py
+
+# Local AI/editor working state
+.claude/
+
+# Local thesis working copies and backups
+BackupTesis/
+workspace/
+tesis_kevin_latex_bien_formateado.zip
+claude_resume_*.log
+run_claude_resume_*.ps1
+
+# Generic generated files
+__pycache__/
+*.py[cod]
+*.log
+.DS_Store
