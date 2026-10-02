@@ -1,71 +1,122 @@
+<div align="center">
+
 # Adaptive Traffic Control — Research Workspace
 
-Research and development workspace related to an adaptive traffic-signal control project.
+### Thesis Workspace · Simulation · Security Experiments · Documentation Tooling
 
-The repository combines the traffic-control software itself with research references and a lightweight local LaTeX editor used to work with technical documentation.
+</div>
 
-## Main Project
+---
 
-The traffic-control implementation is located in:
+## Purpose
 
-```text
-Diseño Software/
-```
+This repository is the **broader research workspace** around an adaptive traffic-signal control project.
 
-It contains the adaptive traffic-control stack, including:
+It intentionally contains more than the clean implementation:
 
-- Computer-vision processing
-- Adaptive and fuzzy control logic
-- SUMO traffic simulation integration
-- FastAPI backend services
-- Web visualization
-- Comparative traffic-control experiments
+- the traffic-control software under **Diseño Software/**
+- experimental SUMO scenarios and comparison outputs
+- thesis-oriented research material
+- security/authentication experiments
+- a local LaTeX/documentation utility
+- references and supporting tooling
 
-See [Diseño Software/README.md](Dise%C3%B1o%20Software/README.md) for execution details.
+For the cleaner implementation-focused repository, use:
 
-## Local LaTeX Utility
+**[ControladorSemaforicoTFC](https://github.com/KevinT31/ControladorSemaforicoTFC)**
 
-The repository root also contains a small local LaTeX editor built with Node.js and Express. It provides:
+## Workspace Map
 
-- File-tree navigation
-- Source editing
-- ZIP import
-- PDF preview
-- Local Tectonic / LaTeX compilation
-
-### Run locally
-
-```powershell
-npm install
-npm run install-tectonic
-npm start
-```
-
-The server normally starts at:
-
-```text
-http://127.0.0.1:3042
-```
-
-Local working directories, generated PDFs, build files, logs and backup copies are intentionally excluded from Git.
-
-## Repository Organization
-
-```text
+~~~text
 .
-├── Diseño Software/                       # Adaptive traffic-control system
-├── Ejemplos/                              # Supporting examples
-├── REFERENCES.md                         # External research references
-├── public/                                # Local LaTeX editor frontend
-├── scripts/                               # Local tooling
-├── server.js                              # Local editor server
+├── Diseño Software/   adaptive traffic-control research implementation
+├── Ejemplos/          supporting examples
+├── REFERENCES.md      external research references
+├── public/             local LaTeX editor frontend
+├── scripts/            local tooling
+├── server.js           local editor server
 └── package.json
-```
+~~~
+
+## Main Research System
+
+The project under **Diseño Software/** extends the adaptive traffic-control work with research-oriented capabilities and experiments around:
+
+- computer vision
+- congestion estimation
+- fuzzy/adaptive traffic control
+- SUMO / TraCI
+- comparative simulation
+- FastAPI services
+- web visualization
+- functional-safety checks
+- authentication/RBAC experiments
+- auditability and traceability
+- broader Lima scenarios
+
+See [Diseño Software/README.md](Dise%C3%B1o%20Software/README.md) for implementation notes.
+
+## Security Hygiene
+
+This public workspace does **not** hardcode demo passwords or a fixed JWT signing key.
+
+The demo-oriented authentication layer expects local environment configuration derived from the included environment template.
+
+The repository also excludes local backups, runtime artifacts, model binaries and generated workspace files from normal version control.
 
 ## Research References
 
-Third-party papers are referenced in [REFERENCES.md](REFERENCES.md) instead of being stored as PDF copies in the repository.
+Third-party research papers are not stored as bundled PDFs.
 
-## Portfolio Context
+[REFERENCES.md](REFERENCES.md) keeps traceable external references instead, reducing repository weight and avoiding unnecessary redistribution of third-party documents.
 
-This repository documents the broader research workspace around the adaptive traffic-control project. The cleaner implementation-focused repository is `ControladorSemaforicoTFC`.
+## Local Documentation Utility
+
+The repository root contains a lightweight local LaTeX editor built with Node.js and Express.
+
+Capabilities include:
+
+- file-tree navigation
+- source editing
+- ZIP import
+- PDF preview
+- local Tectonic / LaTeX compilation
+
+### Run locally
+
+~~~powershell
+npm install
+npm run install-tectonic
+npm start
+~~~
+
+Default local address:
+
+~~~text
+http://127.0.0.1:3042
+~~~
+
+## Why This Repo Exists Separately
+
+The research workspace preserves context that would make the implementation repository unnecessarily noisy:
+
+- experiments
+- thesis-specific material
+- presentation/demo workflows
+- security extensions
+- comparison outputs
+- supporting documentation tools
+
+That separation keeps **ControladorSemaforicoTFC** easier to evaluate as a software project while retaining the broader research history here.
+
+## Repository Boundaries
+
+This is not a production traffic-management system.
+
+The project is research/simulation oriented and should not be interpreted as field-certified infrastructure or a safety-certified traffic controller.
+
+---
+
+### What this workspace demonstrates
+
+**Research engineering · experiment organization · simulation workflows · software/security prototyping · technical documentation discipline**
