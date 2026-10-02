@@ -16,21 +16,24 @@ from __future__ import annotations
 import logging
 from typing import Dict, Optional
 
+from config import settings
 from .passwords import hash_password, verificar_password
 
 logger = logging.getLogger(__name__)
 
 ROLES_VALIDOS = ("operador", "tecnico", "admin")
 
-# Credenciales por defecto (solo demo de sustentación)
-USUARIOS_DEFECTO = [
-    {"username": "operador", "password": "operador123",
-     "nombre": "Operador de Monitoreo", "rol": "operador"},
-    {"username": "tecnico", "password": "tecnico123",
-     "nombre": "Técnico de Tráfico", "rol": "tecnico"},
-    {"username": "admin", "password": "admin123",
-     "nombre": "Administrador del Sistema", "rol": "admin"},
-]
+def _usuarios_demo_configurados():
+    """Usuarios demo cuyas contraseñas fueron definidas explícitamente en .env."""
+    usuarios = [
+        {"username": "operador", "password": settings.DEMO_OPERATOR_PASSWORD,
+         "nombre": "Operador de Monitoreo", "rol": "operador"},
+        {"username": "tecnico", "password": settings.DEMO_TECHNICIAN_PASSWORD,
+         "nombre": "Técnico de Tráfico", "rol": "tecnico"},
+        {"username": "admin", "password": settings.DEMO_ADMIN_PASSWORD,
+         "nombre": "Administrador del Sistema", "rol": "admin"},
+    ]
+    return [u for u in usuarios if u["password"]]
 
 _FALLBACK: Optional[Dict[str, Dict]] = None
 
@@ -40,13 +43,20 @@ def _construir_fallback() -> Dict[str, Dict]:
     if _FALLBACK is None:
         _FALLBACK = {
             u["username"]: {**u, "password_hash": hash_password(u["password"])}
-            for u in USUARIOS_DEFECTO
+            for u in _usuarios_demo_configurados()
         }
     return _FALLBACK
 
 
 def seed_usuarios() -> None:
     """Crea los usuarios por defecto en la BD si no existen (idempotente)."""
+    usuarios_demo = _usuarios_demo_configurados()
+    if not usuarios_demo:
+        logger.warning(
+            "No hay contraseñas DEMO_* configuradas; no se sembrarán usuarios demo."
+        )
+        return
+
     try:
         from modelos_bd import SessionLocal
         from modelos_bd.usuario import UsuarioDB
@@ -54,7 +64,7 @@ def seed_usuarios() -> None:
         db = SessionLocal()
         try:
             creados = 0
-            for u in USUARIOS_DEFECTO:
+            for u in _usuarios_demo_configurados():
                 existe = db.query(UsuarioDB).filter(UsuarioDB.username == u["username"]).first()
                 if not existe:
                     db.add(UsuarioDB(
