@@ -1,9 +1,39 @@
-# OverLeaf Local
+# Adaptive Traffic Control — Research Workspace
 
-Editor LaTeX local tipo Overleaf: arbol de archivos, editor con resaltado,
-subida/importacion de ZIP y preview PDF en el navegador.
+Research and development workspace related to an adaptive traffic-signal control project.
 
-## Uso rapido
+The repository combines the traffic-control software itself with supporting research material and a lightweight local LaTeX editor used to work with technical documentation.
+
+## Main Project
+
+The traffic-control implementation is located in:
+
+```text
+Diseño Software/
+```
+
+It contains the adaptive traffic-control stack, including:
+
+- Computer-vision processing
+- Adaptive and fuzzy control logic
+- SUMO traffic simulation integration
+- FastAPI backend services
+- Web visualization
+- Comparative traffic-control experiments
+
+See [Diseño Software/README.md](Dise%C3%B1o%20Software/README.md) for execution details.
+
+## Local LaTeX Utility
+
+The repository root also contains a small local LaTeX editor built with Node.js and Express. It provides:
+
+- File-tree navigation
+- Source editing
+- ZIP import
+- PDF preview
+- Local Tectonic / LaTeX compilation
+
+### Run locally
 
 ```powershell
 npm install
@@ -11,34 +41,28 @@ npm run install-tectonic
 npm start
 ```
 
-Abre la URL que imprime la consola, normalmente:
+The server normally starts at:
 
 ```text
 http://127.0.0.1:3042
 ```
 
-Tus archivos LaTeX van dentro de `workspace/`. Puedes pegar ahi un proyecto
-grande, subir archivos desde la interfaz o importar un `.zip` exportado de
-Overleaf.
+Local working directories, generated PDFs, build files, logs and backup copies are intentionally excluded from Git.
 
-## Compiladores
-
-La app usa el primer compilador disponible en este orden:
+## Repository Organization
 
 ```text
-tools/tectonic/tectonic.exe
-tectonic
-latexmk
-lualatex
-xelatex
-pdflatex
+.
+├── Diseño Software/                       # Adaptive traffic-control system
+├── Ejemplos/                              # Supporting examples
+├── InformacionUtilComparativaModelosAdaptativos/
+├── TesisReferencia/                       # Research/reference material
+├── public/                                # Local LaTeX editor frontend
+├── scripts/                               # Local tooling
+├── server.js                              # Local editor server
+└── package.json
 ```
 
-Si ya tienes MiKTeX o TeX Live instalado, tambien funcionara. Si no, el comando
-`npm run install-tectonic` descarga Tectonic de forma portatil en `tools/`.
+## Portfolio Context
 
-## Limites locales
-
-No hay limite de proyecto impuesto por Overleaf. El limite real sera tu disco,
-RAM y el compilador LaTeX. Para proyectos enormes, deja los archivos pesados en
-`workspace/` y compila desde el navegador.
+This repository documents the broader research workspace around the adaptive traffic-control project. The cleaner implementation-focused repository is `ControladorSemaforicoTFC`.
