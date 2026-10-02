@@ -2,7 +2,7 @@
 
 Research and development workspace related to an adaptive traffic-signal control project.
 
-The repository combines the traffic-control software itself with supporting research material and a lightweight local LaTeX editor used to work with technical documentation.
+The repository combines the traffic-control software itself with research references and a lightweight local LaTeX editor used to work with technical documentation.
 
 ## Main Project
 
@@ -55,13 +55,16 @@ Local working directories, generated PDFs, build files, logs and backup copies a
 .
 ├── Diseño Software/                       # Adaptive traffic-control system
 ├── Ejemplos/                              # Supporting examples
-├── InformacionUtilComparativaModelosAdaptativos/
-├── TesisReferencia/                       # Research/reference material
+├── REFERENCES.md                         # External research references
 ├── public/                                # Local LaTeX editor frontend
 ├── scripts/                               # Local tooling
 ├── server.js                              # Local editor server
 └── package.json
 ```
+
+## Research References
+
+Third-party papers are referenced in [REFERENCES.md](REFERENCES.md) instead of being stored as PDF copies in the repository.
 
 ## Portfolio Context
 
