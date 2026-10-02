@@ -54,3 +54,8 @@ __pycache__/
 # External bibliography copies
 InformacionUtilComparativaModelosAdaptativos/
 TesisReferencia/
+
+# Generated/legacy artifacts inside the research workspace
+Diseño Software/10.0.0
+Diseño Software/**/backups/
+Diseño Software/integracion-sumo/resultados/*_backup.*
