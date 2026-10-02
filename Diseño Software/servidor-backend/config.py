@@ -65,8 +65,19 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-if settings.AUTH_ENABLED and len(settings.SECRET_KEY) < 32:
-    raise RuntimeError(
-        "SECRET_KEY debe definirse en .env y tener al menos 32 caracteres "
-        "cuando AUTH_ENABLED=true."
-    )
+if settings.AUTH_ENABLED:
+    if len(settings.SECRET_KEY) < 32 or settings.SECRET_KEY.startswith("REPLACE_"):
+        raise RuntimeError(
+            "SECRET_KEY debe reemplazarse en .env por una clave aleatoria "
+            "de al menos 32 caracteres cuando AUTH_ENABLED=true."
+        )
+
+    for nombre, valor in {
+        "DEMO_OPERATOR_PASSWORD": settings.DEMO_OPERATOR_PASSWORD,
+        "DEMO_TECHNICIAN_PASSWORD": settings.DEMO_TECHNICIAN_PASSWORD,
+        "DEMO_ADMIN_PASSWORD": settings.DEMO_ADMIN_PASSWORD,
+    }.items():
+        if valor.startswith("REPLACE_"):
+            raise RuntimeError(
+                f"{nombre} todavía contiene el placeholder de .env.example."
+            )
