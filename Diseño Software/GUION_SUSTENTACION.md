@@ -20,11 +20,14 @@ python verificar_demo.py
 ```
 
 ### Credenciales de demostración (RBAC)
-| Usuario   | Contraseña    | Rol      | Puede |
-|-----------|---------------|----------|-------|
-| `operador`| `operador123` | operador | Solo monitoreo (lectura) |
-| `tecnico` | `tecnico123`  | tecnico  | + ajustar parámetros, emergencias |
-| `admin`   | `admin123`    | admin    | + gestión total |
+
+Las contraseñas no se versionan. Configura `.env` a partir de `.env.example` antes de la demo.
+
+| Usuario | Variable de entorno | Rol | Puede |
+|---|---|---|---|
+| `operador` | `DEMO_OPERATOR_PASSWORD` | operador | Solo monitoreo (lectura) |
+| `tecnico` | `DEMO_TECHNICIAN_PASSWORD` | tecnico | + ajustar parámetros, emergencias |
+| `admin` | `DEMO_ADMIN_PASSWORD` | admin | + gestión total |
 
 ---
 
