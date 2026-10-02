@@ -13,6 +13,18 @@ Notas:
 - SUMO/TraCI: instálalo por separado desde https://sumo.dlr.de y asegúrate de tener `sumo-gui` en el PATH si usarás la opción 3 del menú.
 - Los modelos grandes (`*.pt`) no se versionan; descárgalos según necesidad.
 
+## Configuración de seguridad local
+
+Antes de iniciar el sistema con autenticación habilitada:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edita `.env` y reemplaza los placeholders. `SECRET_KEY` debe tener al menos 32 caracteres. Las contraseñas de los usuarios demo se configuran mediante `DEMO_OPERATOR_PASSWORD`, `DEMO_TECHNICIAN_PASSWORD` y `DEMO_ADMIN_PASSWORD`.
+
+El archivo `.env` está excluido de Git y no debe versionarse.
+
 ## Inicio rápido
 
 ```powershell
