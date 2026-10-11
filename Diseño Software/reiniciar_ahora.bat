@@ -1,4 +1,6 @@
 @echo off
+setlocal
+cd /d "%~dp0"
 REM Script para reiniciar el simulador de forma sencilla
 echo.
 echo ========================================
@@ -10,6 +12,7 @@ echo Asegúrate de que el servidor esté corriendo en http://localhost:8000
 echo.
 
 python reiniciar_simulador.py
+set "RC=%ERRORLEVEL%"
 
 echo.
 echo Si ves "✅ Simulador reiniciado correctamente" arriba, entonces:
@@ -17,3 +20,4 @@ echo   - El backend ahora tiene las 47 intersecciones cargadas
 echo   - Actualiza la página web (F5) para ver todos los marcadores brillar
 echo.
 pause
+exit /b %RC%

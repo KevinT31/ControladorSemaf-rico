@@ -11,8 +11,8 @@
 #
 # ========================================================
 
-# Rutas
-path: C:\Users\kevin\OneDrive\Desktop\ControladorSemaforicoTFC2\datos\entrenamiento-emergencia
+# Rutas relativas al directorio que contiene este YAML. Al omitir `path`,
+# Ultralytics usa de forma portable la carpeta de `dataset.yaml` como raíz.
 train: images/train
 val: images/val
 

@@ -3,7 +3,6 @@ Script simple para servidor de cámara web
 """
 import cv2
 from fastapi import FastAPI, Response
-from fastapi.responses import StreamingResponse
 import threading
 import time
 import numpy as np
@@ -76,4 +75,6 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    from config import settings
+
+    uvicorn.run(app, host=settings.HOST, port=8001)

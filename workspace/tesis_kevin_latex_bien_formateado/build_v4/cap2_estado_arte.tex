@@ -54,6 +54,7 @@ píxel como una suma de gaussianas que se reajustan ante variaciones lentas de i
 precisión en escenas urbanas controladas (Zivkovic, 2004). El descriptor HOG
 (\emph{Histogram of Oriented Gradients}) rinde bien al detectar peatones en los cruces, si bien se resiente
 ante las oclusiones parciales tan habituales cuando la intersección se congestiona (Dalal y Triggs, 2005).
+\newpage
 Por su parte, los clasificadores Haar Cascade resultan muy livianos y, acoplados a un seguidor, estiman la
 velocidad con error bajo, aunque elevan la tasa de falsos positivos (Viola y Jones, 2001).
 
@@ -69,11 +70,12 @@ objeto; ese rasgo visual disminuye de forma marcada los intercambios de identida
 basado solo en cinemática (Wojke et al., 2017). Esta combinación de detección y seguimiento es la que habilita la estimación de flujo, cola y
 velocidad a partir de una única cámara. La selección concreta de la arquitectura de detección y de la
 plataforma de cómputo corresponde al diseño electrónico y se aborda en los capítulos posteriores; aquí
-interesa establecer que la visión por computadora es técnicamente madura para sustituir o complementar a los
+interesa establecer que la visión por computadora es técnicamente madura para sustituir a los
 sensores empotrados.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Comparativa de tecnologías de detección vehicular en intersecciones.}
   \label{tab:sensado}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.18\linewidth}XX>{\raggedright\arraybackslash}X@{}}
@@ -200,6 +202,7 @@ difuso propuesto frente a líneas base clásicas, heurísticas y de aprendizaje 
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Resultados reportados por la literatura de control adaptativo.}
   \label{tab:resultados-adaptativo}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.11\linewidth}>{\raggedright\arraybackslash}X@{}}
@@ -207,9 +210,9 @@ difuso propuesto frente a líneas base clásicas, heurísticas y de aprendizaje 
     \textbf{Trabajo (año)} & \textbf{Controladores} & \textbf{Simulador / escenario} & \textbf{Métrica principal} & \textbf{Mejora reportada vs.\ fijo} \\
     \midrule
     Genders y Razavi (2019) & Tiempo fijo, Webster, Max-Pressure, SOTL, DQN, DDPG & SUMO; dos intersecciones; 32 semillas aleatorias & Tiempo de viaje & Max-Pressure: $\sim$25\,\% menos (59 frente a 79\,s); iguala o supera al RL profundo \\
-    Ali et al. (2021) & Webster fijo, Webster modificado, Difuso+Webster, Difuso+Webster modificado, difuso puro & SUMO+TraCI; intersecciones reales de 3/4/5 ramas (Kilis) & Tiempo de espera & Difuso+Webster: 41,7\,\% menos (datos reales) y 49,4\,\% menos (demanda variable) \\
+    Ali et al. (2021) & Webster fijo, modificado, Difuso+Webster, Difuso+Webster modificado, difuso puro & SUMO+TraCI; intersecciones reales de 3/4/5 ramas (Kilis) & Tiempo de espera & Difuso+Webster: 41,7\,\% menos (datos reales) y 49,4\,\% menos (demanda variable) \\
     Yalcinli et al. (2024) & Tiempo fijo frente a modelo adaptativo (ablación de tres componentes) & SUMO; intersección real de Heybe (Antalya), hora pico & Demora por vehículo & 27,2\,\% menos demora; 32,4\,\% menos espera; 16,7\,\% más velocidad \\
-    Rafique et al. (2024) & RL \emph{turn-based} y \emph{time-based} frente a tiempo fijo & SUMO; una intersección de 4 ramas; demanda Low/High/EW/NS & Tiempo de espera acumulado & \emph{Time-based}: $\sim$35\,\% en promedio (hasta 57\,\% en alta demanda); \emph{turn-based} se degrada (hasta 67\,\% peor) \\
+    Rafique et al. (2024) & RL \emph{turn-based} y \emph{time-based} frente a tiempo fijo & SUMO; una intersección de 4 ramas; demanda Low/High/EW/NS & Tiempo de espera acumulado & \emph{Time-based}: $\sim$35\,\% en promedio; \emph{turn-based} se degrada (hasta 67\,\% peor) \\
     \bottomrule
   \end{tabularx}
   \fuente{Elaboración propia a partir de las fuentes citadas.}
@@ -217,6 +220,7 @@ difuso propuesto frente a líneas base clásicas, heurísticas y de aprendizaje 
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Comparativa de estrategias de control semafórico.}
   \label{tab:control}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}XX>{\raggedright\arraybackslash}p{0.13\linewidth}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.12\linewidth}@{}}
@@ -268,7 +272,7 @@ aproveche esa conexión cuando esté disponible para mejorar su desempeño con i
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.8\linewidth,keepaspectratio]{media/image82.png}
+  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image82.png}
   \caption{Componentes funcionales de un sistema de control de tráfico adaptativo basado en IoT.}
   \label{fig:componentes-iot}
   \fuente{Gheorghe y Soica (2025).}
@@ -289,6 +293,7 @@ como se resume en la Tabla~\ref{tab:protocolos}.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Rol de los protocolos principales en la arquitectura propuesta.}
   \label{tab:protocolos}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.18\linewidth}XX>{\raggedright\arraybackslash}X@{}}
@@ -330,6 +335,7 @@ regularidad y parchear sin demora sostiene la protección frente a amenazas nuev
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Mecanismos de ciberseguridad para semáforos inteligentes IoT.}
   \label{tab:ciberseg-mecanismos}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.22\linewidth}XX>{\raggedright\arraybackslash}X@{}}
@@ -355,6 +361,7 @@ funciones críticas de seguridad funcional.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Modelo de amenazas del sistema IoT semafórico.}
   \label{tab:amenazas-arte}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}XX>{\raggedright\arraybackslash}X@{}}
@@ -379,6 +386,7 @@ ejecución segura de las fases, según los criterios de la Tabla~\ref{tab:seg-fu
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Criterios de seguridad funcional para el módulo propuesto.}
   \label{tab:seg-funcional}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.26\linewidth}XX@{}}
@@ -431,7 +439,7 @@ heurísticas en igualdad de condiciones.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.8\linewidth,keepaspectratio]{media/image144.png}
+  \includegraphics[width=0.6\linewidth,keepaspectratio]{media/image144.png}
   \caption{Interfaz del simulador de tráfico de código abierto SUMO.}
   \label{fig:sumo}
   \fuente{Elaboración propia.}
@@ -439,6 +447,7 @@ heurísticas en igualdad de condiciones.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Comparativa de simuladores de tráfico.}
   \label{tab:simuladores}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.15\linewidth}>{\raggedright\arraybackslash}p{0.20\linewidth}XX@{}}
@@ -466,6 +475,7 @@ entre la revisión bibliográfica y las decisiones de diseño desarrolladas en l
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Síntesis del estado del arte y criterios adoptados para la solución propuesta.}
   \label{tab:sintesis}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.16\linewidth}XX>{\raggedright\arraybackslash}X@{}}

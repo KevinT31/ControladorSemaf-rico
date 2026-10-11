@@ -22,6 +22,7 @@ define los cinco casos de prueba sobre los que se construye la evidencia.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Casos de validación comparativa en SUMO.}
   \label{tab:casos-validacion}
   \begin{tabularx}{\linewidth}{@{}cX X X@{}}
@@ -55,6 +56,7 @@ experimento.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Parámetros de reproducibilidad de la validación SUMO.}
   \label{tab:reproducibilidad}
   \begin{tabularx}{\linewidth}{@{}p{0.34\linewidth}X@{}}
@@ -112,7 +114,7 @@ desaceleración 4.5~m/s\ensuremath{^2}, \emph{sigma} 0.8 (imperfección del cond
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\linewidth,keepaspectratio]{media/image58.png}
+  \includegraphics[width=0.4\linewidth,keepaspectratio]{media/image58.png}
   \caption{Vista de una intersección del escenario con tránsito en simulación.}
   \label{fig:sumo-interseccion}
   \fuente{Elaboración propia.}
@@ -126,7 +128,7 @@ Lima-Centro, por ser el de demanda controlada y semillas comunes.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\linewidth,keepaspectratio]{media/image10.png}
+  \includegraphics[width=0.5\linewidth,keepaspectratio]{media/image10.png}
   \caption{Escenario Lima-Amplio para validación a escala metropolitana.}
   \label{fig:sumo-lima-amplio}
   \fuente{Elaboración propia.}
@@ -168,6 +170,7 @@ relevantes son la reducción de la demora media en $7.6\%$ y de la saturación d
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Comparación del control fijo (A) y el control difuso adaptativo (B) en Lima-Centro (media $\pm$ desviación, 30 semillas). Todas las mejoras son significativas ($p<0.001$, prueba t de Welch).}
   \label{tab:resultados-ab}
   \begin{tabularx}{\linewidth}{@{}X r r r@{}}
@@ -196,6 +199,7 @@ entre estrategias son significativas (demora: $F=184$, $p\approx10^{-67}$).
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Comparación multilínea-base en Lima-Centro (media $\pm$ desviación, 30 semillas), ordenada por demora media.}
   \label{tab:resultados-multibaseline}
   \begin{tabularx}{\linewidth}{@{}l r r c >{\raggedright\arraybackslash}X@{}}
@@ -252,6 +256,7 @@ Tabla~\ref{tab:sensibilidad-demanda} contrasta ambos niveles de carga.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Sensibilidad del control difuso al nivel de demanda (demora media por vehículo, control fijo vs.\ difuso).}
   \label{tab:sensibilidad-demanda}
   \begin{tabularx}{\linewidth}{@{}X r r r c@{}}
@@ -282,6 +287,7 @@ comportamiento esperado y verificado ante distintos modos de falla.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Comportamiento del sistema ante fallas y modo degradado.}
   \label{tab:degradacion}
   \begin{tabularx}{\linewidth}{@{}p{0.30\linewidth} X@{}}
@@ -303,54 +309,13 @@ a sus límites duros con independencia de la disponibilidad de la nube.
 
 \section{Matriz de cumplimiento de requerimientos}\label{sec:matriz-cumplimiento}
 
-La matriz de la Tabla~\ref{tab:cumplimiento} clasifica cada requisito en una de tres
-categorías: \emph{Cumple (diseño)} cuando existe propuesta, cálculo o arquitectura
-documentada; \emph{Cumple (validado en SUMO)} cuando existe una medición reproducible bajo el
-protocolo del §\ref{sec:protocolo-validacion}; y \emph{Fuera de alcance (prototipo/auditoría)}
-cuando el cierre requiere fabricación física o auditoría externa no ejecutada en esta tesis.
-
-\begin{table}[H]
-  \centering
-  \caption{Matriz de cumplimiento de requerimientos del sistema.}
-  \label{tab:cumplimiento}
-  \begin{tabularx}{\linewidth}{@{}c p{0.24\linewidth} c X@{}}
-    \toprule
-    \textbf{Req.} & \textbf{Subsistema} & \textbf{Estado} & \textbf{Evidencia / observación}\\
-    \midrule
-    R-F01   & Sensado            & Validado en SUMO   & Cadena cámara$\rightarrow$ICV demostrada con video real y replicada en SUMO.\\
-    R-F02   & Procesamiento local & Validado en SUMO  & Casos de ICV (8) y análisis de sensibilidad coherentes.\\
-    R-F03   & Plataforma         & Cumple (diseño)    & Plataforma web con históricos y exportación CSV/JSON.\\
-    R-C01   & Control            & Validado en SUMO   & Caso B y modo degradado (caso D) ejecutados.\\
-    R-C02   & Arquitectura       & Cumple (diseño)    & El controlador conserva la autoridad final; integración comercial pendiente.\\
-    R-C03   & Control            & Validado en SUMO   & Barrido de reglas con saturaciones; verde acotado a [10, 120]~s.\\
-    R-C04   & Control            & Cumple (diseño)    & Ante sensado inválido se inhibe la adaptación y se mantiene el plan base.\\
-    R-COM01 & Comunicación       & Cumple (diseño)    & Publicación de telemetría definida en la arquitectura.\\
-    R-COM02 & Comunicación/seguridad & Cumple (diseño) & Rechazo de parámetros inválidos y vencidos por vigencia/secuencia.\\
-    R-NUB01 & Nube               & Cumple (diseño)    & Dashboard, histórico y alertas diseñados; disponibilidad por demostrar.\\
-    R-SEC01 & Ciberseguridad     & Cumple (diseño)    & Arquitectura TLS, autenticación mutua y control de acceso definida.\\
-    R-SEC05 & Ciberseguridad     & Fuera de alcance   & Auditoría, \textit{pentesting} y conformidad IEC 62443 no ejecutados (piloto).\\
-    R-SEC02 & Ciberseguridad     & Cumple (diseño)    & Modelo de amenazas documentado.\\
-    R-SEC03 & Ciberseguridad     & Cumple (diseño)    & Registro de eventos y trazabilidad definidos.\\
-    R-SEC04 & Ciberseguridad     & Cumple (diseño)    & Separación de roles y autoridad documentada.\\
-    R-ELEC01 & Energía           & Cumple (diseño)    & Esquema eléctrico y coordinación de protecciones.\\
-    R-ELEC02 & Energía           & Cumple (diseño)    & Balance de potencia y autonomía por UPS calculados.\\
-    R-ELEC03 & Electrónica       & Cumple (diseño)    & PCB, distribución y diagnóstico definidos.\\
-    R-MEC01 & Mecánico           & Cumple (diseño)    & CAD y acceso de mantenimiento resueltos.\\
-    R-MEC02 & Mecánico           & Fuera de alcance   & Certificación IP65/IK10 y resistencia al vandalismo no ensayadas; requieren prototipo.\\
-    R-MEC03 & Mecánico/sensado   & Cumple (diseño)    & Cobertura, torque y resistencia dimensionados.\\
-    R-CAM01 & Mecánico/Control   & Cumple (diseño)    & Sistema de orientación (NEMA~23, biela-manivela, rodamiento) dimensionado en el Cap.~5.\\
-    R-CAM02 & Percepción         & Cumple (diseño)    & Política de estados \textit{MOVING}/\textit{SETTLING}/\textit{OBSERVING} definida en el Cap.~6.\\
-    R-CAM03 & Control            & Cumple (diseño)    & Vigencia temporal $T_{valid}$ por vector de estado de eje.\\
-    R-CAM04 & Seg.\ funcional    & Cumple (diseño)    & Degradación por baja confianza ($\tau_{det}$) definida en el Cap.~6.\\
-    R-OP01  & Operación          & Cumple (diseño)    & Procedimiento de mantenimiento preventivo definido.\\
-    R-VAL01 & Validación         & Validado en SUMO   & Casos A y B reproducibles (Tabla~\ref{tab:resultados-ab}).\\
-    R-VAL02 & Validación         & Validado en SUMO   & Resultados comparativos consolidados.\\
-    R-VAL03 & Validación         & Cumple (diseño)    & Modo degradado (caso D) verificado a nivel de comportamiento.\\
-    R-COST01 & Costos            & Cumple (diseño)    & CAPEX/OPEX consolidados en el §\ref{cap:analisis-economico}.\\
-    \bottomrule
-  \end{tabularx}
-  \fuente{Elaboración propia.}
-\end{table}
+Cada requisito del Anexo~A se clasifica en una de tres categorías: \emph{Cumple (diseño)} cuando existe
+propuesta, cálculo o arquitectura documentada; \emph{Cumple (validado en SUMO)} cuando existe una medición
+reproducible bajo el protocolo de la Sección~\ref{sec:protocolo-validacion}; y \emph{Fuera de alcance
+(prototipo/auditoría)} cuando el cierre requiere fabricación física o auditoría externa no ejecutada en esta
+tesis. De los 30 requisitos, 6 están validados en SUMO, 22 cumplen a nivel de diseño y 2 quedan fuera de
+alcance (auditoría de seguridad y certificación IP65/IK10 con resistencia al vandalismo), pendientes de un
+piloto físico. La matriz completa, requisito por requisito, se presenta en el Anexo~B.
 
 \section{Análisis de costos}\label{cap:analisis-economico}
 
@@ -381,11 +346,12 @@ sensores. El respaldo energético (UPS APC SMT1500IC, S/~2\,279.99) es el ítem 
 contabiliza una sola vez dentro de dicho subtotal; los rubros de la Tabla~\ref{tab:capex} son una estimación de
 nivel de proyecto y no la suma directa de los componentes del Capítulo~4. El desglose
 fino, con los más de cuarenta ítems individuales (gabinete, postes, cámara, motorización, SBC, módulo
-4G, protecciones, sensores y partidas de obra), se traslada al Anexo correspondiente para no recargar
-la lectura.
+4G, protecciones, sensores y partidas de obra), se conserva en el material digital de la tesis para no
+recargar la lectura.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{CAPEX por intersección, agrupado por rubro.}
   \label{tab:capex}
   \begin{tabularx}{\linewidth}{@{}X r r@{}}
@@ -410,7 +376,7 @@ centralizado del sistema y procesa la telemetría de la red completa (del orden 
 intersecciones). Esta capa es un costo compartido, no un CAPEX por intersección: su detalle por
 servicio (IoT Hub, Stream Analytics, bases de datos, almacenamiento, cómputo de \emph{machine
 learning} y observabilidad) asciende a unos S/ 13\,243 mensuales (S/ 158\,916 anuales) para toda
-la red y se documenta en el Anexo. Prorrateada entre las intersecciones equivale a unos
+la red y se documenta en el material digital de la tesis. Prorrateada entre las intersecciones equivale a unos
 S/ 265 mensuales por intersección, monto que se incorpora como rubro de nube dentro del OPEX.
 
 \subsection{Costos operativos anuales (OPEX)}
@@ -421,6 +387,7 @@ la fracción prorrateada de nube.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{OPEX anual por intersección.}
   \label{tab:opex}
   \begin{tabularx}{\linewidth}{@{}X X r@{}}

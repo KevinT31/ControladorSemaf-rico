@@ -67,12 +67,25 @@ class TestTscEmulated:
 
     def test_historial_sin_conflictos(self):
         authority, actuator = make_authority(Mode.TSC_EMULATED)
-        clock = ManualClock()
         for k in range(20):
             authority.process_state(make_state(seq=k))
         from nsb.safety.conflict_matrix import ConflictMatrix
         m = ConflictMatrix()
         assert all(m.es_segura(g) for g in actuator.historia)
+
+    def test_estado_rechazado_no_puede_avanzar_reloj(self):
+        clock = ManualClock()
+        authority, _ = make_authority(Mode.TSC_EMULATED, clock=clock)
+        authority.process_state(make_state(seq=0, sim_time_s=0.0))
+
+        _, decision = authority.process_state(
+            make_state(seq=0, sim_time_s=36.0),  # duplicado con tiempo futuro
+            on_state_accepted=lambda: clock.set(36.0),
+        )
+
+        assert decision.verdict is Verdict.REJECT
+        assert clock.now() == 0.0
+        assert decision.applied_phase.phase_id.value == "ns_verde"
 
     def test_requiere_actuador(self):
         clock = ManualClock()

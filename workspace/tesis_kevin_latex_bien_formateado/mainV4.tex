@@ -55,14 +55,21 @@
 \def\fps@table{H}
 \makeatother
 
-% Tope de altura para TODAS las figuras: garantiza que la imagen y su leyenda
-% quepan en la página, de modo que el rótulo «Figura X.Y» nunca se salga de la hoja.
-% Con keepaspectratio la imagen se escala al menor de los dos límites (ancho o alto),
-% por lo que solo afecta a las imágenes verticales (largas); las demás no cambian.
 \makeatletter
 \let\gt@oldincludegraphics\includegraphics
 \renewcommand{\includegraphics}[2][]{%
   \gt@oldincludegraphics[height=0.80\textheight,keepaspectratio,#1]{#2}}
+\makeatother
+
+\usepackage{eso-pic}
+% Marca de agua en TODAS las páginas (imagen ya atenuada en escala de grises).
+% Sin asterisco = se aplica al fondo de cada página del documento.
+\makeatletter
+\AddToShipoutPictureBG{%
+  \AtPageCenter{%
+    \put(0,-2.5cm){\makebox(0,0){\gt@oldincludegraphics[width=0.5\paperwidth,keepaspectratio]{media/image155_gray.png}}}%
+  }%
+}
 \makeatother
 
 % ==================== Listas ====================
@@ -78,13 +85,16 @@
 \definecolor{PUCPGray}{HTML}{4A4A4A}
 \usepackage{titlesec}
 \titleformat{\chapter}[display]
-  {\normalfont\bfseries\centering\color{PUCPBlue}}
+  {\normalfont\bfseries\centering\color{black}}
   {\Large CAPÍTULO \thechapter}{0.5em}{\LARGE}
 \titlespacing*{\chapter}{0pt}{-0.2cm}{1.0cm}
 \titleformat{name=\chapter,numberless}[display]
-  {\normalfont\bfseries\centering\color{PUCPBlue}}{}{0pt}{\LARGE}
-\titleformat{\section}{\normalfont\Large\bfseries\color{PUCPBlue}}{\thesection}{0.8em}{}
-\titleformat{\subsection}{\normalfont\large\bfseries\color{PUCPGray}}{\thesubsection}{0.8em}{}
+  {\normalfont\bfseries\centering\color{black}}{}{0pt}{\LARGE}
+% titlesec deja de emitir el \thispagestyle{plain} automático de \chapter/\chapter*;
+% se restaura aquí para que la primera página de cada capítulo muestre su número.
+\assignpagestyle{\chapter}{plain}
+\titleformat{\section}{\normalfont\Large\bfseries\color{black}}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries\color{black}}{\thesubsection}{0.8em}{}
 \titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{0.8em}{}
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{2}
@@ -126,7 +136,7 @@
 \usepackage{hyperref}
 \usepackage{bookmark}
 \hypersetup{
-  pdflang={es},colorlinks=true,linkcolor=PUCPBlue,citecolor=PUCPBlue,urlcolor=PUCPBlue,
+  pdflang={es},colorlinks=true,linkcolor=black,citecolor=PUCPBlue,urlcolor=PUCPBlue,
   pdfauthor={Kevin André Tumbalobos Gamboa},
   pdftitle={Diseño de un módulo IoT mecatrónico complementario para control semafórico adaptativo}
 }
@@ -158,8 +168,8 @@
 \vspace{0.25cm}
 {\Large\bfseries FACULTAD DE CIENCIAS E INGENIERÍA\par}
 \vspace{0.8cm}
-\includegraphics[width=0.30\linewidth,keepaspectratio]{media/image155.png}\par
-\vspace{1.0cm}
+\includegraphics[width=0.40\linewidth,keepaspectratio]{media/image155.png}\par
+\vspace{0.8cm}
 {\large\bfseries\setlength{\baselineskip}{1.2\baselineskip}
 DISEÑO DE UN MÓDULO IoT MECATRÓNICO COMPLEMENTARIO PARA EL CONTROL SEMAFÓRICO ADAPTATIVO CON COMUNICACIÓN SEGURA EN LA NUBE\par}
 \vspace{0.9cm}
@@ -173,17 +183,18 @@ DISEÑO DE UN MÓDULO IoT MECATRÓNICO COMPLEMENTARIO PARA EL CONTROL SEMAFÓRIC
 \vspace{0.10cm}
 {\large Dr. Gustavo Pérez Zúñiga\par}
 \vfill
-{\large Lima, Diciembre, 2025\par}
+{\large Lima, Junio, 2026\par}
 \end{center}
 \end{titlepage}
 
-\pagestyle{empty}
+\pagenumbering{roman}
+\pagestyle{fancy}
 
 % ======================================================================
 %                       INFORME DE SIMILITUD
 % ======================================================================
 \chapter*{}
-\thispagestyle{empty}
+\thispagestyle{plain}
 \begin{center}{\large\bfseries Informe de Similitud}\end{center}
 \vspace{0.5cm}
 \noindent Yo, Gustavo Pérez Zúñiga, docente de la Facultad de Ciencias e Ingeniería de la Pontificia
@@ -208,14 +219,22 @@ consigna el reporte de similitud emitido por el software Turnitin.
 %                          DEDICATORIA
 % ======================================================================
 \chapter*{}
-\thispagestyle{empty}
-\vspace*{4cm}
+\thispagestyle{plain}
+\vspace*{0cm}
 \begin{flushright}
 \begin{minipage}{0.62\linewidth}
 \itshape
-A mis padres, por su apoyo incondicional y por impulsarme a seguir adelante en cada etapa.
-A mis amigos y compañeros de la facultad, por los momentos compartidos a lo largo de esta experiencia.
-Y a mi asesor, por su orientación y disposición constante durante el desarrollo de este trabajo.
+A mis padres, Freddy Tumbalobos y Nerida Gamboa, por su gran apoyo en todo momento, por acompañarme incondicionalmente y por impulsarme a valorar cada etapa de mi vida.
+
+A mis hermanos, Ghianella, Katherine y Mathius Tumbalobos, por su cariño, apoyo y compañía a lo largo de este camino.
+
+A mis abuelos, Teófilo Gamboa, Marcelina Meza, Mariano Tumbalobos y Adela Orellana, por el amor, los valores y el legado que dejaron en mi familia.
+
+A mi pareja, Camila Porras; a mis amigos de toda la vida, Gonzalo, Arantza, Sary, Lenny y André; y a mis compañeros y amigos de Facultad, Marco, Manuel y Diego, por los momentos compartidos a lo largo de esta experiencia y por haber sido parte importante de este camino.
+
+A mi asesor, por su orientación y disposición durante el desarrollo de este trabajo.
+
+Finalmente, reitero mi más profundo agradecimiento a mi abuela, Adela Orellana, por haber criado a mi padre con amor, esfuerzo y valores que perdurarán en mi familia por muchos años. Gracias a todos.
 \end{minipage}
 \end{flushright}
 
@@ -223,8 +242,12 @@ Y a mi asesor, por su orientación y disposición constante durante el desarroll
 %                            RESUMEN
 % ======================================================================
 \clearpage
-\pagestyle{fancy}
-\pagenumbering{roman}
+\begingroup
+
+\titlespacing*{\chapter}
+  {0pt}      % sangría izquierda
+  {-1.2cm}   % espacio antes del título
+  {0.5cm}    % espacio después del título
 \chapter*{RESUMEN}\addcontentsline{toc}{chapter}{RESUMEN}\label{resumen}
 
 La congestión vehicular en Lima Metropolitana evidencia una limitación de ingeniería en las intersecciones
@@ -256,8 +279,8 @@ trazable para fabricar un prototipo y ejecutar un piloto posterior; no incluye i
 con tráfico real, certificación de seguridad funcional ni auditoría formal de ciberseguridad.
 
 \vspace{0.4cm}
-\noindent\textbf{Palabras clave:} congestión vehicular, sistema semafórico adaptativo, IoT, computación en
-el borde, nube, ciberseguridad, control difuso, visión por computadora, VDI 2221, SUMO.
+\noindent\textbf{Palabras clave:} congestión vehicular, sistema semafórico adaptativo, IoT, nube, ciberseguridad, control difuso, visión por computadora, VDI 2221, SUMO.
+\endgroup
 
 % ======================================================================
 %                            ÍNDICES

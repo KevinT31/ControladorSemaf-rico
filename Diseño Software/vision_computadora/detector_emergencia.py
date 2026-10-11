@@ -161,6 +161,8 @@ class DetectorEmergencia:
 
     def _mostrar_instrucciones_entrenamiento(self):
         """Muestra instrucciones para entrenar el modelo"""
+        base_proyecto = Path(__file__).resolve().parent.parent
+        dataset = base_proyecto / "datos" / "entrenamiento-emergencia" / "dataset.yaml"
         logger.info("")
         logger.info("=" * 70)
         logger.info("MODELO DE EMERGENCIAS NO DISPONIBLE")
@@ -174,8 +176,8 @@ class DetectorEmergencia:
         logger.info("   - Ver instrucciones en: datos/entrenamiento-emergencia/README.md")
         logger.info("")
         logger.info("2. Entrenar modelo:")
-        logger.info("   cd C:\\Users\\kevin\\OneDrive\\Desktop\\ControladorSemaforicoTFC2")
-        logger.info("   yolo train data=datos/entrenamiento-emergencia/dataset.yaml model=yolov8n.pt epochs=50")
+        logger.info(f'   cd "{base_proyecto}"')
+        logger.info(f'   yolo train data="{dataset}" model=yolov8n.pt epochs=50')
         logger.info("")
         logger.info("3. El modelo entrenado se guardará en:")
         logger.info("   runs/detect/train/weights/best.pt")
@@ -258,8 +260,10 @@ class DetectorEmergencia:
                     # Heurística simple: si hay predominancia de rojo, bomberos; en otro caso, ambulancia
                     # Reconstruir en HSV para decidir
                     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-                    rojo_bajo1 = np.array([0, 100, 100]); rojo_alto1 = np.array([10, 255, 255])
-                    rojo_bajo2 = np.array([160, 100, 100]); rojo_alto2 = np.array([180, 255, 255])
+                    rojo_bajo1 = np.array([0, 100, 100])
+                    rojo_alto1 = np.array([10, 255, 255])
+                    rojo_bajo2 = np.array([160, 100, 100])
+                    rojo_alto2 = np.array([180, 255, 255])
                     mask_rojo = cv2.bitwise_or(
                         cv2.inRange(hsv, rojo_bajo1, rojo_alto1),
                         cv2.inRange(hsv, rojo_bajo2, rojo_alto2)
@@ -361,7 +365,7 @@ class DetectorEmergencia:
         cv2.addWeighted(overlay, 0.4, frame, 0.6, 0, frame)
 
         # Texto de alerta
-        texto_alerta = f"🚨 VEHICULO DE EMERGENCIA DETECTADO 🚨"
+        texto_alerta = "🚨 VEHICULO DE EMERGENCIA DETECTADO 🚨"
         font_scale = 1.0
         thickness = 2
 

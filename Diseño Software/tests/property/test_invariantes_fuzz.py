@@ -11,7 +11,6 @@ Tras CADA evento se verifican las invariantes:
   I4. Toda entrada no finita o fuera de orden se rechaza sin excepción
       no controlada.
 """
-import math
 import random
 
 import pytest

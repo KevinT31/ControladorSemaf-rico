@@ -3,7 +3,7 @@ Modelos Pydantic para Datos de Tráfico y Video
 """
 
 from pydantic import BaseModel, Field
-from typing import List, Dict, Optional
+from typing import List, Optional
 from datetime import datetime
 
 

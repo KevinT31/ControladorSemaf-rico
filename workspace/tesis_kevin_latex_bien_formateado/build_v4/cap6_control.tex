@@ -230,7 +230,7 @@ en la matriz de estado en la Figura~\ref{fig:matriz-estado}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image95.png}
+  \includegraphics[width=0.7\linewidth,keepaspectratio]{media/image95.png}
   \caption{Relación de las variables locales: las cinco funciones de detección alimentan los
   índices integrados PI e ICV de cada carril.}
   \label{fig:variables-locales}
@@ -239,7 +239,7 @@ en la matriz de estado en la Figura~\ref{fig:matriz-estado}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image143.png}
+  \includegraphics[width=0.7\linewidth,keepaspectratio]{media/image143.png}
   \caption{Relación de las variables locales con la matriz de estado local transmitida a la nube.}
   \label{fig:matriz-estado}
   \fuente{Elaboración propia.}
@@ -296,6 +296,7 @@ velocidad de red.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Matriz de comparación por pares (escala de Saaty) y verificación de los pesos del ICV.}
   \label{tab:ahp}
   \begin{tabular}{@{}lcccccc@{}}
@@ -327,6 +328,7 @@ coherentemente los tres niveles de congestión.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Casos de prueba del ICV con sus variables de entrada y nivel resultante.}
   \label{tab:casos-icv}
   \begin{tabular}{@{}lcccccll@{}}
@@ -359,6 +361,7 @@ la verificación por AHP: las variables de mayor peso son también las de mayor 
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Análisis de sensibilidad del ICV ante un incremento del $10\%$ en cada variable
   (caso base $ICV\approx 0.669$).}
   \label{tab:sensibilidad}
@@ -403,6 +406,7 @@ para las etapas de adquisición y comunicación. Las mediciones se obtuvieron so
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Presupuesto de latencia del lazo de percepción y control (referencia en CPU de escritorio).}
   \label{tab:latencia}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X r >{\raggedright\arraybackslash}p{3.6cm}@{}}
@@ -485,6 +489,7 @@ La Tabla~\ref{tab:reglas-difusas} resume la base de reglas.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Base de reglas difusas organizada por nivel de prioridad.}
   \label{tab:reglas-difusas}
   \begin{tabular}{@{}clll@{}}
@@ -570,9 +575,11 @@ detectada) el controlador difuso local asume el mando de inmediato. En todos los
 final atraviesa las restricciones de seguridad de tiempos y de ciclo. La
 Tabla~\ref{tab:modos-operacion} define el comportamiento esperado ante fallas; nótese que la
 autoridad final recae siempre en el controlador semafórico.
+\newpage
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Modos de operación y degradación segura del módulo de control.}
   \label{tab:modos-operacion}
   \begin{tabular}{@{}p{2.4cm}p{3.6cm}p{4.0cm}p{3.2cm}@{}}
@@ -614,6 +621,7 @@ semafórico existente. La Tabla~\ref{tab:riesgos-percepcion} resume los riesgos 
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Riesgos de percepción asociados a la cámara orientable y mitigaciones propuestas.}
   \label{tab:riesgos-percepcion}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}XX@{}}
@@ -644,7 +652,7 @@ capas se encuentra entrenada ni validada} en esta tesis. Se documentan como dise
 futuro y \textbf{no constituyen condición del objetivo general}, que se demuestra íntegramente
 con el control difuso local y su verificación. Su formulación detallada --- el modelo de
 decisión de Markov, los espacios de estados y acciones, la función de recompensa y los
-protocolos de entrenamiento --- se traslada al Anexo para no recargar el cuerpo del documento;
+protocolos de entrenamiento --- se traslada al Anexo~E para no recargar el cuerpo del documento;
 aquí solo se enuncian su propósito y sus limitaciones.
 
 \textbf{Optimización mediante aprendizaje por refuerzo (RL).} Se plantea un agente de
@@ -664,7 +672,7 @@ intersecciones vecinas) y redes LSTM (para las dependencias temporales), con el 
 el ICV y el PI a un horizonte corto y habilitar acciones preventivas (alertas tempranas,
 preacondicionamiento de olas verdes). Al igual que el módulo de RL, se trata de una propuesta de
 diseño no entrenada: su validación, métricas de error y protocolo de reentrenamiento quedan como
-trabajo futuro descrito en el Anexo. Ambas capas comparten el mismo principio de seguridad: son
+trabajo futuro descrito en el Anexo~E. Ambas capas comparten el mismo principio de seguridad: son
 módulos de soporte cuya indisponibilidad o inmadurez no compromete la operación del lazo local.
 
 \section{Arquitectura de ciberseguridad propuesta}\label{sec:ciberseguridad}
@@ -678,28 +686,30 @@ Tabla~\ref{tab:amenazas} resume el modelo de amenazas y los mecanismos de mitiga
 
 \begin{landscape}
 \footnotesize
-\begin{table}[H]
-  \centering
-  \caption{Modelo de amenazas y mecanismos de mitigación propuestos.}
-  \label{tab:amenazas}
-  \begin{tabular}{@{}p{3.6cm}p{3.0cm}p{3.0cm}p{1.8cm}p{5.4cm}p{3.6cm}@{}}
+\begin{longtable}{@{}p{4.2cm}p{3.6cm}p{3.6cm}p{1.8cm}p{10.2cm}@{}}
+\caption{Modelo de amenazas y mecanismos de mitigación propuestos.}\label{tab:amenazas}\\
 \toprule
-\textbf{Amenaza} & \textbf{Activo afectado} & \textbf{Impacto} & \textbf{Prob.} & \textbf{Medida de mitigación} & \textbf{Mecanismo propuesto}\\
+\textbf{Amenaza} & \textbf{Activo afectado} & \textbf{Impacto} & \textbf{Prob.} & \textbf{Medida de mitigación}\\
 \midrule
-Acceso no autorizado al dashboard & Cuentas, visualización y configuración & Exposición o cambio indebido & Media & MFA, RBAC, mínimo privilegio, sesiones y bloqueo. & Revisión de roles y flujo de autenticación.\\
-Manipulación de parámetros de control & Configuración y recomendaciones & Degradación del tránsito & Media & Firma/token, lista blanca, rango, vigencia, doble validación y autoridad final del controlador. & Casos de rechazo de parámetros inválidos.\\
-Intercepción de telemetría & Datos operativos & Pérdida de confidencialidad e inteligencia operacional & Media & TLS, identidad por dispositivo y gestión de certificados. & Inspección de configuración y diagrama de confianza.\\
-Inyección de datos falsos & ICV, estados y alertas & Decisiones incorrectas & Media & Autenticación, integridad, sello temporal, detección de atípicos y comparación con estado local. & Pruebas con mensajes alterados o fuera de secuencia.\\
-Pérdida de conectividad & Supervisión y coordinación & Pérdida de visibilidad global & Alta & Control local, búfer de registros, reintento con retroceso y plan base. & Caso de validación y registro de transición.\\
-Denegación de servicio & Enlace, broker o API & Indisponibilidad de nube & Media & Límites de tasa, colas, segmentación y operación local independiente. & Prueba controlada de indisponibilidad.\\
-Compromiso de credenciales & Identidad de equipo/usuario & Suplantación & Media & Secretos no embebidos, rotación, revocación, MFA y almacenamiento seguro. & Revisión de arquitectura y procedimiento.\\
-Actualización no autorizada & Software edge y configuración & Ejecución de código malicioso & Baja/Media & Firma de firmware, canal autenticado, control de versiones y rollback. & Flujo de actualización y validación de firma.\\
-Fallo de sincronización con nube & Timestamps y estado distribuido & Recomendaciones obsoletas & Media & Vigencia, reloj sincronizado, número de secuencia e invalidación por timeout. & Caso de mensaje retrasado/duplicado.\\
-Corrupción de datos históricos & Base de datos y reportes & Pérdida de trazabilidad & Baja/Media & Backups, control de integridad, retención y permisos separados. & Revisión de política y restauración propuesta.\\
+\endfirsthead
+\toprule
+\textbf{Amenaza} & \textbf{Activo afectado} & \textbf{Impacto} & \textbf{Prob.} & \textbf{Medida de mitigación}\\
+\midrule
+\endhead
 \bottomrule
-  \end{tabular}
-  \fuente{Elaboración propia.}
-\end{table}
+\endfoot
+Acceso no autorizado al dashboard & Cuentas, visualización y configuración & Exposición o cambio indebido & Media & MFA, RBAC, mínimo privilegio, sesiones y bloqueo, con revisión periódica de roles y del flujo de autenticación.\\
+Manipulación de parámetros de control & Configuración y recomendaciones & Degradación del tránsito & Media & Firma, lista blanca, rango, vigencia, doble validación y autoridad final del controlador; se verifica con casos de rechazo de parámetros inválidos.\\
+Intercepción de telemetría & Datos operativos & Pérdida de confidencialidad & Media & TLS, identidad por dispositivo y gestión de certificados, con inspección de configuración y diagrama de confianza.\\
+Inyección de datos falsos & ICV, estados y alertas & Decisiones incorrectas & Media & Autenticación, integridad, sello temporal, detección de atípicos y comparación con estado local, validada con pruebas de mensajes alterados.\\
+Pérdida de conectividad & Supervisión y coordinación & Pérdida de visibilidad global & Alta & Control local, búfer de registros, reintento con retroceso y plan base, con caso de validación y registro de la transición.\\
+Denegación de servicio & Enlace, broker o API & Indisponibilidad de nube & Media & Límites de tasa, colas, segmentación y operación local independiente, verificados con prueba controlada de indisponibilidad.\\
+Compromiso de credenciales & Identidad de equipo/usuario & Suplantación & Media & Secretos no embebidos, rotación, revocación, MFA y almacenamiento seguro, sustentados en revisión de arquitectura y procedimiento.\\
+Actualización no autorizada & Software edge y configuración & Ejecución de código malicioso & Baja/Media & Firma de firmware, canal autenticado, control de versiones y rollback, mediante un flujo de actualización con validación de firma.\\
+Fallo de sincronización con nube & Timestamps y estado distribuido & Recomendaciones obsoletas & Media & Vigencia, reloj sincronizado, número de secuencia e invalidación por timeout, probado con casos de mensaje retrasado o duplicado.\\
+Corrupción de datos históricos & Base de datos y reportes & Pérdida de trazabilidad & Baja/Media & Backups, control de integridad, retención y permisos separados, con revisión de política y prueba de restauración.\\
+\end{longtable}
+\fuente{Elaboración propia.}
 \end{landscape}
 
 La medida arquitectónica principal es la separación entre \emph{recomendación} y \emph{acción

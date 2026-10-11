@@ -34,20 +34,31 @@ def cargar_pinout(path: str | Path) -> Dict[SignalGroup, Dict[SignalColor, int]]
     """Lee y valida pinout.yaml: 12 pines BCM únicos."""
     with open(path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
+    if not isinstance(data, dict):
+        raise ValueError("pinout.yaml: la raíz debe ser un mapping YAML")
     if data.get("numbering", "BCM") != "BCM":
         raise ValueError("pinout.yaml: solo se soporta numeración BCM")
     grupos = data.get("groups", {})
+    if not isinstance(grupos, dict):
+        raise ValueError("pinout.yaml: groups debe ser un mapping")
     pinout: Dict[SignalGroup, Dict[SignalColor, int]] = {}
     vistos: Dict[int, str] = {}
     for grupo, clave in _GRUPO_YAML.items():
-        if clave not in grupos:
+        if clave not in grupos or not isinstance(grupos[clave], dict):
             raise ValueError(f"pinout.yaml: falta el grupo {clave!r}")
         pinout[grupo] = {}
         for color, ckey in _COLOR_YAML.items():
             if ckey not in grupos[clave]:
                 raise ValueError(f"pinout.yaml: falta {clave}.{ckey}")
-            pin = int(grupos[clave][ckey])
             donde = f"{clave}.{ckey}"
+            pin = grupos[clave][ckey]
+            if isinstance(pin, bool) or not isinstance(pin, int):
+                raise ValueError(
+                    f"pinout.yaml: {donde} debe ser un entero BCM, no {pin!r}")
+            if not 0 <= pin <= 27:
+                raise ValueError(
+                    f"pinout.yaml: {donde}={pin} fuera del rango BCM 0..27 "
+                    "de Raspberry Pi 4B")
             if pin in vistos:
                 raise ValueError(
                     f"pinout.yaml: pin BCM {pin} duplicado "
@@ -73,28 +84,53 @@ class GPIOActuator:
 
         with open(pinout_path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
+        if not isinstance(data, dict):
+            raise ValueError("pinout.yaml: la raíz debe ser un mapping YAML")
         if active_high is None:
-            active_high = bool(data.get("active_high", True))
+            active_high = data.get("active_high", True)
+        if not isinstance(active_high, bool):
+            raise ValueError("pinout.yaml: active_high debe ser true o false")
 
         pinout = cargar_pinout(pinout_path)
         self._leds: Dict[SignalGroup, Dict[SignalColor, object]] = {}
-        for grupo, colores in pinout.items():
-            self._leds[grupo] = {
-                color: LED(pin, active_high=active_high, initial_value=False)
-                for color, pin in colores.items()}
-        self._estado: Dict[SignalGroup, SignalColor] = dict(TODO_ROJO)
-        self.apply(dict(TODO_ROJO))
+        try:
+            for grupo, colores in pinout.items():
+                self._leds[grupo] = {}
+                for color, pin in colores.items():
+                    self._leds[grupo][color] = LED(
+                        pin, active_high=active_high, initial_value=False)
+            self._estado: Dict[SignalGroup, SignalColor] = dict(TODO_ROJO)
+            self.apply(dict(TODO_ROJO))
+        except Exception:
+            for leds in self._leds.values():
+                for led in leds.values():
+                    try:
+                        led.close()
+                    except Exception:
+                        pass
+            raise
         logger.info("GPIOActuator inicializado (12 salidas BCM, "
                     "active_high=%s)", active_high)
 
     def apply(self, groups: Dict[SignalGroup, SignalColor]) -> None:
-        # Orden seguro: primero APAGAR lo que no corresponde, luego encender.
+        # Resolver todo antes de tocar GPIO: un mapping incompleto no puede
+        # dejar una actualización física a medias.
+        objetivos: Dict[SignalGroup, SignalColor] = {}
         for grupo, leds in self._leds.items():
             objetivo = groups[grupo]
+            if objetivo not in leds:
+                raise ValueError(f"color inválido para {grupo.value}: {objetivo!r}")
+            objetivos[grupo] = objetivo
+
+        # Orden seguro GLOBAL: apagar primero todos los colores no objetivo.
+        # Hacerlo grupo por grupo podía encender NS mientras EO seguía verde.
+        for grupo, leds in self._leds.items():
+            objetivo = objetivos[grupo]
             for color, led in leds.items():
                 if color is not objetivo:
                     led.off()
-            leds[objetivo].on()
+        for grupo, leds in self._leds.items():
+            leds[objetivos[grupo]].on()
         self._estado = dict(groups)
 
     def state(self) -> Dict[SignalGroup, SignalColor]:

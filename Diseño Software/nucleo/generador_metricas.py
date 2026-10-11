@@ -436,11 +436,11 @@ if __name__ == "__main__":
 
         # Clasificar
         if icv_promedio < 0.3:
-            print(f"   → Estado: 🟢 FLUIDO")
+            print("   → Estado: 🟢 FLUIDO")
         elif icv_promedio < 0.6:
-            print(f"   → Estado: 🟡 MODERADO")
+            print("   → Estado: 🟡 MODERADO")
         else:
-            print(f"   → Estado: 🔴 CONGESTIONADO")
+            print("   → Estado: 🔴 CONGESTIONADO")
 
     # Probar comparación
     print("\n" + "="*70)
@@ -466,15 +466,15 @@ if __name__ == "__main__":
     mejora_icv = ((icv_fijo - icv_adapt) / icv_fijo) * 100
     mejora_vel = ((vel_adapt - vel_fijo) / vel_fijo) * 100
 
-    print(f"Control Tiempo Fijo:")
+    print("Control Tiempo Fijo:")
     print(f"  • ICV: {icv_fijo:.3f}")
     print(f"  • Velocidad: {vel_fijo:.1f} km/h")
 
-    print(f"\nControl Adaptativo:")
+    print("\nControl Adaptativo:")
     print(f"  • ICV: {icv_adapt:.3f}")
     print(f"  • Velocidad: {vel_adapt:.1f} km/h")
 
-    print(f"\nMejoras:")
+    print("\nMejoras:")
     print(f"  ✓ Reducción de congestión: {mejora_icv:.1f}%")
     print(f"  ✓ Aumento de velocidad: {mejora_vel:.1f}%")
 

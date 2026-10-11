@@ -8,7 +8,7 @@ a las que genera ejecutar.py para mantener consistencia.
 """
 
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 from datetime import datetime
 import json
 import logging
@@ -18,8 +18,6 @@ try:
     import matplotlib
     matplotlib.use('Agg')  # Backend sin GUI
     import matplotlib.pyplot as plt
-    import matplotlib.dates as mdates
-    from matplotlib.figure import Figure
     MATPLOTLIB_DISPONIBLE = True
 except ImportError:
     MATPLOTLIB_DISPONIBLE = False

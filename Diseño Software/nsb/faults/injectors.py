@@ -10,8 +10,7 @@
 """
 from __future__ import annotations
 
-import math
-from typing import Iterator, Optional, Tuple
+from typing import Iterator, Optional
 
 from nsb.core.pipeline import DecisionPipeline
 from nsb.domain.contracts import (

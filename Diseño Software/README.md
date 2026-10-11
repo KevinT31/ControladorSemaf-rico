@@ -23,6 +23,13 @@ python ejecutar.py
 python servidor-backend/main.py
 ```
 
+En el primer arranque, si no se definieron `DEMO_OPERADOR_PASSWORD`,
+`DEMO_TECNICO_PASSWORD` y `DEMO_ADMIN_PASSWORD`, el backend genera claves
+aleatorias en `.demo_credentials.json`. Ese archivo es local, está ignorado por
+Git y debe mantenerse privado. Para despliegues persistentes, copie
+`.env.example` a `.env`, configure las tres claves y defina un `JWT_SECRET`
+aleatorio estable.
+
 ## Menú principal (ejecutar.py)
 
 1. Iniciar Dashboard
@@ -53,7 +60,7 @@ datos/                      # Datos de ejemplo (no versionar videos)
 
 ## Dependencias principales
 
-- Python 3.9+
+- Python 3.10+
 - FastAPI, Uvicorn
 - NumPy, OpenCV
 - Psutil
@@ -69,5 +76,7 @@ python -m pip install -r requirements.txt
 ## Consideraciones de despliegue
 
 - Configura `sumo-gui` en el PATH para usar la opción 3.
+- El backend escucha en `127.0.0.1` por defecto. Expóngalo a la red solo con un
+  proxy TLS y una lista explícita de orígenes CORS.
 - No versionar archivos grandes como modelos (`.pt`) ni resultados. Usa Git LFS o descargas separadas.
 - Revisa `.gitignore` para excluir `__pycache__`, `node_modules`, resultados y temporales.

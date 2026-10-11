@@ -213,7 +213,6 @@ class OverlayMetricasCap6:
         # ICV (Índice de Congestión Vehicular)
         if 'icv' in metricas:
             icv = metricas['icv']
-            clasificacion = metricas.get('clasificacion_icv', 'N/A')
 
             # Color según clasificación
             if icv < 0.3:

@@ -165,7 +165,7 @@ async def guardar_analisis_csv(datos: Dict):
     try:
         ruta_archivo = VideoService.guardar_analisis_csv(datos)
         return MensajeResponse(
-            mensaje=f"Análisis guardado correctamente",
+            mensaje="Análisis guardado correctamente",
             datos={'archivo': ruta_archivo}
         )
     except Exception as e:
@@ -413,7 +413,7 @@ async def stream_video_index(video_index: int):
             if 'video1' in nombre_video or 'video3' in nombre_video or 'video_1' in nombre_video or 'video_3' in nombre_video:
                 segundos_saltar_analisis = 30
                 logger.info(f"⏩ Video {video_index + 1}: Análisis YOLO iniciará desde segundo {segundos_saltar_analisis}")
-                logger.info(f"📹 Video mostrado: desde segundo 0 (completo)")
+                logger.info("📹 Video mostrado: desde segundo 0 (completo)")
 
             while True:
                 procesador = ProcesadorVideo(
@@ -476,7 +476,7 @@ async def stream_video_index(video_index: int):
                         segundos_restantes = int((frame_inicio_analisis - frame_num) / fps)
                         cv2.putText(
                             frame_anotado,
-                            f"Esperando estabilizacion del video...",
+                            "Esperando estabilizacion del video...",
                             (20, 30),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             0.7,

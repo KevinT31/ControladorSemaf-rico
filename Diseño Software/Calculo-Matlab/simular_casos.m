@@ -35,13 +35,14 @@ end
 
 %% Visualización
 figure('Name','Clasificación de Congestión','NumberTitle','off');
-bar(ICVs, 'FaceColor','flat');
+b = bar(ICVs, 'FaceColor','flat');
 title('Índice de Congestión Vehicular (ICV)');
 ylabel('ICV [0–1]');
 xticklabels(etiquetas);
 ylim([0 1]);
 
 % Colores semafóricos
+b.CData = zeros(length(casos), 3);
 for i = 1:length(casos)
     switch colores(i)
         case 'Verde'
@@ -51,7 +52,7 @@ for i = 1:length(casos)
         case 'Rojo'
             colorRGB = [0.9 0.2 0.2];
     end
-    set(gca.Children(i), 'CData', colorRGB);
+    b.CData(i,:) = colorRGB;
 end
 
 grid on;

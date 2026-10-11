@@ -4,7 +4,6 @@ Modelo de Detecciones de Video (YOLO)
 
 from sqlalchemy import Column, String, Float, Integer, DateTime, ForeignKey, Index, JSON
 from sqlalchemy.orm import relationship
-from datetime import datetime
 from .base import Base
 
 

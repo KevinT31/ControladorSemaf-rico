@@ -12,7 +12,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from modelos_bd import SessionLocal, MetricaTrafico
-from sqlalchemy import func
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,13 @@ Write-Host "  CREACIÓN DE MAPA AMPLIO DE LIMA - PRESENTACIÓN" -ForegroundColor
 Write-Host "======================================================================" -ForegroundColor Cyan
 Write-Host ""
 
-$limaAmplioDir = "C:\Users\kevin\OneDrive\Desktop\ControladorSemaforicoTFC2\integracion-sumo\escenarios\lima-amplio"
+$integrationDir = $PSScriptRoot
+$limaAmplioDir = Join-Path $integrationDir "escenarios\lima-amplio"
+
+if (-not (Test-Path -LiteralPath $limaAmplioDir -PathType Container)) {
+    Write-Error "No existe el directorio del escenario: $limaAmplioDir"
+    exit 1
+}
 
 # ====================================================================
 # PASO 1: DESCARGAR MAPA (si no existe)
@@ -161,39 +167,16 @@ function Paso4-ProbarSimulacion {
 function Paso5-ExtraerCalles {
     Write-Host "`n[PASO 5/5] Extrayendo calles para visualizacion web..." -ForegroundColor Yellow
     
-    $integrationDir = "C:\Users\kevin\OneDrive\Desktop\ControladorSemaforicoTFC2\integracion-sumo"
-    Set-Location $integrationDir
+    Push-Location -LiteralPath $integrationDir
+    try {
+        & python (Join-Path $integrationDir "extraer_calles.py") "lima-amplio"
+        $resultado = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
     
-    # Crear script temporal para extraer calles
-    $tempScript = @"
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path('$integrationDir')))
-
-from extraer_calles import extraer_calles_sumo, guardar_geojson
-
-print('Extrayendo calles del mapa amplio...')
-ruta_net = Path('$limaAmplioDir') / 'lima_amplio.net.xml'
-
-if not ruta_net.exists():
-    print(f'ERROR: {ruta_net} no encontrado')
-    sys.exit(1)
-
-geojson = extraer_calles_sumo(str(ruta_net))
-ruta_salida = Path('$limaAmplioDir') / 'calles.geojson'
-guardar_geojson(geojson, str(ruta_salida))
-
-print(f'Calles extraidas: {len(geojson["features"])}')
-print(f'Archivo: {ruta_salida}')
-"@
-    
-    $tempScript | Out-File -FilePath "temp_extraer_amplio.py" -Encoding UTF8
-    
-    python temp_extraer_amplio.py
-    
-    Remove-Item "temp_extraer_amplio.py" -ErrorAction SilentlyContinue
-    
-    if (Test-Path "$limaAmplioDir\calles.geojson") {
+    if ($resultado -eq 0 -and (Test-Path (Join-Path $limaAmplioDir "calles.geojson"))) {
         Write-Host "  Calles extraidas exitosamente" -ForegroundColor Green
         return $true
     } else {

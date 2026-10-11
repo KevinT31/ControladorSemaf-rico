@@ -24,8 +24,8 @@ from pathlib import Path
 _AQUI = Path(__file__).resolve()
 sys.path.insert(0, str(_AQUI.parents[2]))   # raíz "Diseño Software"
 
-from nucleo.controlador_difuso_capitulo6 import ControladorDifusoCapitulo6
-from nucleo.indice_congestion import (
+from nucleo.controlador_difuso_capitulo6 import ControladorDifusoCapitulo6  # noqa: E402
+from nucleo.indice_congestion import (  # noqa: E402
     CalculadorICV,
     ParametrosInterseccion as ParametrosICV,
 )

@@ -7,16 +7,37 @@
 #
 # Uso (desde cualquier directorio):
 #   .\scripts\nsb\mqtt\gen_lab_certs.ps1
-#   .\scripts\nsb\mqtt\gen_lab_certs.ps1 -Nodes nsb-node-01,nsb-observer -ServerSans 192.168.1.50
+#   .\scripts\nsb\mqtt\gen_lab_certs.ps1 -Nodes nsb-node-01 -Observers nsb-observer -ServerSans 192.168.1.50
 #   .\scripts\nsb\mqtt\gen_lab_certs.ps1 -Force        # regenera la CA (rotación)
 param(
-    [string[]]$Nodes = @("nsb-node-01", "nsb-pi-01", "nsb-observer"),
+    [string[]]$Nodes = @("nsb-node-01", "nsb-pi-01"),
+    [string[]]$Observers = @("nsb-observer"),
     [string[]]$ServerSans = @(),      # IPs/DNS extra del broker (p. ej. IP LAN para la Pi)
     [int]$DiasCa = 730,
     [int]$Dias = 365,
     [switch]$Force
 )
 $ErrorActionPreference = "Stop"
+
+if ($DiasCa -lt 1 -or $Dias -lt 1) {
+    Write-Error "DiasCa y Dias deben ser enteros >= 1."
+    exit 1
+}
+$identidades = @($Nodes) + @($Observers)
+if ($identidades.Count -eq 0) {
+    Write-Error "Debe declarar al menos un nodo u observador."
+    exit 1
+}
+if (($identidades | Select-Object -Unique).Count -ne $identidades.Count) {
+    Write-Error "Nodes y Observers no pueden contener identidades duplicadas."
+    exit 1
+}
+foreach ($identidad in $identidades) {
+    if ($identidad -notmatch '^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$') {
+        Write-Error "Identidad MQTT invalida: $identidad"
+        exit 1
+    }
+}
 
 # --- localizar openssl (Git para Windows lo incluye) -----------------------
 $openssl = (Get-Command openssl -ErrorAction SilentlyContinue).Source
@@ -84,7 +105,7 @@ Write-Host "Broker: server.crt (SAN: $($san -join ', '))"
 
 # --- Certificados de cliente por nodo (CN = node_id → identidad ACL) --------
 Set-Content -Path "client_ext.cnf" -Encoding ascii -Value "extendedKeyUsage=clientAuth"
-foreach ($nodo in $Nodes) {
+foreach ($nodo in $identidades) {
     Invoke-OpenSsl @("genrsa", "-out", "$nodo.key", "2048")
     Invoke-OpenSsl @("req", "-new", "-key", "$nodo.key", "-out", "$nodo.csr",
                      "-subj", "/CN=$nodo")
@@ -93,6 +114,24 @@ foreach ($nodo in $Nodes) {
                      "-days", "$Dias", "-sha256", "-extfile", "client_ext.cnf")
     Write-Host "Cliente: $nodo.crt (CN=$nodo)"
 }
+
+# ACL coherente con las identidades generadas. Se enumeran los escritores:
+# un pattern con %u también daría write a los observadores.
+$acl = @(
+    "# Generado por scripts/nsb/mqtt/gen_lab_certs.ps1",
+    "# Nodos: escritura solo en su prefijo; observadores: lectura global."
+)
+foreach ($nodo in $Nodes) {
+    $acl += ""
+    $acl += "user $nodo"
+    $acl += "topic write nsb/$nodo/#"
+}
+foreach ($observador in $Observers) {
+    $acl += ""
+    $acl += "user $observador"
+    $acl += "topic read nsb/#"
+}
+Set-Content -LiteralPath (Join-Path $dir "..\acl.conf") -Encoding ascii -Value $acl
 
 Remove-Item -Force "*.csr", "server_ext.cnf", "client_ext.cnf" -ErrorAction SilentlyContinue
 Write-Host ""

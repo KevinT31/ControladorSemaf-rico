@@ -10,10 +10,10 @@ function [pesos, CR] = calcular_pesos_ahp(A)
 %   CR    - Índice de consistencia (CR < 0.1 es aceptable)
 
     %% Validación
-    [n, m] = size(A);
-    if n ~= m
-        error('La matriz A debe ser cuadrada.');
-    end
+    validateattributes(A, {'numeric'}, ...
+        {'2d', 'square', 'real', 'finite', 'nonempty', 'positive'}, ...
+        mfilename, 'A', 1);
+    [n, ~] = size(A);
 
     %% Paso 1: Normalizar columnas
     col_sum = sum(A, 1);
@@ -28,9 +28,14 @@ function [pesos, CR] = calcular_pesos_ahp(A)
     lambda_max = mean(Aw ./ pesos);
 
     %% Paso 4: Calcular índice de consistencia (CI) y razón de consistencia (CR)
-    CI = (lambda_max - n) / (n - 1);
-    RI = obtener_RI(n);
-    CR = CI / RI;
+    if n <= 2
+        CI = 0;
+        CR = 0;
+    else
+        CI = (lambda_max - n) / (n - 1);
+        RI = obtener_RI(n);
+        CR = CI / RI;
+    end
 
     %% Mostrar resultados
     fprintf('=== Cálculo de Pesos AHP ===\n');

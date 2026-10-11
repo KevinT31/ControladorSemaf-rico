@@ -32,7 +32,6 @@ import logging
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 from nsb.config import TelemetryConfig
 from nsb.telemetry.events import TelemetryEvent
@@ -201,7 +200,16 @@ class MqttTelemetrySink:
                 info.wait_for_publish(timeout=CLOSE_FLUSH_S)
             except Exception:
                 pass   # sin conexión: no hay nada que drenar
-            self._client.disconnect()   # DISCONNECT limpio suprime el Last Will
-            self._client.loop_stop()
         except Exception:
             logger.debug("MQTT close: fallo ignorado", exc_info=True)
+        finally:
+            try:
+                # DISCONNECT limpio suprime el Last Will cuando hay conexión.
+                self._client.disconnect()
+            except Exception:
+                logger.debug("MQTT disconnect: fallo ignorado", exc_info=True)
+            finally:
+                try:
+                    self._client.loop_stop()
+                except Exception:
+                    logger.debug("MQTT loop_stop: fallo ignorado", exc_info=True)

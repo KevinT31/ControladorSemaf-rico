@@ -24,20 +24,53 @@ function [ICV, clasificacion, color] = calcular_icv(L, V, F, N, parametros)
         error('Faltan argumentos. Debes proporcionar L, V, F, N y parametros.');
     end
 
-    if abs(sum(parametros.pesos) - 1) > 1e-3
+    validateattributes(L, {'numeric'}, ...
+        {'real', 'finite', 'scalar', 'nonnegative'}, mfilename, 'L', 1);
+    validateattributes(V, {'numeric'}, ...
+        {'real', 'finite', 'scalar', 'nonnegative'}, mfilename, 'V', 2);
+    validateattributes(F, {'numeric'}, ...
+        {'real', 'finite', 'scalar', 'nonnegative'}, mfilename, 'F', 3);
+    validateattributes(N, {'numeric'}, ...
+        {'real', 'finite', 'scalar', 'nonnegative'}, mfilename, 'N', 4);
+
+    campos = {'L_max', 'V_max', 'F_sat', 'L_carril', 'rho_jam', 'pesos'};
+    if ~isstruct(parametros) || ~all(isfield(parametros, campos))
+        error('parametros debe contener L_max, V_max, F_sat, L_carril, rho_jam y pesos.');
+    end
+    validateattributes(parametros.L_max, {'numeric'}, {'real', 'finite', 'scalar', 'positive'});
+    validateattributes(parametros.V_max, {'numeric'}, {'real', 'finite', 'scalar', 'positive'});
+    validateattributes(parametros.F_sat, {'numeric'}, {'real', 'finite', 'scalar', 'positive'});
+    validateattributes(parametros.L_carril, {'numeric'}, {'real', 'finite', 'scalar', 'positive'});
+    validateattributes(parametros.rho_jam, {'numeric'}, {'real', 'finite', 'scalar', 'positive'});
+    validateattributes(parametros.pesos, {'numeric'}, ...
+        {'real', 'finite', 'vector', 'numel', 4, 'nonnegative'});
+
+    if abs(sum(parametros.pesos) - 1) > 1e-6
         error('La suma de los pesos debe ser igual a 1.');
+    end
+
+    % Mantener el mismo caso sin tráfico que el núcleo Python canónico.
+    if N == 0
+        ICV = 0;
+        clasificacion = 'Bajo';
+        color = 'Verde';
+        return;
     end
 
     %% Cálculo de densidad normalizada
     rho = N / parametros.L_carril;
-    D_norm = min(rho / parametros.rho_jam, 1);
+    D_norm = min(max(rho / parametros.rho_jam, 0), 1);
 
     %% Cálculo del ICV
-    w = parametros.pesos;
-    ICV = w(1) * (L / parametros.L_max) + ...
-          w(2) * (1 - V / parametros.V_max) + ...
-          w(3) * (F / parametros.F_sat) + ...
+    w = parametros.pesos(:);
+    L_norm = min(max(L / parametros.L_max, 0), 1);
+    V_norm = min(max(1 - V / parametros.V_max, 0), 1);
+    F_norm = min(max(F / parametros.F_sat, 0), 1);
+    ICV = w(1) * L_norm + ...
+          w(2) * V_norm + ...
+          w(3) * F_norm + ...
           w(4) * D_norm;
+    ICV = min(max(ICV, 0), 1);
 
     %% Clasificación semafórica
     if ICV < 0.3

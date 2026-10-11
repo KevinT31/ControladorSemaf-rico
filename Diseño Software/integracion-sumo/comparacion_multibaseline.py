@@ -32,7 +32,7 @@ import random
 import statistics as st
 from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 _INTEG = Path(__file__).parent
 _RAIZ = _INTEG.parent
@@ -106,8 +106,8 @@ def _activar_actuated():
 # Reimplementación clean-room en TraCI plano.
 # ----------------------------------------------------------------------
 def _init_webster(info: dict) -> dict:
-    return {tls: {'vistos': {l: set() for g in d['fases_verdes'] for l in g['lanes']},
-                  'count': {l: 0 for g in d['fases_verdes'] for l in g['lanes']}}
+    return {tls: {'vistos': {lane: set() for g in d['fases_verdes'] for lane in g['lanes']},
+                  'count': {lane: 0 for g in d['fases_verdes'] for lane in g['lanes']}}
             for tls, d in info.items()}
 
 
@@ -140,8 +140,8 @@ def _aplicar_webster(info: dict, estado: dict, update_freq: int,
             gps = d['fases_verdes']
             y_crit = []
             for g in gps:
-                flujos = [(estado[tls]['count'].get(l, 0) / update_freq) / sat_flow
-                          for l in g['lanes']]
+                flujos = [(estado[tls]['count'].get(lane, 0) / update_freq) / sat_flow
+                          for lane in g['lanes']]
                 y_crit.append(max(flujos) if flujos else 0.0)
             Y = sum(y_crit)
             Y = min(Y, 0.85)
@@ -167,7 +167,7 @@ def _aplicar_webster(info: dict, estado: dict, update_freq: int,
                 ph.duration = ph.minDur = ph.maxDur = float(nv)
             traci.trafficlight.setProgramLogic(tls, logic)
             # reiniciar ventana
-            estado[tls]['count'] = {l: 0 for g in gps for l in g['lanes']}
+            estado[tls]['count'] = {lane: 0 for g in gps for lane in g['lanes']}
         except Exception:
             continue
 
@@ -228,8 +228,14 @@ def _paso_maxpressure(info: dict, estado: dict, green_t: float = 12.0,
             gps = d['fases_verdes']
             presiones = []
             for g in gps:
-                inc = sum(traci.lane.getLastStepVehicleNumber(l) for l in g['lanes'])
-                out = sum(traci.lane.getLastStepVehicleNumber(l) for l in g.get('out_lanes', []))
+                inc = sum(
+                    traci.lane.getLastStepVehicleNumber(lane)
+                    for lane in g['lanes']
+                )
+                out = sum(
+                    traci.lane.getLastStepVehicleNumber(lane)
+                    for lane in g.get('out_lanes', [])
+                )
                 presiones.append(inc - out)
             mejor = max(presiones)
             if mejor <= 0 and sum(abs(p) for p in presiones) == 0:

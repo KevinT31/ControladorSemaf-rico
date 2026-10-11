@@ -5,7 +5,7 @@ Windows y el que usan los tests de integración.
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from nsb.domain.enums import SignalColor, SignalGroup
 from nsb.safety.gate import TODO_ROJO

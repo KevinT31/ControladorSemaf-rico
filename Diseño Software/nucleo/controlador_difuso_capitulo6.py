@@ -94,8 +94,8 @@ class ControladorDifusoCapitulo6:
         self._definir_reglas_difusas()
 
         logger.info("Controlador Difuso Capítulo 6 inicializado")
-        logger.info(f"  - 12 reglas difusas jerárquicas")
-        logger.info(f"  - Método Mamdani con defuzzificación por centroide")
+        logger.info("  - 12 reglas difusas jerárquicas")
+        logger.info("  - Método Mamdani con defuzzificación por centroide")
         logger.info(f"  - T_ciclo: {T_ciclo}s, T_base_NS: {T_base_NS}s, T_base_EO: {T_base_EO}s")
 
     def _inicializar_conjuntos_difusos(self):
@@ -535,11 +535,11 @@ class ControladorDifusoCapitulo6:
         resumen += "DIRECCIÓN NORTE-SUR:\n"
         ns = resultado['NS']['inferencia']
         resumen += f"  Entradas: ICV={ns['icv']:.3f}, PI={ns['pi']:.3f}, EV={ns['ev']:.0f}\n"
-        resumen += f"  Fuzzificación ICV: "
+        resumen += "  Fuzzificación ICV: "
         resumen += ", ".join([f"{k}={v:.3f}" for k, v in ns['grados_icv'].items()]) + "\n"
-        resumen += f"  Fuzzificación PI:  "
+        resumen += "  Fuzzificación PI:  "
         resumen += ", ".join([f"{k}={v:.3f}" for k, v in ns['grados_pi'].items()]) + "\n"
-        resumen += f"  Fuzzificación EV:  "
+        resumen += "  Fuzzificación EV:  "
         resumen += ", ".join([f"{k}={v:.3f}" for k, v in ns['grados_ev'].items()]) + "\n"
         resumen += f"\n  Reglas disparadas ({len(ns['reglas_disparadas'])}):\n"
         for regla in ns['reglas_disparadas']:
@@ -552,11 +552,11 @@ class ControladorDifusoCapitulo6:
         resumen += "DIRECCIÓN ESTE-OESTE:\n"
         eo = resultado['EO']['inferencia']
         resumen += f"  Entradas: ICV={eo['icv']:.3f}, PI={eo['pi']:.3f}, EV={eo['ev']:.0f}\n"
-        resumen += f"  Fuzzificación ICV: "
+        resumen += "  Fuzzificación ICV: "
         resumen += ", ".join([f"{k}={v:.3f}" for k, v in eo['grados_icv'].items()]) + "\n"
-        resumen += f"  Fuzzificación PI:  "
+        resumen += "  Fuzzificación PI:  "
         resumen += ", ".join([f"{k}={v:.3f}" for k, v in eo['grados_pi'].items()]) + "\n"
-        resumen += f"  Fuzzificación EV:  "
+        resumen += "  Fuzzificación EV:  "
         resumen += ", ".join([f"{k}={v:.3f}" for k, v in eo['grados_ev'].items()]) + "\n"
         resumen += f"\n  Reglas disparadas ({len(eo['reglas_disparadas'])}):\n"
         for regla in eo['reglas_disparadas']:

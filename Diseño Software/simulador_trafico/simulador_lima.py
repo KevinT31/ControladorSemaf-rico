@@ -12,8 +12,8 @@ para simular el comportamiento de cámaras de tráfico en intersecciones.
 """
 
 import math
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass, field
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 import logging
 
@@ -295,8 +295,10 @@ class SimuladorLima:
                 vel_norm = max(0.0, min(1.0, velocidad / vel_libre))
                 icv_val = 0.40 * flujo_norm + 0.30 * cola_norm + 0.15 * (1.0 - vel_norm)
 
-            # Clamp estricto solicitado para modo simulador: [0.50, 0.60]
-            icv_val = max(0.50, min(0.60, icv_val))
+            # El ICV es una salida del modelo, no un valor de presentación.
+            # Conservar toda su variación y limitar únicamente al dominio
+            # matemático definido por el núcleo.
+            icv_val = max(0.0, min(1.0, float(icv_val)))
 
             estado = EstadoTrafico(
                 timestamp=self.tiempo_simulacion,
@@ -379,7 +381,7 @@ if __name__ == "__main__":
     print("=" * 60)
     print(f"\nEscenario: {simulador.escenario}")
     print(f"Intersecciones: {len(intersecciones_lima)}")
-    print(f"\nParámetros del escenario:")
+    print("\nParámetros del escenario:")
     print(f"  Tasa de llegada: {simulador.params['tasa_llegada']:.1f} veh/min/carril")
     print(f"  Tasa de salida: {simulador.params['tasa_salida']:.1f} veh/min/carril")
     print(f"  Velocidad en verde: {simulador.params['velocidad_verde']:.1f} km/h")

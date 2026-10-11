@@ -36,8 +36,6 @@ import json
 sys.path.append(str(Path(__file__).parent.parent))
 
 from vision_computadora.procesador_video import ProcesadorVideo
-from vision_computadora.tracking_vehicular import TrackerVehicular
-from vision_computadora.detector_emergencia import DetectorEmergencia
 
 logging.basicConfig(
     level=logging.INFO,

@@ -7,8 +7,7 @@ Identifica solo las intersecciones críticas que están en el camino más corto.
 """
 
 import numpy as np
-from typing import List, Dict, Tuple, Optional
-from dataclasses import dataclass
+from typing import List, Dict
 import logging
 
 logger = logging.getLogger(__name__)
@@ -180,7 +179,7 @@ class OptimizadorRutas:
         # Factor de detour es 1.0 (ruta perfectamente directa)
         factor_detour = 1.0
         
-        logger.info(f"Ruta optimizada calculada:")
+        logger.info("Ruta optimizada calculada:")
         logger.info(f"  - Intersecciones en ruta: {len(ruta_ids)}")
         logger.info(f"  - Distancia total: {distancia_total:.0f}m")
         logger.info(f"  - Factor de detour: {factor_detour:.2f}")
@@ -289,7 +288,7 @@ if __name__ == "__main__":
     )
     
     if resultado['exito']:
-        print(f"\n✓ Ruta optimizada calculada:")
+        print("\n✓ Ruta optimizada calculada:")
         print(f"  Origen: {resultado['origen']['nombre']}")
         print(f"  Destino: {resultado['destino']['nombre']}")
         print(f"  Intersecciones: {resultado['num_intersecciones']}")

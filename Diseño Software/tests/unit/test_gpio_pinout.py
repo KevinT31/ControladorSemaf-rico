@@ -53,3 +53,37 @@ def test_gpio_actuator_sin_gpiozero_da_error_claro(tmp_path):
     from nsb.actuation.gpio import GPIOActuator
     with pytest.raises(RuntimeError, match="gpiozero no disponible"):
         GPIOActuator("config/nsb/pinout.yaml")
+
+
+def test_apply_apaga_globalmente_antes_de_encender():
+    from nsb.actuation.gpio import GPIOActuator
+    from nsb.domain.enums import SignalColor, SignalGroup
+    from nsb.safety.gate import TODO_ROJO
+
+    operaciones = []
+
+    class LedFalso:
+        def __init__(self, grupo, color):
+            self._id = (grupo, color)
+
+        def off(self):
+            operaciones.append(("off", *self._id))
+
+        def on(self):
+            operaciones.append(("on", *self._id))
+
+    actuator = GPIOActuator.__new__(GPIOActuator)
+    actuator._leds = {
+        grupo: {color: LedFalso(grupo, color) for color in SignalColor}
+        for grupo in SignalGroup
+    }
+    actuator._estado = dict(TODO_ROJO)
+    objetivo = dict(TODO_ROJO)
+    objetivo[SignalGroup.NORTE] = SignalColor.VERDE
+    objetivo[SignalGroup.SUR] = SignalColor.VERDE
+
+    actuator.apply(objetivo)
+
+    primer_on = next(i for i, op in enumerate(operaciones) if op[0] == "on")
+    assert all(op[0] == "off" for op in operaciones[:primer_on])
+    assert all(op[0] == "on" for op in operaciones[primer_on:])

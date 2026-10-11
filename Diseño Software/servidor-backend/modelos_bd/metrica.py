@@ -4,7 +4,6 @@ Modelo de Métricas de Tráfico (Serie Temporal)
 
 from sqlalchemy import Column, String, Float, Integer, DateTime, ForeignKey, Index
 from sqlalchemy.orm import relationship
-from datetime import datetime
 from .base import Base
 
 

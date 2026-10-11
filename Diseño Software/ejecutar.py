@@ -15,16 +15,20 @@ import webbrowser
 import time
 import json
 import logging
-import math
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional
+
+from utilidades_proceso import liberar_puerto_backend
+
+
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 # Configurar encoding 
 if sys.platform == 'win32':
-    import codecs
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, 'reconfigure', None)
+        if reconfigure:
+            reconfigure(encoding='utf-8', errors='replace')
 
 # Configurar logging
 logging.basicConfig(
@@ -50,35 +54,8 @@ def imprimir_banner():
 
 
 def limpiar_puerto_8000():
-    """Limpia el puerto 8000 antes de iniciar el servidor"""
-    try:
-        import psutil
-        procesos_terminados = 0
-
-        print("\n🔍 Verificando puerto 8000...")
-        for conn in psutil.net_connections():
-            if conn.laddr.port == 8000:
-                try:
-                    proceso = psutil.Process(conn.pid)
-                    nombre = proceso.name()
-                    print(f"   [!] Terminando proceso: {nombre} (PID: {conn.pid})")
-                    proceso.kill()
-                    procesos_terminados += 1
-                except (psutil.NoSuchProcess, psutil.AccessDenied):
-                    pass
-
-        if procesos_terminados > 0:
-            print(f"   [OK] {procesos_terminados} proceso(s) terminado(s)")
-            print("   Esperando 2 segundos...")
-            time.sleep(2)
-        else:
-            print("   [OK] Puerto 8000 libre")
-    except ImportError:
-        # Si no tiene psutil, intentar matar todos los python.exe
-        print("   [!] Limpiando todos los procesos Python...")
-        if sys.platform == 'win32':
-            os.system('taskkill /F /IM python.exe /T 2>nul')
-            time.sleep(2)
+    """Libera el puerto 8000 sin terminar procesos ajenos al proyecto."""
+    return liberar_puerto_backend(8000)
 
 
 def iniciar_sistema_completo():
@@ -87,7 +64,9 @@ def iniciar_sistema_completo():
     Integra: EstadoLocal, ControlDifuso, MetricasRed, OlasVerdes
     """
     # PRIMERO: Limpiar el puerto 8000
-    limpiar_puerto_8000()
+    if not limpiar_puerto_8000():
+        print("\n❌ No se inició el servidor porque el puerto 8000 no está disponible.")
+        return
 
     # Verificar que el servidor existe
     servidor_path = Path(__file__).parent / 'servidor-backend'
@@ -161,17 +140,19 @@ def verificar_dependencias():
             print(f"  ○ {dep:15} - {desc} (opcional, no instalado)")
             faltan_opcionales.append(dep)
 
-        if faltan_criticas:
-            print(f"\n⚠️  Faltan dependencias críticas: {', '.join(faltan_criticas)}")
-            print("Instalando automáticamente...")
-            subprocess.run([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
-            print("✓ Dependencias instaladas")
-        else:
-            print("\n✓ Todas las dependencias están instaladas")
+    if faltan_criticas:
+        requirements = PROJECT_ROOT / 'requirements.txt'
+        print(f"\n⚠️  Faltan dependencias críticas: {', '.join(faltan_criticas)}")
+        print("Instálalas antes de iniciar el dashboard con:")
+        print(f'   "{sys.executable}" -m pip install -r "{requirements}"')
+    else:
+        print("\n✓ Todas las dependencias críticas están instaladas")
 
-        if faltan_opcionales:
-            print(f"\n💡 Puedes instalar dependencias opcionales con:")
-            print(f"   pip install {' '.join(faltan_opcionales)}")
+    if faltan_opcionales:
+        print("\n💡 Dependencias opcionales no instaladas:")
+        print(f"   {', '.join(faltan_opcionales)}")
+
+    return not faltan_criticas
 
 
 def mostrar_menu():
@@ -211,11 +192,6 @@ def procesar_video():
 
     # Buscar videos (incluye videos-prueba/ y sus subcarpetas, recursivo)
     base_videos = Path(__file__).parent / 'datos' / 'videos-prueba'
-    carpetas_prueba = [
-        base_videos,
-        Path(__file__).parent / 'datos',
-    ]
-
     videos_encontrados = []
     exts = ['*.mp4', '*.avi', '*.mov', '*.mkv']
     # Búsqueda recursiva dentro de videos-prueba (donde se guardan los videos)
@@ -368,7 +344,7 @@ def comparar_sistemas():
 
     try:
         from nucleo.sistema_comparacion import (
-            SistemaComparacion, TipoControl, ConfiguracionInterseccion
+            SistemaComparacion, TipoControl
         )
 
         print("\n🔧 Inicializando comparador...")
@@ -418,7 +394,7 @@ def comparar_sistemas():
         print("✅ RESULTADOS DE LA COMPARACIÓN")
         print("="*70)
 
-        print(f"\n📊 Métricas Promedio (5 minutos de simulación):")
+        print("\n📊 Métricas Promedio (5 minutos de simulación):")
         print(f"\n  {'Métrica':<25} {'Tiempo Fijo':<15} {'Adaptativo':<15} {'Mejora':<10}")
         print(f"  {'-'*65}")
 
@@ -437,7 +413,7 @@ def comparar_sistemas():
         print(f"\n  {'Throughput (veh)':<25} {rf['throughput']:<15d} {ra['throughput']:<15d} {pct(thr_mej)}")
         print(f"  {'Demora media (s/veh)':<25} {rf['demora_media_s']:<15.2f} {ra['demora_media_s']:<15.2f} {pct(dem_mej)}")
 
-        print(f"\n📈 Resumen:")
+        print("\n📈 Resumen:")
         print(f"  • Reducción de congestión: {pct(informe.mejora_icv)}")
         print(f"  • Aumento de velocidad: {pct(informe.mejora_velocidad)}")
         print(f"  • Mejora de flujo: {pct(informe.mejora_flujo)}")
@@ -487,8 +463,8 @@ def ejecutar_pruebas():
                 (140, 8, 28, "Severo")
             ]
 
-            for l, v, f, desc in casos:
-                resultado = calculador.calcular(l, v, f)
+            for longitud_cola, velocidad, flujo, desc in casos:
+                resultado = calculador.calcular(longitud_cola, velocidad, flujo)
                 print(f"  {desc}: ICV={resultado['icv']:.4f} ({resultado['clasificacion']})")
 
         if opcion in ['2', '5']:
@@ -614,10 +590,13 @@ def ver_estado_componentes():
     # Verificar servidor activo
     print("\n🌐 Servidor:")
     try:
+        import urllib.error
         import urllib.request
-        urllib.request.urlopen("http://localhost:8000/api/estado", timeout=1)
+        # URL fija local; no se acepta un esquema controlado por el usuario.
+        urllib.request.urlopen(  # nosec B310
+            "http://localhost:8000/api/estado", timeout=1)
         print("  ✓ Dashboard activo en http://localhost:8000")
-    except:
+    except (OSError, TimeoutError, urllib.error.URLError):
         print("  ✗ Dashboard no está activo")
 
     input("\n\nPresiona ENTER para continuar...")
@@ -666,7 +645,7 @@ def exportar_configuracion():
         'ubicacion': 'Lima Centro, Perú'
     }
 
-    output_file = Path('configuracion_sistema.json')
+    output_file = PROJECT_ROOT / 'configuracion_sistema.json'
 
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(config, f, indent=2, ensure_ascii=False)

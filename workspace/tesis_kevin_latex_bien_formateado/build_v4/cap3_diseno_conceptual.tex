@@ -31,6 +31,7 @@ sintetiza sus necesidades.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Actores clave del sistema y sus necesidades principales.}
   \label{tab:actores}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}X@{}}
@@ -62,96 +63,12 @@ clave y el 50\,\% asoció las conductas peligrosas a la frustración causada por
 \section{Lista de requerimientos}\label{sec:requerimientos}
 
 A partir de las necesidades anteriores se derivan los requerimientos del sistema, clasificados como exigencias
-(obligatorias) o deseos (mejoras adicionales). La Tabla~\ref{tab:exigencias} resume las exigencias y deseos
-por dominio de diseño, conforme a la estructura VDI 2221.
-
-\begin{table}[H]
-  \centering
-  \caption{Resumen de exigencias y deseos por dominio de diseño.}
-  \label{tab:exigencias}
-  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}X@{}}
-    \toprule
-    \textbf{Aspecto} & \textbf{Carácter} & \textbf{Especificación}\\
-    \midrule
-    Función principal & Exigencia & Sistema de semaforización adaptativa que optimiza la gestión del tráfico en
-    tiempo real usando sensado IoT, comunicación con la nube y control inteligente interpretable basado en
-    lógica difusa.\\
-    Energía & Exigencia & Alimentación principal desde la red eléctrica (DC de 12\,V o 24\,V) con respaldo
-    capaz de operar un mínimo de 1\,h ante corte de energía.\\
-    Fuerzas & Exigencia & La estructura debe soportar el peso de placa, microcontrolador, sensores, actuadores
-    y de la propia carcasa.\\
-    Materia & Exigencia & Módulo resistente a temperatura, humedad, polvo y radiación solar; impermeable,
-    antivandálico y con aislamiento contra cortocircuitos y daños físicos.\\
-    Comunicación & Exigencia & Comunicación NTCIP entre semáforos y la plataforma centralizada, con base de
-    datos para registro y análisis.\\
-    Control & Exigencia & Control adaptativo que ajusta los ciclos según el tráfico en tiempo real, escalable a
-    futuras intersecciones e integrando aprendizaje para mejorar la predicción de flujo.\\
-    Software & Exigencia & Gestión de algoritmos de control adaptativo, procesamiento de sensores en tiempo
-    real, actualización remota por la nube y ciberseguridad según estándares internacionales.\\
-    Uso & Exigencia & Interoperabilidad con los semáforos y controladores existentes en Lima.\\
-    Seguridad & Exigencia & Ciberseguridad según IEC 62443 y protección física del módulo frente a clima
-    extremo y vandalismo (IP65).\\
-    Geometría & Deseo & Módulo IoT de tamaño máximo aproximado de 70$\times$70$\times$80\,cm.\\
-    Precio & Deseo & Solución de bajo costo, con presupuesto máximo estimado de 10\,000 soles por intersección.\\
-    \bottomrule
-  \end{tabularx}
-  \fuente{Elaboración propia.}
-\end{table}
-
-Para conducir el diseño y cerrar la validación, las exigencias anteriores se traducen en una
-\textbf{especificación verificable codificada} (Tabla~\ref{tab:req-verificables}), donde cada requerimiento
-recibe un código, un valor objetivo o criterio, su justificación y el método de verificación previsto. La
-prioridad se clasifica como M (mandatoria), A (alta) o D (deseable). Esta tabla presenta la versión
-consolidada que gobierna el resto de la tesis; el desglose fino por subcriterio y las hojas de cálculo
-asociadas se incluyen en el Anexo de requerimientos.
-
-\begin{landscape}
-\footnotesize
-\begin{longtable}{@{}p{1.15cm}p{1.7cm}p{5.1cm}p{3.1cm}p{4.2cm}p{3.6cm}p{1.0cm}@{}}
-\caption{Requerimientos verificables del módulo IoT semafórico.}\label{tab:req-verificables}\\
-\toprule
-\textbf{Código} & \textbf{Categoría} & \textbf{Requerimiento} & \textbf{Valor objetivo o criterio} & \textbf{Justificación} & \textbf{Método de verificación} & \textbf{Prior.}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Código} & \textbf{Categoría} & \textbf{Requerimiento} & \textbf{Valor objetivo o criterio} & \textbf{Justificación} & \textbf{Método de verificación} & \textbf{Prior.}\\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-R-F01 & Funcional & Estimar el estado de congestión local a partir de video o variables equivalentes de tráfico. & Flujo, velocidad, ocupación y/o cola por acceso. & El control adaptativo requiere una medida local de demanda y acumulación. & Escenarios SUMO y prueba del algoritmo de visión con datos etiquetados. & M\\
-R-F02 & Funcional & Calcular un índice de congestión local como entrada del controlador. & Índice normalizado y documentado; pesos calibrados o justificados. & Permite combinar variables heterogéneas en una entrada interpretable. & Revisión de ecuaciones, análisis de sensibilidad y casos de prueba. & M\\
-R-F03 & Funcional & Generar telemetría, estado del módulo, alertas y registros históricos. & Estructura de mensajes definida y con marca temporal. & La supervisión y el mantenimiento requieren trazabilidad operacional. & Inspección de mensajes, base de datos y dashboard controlado. & A\\
-R-C01 & Control & Generar localmente tiempos o parámetros de fase recomendados sin depender de la nube. & Decisión local disponible durante desconexión simulada. & Evita que la conectividad externa sea un punto único de falla. & Prueba de pérdida de enlace y revisión del flujo de control. & M\\
-R-C02 & Seguridad funcional & Mantener al controlador semafórico existente como autoridad final sobre luces, enclavamientos, fases incompatibles y modos seguros. & Sin conexión directa del módulo IoT a lámparas en la arquitectura operacional. & Separa la optimización de la función certificada de seguridad vial. & Diagrama de arquitectura, interfaces y análisis de modos de falla. & M\\
-R-C03 & Control & Respetar límites mínimos, máximos y tiempos de despeje para cada fase. & Valores mínimos, máximos y de despeje definidos y validados en el Capítulo~6 según norma y controlador objetivo. & Impide recomendaciones fuera del dominio operacional permitido. & Revisión de reglas, saturaciones y barrido de entradas. & M\\
-R-C04 & Control & Retornar al plan base cuando la calidad de sensado sea insuficiente o exista una falla no recuperable del módulo. & Transición determinista a modo degradado. & Una estimación inválida no debe provocar ajustes no confiables. & Inyección simulada de datos ausentes o fuera de rango. & M\\
-R-COM01 & Comunicación & Transmitir telemetría, métricas de tráfico, alertas y estado del equipo hacia la plataforma de supervisión. & MQTT/TLS o protocolo equivalente; frecuencia de publicación configurable. & La nube cumple funciones de supervisión e histórico, no de seguridad funcional. & Revisión de tópicos, carga útil y prueba de intercambio. & A\\
-R-COM02 & Comunicación & Recibir únicamente parámetros autorizados, versionados y validados. & Lista blanca, rango permitido, vigencia y firma/token verificable. & Reduce el riesgo de manipulación remota de la configuración. & Casos de aceptación/rechazo de parámetros. & M\\
-R-NUB01 & Nube & Almacenar históricos, mostrar estado, gestionar alertas y apoyar coordinación no crítica. & Disponibilidad acorde a un servicio de supervisión no crítico, sin cerrar el lazo de seguridad. & Centraliza análisis y operación sin cerrar el lazo crítico en la nube. & Demostración en entorno controlado y revisión de arquitectura. & A\\
-R-SEC01 & Ciberseguridad & Proteger comunicaciones mediante cifrado, autenticación mutua o equivalente y control de acceso. & TLS vigente, credenciales por dispositivo y roles de usuario. & Protege confidencialidad, integridad y autenticidad. & Revisión de configuración, flujo de autenticación y modelo de amenazas. & M\\
-R-SEC02 & Ciberseguridad & Contemplar pérdida de conectividad, datos falsos, acceso no autorizado y manipulación de parámetros. & Amenazas registradas con mitigación y verificación. & Son escenarios plausibles en infraestructura IoT urbana. & Tabla de amenazas y pruebas negativas controladas. & M\\
-R-SEC03 & Ciberseguridad & Registrar accesos, cambios de configuración, errores y eventos relevantes. & Logs con identidad, fecha, acción y resultado. & Permite auditoría y análisis posterior de incidentes. & Inspección de registros y trazabilidad de una operación. & A\\
-R-SEC04 & Ciberseguridad & Aplicar mínimo privilegio y separación entre recomendación y actuación. & Roles diferenciados; ningún usuario del dashboard gobierna directamente las lámparas. & Limita el impacto de una cuenta comprometida. & Revisión de permisos y diagrama de confianza. & M\\
-R-SEC05 & Ciberseguridad & Someter el sistema a auditoría de seguridad, \textit{pentesting} y evaluación de conformidad con IEC 62443. & Pruebas autorizadas y evaluación normativa en fase de piloto. & La verificación formal de seguridad excede el diseño y requiere un sistema implementado. & Auditoría externa y pruebas de penetración (fuera del alcance de esta tesis). & D\\
-R-ELEC01 & Electrónico & Incorporar protecciones contra sobrecorriente, sobretensión y fallas de alimentación. & Protecciones dimensionadas por cálculo en el Capítulo~4. & El entorno vial presenta transitorios y operación continua. & Esquema eléctrico, hojas de datos y coordinación de protecciones. & M\\
-R-ELEC02 & Electrónico & Disponer de respaldo energético para apagado controlado o continuidad temporal del módulo. & Autonomía dimensionada según perfil de carga en el Capítulo~4. & Evita pérdida abrupta de registros y diagnósticos. & Balance de potencia y cálculo de batería/UPS. & A\\
-R-ELEC03 & Electrónico & Separar alimentación de potencia, señales y comunicaciones, incorporando diagnóstico interno. & Canalización y puntos de medición documentados. & Reduce interferencia y facilita mantenimiento. & Revisión de PCB, esquema y distribución interna. & A\\
-R-MEC01 & Mecánico & Alojar los componentes con acceso de mantenimiento, ventilación y reserva de expansión. & Gabinete modular; volumen y holguras definidos en CAD en el Capítulo~5. & La mantenibilidad condiciona el costo de operación. & CAD, plano de distribución y procedimiento de acceso. & A\\
-R-MEC02 & Mecánico & Proteger los componentes frente a polvo, humedad, radiación y manipulación. & Grado IP65 objetivo y resistencia al impacto, validados en el Capítulo~5. & La instalación prevista es exterior y accesible. & Especificación de gabinete, sellos, material y análisis de riesgos. & M\\
-R-MEC03 & Mecánico & Posicionar la cámara con cobertura de las zonas de interés sin comprometer estabilidad. & Campo visual y cobertura validados con geometría y prueba en el Capítulo~5. & La calidad de estimación depende del encuadre y la oclusión. & CAD, cobertura, análisis estructural y prueba de campo. & A\\
-R-OP01 & Operación & Permitir mantenimiento, actualización y recuperación sin alterar la programación segura del controlador vial. & Procedimiento documentado y configuración respaldada. & Reduce tiempo fuera de servicio y riesgo operacional. & Revisión de procedimiento y prueba en banco. & A\\
-R-VAL01 & Validación & Comparar el control propuesto con una estrategia fija o convencional bajo la misma demanda. & Casos A y B con semilla y horizonte comunes. & La mejora solo es defendible frente a una línea base reproducible. & Simulación SUMO/TraCI y archivos de configuración. & M\\
-R-VAL02 & Validación & Reportar espera, colas, velocidad, throughput, paradas, viaje, ICV y consumo/emisiones cuando estén disponibles. & Tabla comparativa con unidades y dispersión. & Evita sustentar el desempeño en una única métrica. & Exportación SUMO y procesamiento estadístico. & M\\
-R-VAL03 & Validación & Evaluar un caso de pérdida de conectividad y retorno al modo local/base. & Sin estados incompatibles ni dependencia de respuesta cloud. & Verifica la premisa de disponibilidad de la arquitectura edge. & Caso D simulado y registro de transición. & M\\
-R-COST01 & Costos & Estimar CAPEX y OPEX por intersección, separando módulo, instalación, conectividad, nube y mantenimiento. & Valores con fuente, fecha y supuestos, detallados en el Capítulo~7. & Permite evaluar viabilidad y escalamiento. & Hoja de costos y análisis de sensibilidad. & A\\
-R-CAM01 & Mecánico/Control & Orientar la cámara hacia los ejes Norte--Sur y Este--Oeste de la intersección. & Rango angular y repetibilidad de posicionamiento coherentes con la función \emph{CamMask}. & La percepción activa requiere dirigir el campo visual al eje relevante. & Revisión de diseño mecánico, rango angular y prueba de repetibilidad. & M\\
-R-CAM02 & Control/Percepción & No actualizar el ICV con cuadros capturados durante el movimiento de la cámara o antes de su estabilización. & Lógica de estados \emph{MOVING}, \emph{SETTLING} y \emph{OBSERVING}. & Evita que el desenfoque o la vibración del giro contaminen la estimación. & Revisión del algoritmo de percepción y de estados. & M\\
-R-CAM03 & Control & Asociar a cada vector de estado por eje una marca temporal y un tiempo máximo de validez. & $T_{valid}$ definido; vector vencido declarado no confiable. & Una estimación caduca no debe sustentar una recomendación. & Revisión de diseño de control y modo degradado. & M\\
-R-CAM04 & Control/Seg.\ funcional & Congelar la adaptación y retornar a modo conservador si la confianza de detección cae bajo el umbral mínimo. & Umbral $\tau_{det}$; transición determinista a plan base. & Limita el efecto de una percepción poco confiable. & Revisión de la lógica de degradación segura. & M\\
-\end{longtable}
-\fuente{Elaboración propia.}
-\end{landscape}
+(obligatorias) o deseos (mejoras adicionales), y se traducen en una \textbf{especificación verificable
+codificada} donde cada requerimiento recibe un código, un valor objetivo, su justificación, el método de
+verificación previsto y una prioridad M (mandatoria), A (alta) o D (deseable), conforme a la estructura VDI
+2221. Esta especificación consolidada gobierna el resto de la tesis y se presenta íntegra, junto con el
+resumen de exigencias y deseos por dominio de diseño, en el Anexo~A (Tablas~\ref{tab:exigencias}
+y~\ref{tab:req-verificables}).
 
 \section{Estructura de funciones}\label{sec:estructura-funciones}
 
@@ -176,6 +93,7 @@ arquitectura, evitando duplicar en prosa el detalle de cada señal.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Entradas y salidas del módulo IoT y su uso dentro de la arquitectura.}
   \label{tab:entradas-salidas}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.7cm}>{\raggedright\arraybackslash}p{5.0cm}>{\raggedright\arraybackslash}X@{}}
@@ -232,6 +150,7 @@ en versiones anteriores aparecía dispersa en el texto.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Significado de las señales internas de la estructura de funciones.}
   \label{tab:senales-funciones}
   \begin{tabularx}{\linewidth}{@{}cX@{}}
@@ -267,7 +186,7 @@ congestión y reporte de datos de la API.
   \label{fig:dominio-interfaz}
   \fuente{Elaboración propia.}
 \end{figure}
-
+\newpage
 El \textbf{dominio de sensores} (Figura~\ref{fig:dominio-sensores}) recibe la señal de video, sensa voltaje y
 amperaje, sensa temperatura y humedad, y procesa las señales para detectar fallas, desconexiones o anomalías
 del sistema.
@@ -286,7 +205,7 @@ energía para interfaz, sensores, control y actuadores.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image83.png}
+  \includegraphics[width=0.4\linewidth,keepaspectratio]{media/image83.png}
   \caption{Estructura de funciones del dominio de energía.}
   \label{fig:dominio-energia}
   \fuente{Elaboración propia.}
@@ -321,99 +240,21 @@ vandalismo.
 
 \section{Matriz morfológica y selección de alternativa}\label{sec:matriz-morfologica}
 
-La matriz morfológica (Tabla~\ref{tab:matriz-morfologica}) vincula cada función principal con tecnologías
-capaces de realizarla. Su propósito no es listar componentes de forma aislada, sino generar conceptos
-completos y comparables. La alternativa seleccionada para el concepto óptimo se resalta en negrita.
+La matriz morfológica vincula cada función principal con tecnologías capaces de realizarla, generando cuatro
+conceptos completos y comparables: \textbf{A} (control centralizado en nube), \textbf{B} (solución industrial
+local cerrada), \textbf{C} (módulo complementario edge--nube) y \textbf{D} (control directo basado en
+aprendizaje). Los conceptos se evaluaron técnico-económicamente en una escala de 1 a 5 ponderada por criterios
+de diseño (adecuación funcional, operación local, seguridad funcional, integración, mantenibilidad,
+ciberseguridad, escalabilidad, costo y facilidad de validación académica). El concepto C obtuvo la mayor
+puntuación normalizada (96.4/100) por combinar autonomía local, interpretabilidad, compatibilidad con la
+validación en SUMO, supervisión remota y separación de responsabilidades. La matriz morfológica completa, la
+descripción de los cuatro conceptos y la evaluación ponderada detallada se presentan en el Anexo~C
+(Tablas~\ref{tab:matriz-morfologica} y~\ref{tab:evaluacion-conceptos}).
 
-\begin{landscape}
-\footnotesize
-\begin{longtable}{@{}p{3.8cm}p{3.8cm}p{3.8cm}p{3.8cm}p{3.8cm}p{3.8cm}@{}}
-\caption{Matriz morfológica del sistema.}\label{tab:matriz-morfologica}\\
-\toprule
-\textbf{Función} & \textbf{Alternativa 1} & \textbf{Alternativa 2} & \textbf{Alternativa 3} & \textbf{Alternativa 4} & \textbf{Alternativa 5}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Función} & \textbf{Alternativa 1} & \textbf{Alternativa 2} & \textbf{Alternativa 3} & \textbf{Alternativa 4} & \textbf{Alternativa 5}\\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-Sensar tráfico & \textbf{Cámara IP con visión} & Radar & Lazo inductivo & Ultrasónico/LiDAR & API externa\\
-Procesar localmente & Microcontrolador & \textbf{SBC/edge computer} & Mini PC industrial & FPGA & 100\,\% nube\\
-Estimar congestión & Umbrales simples & \textbf{Índice multivariable} & Modelo estadístico & Red neuronal & Dato externo\\
-Adaptar tiempos & Control fijo & Actuado por demanda & \textbf{Control difuso} & Optimización matemática & Aprendizaje por refuerzo\\
-Interfaz con controlador & Contactos/relés directos & Protocolo propietario & \textbf{Interfaz validada/NTCIP cuando sea compatible} & API del fabricante & Sin integración\\
-Comunicar al exterior & Ethernet & Wi-Fi & \textbf{4G/LTE con respaldo o Ethernet disponible} & LoRaWAN & Fibra\\
-Supervisar y almacenar & Servidor local & \textbf{Nube/híbrido} & Azure & AWS/GCP & Sin histórico\\
-Proteger comunicaciones & Usuario/contraseña & TLS + token & \textbf{TLS + identidad por dispositivo + roles} & VPN + certificados & Sin seguridad explícita\\
-Respaldar energía & Sin respaldo & Capacitor de retención & \textbf{UPS/batería dimensionada} & Generador & Alimentación dual\\
-Proteger físicamente & Caja comercial interior & Gabinete plástico & \textbf{Gabinete metálico modular exterior} & Rack abierto & Gabinete del controlador existente\\
-Validar control & Cálculo manual & \textbf{SUMO/TraCI} & VISSIM & AIMSUN & Prueba en vía pública\\
-\bottomrule
-\end{longtable}
-\fuente{Elaboración propia.}
-\end{landscape}
-
-\subsection{Conceptos generados}\label{sec:conceptos-generados}
-
-\begin{itemize}
-  \item \textbf{Concepto A --- control centralizado en nube:} cámaras económicas transmiten datos hacia la
-  nube, donde se calcula el control. Presenta alta escalabilidad informática, pero dependencia crítica de
-  conectividad y mayor exposición de datos.
-  \item \textbf{Concepto B --- solución industrial local cerrada:} radar o lazos, PLC/controlador industrial y
-  red cableada, con mínima participación de nube. Ofrece alta robustez local, pero eleva el costo de obra e
-  integración y limita la experimentación académica.
-  \item \textbf{Concepto C --- módulo complementario edge--nube:} cámara, procesamiento local, índice de
-  congestión, control difuso, comunicación segura con nube, gabinete modular y controlador vial como autoridad
-  final.
-  \item \textbf{Concepto D --- control directo basado en aprendizaje:} visión y aprendizaje por refuerzo
-  generan acciones de fase. Su potencial es alto, pero exige datos, validación y garantías que exceden el
-  alcance y no ofrece la interpretabilidad requerida como núcleo de esta tesis.
-\end{itemize}
-
-\subsection{Evaluación técnico-económica ponderada}\label{sec:evaluacion-ponderada}
-
-La calificación emplea una escala de 1 a 5, donde 1 representa desempeño insuficiente y 5 desempeño muy
-favorable. Los pesos expresan prioridad de diseño, no resultados experimentales. La puntuación normalizada se
-calcula mediante $\sum w_i p_i/5$, con $\sum w_i = 100$.
-
-\begin{landscape}
-\footnotesize
-\begin{longtable}{@{}p{5.0cm}rccccp{5.0cm}@{}}
-\caption{Evaluación ponderada de conceptos de solución.}\label{tab:evaluacion-conceptos}\\
-\toprule
-\textbf{Criterio} & \textbf{Peso (\%)} & \textbf{A} & \textbf{B} & \textbf{C} & \textbf{D} & \textbf{Razón del peso}\\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Criterio} & \textbf{Peso (\%)} & \textbf{A} & \textbf{B} & \textbf{C} & \textbf{D} & \textbf{Razón del peso}\\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-Adecuación a la función principal & 18 & 3 & 4 & 5 & 4 & Debe estimar tráfico y producir ajustes verificables.\\
-Operación local y tiempo de respuesta & 14 & 1 & 5 & 5 & 3 & La decisión no puede depender de conectividad externa.\\
-Seguridad funcional y modos degradados & 14 & 2 & 5 & 5 & 1 & El controlador existente debe conservar la autoridad final.\\
-Integración con infraestructura existente & 12 & 3 & 4 & 5 & 3 & Lima presenta controladores y redes heterogéneos.\\
-Mantenibilidad & 10 & 3 & 4 & 4 & 2 & El municipio requiere diagnóstico y reemplazo modular.\\
-Ciberseguridad & 10 & 3 & 4 & 5 & 2 & La conectividad amplía la superficie de ataque.\\
-Escalabilidad & 8 & 5 & 2 & 5 & 4 & Se busca una arquitectura replicable por intersección.\\
-Costo y disponibilidad & 8 & 4 & 2 & 4 & 2 & La tesis requiere componentes disponibles y un piloto viable.\\
-Facilidad de validación académica & 6 & 3 & 4 & 5 & 3 & Debe verificarse con herramientas y métricas reproducibles.\\
-\midrule
-\textbf{Puntuación normalizada /100} & \textbf{100} & \textbf{56.4} & \textbf{79.2} & \textbf{96.4} & \textbf{54.0} & ---\\
-\bottomrule
-\end{longtable}
-\fuente{Elaboración propia.}
-\end{landscape}
-
-El concepto C obtiene la mayor puntuación (96,4/100) porque combina autonomía local, interpretabilidad,
-compatibilidad con la validación en SUMO, supervisión remota y separación de responsabilidades. Por tanto, la
-solución seleccionada es: \textbf{cámara con visión por computadora + procesamiento local en el borde + índice
-de congestión + control difuso + comunicación segura con nube + SUMO como simulador + gabinete modular +
-arquitectura complementaria al controlador existente}. Esta elección no implica que cada componente comercial
-esté ya certificado; indica que el concepto satisface mejor los requerimientos del alcance de tesis.
+Por tanto, la solución seleccionada es: \textbf{cámara con visión por computadora + procesamiento local en el
+borde + índice de congestión + control difuso + comunicación segura con nube + SUMO como simulador + gabinete
+modular + arquitectura complementaria al controlador existente}. Esta elección no implica que cada componente
+comercial esté ya certificado; indica que el concepto satisface mejor los requerimientos del alcance de tesis.
 
 \section{Solución óptima}\label{sec:solucion-optima}
 
@@ -459,7 +300,7 @@ documento.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image140.png}
+  \includegraphics[width=0.4\linewidth,keepaspectratio]{media/image140.png}
   \caption{Bosquejo del diseño de la solución óptima.}
   \label{fig:bosquejo}
   \fuente{Elaboración propia.}
@@ -523,6 +364,7 @@ esta comparación funcional, sin recurrir a argumentos de costo o de cableado.
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Comparación funcional entre una configuración de cámaras fijas y una cámara orientable.}
   \label{tab:camara-orientable}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}XX@{}}
@@ -558,7 +400,7 @@ el controlador programable.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image49.png}
+  \includegraphics[width=0.7\linewidth,keepaspectratio]{media/image49.png}
   \caption{Diagrama general de flujo del sistema.}
   \label{fig:flujo-general}
   \fuente{Elaboración propia.}
@@ -582,7 +424,7 @@ datos para su transmisión segura a la nube.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image66.png}
+  \includegraphics[width=0.4\linewidth,keepaspectratio]{media/image66.png}
   \caption{Diagrama del flujo completo del sistema (parte~1 de~2): energización,
   inicialización de subsistemas y verificación de la comunicación.}
   \label{fig:flujo-completo}
@@ -591,7 +433,7 @@ datos para su transmisión segura a la nube.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image33.png}
+  \includegraphics[width=0.4\linewidth,keepaspectratio]{media/image33.png}
   \caption{Diagrama del flujo completo del sistema (parte~2 de~2): bucle de captura,
   cálculo del índice de congestión y transmisión segura hacia la nube.}
   \label{fig:flujo-completo-b}
@@ -611,7 +453,7 @@ comunicación opera con NTCIP hacia la central de control y MQTT hacia la nube A
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth,keepaspectratio]{media/image13.png}
+  \includegraphics[width=0.3\linewidth,keepaspectratio]{media/image13.png}
   \caption{Leyenda del diagrama de bloques del sistema.}
   \label{fig:leyenda-bloques}
   \fuente{Elaboración propia.}
@@ -636,6 +478,7 @@ Tabla~\ref{tab:niveles-alcance} detalla los niveles y la evidencia esperada de c
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Niveles de alcance del sistema y evidencia esperada.}
   \label{tab:niveles-alcance}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.5cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{4.6cm}@{}}
@@ -659,6 +502,7 @@ requerimientos verificables (Tabla~\ref{tab:req-verificables}) y se ejercitan du
 
 \begin{table}[H]
   \centering
+  \footnotesize
   \caption{Riesgos y limitaciones del concepto edge--nube y sus mitigaciones.}
   \label{tab:riesgos-concepto}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{2.0cm}@{}}
@@ -685,19 +529,15 @@ capítulos donde se abordan, el método de validación y la evidencia esperada, 
 diseño conceptual y las etapas de desarrollo y validación.
 
 \begin{landscape}
+\begin{table}[!htbp]
+\centering
 \footnotesize
-\begin{longtable}{@{}p{1.3cm}p{4.3cm}p{2.6cm}p{3.7cm}p{7.0cm}@{}}
-\caption{Trazabilidad entre objetivos, requerimientos y evidencia.}\label{tab:trazabilidad}\\
+\centering
+\caption{Trazabilidad entre objetivos, requerimientos y evidencia.}\label{tab:trazabilidad}
+\begin{tabular}{@{}p{1.3cm}p{4.3cm}p{2.6cm}p{3.7cm}p{7.0cm}@{}}
 \toprule
 \textbf{Objetivo} & \textbf{Requerimientos relacionados} & \textbf{Capítulos} & \textbf{Método de validación} & \textbf{Evidencia/resultado}\\
 \midrule
-\endfirsthead
-\toprule
-\textbf{Objetivo} & \textbf{Requerimientos relacionados} & \textbf{Capítulos} & \textbf{Método de validación} & \textbf{Evidencia/resultado}\\
-\midrule
-\endhead
-\bottomrule
-\endfoot
 OE1 & Base para todos los requerimientos & 1 y 2 & Revisión comparativa y síntesis & Tabla de lecciones y criterios adoptados.\\
 OE2 & R-F01 a R-COST01 & 3 & Inspección de especificación & Tabla~\ref{tab:req-verificables} con código, criterio, justificación y verificación.\\
 OE3 & R-C01, R-C02, R-C04, R-COM01, R-MEC01 & 3 & Evaluación ponderada & Caja negra, estructura funcional, matriz morfológica y concepto C.\\
@@ -709,6 +549,7 @@ OE8 & R-SEC01 a R-SEC04 & 2, 6 y 7 & Análisis de amenazas & Tabla de amenazas, 
 OE9 & R-VAL01 a R-VAL03 & 7 & Simulación comparativa & Tabla comparativa de métricas SUMO y archivos de salida del Capítulo~7.\\
 OE10 & R-COST01 & 7 & Presupuesto y sensibilidad & CAPEX/OPEX con fuentes, fecha y supuestos.\\
 \bottomrule
-\end{longtable}
+\end{tabular}
 \fuente{Elaboración propia.}
+\end{table}
 \end{landscape}

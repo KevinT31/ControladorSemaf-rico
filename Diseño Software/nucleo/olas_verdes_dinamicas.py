@@ -9,9 +9,9 @@ Usa algoritmo A* con heurística euclidiana para encontrar rutas óptimas.
 
 import heapq
 import numpy as np
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Optional
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -590,7 +590,7 @@ if __name__ == "__main__":
         print(f"  Ruta: {' → '.join(resultado['ruta'])}")
         print(f"  Distancia total: {resultado['distancia_total']:.0f}m")
         print(f"  Tiempo estimado: {resultado['tiempo_estimado']:.0f}s")
-        print(f"\n  Comandos de sincronización:")
+        print("\n  Comandos de sincronización:")
         for cmd in resultado['comandos']:
             print(f"    {cmd['orden_secuencia']+1}. {cmd['interseccion_id']} "
                   f"({cmd['direccion'] or 'origen'}) - ETA: {cmd['eta']:.0f}s")

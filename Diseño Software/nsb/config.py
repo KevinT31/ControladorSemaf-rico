@@ -16,8 +16,10 @@ Nunca se leen secretos de estos YAML; ver ``.env.example``.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Annotated, Optional, Tuple, Type
+from urllib.parse import urlsplit
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -29,6 +31,11 @@ from pydantic_settings import (
 
 from nsb.domain.enums import Mode, SourceKind, TimeoutPolicy
 from nsb.safety.limits import LIMITES, T_AMBAR_MAX, T_TODO_ROJO_MAX
+
+
+Port = Annotated[int, Field(ge=1, le=65535)]
+PositiveFiniteFloat = Annotated[
+    float, Field(gt=0, allow_inf_nan=False)]
 
 
 class ActuatorConfig(BaseModel):
@@ -50,10 +57,17 @@ class HilClientConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     host: str = "127.0.0.1"
-    port: int = 9500
-    connect_timeout_s: float = 5.0
-    read_timeout_s: float = 30.0          # el gateway marca el ritmo; holgado
-    reconnect_max_s: float = 30.0         # techo del backoff exponencial
+    port: Port = 9500
+    connect_timeout_s: PositiveFiniteFloat = 5.0
+    read_timeout_s: PositiveFiniteFloat = 30.0  # gateway marca el ritmo; holgado
+    reconnect_max_s: PositiveFiniteFloat = 30.0  # techo del backoff
+
+    @field_validator("host")
+    @classmethod
+    def _host_no_vacio(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("hil.host no puede estar vacío")
+        return v
 
 
 class TelemetryConfig(BaseModel):
@@ -64,11 +78,26 @@ class TelemetryConfig(BaseModel):
     http_url: str = "http://127.0.0.1:8000/api/estado-local/ingresar"
     mqtt_enabled: bool = False
     mqtt_host: str = "127.0.0.1"
-    mqtt_port: int = 8883
+    mqtt_port: Port = 8883
     mqtt_tls: bool = True
     mqtt_ca_cert: Optional[str] = None
     mqtt_client_cert: Optional[str] = None
     mqtt_client_key: Optional[str] = None
+
+    @field_validator("jsonl_dir", "mqtt_host")
+    @classmethod
+    def _texto_no_vacio(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("el valor no puede estar vacío")
+        return v
+
+    @field_validator("http_url")
+    @classmethod
+    def _url_http_valida(cls, v: str) -> str:
+        partes = urlsplit(v)
+        if partes.scheme not in ("http", "https") or not partes.netloc:
+            raise ValueError("telemetry.http_url debe ser una URL http(s) válida")
+        return v
 
 
 class SafetyTimingConfig(BaseModel):
@@ -117,7 +146,7 @@ class NodeConfig(BaseSettings):
     intersection_id: str = "interseccion-01"
     mode: Mode = Mode.ADVISORY
     source: SourceKind = SourceKind.MANUAL
-    control_interval_s: Annotated[float, Field(gt=0)] = 25.0  # canónico tesis
+    control_interval_s: PositiveFiniteFloat = 25.0  # canónico de la tesis
     # AUTOMATED_DIRECT_LAB: primera compuerta. Las otras dos (flag CLI +
     # variable de entorno de confirmación) viven en authority.direct_lab_gate.
     allow_direct_lab: bool = False
@@ -129,9 +158,34 @@ class NodeConfig(BaseSettings):
 
     @model_validator(mode="after")
     def _gpio_requiere_pinout(self) -> "NodeConfig":
-        if self.actuator.type == "gpio" and not self.actuator.pinout_path:
+        if (self.actuator.type == "gpio"
+                and not (self.actuator.pinout_path or "").strip()):
             raise ValueError("actuator.type=gpio requiere actuator.pinout_path")
         return self
+
+    @field_validator("node_id")
+    @classmethod
+    def _node_id_seguro(cls, v: str) -> str:
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}", v):
+            raise ValueError(
+                "node_id debe usar 1..128 caracteres ASCII alfanuméricos, "
+                "punto, guion o guion bajo")
+        return v
+
+    @field_validator("intersection_id")
+    @classmethod
+    def _intersection_no_vacia(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("intersection_id no puede estar vacío")
+        return v
+
+    @field_validator("log_level")
+    @classmethod
+    def _log_level_conocido(cls, v: str) -> str:
+        nivel = v.upper()
+        if nivel not in ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"):
+            raise ValueError(f"log_level desconocido: {v!r}")
+        return nivel
 
     @classmethod
     def settings_customise_sources(
@@ -155,6 +209,13 @@ class PhaseMapConfig(BaseModel):
     ns_green_index: Annotated[int, Field(ge=0)]
     eo_green_index: Annotated[int, Field(ge=0)]
 
+    @field_validator("tls_id")
+    @classmethod
+    def _tls_no_vacio(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("phase_map.tls_id no puede estar vacío")
+        return v
+
     @model_validator(mode="after")
     def _indices_distintos(self) -> "PhaseMapConfig":
         if self.ns_green_index == self.eo_green_index:
@@ -170,24 +231,40 @@ class GatewayConfig(BaseSettings):
     sumo_cfg: str                                  # ruta al .sumocfg
     seed: Annotated[int, Field(ge=0)] = 42
     sumo_binary: str = "sumo"                      # "sumo-gui" para demo visual
-    control_interval_s: Annotated[float, Field(gt=0)] = 25.0
+    control_interval_s: PositiveFiniteFloat = 25.0
     max_control_points: Annotated[int, Field(ge=1)] = 28   # ≈700 s con 25 s
     phase_map: PhaseMapConfig
     bind_host: str = "127.0.0.1"                   # LAN explícita para la Pi
-    bind_port: int = 9500
-    node_timeout_s: Annotated[float, Field(gt=0)] = 2.0
+    bind_port: Port = 9500
+    node_timeout_s: PositiveFiniteFloat = 2.0
     timeout_policy: TimeoutPolicy = TimeoutPolicy.FALLBACK
     max_consecutive_timeouts: Annotated[int, Field(ge=1)] = 3
-    max_wait_reconnect_s: Annotated[float, Field(ge=0)] = 60.0
+    max_wait_reconnect_s: PositiveFiniteFloat = 60.0
     tick_mode: str = "control_only"                # control_only | per_step
     record_jsonl: Optional[str] = None             # graba TrafficState+Decision
     experiment_id: Optional[str] = None            # autogenerado si None
+
+    @field_validator("sumo_cfg", "sumo_binary", "bind_host")
+    @classmethod
+    def _gateway_texto_no_vacio(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("el valor no puede estar vacío")
+        return v
 
     @field_validator("tick_mode")
     @classmethod
     def _tick_conocido(cls, v: str) -> str:
         if v not in ("control_only", "per_step"):
             raise ValueError(f"tick_mode desconocido: {v!r}")
+        return v
+
+    @field_validator("control_interval_s")
+    @classmethod
+    def _intervalo_en_segundos_enteros(cls, v: float) -> float:
+        if not v.is_integer():
+            raise ValueError(
+                "gateway.control_interval_s debe ser un número entero de "
+                "segundos (SUMO usa step-length=1)")
         return v
 
     @classmethod

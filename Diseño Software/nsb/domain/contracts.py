@@ -54,6 +54,13 @@ class ApproachState(_StrictModel):
     num_vehicles: Annotated[int, Field(ge=0)] = 0
     stopped_vehicles: Annotated[int, Field(ge=0)] = 0
 
+    @model_validator(mode="after")
+    def _detenidos_no_superan_total(self) -> "ApproachState":
+        if self.stopped_vehicles > self.num_vehicles:
+            raise ValueError(
+                "stopped_vehicles no puede superar num_vehicles")
+        return self
+
 
 class QualityFlags(_StrictModel):
     """Flags de calidad del sensado (relevantes para video de dron, §16)."""

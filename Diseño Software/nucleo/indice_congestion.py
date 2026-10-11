@@ -8,7 +8,7 @@ Incluye implementación de fórmulas exactas del Capítulo 6 de la tesis.
 """
 
 import numpy as np
-from typing import Dict, Tuple, List, Optional
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 import logging
 

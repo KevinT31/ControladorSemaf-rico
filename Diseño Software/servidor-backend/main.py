@@ -6,6 +6,7 @@ Proporciona API REST y WebSocket para el sistema de control semafórico
 
 # Configurar encoding para Windows
 import sys
+from contextlib import asynccontextmanager
 if sys.platform == 'win32':
     import codecs
     if hasattr(sys.stdout, 'buffer'):
@@ -13,11 +14,12 @@ if sys.platform == 'win32':
     if hasattr(sys.stderr, 'buffer'):
         sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Request
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from typing import List, Dict
+from fastapi.responses import JSONResponse, StreamingResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from typing import Dict
 import asyncio
 import json
 import logging
@@ -340,8 +342,6 @@ def inicializar_sistema():
 
 
 # Manejador de lifespan (reemplaza on_event)
-from contextlib import asynccontextmanager
-
 @asynccontextmanager
 async def lifespan(app_instance: FastAPI):
     # Startup
@@ -385,6 +385,10 @@ try:
     from seguridad.auditoria import registrar_evento
     _cors_origins = list(getattr(_settings, "CORS_ORIGINS", ["*"]))
     _auth_disponible = True
+    if getattr(_settings, "secret_key_ephemeral", False):
+        logger.warning(
+            "SECRET_KEY no configurada: se usa una clave efímera segura. "
+            "Defínala en .env para despliegues persistentes o multiproceso.")
 except Exception as _e_sec:
     logger.warning(f"Subsistema de seguridad no disponible: {_e_sec}")
     _cors_origins = ["*"]
@@ -408,14 +412,30 @@ except Exception as _e_sec:
 if _auth_disponible:
     app.add_middleware(AuthMiddleware)
     logger.info("🔐 Middleware de autenticación activo")
+else:
+    class _SecurityUnavailableMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            if (request.url.path.startswith("/api")
+                    and request.url.path != "/api/health"
+                    and request.method != "OPTIONS"):
+                return JSONResponse(
+                    status_code=503,
+                    content={"detail": "Subsistema de seguridad no disponible"},
+                )
+            return await call_next(request)
+
+    # Fallo cerrado: si el subsistema de auth no carga, no se exponen por
+    # accidente endpoints modulares que dependían del middleware global.
+    app.add_middleware(_SecurityUnavailableMiddleware)
+    logger.error("API en modo de fallo cerrado por ausencia del subsistema de seguridad")
 
 # Configurar CORS (lista blanca desde settings; ya no "*")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
 # Registrar routers modulares
@@ -586,10 +606,14 @@ async def obtener_metricas_red():
     # Calcular promedios de red
     import numpy as np
 
-    QL_red = np.mean([m['longitud_cola'] for m in metricas_intersecciones])
-    Vavg_red = np.mean([m['velocidad_promedio'] for m in metricas_intersecciones if m['velocidad_promedio'] > 0])
-    q_red = np.mean([m['flujo_vehicular'] for m in metricas_intersecciones])
-    ICV_red = np.mean([m['icv'] for m in metricas_intersecciones])
+    velocidades_positivas = [
+        m['velocidad_promedio'] for m in metricas_intersecciones
+        if m['velocidad_promedio'] > 0
+    ]
+    QL_red = float(np.mean([m['longitud_cola'] for m in metricas_intersecciones]))
+    Vavg_red = float(np.mean(velocidades_positivas)) if velocidades_positivas else 0.0
+    q_red = float(np.mean([m['flujo_vehicular'] for m in metricas_intersecciones]))
+    ICV_red = float(np.mean([m['icv'] for m in metricas_intersecciones]))
 
     # Clasificar estado de la red según ICV_red
     if ICV_red < 0.3:
@@ -629,96 +653,20 @@ adicional, revisar `servidor-backend/rutas/emergencias.py` y el servicio
 @app.post("/api/modo/cambiar")
 async def cambiar_modo(modo: str, request: Request,
                        usuario: dict = Depends(requiere_rol('tecnico', 'admin'))):
-    """Cambia el modo de operación (requiere rol tecnico/admin; auditado)"""
+    """Alias compatible del endpoint modular de cambio de modo."""
     ip = request.client.host if request.client else ""
-    if modo not in ['simulador', 'video', 'sumo']:
+    valido, errores = validar_modo(modo)
+    if not valido:
         registrar_evento(usuario.get('username'), usuario.get('rol'), 'CAMBIAR_MODO',
-                         '/api/modo/cambiar', 'RECHAZADO', f"modo '{modo}' inválido",
+                         '/api/modo/cambiar', 'RECHAZADO', '; '.join(errores),
                          detalle={'modo': modo}, ip=ip)
         raise HTTPException(status_code=400, detail="Modo inválido")
+
+    from servicios.simulacion_service import SimulacionService
+    await SimulacionService.cambiar_modo(modo)
     registrar_evento(usuario.get('username'), usuario.get('rol'), 'CAMBIAR_MODO',
                      '/api/modo/cambiar', 'ACEPTADO', f"modo -> {modo}",
                      detalle={'modo': modo}, ip=ip)
-
-    # Limpiar modo anterior
-    if estado_sistema['modo'] == 'sumo' and estado_sistema['conector_sumo']:
-        try:
-            # Cancelar tarea de avance automático
-            if estado_sistema.get('sumo_auto_step'):
-                estado_sistema['sumo_auto_step'].cancel()
-                estado_sistema['sumo_auto_step'] = None
-                logger.info("Tarea de avance automático SUMO cancelada")
-            
-            estado_sistema['conector_sumo'].desconectar()
-            estado_sistema['conector_sumo'] = None
-            logger.info("Conector SUMO desconectado")
-        except:
-            pass
-
-    # Configurar nuevo modo
-    estado_sistema['modo'] = modo
-    # Sincronizar inmediatamente con servicios.estado_global
-    try:
-        from servicios.estado_global import estado_sistema as estado_global
-        estado_global.modo = modo
-    except Exception as e:
-        logger.warning(f"No se pudo sincronizar modo con servicios.estado_global: {e}")
-
-    # Inicializar modo SUMO si es necesario
-    if modo == 'sumo':
-        try:
-            # Importar conector SUMO
-            from pathlib import Path
-            import sys
-            integracion_path = Path(__file__).parent.parent / 'integracion-sumo'
-            sys.path.insert(0, str(integracion_path))
-
-            try:
-                from conector_sumo import ConectorSUMO
-
-                # Buscar configuración SUMO (preferir lima-amplio si existe)
-                ruta_config_amplio = integracion_path / 'escenarios' / 'lima-amplio' / 'lima_amplio.sumocfg'
-                ruta_config_centro = integracion_path / 'escenarios' / 'lima-centro' / 'osm.sumocfg'
-                
-                ruta_config = None
-                # Priorizar mapa pequeño (centro) para mejor visualización
-                if ruta_config_centro.exists():
-                    ruta_config = ruta_config_centro
-                    logger.info("🗺️  Usando mapa centro de Lima (47 intersecciones)")
-                elif ruta_config_amplio.exists():
-                    ruta_config = ruta_config_amplio
-                    logger.info("🗺️  Usando mapa amplio de Lima")
-
-                if ruta_config:
-                    estado_sistema['conector_sumo'] = ConectorSUMO(
-                        ruta_config_sumo=str(ruta_config),
-                        usar_gui=True  # ✅ CON GUI para visualización en tiempo real
-                    )
-                    estado_sistema['conector_sumo'].conectar()
-                    logger.info("✓ Conector SUMO inicializado y conectado")
-                    logger.info("🎮 SUMO-GUI abierto - verás los vehículos circulando en tiempo real")
-                    
-                    # Iniciar tarea de avance automático
-                    estado_sistema['sumo_auto_step'] = asyncio.create_task(avanzar_sumo_automaticamente())
-                    logger.info("✅ Avance automático de simulación iniciado")
-                    # Sincronizar con servicios.estado_global
-                    try:
-                        from servicios.estado_global import estado_sistema as estado_global
-                        estado_global.conector_sumo = estado_sistema['conector_sumo']
-                    except Exception as e_sync:
-                        logger.warning(f"No se pudo sincronizar conector_sumo con servicios.estado_global: {e_sync}")
-                else:
-                    logger.warning("Archivo de configuración SUMO no encontrado")
-            except ImportError as e:
-                logger.warning(f"SUMO/TraCI no disponible: {e}")
-                logger.info("Modo SUMO funcionará solo con visualización de calles")
-        except Exception as e:
-            logger.error(f"Error inicializando SUMO: {e}")
-
-    await broadcast_mensaje({
-        'tipo': 'modo_cambiado',
-        'datos': {'modo': modo}
-    })
 
     return {'modo': modo, 'mensaje': f'Modo cambiado a {modo}'}
 
@@ -1049,11 +997,6 @@ async def obtener_estado_video():
     return {'activo': False}
 
 
-from fastapi.responses import StreamingResponse
-import cv2
-import numpy as np
-
-
 @app.get("/api/video/stream-camera")
 async def stream_camera():
     """Stream de cámara con procesamiento YOLO y métricas visuales en tiempo real"""
@@ -1081,7 +1024,7 @@ async def stream_camera():
             logger.info("✓ Procesador de video creado para stream de cámara")
             logger.info(f"  Resolucion: {procesador.ancho}x{procesador.alto}")
             logger.info(f"  FPS: {procesador.fps:.1f}")
-            logger.info(f"  Métricas avanzadas: Activadas")
+            logger.info("  Métricas avanzadas: Activadas")
             
             frame_num = 0
             
@@ -1207,7 +1150,7 @@ async def stream_video_procesado(video_index: int):
             logger.info(f"  Resolución: {procesador.ancho}x{procesador.alto}")
             logger.info(f"  FPS: {procesador.fps:.1f}")
             logger.info(f"  Total frames: {procesador.total_frames}")
-            logger.info(f"  Modo: SIMPLE (solo barra + título)")
+            logger.info("  Modo: SIMPLE (solo barra + título)")
             
             frame_num = 0
             
@@ -1225,14 +1168,14 @@ async def stream_video_procesado(video_index: int):
                     
                     # Dibujar detecciones con overlay MODO SIMPLE
                     # (solo título + barra, sin panel de métricas)
-                    print(f"[ENDPOINT VIDEO] Llamando dibujar_detecciones con modo_simple=False")
+                    print("[ENDPOINT VIDEO] Llamando dibujar_detecciones con modo_simple=False")
                     frame_anotado = procesador.dibujar_detecciones(
                         frame,
                         resultado,
                         mostrar_info=True,
                         modo_simple=False  # MODO COMPLETO: mostrar panel de métricas (incluye longitud de cola)
                     )
-                    print(f"[ENDPOINT VIDEO] dibujar_detecciones terminó")
+                    print("[ENDPOINT VIDEO] dibujar_detecciones terminó")
                     
                     # Codificar frame como JPEG
                     ret, buffer = cv2.imencode('.jpg', frame_anotado, [cv2.IMWRITE_JPEG_QUALITY, 85])
@@ -1276,26 +1219,6 @@ async def stream_video_procesado(video_index: int):
     )
 
 
-# ==================== WEBSOCKET ====================
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """Endpoint WebSocket para actualizaciones en tiempo real"""
-    await websocket.accept()
-    estado_sistema['conexiones_ws'].append(websocket)
-
-    logger.info(f"Cliente WebSocket conectado. Total: {len(estado_sistema['conexiones_ws'])}")
-
-    try:
-        while True:
-            # Mantener conexión activa
-            data = await websocket.receive_text()
-            # Opcional: procesar comandos del cliente
-    except WebSocketDisconnect:
-        estado_sistema['conexiones_ws'].remove(websocket)
-        logger.info(f"Cliente WebSocket desconectado. Total: {len(estado_sistema['conexiones_ws'])}")
-
-
 async def broadcast_mensaje(mensaje: Dict):
     """Envía mensaje a todos los clientes WebSocket usando WebSocketManager"""
     from servicios.websocket_manager import WebSocketManager
@@ -1326,10 +1249,8 @@ async def bucle_simulacion():
                         velocidad_promedio=estado.velocidad_promedio,
                         flujo_vehicular=estado.flujo_vehicular
                     )
-                    # Clamp estricto del ICV en modo simulador (0.50–0.60)
-                    icv_val = float(resultado_icv['icv'])
-                    if estado_sistema['modo'] == 'simulador':
-                        icv_val = max(0.50, min(0.60, icv_val))
+                    # Conservar la salida científica; limitar solo al dominio ICV.
+                    icv_val = max(0.0, min(1.0, float(resultado_icv['icv'])))
 
                     # Obtener estado del semáforo desde el simulador
                     estado_semaforo = estado_sistema['simulador'].estados_semaforo.get(inter_id)
@@ -1402,8 +1323,14 @@ if __name__ == "__main__":
         print("[*] WebSocket en: ws://localhost:8000/ws")
         print("[*] Documentación API: http://localhost:8000/docs")
         print("\nPresiona Ctrl+C para detener\n")
-    except:
+    except UnicodeError:
         # Fallback si hay problemas con encoding
         print("\nSistema iniciando en http://localhost:8000\n")
 
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    config_servidor = globals().get("_settings")
+    uvicorn.run(
+        app,
+        host=getattr(config_servidor, "HOST", "127.0.0.1"),
+        port=getattr(config_servidor, "PORT", 8000),
+        log_level=str(getattr(config_servidor, "LOG_LEVEL", "INFO")).lower(),
+    )

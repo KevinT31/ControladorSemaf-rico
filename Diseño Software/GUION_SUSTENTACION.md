@@ -22,9 +22,12 @@ python verificar_demo.py
 ### Credenciales de demostración (RBAC)
 | Usuario   | Contraseña    | Rol      | Puede |
 |-----------|---------------|----------|-------|
-| `operador`| `operador123` | operador | Solo monitoreo (lectura) |
-| `tecnico` | `tecnico123`  | tecnico  | + ajustar parámetros, emergencias |
-| `admin`   | `admin123`    | admin    | + gestión total |
+| `operador`| clave local | operador | Solo monitoreo (lectura) |
+| `tecnico` | clave local | tecnico  | + ajustar parámetros, emergencias |
+| `admin`   | clave local | admin    | + gestión total |
+
+Las claves se definen mediante `DEMO_*_PASSWORD` o se generan en
+`.demo_credentials.json`; nunca se publican en el repositorio.
 
 ---
 

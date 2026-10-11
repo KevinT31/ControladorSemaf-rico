@@ -25,7 +25,7 @@ def main():
         return False
     
     print(f"📂 Leyendo red SUMO: {ruta_net.name}")
-    print(f"   (Esto puede tomar 1-2 minutos para una red grande)")
+    print("   (Esto puede tomar 1-2 minutos para una red grande)")
     print()
     
     try:
@@ -37,7 +37,7 @@ def main():
         
         print()
         print("="*70)
-        print(f"✅ EXTRACCIÓN COMPLETADA")
+        print("✅ EXTRACCIÓN COMPLETADA")
         print("="*70)
         print(f"   Calles extraídas: {len(geojson['features'])}")
         print(f"   Archivo: {ruta_salida}")

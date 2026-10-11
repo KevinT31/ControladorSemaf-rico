@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Optional
 
 from nsb.config import GatewayConfig
-from nsb.domain.contracts import DecisionEnvelope, PlanSemaforico
+from nsb.domain.contracts import DecisionEnvelope
 from nsb.domain.enums import Mode, TimeoutPolicy, Verdict, WireType
 from nsb.domain.wire import WireDecodeError, WireEnvelope
 from nsb.hil.protocol import ChannelClosed, LineChannel
@@ -131,7 +131,12 @@ class HilGateway:
         timeouts_consecutivos = 0
 
         for k in range(cfg.max_control_points):
-            self._bridge.avanzar(pasos_por_punto)
+            if cfg.tick_mode == "per_step":
+                for _ in range(pasos_por_punto):
+                    sim_time = self._bridge.avanzar(1)
+                    self._enviar_tick(sim_time)
+            else:
+                self._bridge.avanzar(pasos_por_punto)
             state = self._bridge.extraer_estado(
                 self._experiment_id, seq=k,
                 intersection_id=cfg.phase_map.tls_id)
@@ -203,7 +208,11 @@ class HilGateway:
                 continue
 
             if resp.type is WireType.HEARTBEAT:
-                self._channel.send(WireEnvelope(type=WireType.HEARTBEAT_ACK))
+                try:
+                    self._channel.send(WireEnvelope(type=WireType.HEARTBEAT_ACK))
+                except ChannelClosed:
+                    self._reconectar()
+                    return None
                 continue
             if resp.type is not WireType.DECISION:
                 logger.warning("tipo inesperado %s; descartado", resp.type)
@@ -215,6 +224,13 @@ class HilGateway:
                 logger.error("DecisionEnvelope inválido: %s", e)
                 self._enviar_error(f"bad_decision:{e}")
                 continue
+
+            if (resp.experiment_id != self._experiment_id
+                    or resp.seq != decision.seq
+                    or decision.experiment_id != self._experiment_id):
+                self._enviar_error("protocol_violation:envelope_inconsistente")
+                raise GatewayAbort(
+                    "DecisionEnvelope inconsistente con su envelope HIL")
 
             if decision.seq == state.seq:
                 return decision
@@ -232,6 +248,19 @@ class HilGateway:
                 f"(esperado {state.seq})")
 
     # ------------------------------------------------------------------ #
+    def _enviar_tick(self, sim_time_s: float) -> None:
+        """Envía un tick de espejo; una caída se reconecta para el próximo."""
+        if self._channel is None:
+            return
+        try:
+            self._channel.send(WireEnvelope(
+                type=WireType.TICK,
+                experiment_id=self._experiment_id,
+                payload={"sim_time_s": sim_time_s},
+            ))
+        except ChannelClosed:
+            self._reconectar()
+
     def _enviar_error(self, motivo: str) -> None:
         try:
             if self._channel is not None:

@@ -39,7 +39,7 @@ def configurar_torch_para_yolo():
         try:
             # Para versiones más nuevas de PyTorch
             torch.serialization._set_default_safe_globals()
-        except:
+        except (AttributeError, RuntimeError, TypeError):
             pass
 
         print("✓ PyTorch configurado")
@@ -65,7 +65,7 @@ def test_yolo_simple():
         configurar_torch_para_yolo()
 
         print("\nIntentando cargar modelo YOLO...")
-        modelo = YOLO('yolov8n.pt')
+        YOLO('yolov8n.pt')
         print("✓ ¡Modelo YOLO cargado exitosamente!")
 
         return True

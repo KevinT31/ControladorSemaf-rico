@@ -26,6 +26,10 @@ class ManualTestStateSource:
         if escenario not in ESCENARIOS:
             raise ValueError(
                 f"escenario desconocido: {escenario!r}; opciones: {ESCENARIOS}")
+        if isinstance(pasos, bool) or not isinstance(pasos, int) or pasos < 1:
+            raise ValueError("pasos debe ser un entero >= 1")
+        if not math.isfinite(control_interval_s) or control_interval_s <= 0:
+            raise ValueError("control_interval_s debe ser finito y > 0")
         self._escenario = escenario
         self._pasos = pasos
         self._experiment_id = f"{experiment_id}-{escenario}"

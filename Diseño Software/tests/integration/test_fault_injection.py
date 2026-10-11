@@ -16,7 +16,6 @@ Cobertura de los 12 fallos de la spec:
  11 edge no disponible → unit test_tsc_emulator (silencio → CONFIG_SEGURA)
  12 EV incompatible  → unit test_tsc_emulator (secuencia segura)
 """
-import pytest
 
 from nsb.core.adapters import AdaptadorDifuso, AdaptadorICV
 from nsb.core.pipeline import DecisionPipeline

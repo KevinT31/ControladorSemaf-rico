@@ -20,8 +20,11 @@ $confDir = Resolve-Path (Join-Path $PSScriptRoot "..\..\..\config\nsb\mosquitto"
 Set-Location $confDir   # las rutas del .conf son relativas al cwd del broker
 
 if ($Tls) {
-    if (-not (Test-Path "certs\server.crt")) {
-        Write-Error "No hay certificados. Genere primero: scripts\nsb\mqtt\gen_lab_certs.ps1"
+    $requeridos = @("certs\ca.crt", "certs\server.crt", "certs\server.key",
+                    "acl.conf")
+    $faltantes = @($requeridos | Where-Object { -not (Test-Path $_) })
+    if ($faltantes.Count -gt 0) {
+        Write-Error "TLS incompleto; faltan: $($faltantes -join ', '). Genere primero: scripts\nsb\mqtt\gen_lab_certs.ps1"
         exit 1
     }
     & $mosquitto -c mosquitto.tls.conf -v

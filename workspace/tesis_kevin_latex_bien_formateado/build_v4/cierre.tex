@@ -7,7 +7,7 @@
 \section*{Conclusiones}
 
 \begin{enumerate}
-\item La problemática se delimitó como una limitación de ingeniería: los planes de tiempo fijo o con
+\item Los planes de tiempo fijo o con
 adaptación limitada no representan adecuadamente las variaciones direccionales de demanda, mientras que una
 arquitectura exclusivamente remota introduce dependencia de la conectividad y un punto único de falla. Esto
 justifica un módulo local complementario y no el reemplazo directo del controlador semafórico (OE1, OE2).
@@ -19,9 +19,9 @@ interpretabilidad y su compatibilidad con una validación reproducible (OE3).
 
 \item El diseño electrónico definió y dimensionó las funciones de sensado, procesamiento, comunicación,
 alimentación, protección, respaldo y diagnóstico. El balance de potencia (consumo cercano a 145.7~W,
-elevado a 182~W con un factor de seguridad del 25~\%), el dimensionamiento de las fuentes, la autonomía del
+elevado a 182~W con un factor de seguridad), el dimensionamiento de las fuentes, la autonomía del
 respaldo ($\sim$72~min) y la coordinación de protecciones quedaron resueltos a nivel de diseño; su cierre
-para fabricación requiere la confirmación con componentes físicos y con el controlador objetivo (OE4).
+para fabricación requiere la confirmación con componentes físicos (OE4).
 
 \item El diseño mecánico incorporó gabinete, distribución interna, ventilación, acceso de mantenimiento y
 soporte de cámara. El análisis estructural por elementos finitos arrojó un factor de seguridad mínimo de
@@ -37,10 +37,10 @@ mantiene la autoridad final sobre la actuación (OE6).
 
 \item La elección de una cámara orientable se justifica como una estrategia de \emph{percepción activa}, en
 la que el campo visual se dirige hacia el eje de mayor relevancia operacional del ciclo semafórico. Esta
-decisión integra mecánica, electrónica, percepción y control local en un mismo módulo mecatrónico, y se
+decisión integra mecánica, electrónica, percepción y control local en un mismo módulo, y se
 acompaña de una política de validez temporal (estados \textit{MOVING}/\textit{SETTLING}/\textit{OBSERVING} y
 vigencia $T_{valid}$) que evita que la reorientación degrade la recomendación; la salida del sistema permanece
-como recomendación acotada y no como actuación directa sobre las luces (OE5, OE6).
+como recomendación y no como actuación directa sobre las luces (OE5, OE6).
 
 \item La nube se delimitó como soporte para telemetría, históricos, alertas, coordinación y distribución
 autorizada de parámetros, demostrándose que la decisión local continúa sin conectividad externa. La
@@ -101,16 +101,10 @@ ambiental y los procedimientos municipales aplicables.
 supervisión humana y métricas acordadas.
 \item Mantener el aprendizaje por refuerzo, la predicción CNN--LSTM, la optimización metropolitana y la
 detección de vehículos de emergencia como líneas futuras, hasta disponer de datos, validación fuera de
-muestra y criterios de aceptación (Anexo~\ref{anexo:futuros}).
+muestra y criterios de aceptación (Anexo~E).
 \item Extender el estudio de una intersección a un corredor solo después de demostrar estabilidad local,
 interoperabilidad y un beneficio estadísticamente sustentado.
 \end{itemize}
-
-% ======================================================================
-%                          BIBLIOGRAFÍA
-% ======================================================================
-\chapter*{BIBLIOGRAFÍA}\addcontentsline{toc}{chapter}{BIBLIOGRAFÍA}\label{bibliografia}
-\input{build_v4/bibliografia_items}
 
 % ======================================================================
 %                            ANEXOS
@@ -122,8 +116,255 @@ como material digital de soporte de la tesis. A continuación se incluyen los an
 del documento.
 
 % ---------------------------------------------------------------------
-\section*{ANEXO A: Reproducibilidad de la validación en SUMO}
-\addcontentsline{toc}{section}{ANEXO A: Reproducibilidad de la validación en SUMO}\label{anexo:sumo}
+\section*{ANEXO A: Lista de requerimientos}
+\addcontentsline{toc}{section}{ANEXO A: Lista de requerimientos}\label{anexo:requerimientos}
+
+A partir de las necesidades del sistema se derivan los requerimientos, clasificados como exigencias
+(obligatorias) o deseos (mejoras adicionales). La Tabla~\ref{tab:exigencias} resume las exigencias y deseos
+por dominio de diseño, conforme a la estructura VDI 2221.
+
+Para conducir el diseño y cerrar la validación, las exigencias anteriores se traducen en una
+\textbf{especificación verificable codificada} (Tabla~\ref{tab:req-verificables}), donde cada requerimiento
+recibe un código, un valor objetivo, su justificación y el método de verificación previsto. La
+prioridad se clasifica como M (mandatoria), A (alta) o D (deseable). Esta tabla presenta la versión
+consolidada que gobierna el resto de la tesis.
+
+\begin{table}[H]
+  \centering
+  \footnotesize
+  \caption{Resumen de exigencias y deseos por dominio de diseño.}
+  \label{tab:exigencias}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Aspecto} & \textbf{Carácter} & \textbf{Especificación}\\
+    \midrule
+    Función principal & Exigencia & Sistema de semaforización adaptativa que optimiza la gestión del tráfico en
+    tiempo real usando sensado IoT, comunicación con la nube y control inteligente interpretable basado en
+    lógica difusa.\\
+    Energía & Exigencia & Alimentación principal desde la red eléctrica (DC de 12\,V o 24\,V) con respaldo
+    capaz de operar un mínimo de 1\,h ante corte de energía.\\
+    Fuerzas & Exigencia & La estructura debe soportar el peso de placa, microcontrolador, sensores, actuadores
+    y de la propia carcasa.\\
+    Materia & Exigencia & Módulo resistente a temperatura, humedad, polvo y radiación solar; impermeable,
+    antivandálico y con aislamiento contra cortocircuitos y daños físicos.\\
+    Comunicación & Exigencia & Comunicación NTCIP entre semáforos y la plataforma centralizada, con base de
+    datos para registro y análisis.\\
+    Control & Exigencia & Control adaptativo que ajusta los ciclos según el tráfico en tiempo real, escalable a
+    futuras intersecciones e integrando aprendizaje para mejorar la predicción de flujo.\\
+    Software & Exigencia & Gestión de algoritmos de control adaptativo, procesamiento de sensores en tiempo
+    real, actualización remota por la nube y ciberseguridad según estándares internacionales.\\
+    Uso & Exigencia & Interoperabilidad con los semáforos y controladores existentes en Lima.\\
+    Seguridad & Exigencia & Ciberseguridad según IEC 62443 y protección física del módulo frente a clima
+    extremo y vandalismo (IP65).\\
+    Geometría & Deseo & Módulo IoT de tamaño máximo aproximado de 70$\times$70$\times$80\,cm.\\
+    Precio & Deseo & Solución de bajo costo, con presupuesto máximo estimado de 10\,000 soles por intersección.\\
+    \bottomrule
+  \end{tabularx}
+  \fuente{Elaboración propia.}
+\end{table}
+
+\begin{landscape}
+\footnotesize
+\begin{longtable}{@{}p{1.15cm}p{1.7cm}p{5.1cm}p{3.1cm}p{4.2cm}p{3.6cm}p{1.0cm}@{}}
+\caption{Requerimientos verificables del módulo IoT semafórico.}\label{tab:req-verificables}\\
+\toprule
+\textbf{Código} & \textbf{Categoría} & \textbf{Requerimiento} & \textbf{Valor objetivo} & \textbf{Justificación} & \textbf{Método de verificación} & \textbf{Prior.}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Código} & \textbf{Categoría} & \textbf{Requerimiento} & \textbf{Valor objetivo} & \textbf{Justificación} & \textbf{Método de verificación} & \textbf{Prior.}\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+R-F01 & Funcional & Estimar el estado de congestión local a partir de video o variables equivalentes de tráfico. & Flujo, velocidad, ocupación y/o cola por acceso. & El control adaptativo requiere una medida local de demanda y acumulación. & Escenarios SUMO y prueba del algoritmo de visión con datos etiquetados. & M\\
+R-F02 & Funcional & Calcular un índice de congestión local como entrada del controlador. & Índice normalizado y documentado; pesos calibrados o justificados. & Permite combinar variables heterogéneas en una entrada interpretable. & Revisión de ecuaciones, análisis de sensibilidad y casos de prueba. & M\\
+R-F03 & Funcional & Generar telemetría, estado del módulo, alertas y registros históricos. & Estructura de mensajes definida y con marca temporal. & La supervisión y el mantenimiento requieren trazabilidad operacional. & Inspección de mensajes, base de datos y dashboard controlado. & A\\
+R-C01 & Control & Generar localmente tiempos o parámetros de fase recomendados sin depender de la nube. & Decisión local disponible durante desconexión simulada. & Evita que la conectividad externa sea un punto único de falla. & Prueba de pérdida de enlace y revisión del flujo de control. & M\\
+R-C02 & Seguridad funcional & Mantener al controlador semafórico existente como autoridad final sobre luces, enclavamientos, fases incompatibles y modos seguros. & Sin conexión directa del módulo IoT a lámparas en la arquitectura operacional. & Separa la optimización de la función certificada de seguridad vial. & Diagrama de arquitectura, interfaces y análisis de modos de falla. & M\\
+R-C03 & Control & Respetar límites mínimos, máximos y tiempos de despeje para cada fase. & Valores mínimos, máximos y de despeje definidos y validados en el Capítulo~6 según norma y controlador objetivo. & Impide recomendaciones fuera del dominio operacional permitido. & Revisión de reglas, saturaciones y barrido de entradas. & M\\
+R-C04 & Control & Retornar al plan base cuando la calidad de sensado sea insuficiente o exista una falla no recuperable del módulo. & Transición determinista a modo degradado. & Una estimación inválida no debe provocar ajustes no confiables. & Inyección simulada de datos ausentes o fuera de rango. & M\\
+R-COM01 & Comunicación & Transmitir telemetría, métricas de tráfico, alertas y estado del equipo hacia la plataforma de supervisión. & MQTT/TLS o protocolo equivalente; frecuencia de publicación configurable. & La nube cumple funciones de supervisión e histórico, no de seguridad funcional. & Revisión de tópicos, carga útil y prueba de intercambio. & A\\
+R-COM02 & Comunicación & Recibir únicamente parámetros autorizados, versionados y validados. & Lista blanca, rango permitido, vigencia y firma/token verificable. & Reduce el riesgo de manipulación remota de la configuración. & Casos de aceptación/rechazo de parámetros. & M\\
+R-NUB01 & Nube & Almacenar históricos, mostrar estado, gestionar alertas y apoyar coordinación no crítica. & Disponibilidad acorde a un servicio de supervisión no crítico, sin cerrar el lazo de seguridad. & Centraliza análisis y operación sin cerrar el lazo crítico en la nube. & Demostración en entorno controlado y revisión de arquitectura. & A\\
+R-SEC01 & Ciberseguridad & Proteger comunicaciones mediante cifrado, autenticación mutua o equivalente y control de acceso. & TLS vigente, credenciales por dispositivo y roles de usuario. & Protege confidencialidad, integridad y autenticidad. & Revisión de configuración, flujo de autenticación y modelo de amenazas. & M\\
+R-SEC02 & Ciberseguridad & Contemplar pérdida de conectividad, datos falsos, acceso no autorizado y manipulación de parámetros. & Amenazas registradas con mitigación y verificación. & Son escenarios plausibles en infraestructura IoT urbana. & Tabla de amenazas y pruebas negativas controladas. & M\\
+R-SEC03 & Ciberseguridad & Registrar accesos, cambios de configuración, errores y eventos relevantes. & Logs con identidad, fecha, acción y resultado. & Permite auditoría y análisis posterior de incidentes. & Inspección de registros y trazabilidad de una operación. & A\\
+R-SEC04 & Ciberseguridad & Aplicar mínimo privilegio y separación entre recomendación y actuación. & Roles diferenciados; ningún usuario del dashboard gobierna directamente las lámparas. & Limita el impacto de una cuenta comprometida. & Revisión de permisos y diagrama de confianza. & M\\
+R-SEC05 & Ciberseguridad & Someter el sistema a auditoría de seguridad, \textit{pentesting} y evaluación de conformidad con IEC 62443. & Pruebas autorizadas y evaluación normativa en fase de piloto. & La verificación formal de seguridad excede el diseño y requiere un sistema implementado. & Auditoría externa y pruebas de penetración (fuera del alcance de esta tesis). & D\\
+R-ELEC01 & Electrónico & Incorporar protecciones contra sobrecorriente, sobretensión y fallas de alimentación. & Protecciones dimensionadas por cálculo en el Capítulo~4. & El entorno vial presenta transitorios y operación continua. & Esquema eléctrico, hojas de datos y coordinación de protecciones. & M\\
+R-ELEC02 & Electrónico & Disponer de respaldo energético para apagado controlado o continuidad temporal del módulo. & Autonomía dimensionada según perfil de carga en el Capítulo~4. & Evita pérdida abrupta de registros y diagnósticos. & Balance de potencia y cálculo de batería/UPS. & A\\
+R-ELEC03 & Electrónico & Separar alimentación de potencia, señales y comunicaciones, incorporando diagnóstico interno. & Canalización y puntos de medición documentados. & Reduce interferencia y facilita mantenimiento. & Revisión de PCB, esquema y distribución interna. & A\\
+R-MEC01 & Mecánico & Alojar los componentes con acceso de mantenimiento, ventilación y reserva de expansión. & Gabinete modular; volumen y holguras definidos en CAD en el Capítulo~5. & La mantenibilidad condiciona el costo de operación. & CAD, plano de distribución y procedimiento de acceso. & A\\
+R-MEC02 & Mecánico & Proteger los componentes frente a polvo, humedad, radiación y manipulación. & Grado IP65 objetivo y resistencia al impacto, validados en el Capítulo~5. & La instalación prevista es exterior y accesible. & Especificación de gabinete, sellos, material y análisis de riesgos. & M\\
+R-MEC03 & Mecánico & Posicionar la cámara con cobertura de las zonas de interés sin comprometer estabilidad. & Campo visual y cobertura validados con geometría y prueba en el Capítulo~5. & La calidad de estimación depende del encuadre y la oclusión. & CAD, cobertura, análisis estructural y prueba de campo. & A\\
+R-OP01 & Operación & Permitir mantenimiento, actualización y recuperación sin alterar la programación segura del controlador vial. & Procedimiento documentado y configuración respaldada. & Reduce tiempo fuera de servicio y riesgo operacional. & Revisión de procedimiento y prueba en banco. & A\\
+R-VAL01 & Validación & Comparar el control propuesto con una estrategia fija o convencional bajo la misma demanda. & Casos A y B con semilla y horizonte comunes. & La mejora solo es defendible frente a una línea base reproducible. & Simulación SUMO/TraCI y archivos de configuración. & M\\
+R-VAL02 & Validación & Reportar espera, colas, velocidad, throughput, paradas, viaje, ICV y consumo/emisiones cuando estén disponibles. & Tabla comparativa con unidades y dispersión. & Evita sustentar el desempeño en una única métrica. & Exportación SUMO y procesamiento estadístico. & M\\
+R-VAL03 & Validación & Evaluar un caso de pérdida de conectividad y retorno al modo local/base. & Sin estados incompatibles ni dependencia de respuesta cloud. & Verifica la premisa de disponibilidad de la arquitectura edge. & Caso D simulado y registro de transición. & M\\
+R-COST01 & Costos & Estimar CAPEX y OPEX por intersección, separando módulo, instalación, conectividad, nube y mantenimiento. & Valores con fuente, fecha y supuestos, detallados en el Capítulo~7. & Permite evaluar viabilidad y escalamiento. & Hoja de costos y análisis de sensibilidad. & A\\
+R-CAM01 & Mecánico/Control & Orientar la cámara hacia los ejes Norte--Sur y Este--Oeste de la intersección. & Rango angular y repetibilidad de posicionamiento coherentes con la función \emph{CamMask}. & La percepción activa requiere dirigir el campo visual al eje relevante. & Revisión de diseño mecánico, rango angular y prueba de repetibilidad. & M\\
+R-CAM02 & Control/Percepción & No actualizar el ICV con cuadros capturados durante el movimiento de la cámara o antes de su estabilización. & Lógica de estados \emph{MOVING}, \emph{SETTLING} y \emph{OBSERVING}. & Evita que el desenfoque o la vibración del giro contaminen la estimación. & Revisión del algoritmo de percepción y de estados. & M\\
+R-CAM03 & Control & Asociar a cada vector de estado por eje una marca temporal y un tiempo máximo de validez. & $T_{valid}$ definido; vector vencido declarado no confiable. & Una estimación caduca no debe sustentar una recomendación. & Revisión de diseño de control y modo degradado. & M\\
+R-CAM04 & Control/Seg.\ funcional & Congelar la adaptación y retornar a modo conservador si la confianza de detección cae bajo el umbral mínimo. & Umbral $\tau_{det}$; transición determinista a plan base. & Limita el efecto de una percepción poco confiable. & Revisión de la lógica de degradación segura. & M\\
+\end{longtable}
+\fuente{Elaboración propia.}
+\end{landscape}
+
+% ---------------------------------------------------------------------
+\section*{ANEXO B: Matriz de cumplimiento de requerimientos}
+\addcontentsline{toc}{section}{ANEXO B: Matriz de cumplimiento de requerimientos}\label{anexo:cumplimiento}
+
+La matriz siguiente clasifica cada requisito del Anexo~A en una de tres categorías: \emph{Cumple (diseño)}
+cuando existe propuesta, cálculo o arquitectura documentada; \emph{Cumple (validado en SUMO)} cuando existe
+una medición reproducible bajo el protocolo de la Sección~\ref{sec:protocolo-validacion}; y \emph{Fuera de
+alcance (prototipo/auditoría)} cuando el cierre requiere fabricación física o auditoría externa no ejecutada
+en esta tesis.
+
+\begin{landscape}
+\footnotesize
+\begin{longtable}{@{}c p{4.2cm} c p{9.5cm}@{}}
+\caption{Matriz de cumplimiento de requerimientos del sistema.}\label{tab:cumplimiento}\\
+\toprule
+\textbf{Req.} & \textbf{Subsistema} & \textbf{Estado} & \textbf{Evidencia / observación}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Req.} & \textbf{Subsistema} & \textbf{Estado} & \textbf{Evidencia / observación}\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+R-F01   & Sensado            & Validado en SUMO   & Cadena cámara$\rightarrow$ICV demostrada con video real y replicada en SUMO.\\
+R-F02   & Procesamiento local & Validado en SUMO  & Casos de ICV (8) y análisis de sensibilidad coherentes.\\
+R-F03   & Plataforma         & Cumple (diseño)    & Plataforma web con históricos y exportación CSV/JSON.\\
+R-C01   & Control            & Validado en SUMO   & Caso B y modo degradado (caso D) ejecutados.\\
+R-C02   & Arquitectura       & Cumple (diseño)    & El controlador conserva la autoridad final; integración comercial pendiente.\\
+R-C03   & Control            & Validado en SUMO   & Barrido de reglas con saturaciones; verde acotado a [10, 120]~s.\\
+R-C04   & Control            & Cumple (diseño)    & Ante sensado inválido se inhibe la adaptación y se mantiene el plan base.\\
+R-COM01 & Comunicación       & Cumple (diseño)    & Publicación de telemetría definida en la arquitectura.\\
+R-COM02 & Comunicación/seguridad & Cumple (diseño) & Rechazo de parámetros inválidos y vencidos por vigencia/secuencia.\\
+R-NUB01 & Nube               & Cumple (diseño)    & Dashboard, histórico y alertas diseñados; disponibilidad por demostrar.\\
+R-SEC01 & Ciberseguridad     & Cumple (diseño)    & Arquitectura TLS, autenticación mutua y control de acceso definida.\\
+R-SEC05 & Ciberseguridad     & Fuera de alcance   & Auditoría, \textit{pentesting} y conformidad IEC 62443 no ejecutados (piloto).\\
+R-SEC02 & Ciberseguridad     & Cumple (diseño)    & Modelo de amenazas documentado.\\
+R-SEC03 & Ciberseguridad     & Cumple (diseño)    & Registro de eventos y trazabilidad definidos.\\
+R-SEC04 & Ciberseguridad     & Cumple (diseño)    & Separación de roles y autoridad documentada.\\
+R-ELEC01 & Energía           & Cumple (diseño)    & Esquema eléctrico y coordinación de protecciones.\\
+R-ELEC02 & Energía           & Cumple (diseño)    & Balance de potencia y autonomía por UPS calculados.\\
+R-ELEC03 & Electrónica       & Cumple (diseño)    & PCB, distribución y diagnóstico definidos.\\
+R-MEC01 & Mecánico           & Cumple (diseño)    & CAD y acceso de mantenimiento resueltos.\\
+R-MEC02 & Mecánico           & Fuera de alcance   & Certificación IP65/IK10 y resistencia al vandalismo no ensayadas; requieren prototipo.\\
+R-MEC03 & Mecánico/sensado   & Cumple (diseño)    & Cobertura, torque y resistencia dimensionados.\\
+R-CAM01 & Mecánico/Control   & Cumple (diseño)    & Sistema de orientación (NEMA~23, biela-manivela, rodamiento) dimensionado en el Cap.~5.\\
+R-CAM02 & Percepción         & Cumple (diseño)    & Política de estados \textit{MOVING}/\textit{SETTLING}/\textit{OBSERVING} definida en el Cap.~6.\\
+R-CAM03 & Control            & Cumple (diseño)    & Vigencia temporal $T_{valid}$ por vector de estado de eje.\\
+R-CAM04 & Seg.\ funcional    & Cumple (diseño)    & Degradación por baja confianza ($\tau_{det}$) definida en el Cap.~6.\\
+R-OP01  & Operación          & Cumple (diseño)    & Procedimiento de mantenimiento preventivo definido.\\
+R-VAL01 & Validación         & Validado en SUMO   & Casos A y B reproducibles (Tabla~\ref{tab:resultados-ab}).\\
+R-VAL02 & Validación         & Validado en SUMO   & Resultados comparativos consolidados.\\
+R-VAL03 & Validación         & Cumple (diseño)    & Modo degradado (caso D) verificado a nivel de comportamiento.\\
+R-COST01 & Costos            & Cumple (diseño)    & CAPEX/OPEX consolidados en el §\ref{cap:analisis-economico}.\\
+\end{longtable}
+\fuente{Elaboración propia.}
+\end{landscape}
+
+% ---------------------------------------------------------------------
+\section*{ANEXO C: Matriz morfológica y selección de alternativa}
+\addcontentsline{toc}{section}{ANEXO C: Matriz morfológica y selección de alternativa}\label{anexo:matriz-morfologica}
+
+La matriz morfológica (Tabla~\ref{tab:matriz-morfologica}) vincula cada función principal con tecnologías
+capaces de realizarla. Su propósito no es listar componentes de forma aislada, sino generar conceptos
+completos y comparables. La alternativa seleccionada para el concepto óptimo se resalta en negrita.
+
+\begin{landscape}
+\footnotesize
+\begin{longtable}{@{}p{3.8cm}p{3.8cm}p{3.8cm}p{3.8cm}p{3.8cm}p{3.8cm}@{}}
+\caption{Matriz morfológica del sistema.}\label{tab:matriz-morfologica}\\
+\toprule
+\textbf{Función} & \textbf{Alternativa 1} & \textbf{Alternativa 2} & \textbf{Alternativa 3} & \textbf{Alternativa 4} & \textbf{Alternativa 5}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Función} & \textbf{Alternativa 1} & \textbf{Alternativa 2} & \textbf{Alternativa 3} & \textbf{Alternativa 4} & \textbf{Alternativa 5}\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Sensar tráfico & \textbf{Cámara IP con visión} & Radar & Lazo inductivo & Ultrasónico/LiDAR & API externa\\
+Procesar localmente & Microcontrolador & \textbf{SBC/edge computer} & Mini PC industrial & FPGA & 100\,\% nube\\
+Estimar congestión & Umbrales simples & \textbf{Índice multivariable} & Modelo estadístico & Red neuronal & Dato externo\\
+Adaptar tiempos & Control fijo & Actuado por demanda & \textbf{Control difuso} & Optimización matemática & Aprendizaje por refuerzo\\
+Interfaz con controlador & Contactos/relés directos & Protocolo propietario & \textbf{Interfaz validada/NTCIP cuando sea compatible} & API del fabricante & Sin integración\\
+Comunicar al exterior & Ethernet & Wi-Fi & \textbf{4G/LTE con respaldo o Ethernet disponible} & LoRaWAN & Fibra\\
+Supervisar y almacenar & Servidor local & \textbf{Nube/híbrido} & Azure & AWS/GCP & Sin histórico\\
+Proteger comunicaciones & Usuario/contraseña & TLS + token & \textbf{TLS + identidad por dispositivo + roles} & VPN + certificados & Sin seguridad explícita\\
+Respaldar energía & Sin respaldo & Capacitor de retención & \textbf{UPS/batería dimensionada} & Generador & Alimentación dual\\
+Proteger físicamente & Caja comercial interior & Gabinete plástico & \textbf{Gabinete metálico modular exterior} & Rack abierto & Gabinete del controlador existente\\
+Validar control & Cálculo manual & \textbf{SUMO/TraCI} & VISSIM & AIMSUN & Prueba en vía pública\\
+\end{longtable}
+\fuente{Elaboración propia.}
+\end{landscape}
+
+\subsection*{C.1\quad Conceptos generados}
+
+\begin{itemize}
+  \item \textbf{Concepto A --- control centralizado en nube:} cámaras económicas transmiten datos hacia la
+  nube, donde se calcula el control. Presenta alta escalabilidad informática, pero dependencia crítica de
+  conectividad y mayor exposición de datos.
+  \item \textbf{Concepto B --- solución industrial local cerrada:} radar o lazos, PLC/controlador industrial y
+  red cableada, con mínima participación de nube. Ofrece alta robustez local, pero eleva el costo de obra e
+  integración y limita la experimentación académica.
+  \item \textbf{Concepto C --- módulo complementario edge--nube:} cámara, procesamiento local, índice de
+  congestión, control difuso, comunicación segura con nube, gabinete modular y controlador vial como autoridad
+  final.
+  \item \textbf{Concepto D --- control directo basado en aprendizaje:} visión y aprendizaje por refuerzo
+  generan acciones de fase. Su potencial es alto, pero exige datos, validación y garantías que exceden el
+  alcance y no ofrece la interpretabilidad requerida como núcleo de esta tesis.
+\end{itemize}
+
+\subsection*{C.2\quad Evaluación técnico-económica ponderada}
+
+La calificación emplea una escala de 1 a 5, donde 1 representa desempeño insuficiente y 5 desempeño muy
+favorable. Los pesos expresan prioridad de diseño, no resultados experimentales. La puntuación normalizada se
+calcula mediante $\sum w_i p_i/5$, con $\sum w_i = 100$.
+
+\begin{landscape}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Evaluación ponderada de conceptos de solución.}\label{tab:evaluacion-conceptos}
+\begin{tabular}{@{}p{5.0cm}rccccp{5.0cm}@{}}
+\toprule
+\textbf{Criterio} & \textbf{Peso (\%)} & \textbf{A} & \textbf{B} & \textbf{C} & \textbf{D} & \textbf{Razón del peso}\\
+\midrule
+Adecuación a la función principal & 18 & 3 & 4 & 5 & 4 & Debe estimar tráfico y producir ajustes verificables.\\
+Operación local y tiempo de respuesta & 14 & 1 & 5 & 5 & 3 & La decisión no puede depender de conectividad externa.\\
+Seguridad funcional y modos degradados & 14 & 2 & 5 & 5 & 1 & El controlador existente debe conservar la autoridad final.\\
+Integración con infraestructura existente & 12 & 3 & 4 & 5 & 3 & Lima presenta controladores y redes heterogéneos.\\
+Mantenibilidad & 10 & 3 & 4 & 4 & 2 & El municipio requiere diagnóstico y reemplazo modular.\\
+Ciberseguridad & 10 & 3 & 4 & 5 & 2 & La conectividad amplía la superficie de ataque.\\
+Escalabilidad & 8 & 5 & 2 & 5 & 4 & Se busca una arquitectura replicable por intersección.\\
+Costo y disponibilidad & 8 & 4 & 2 & 4 & 2 & La tesis requiere componentes disponibles y un piloto viable.\\
+Facilidad de validación académica & 6 & 3 & 4 & 5 & 3 & Debe verificarse con herramientas y métricas reproducibles.\\
+\midrule
+\textbf{Puntuación normalizada /100} & \textbf{100} & \textbf{56.4} & \textbf{79.2} & \textbf{96.4} & \textbf{54.0} & ---\\
+\bottomrule
+\end{tabular}
+\fuente{Elaboración propia.}
+\end{table}
+\end{landscape}
+
+El concepto C obtiene la mayor puntuación (96,4/100) porque combina autonomía local, interpretabilidad,
+compatibilidad con la validación en SUMO, supervisión remota y separación de responsabilidades. Por tanto, la
+solución seleccionada es: \textbf{cámara con visión por computadora + procesamiento local en el borde + índice
+de congestión + control difuso + comunicación segura con nube + SUMO como simulador + gabinete modular +
+arquitectura complementaria al controlador existente}. Esta elección no implica que cada componente comercial
+esté ya certificado; indica que el concepto satisface mejor los requerimientos del alcance de tesis.
+
+% ---------------------------------------------------------------------
+\section*{ANEXO D: Reproducibilidad de la validación en SUMO}
+\addcontentsline{toc}{section}{ANEXO D: Reproducibilidad de la validación en SUMO}\label{anexo:sumo}
 
 La comparación entre el control de tiempo fijo y el control difuso adaptativo se ejecutó sobre el mismo
 escenario y demanda, conservando el presupuesto de verde por ciclo, de modo que la única diferencia entre
@@ -143,6 +384,7 @@ seguridad funcional; cualquier recomendación fuera de rango se acota antes de a
 evento.
 \end{itemize}
 
+\newpage
 \noindent\textbf{Tabla A.1.} Agregado de la campaña multilínea-base (media $\pm$ desviación, 30 semillas).
 \begin{center}
 \begin{tabular}{@{}lccc@{}}
@@ -168,15 +410,15 @@ La discusión completa y las mejoras porcentuales agregadas se presentan en el
 Capítulo~\ref{cap:validacion}.
 
 % ---------------------------------------------------------------------
-\section*{ANEXO B: Formulación de los módulos de investigación futura}
-\addcontentsline{toc}{section}{ANEXO B: Módulos de investigación futura (RL y CNN--LSTM)}\label{anexo:futuros}
+\section*{ANEXO E: Formulación de los módulos de investigación futura}
+\addcontentsline{toc}{section}{ANEXO E: Módulos de investigación futura (RL y CNN--LSTM)}\label{anexo:futuros}
 
 Los módulos de aprendizaje por refuerzo (RL) y de predicción CNN--LSTM se presentan como diseño conceptual y
 \textbf{no forman parte del núcleo validado} de esta tesis: no fueron entrenados ni validados fuera de
 muestra, y su desarrollo completo queda como línea futura. Se documentan aquí para sustentar la
 escalabilidad de la arquitectura.
 
-\subsection*{B.1\quad Coordinación por aprendizaje por refuerzo (A2C)}
+\subsection*{E.1\quad Coordinación por aprendizaje por refuerzo (A2C)}
 El problema de coordinación de varias intersecciones se formula como un proceso de decisión de Markov (MDP):
 \begin{itemize}
 \item \textbf{Estado:} vector con el ICV por dirección de cada intersección del corredor, la longitud de
@@ -191,7 +433,7 @@ política de ajuste y una red crítico que estima el valor del estado. El entren
 sobre escenarios SUMO calibrados, control de la distribución de datos y validación fuera de muestra antes de
 cualquier uso operativo.
 
-\subsection*{B.2\quad Predicción de congestión con CNN--LSTM}
+\subsection*{E.2\quad Predicción de congestión con CNN--LSTM}
 Para anticipar la congestión se propone una arquitectura híbrida: una etapa convolucional (CNN) que extrae
 patrones espaciales del estado de la red y una etapa recurrente (LSTM) que modela la evolución temporal del
 ICV, entregando una predicción a un horizonte corto. Esta predicción alimentaría a la capa de coordinación
@@ -199,8 +441,8 @@ para anticipar la formación de colas. El entrenamiento y el reentrenamiento per
 históricas representativas, que se obtendrían de la operación del propio sistema una vez desplegado.
 
 % ---------------------------------------------------------------------
-\section*{ANEXO C: Especificaciones técnicas comparativas de componentes}
-\addcontentsline{toc}{section}{ANEXO C: Especificaciones técnicas de componentes}\label{anexo:componentes}
+\section*{ANEXO F: Especificaciones técnicas comparativas de componentes}
+\addcontentsline{toc}{section}{ANEXO F: Especificaciones técnicas de componentes}\label{anexo:componentes}
 
 Se incluyen las tablas comparativas y las especificaciones técnicas detalladas de los componentes
 seleccionados en los Capítulos~\ref{cap:diseno-electronico} y~\ref{cap:diseno-mecanico}.
@@ -208,8 +450,8 @@ seleccionados en los Capítulos~\ref{cap:diseno-electronico} y~\ref{cap:diseno-m
 \input{build_v4/anexo_componentes}
 
 % ---------------------------------------------------------------------
-\section*{ANEXO D: Presupuesto detallado y planos}
-\addcontentsline{toc}{section}{ANEXO D: Presupuesto detallado y planos}\label{anexo:planos}
+\section*{ANEXO G: Presupuesto detallado, esquemáticos y planos}
+\addcontentsline{toc}{section}{ANEXO G: Presupuesto detallado, esquemáticos y planos}\label{anexo:planos}
 
 El presupuesto consolidado por rubros (CAPEX y OPEX) se presenta en el Capítulo~\ref{cap:analisis-economico}.
 El desglose detallado por componente —fabricación mecánica, sistema de visión, electrónica de control,
@@ -226,12 +468,12 @@ Los archivos CAD editables se conservan como material digital de la tesis.
 \begingroup
 \captionsetup[figure]{list=no}   % no saturar el índice de figuras con las 21 láminas
 
-\subsection*{D.1\quad Vista general del módulo}
+\subsection*{G.1\quad Vista general del módulo}
 \begin{center}
 \includegraphics[width=0.97\linewidth,keepaspectratio]{media/image3.png}
 \end{center}
 
-\subsection*{D.2\quad Estructura interna: rack DIN, rieles y bases (Sección E)}
+\subsection*{G.2\quad Estructura interna: rack DIN, rieles y bases (Sección E)}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image138.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image94.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image62.png}\end{center}
@@ -240,27 +482,93 @@ Los archivos CAD editables se conservan como material digital de la tesis.
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image121.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image59.png}\end{center}
 
-\subsection*{D.3\quad Gabinete (Sección G)}
+\subsection*{G.3\quad Gabinete (Sección G)}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image34.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image23.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image142.png}\end{center}
 
-\subsection*{D.4\quad Mecanismo de orientación de la cámara (Sección M)}
+\subsection*{G.4\quad Mecanismo de orientación de la cámara (Sección M)}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image135.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image98.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image38.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image119.png}\end{center}
 
-\subsection*{D.5\quad Zócalo y soporte del gabinete (Sección V)}
+\subsection*{G.5\quad Zócalo y soporte del gabinete (Sección V)}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image123.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image63.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image92.png}\end{center}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image4.png}\end{center}
 
-\subsection*{D.6\quad Poste metálico y placa base (Sección P)}
+\subsection*{G.6\quad Poste metálico y placa base (Sección P)}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image129.png}\end{center}
 
-\subsection*{D.7\quad Zapata de cimentación (Sección Z)}
+\subsection*{G.7\quad Zapata de cimentación (Sección Z)}
 \begin{center}\includegraphics[width=0.97\linewidth,keepaspectratio]{media/image106.png}\end{center}
 
+\subsection*{G.8\quad Esquemáticos electrónicos}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\linewidth,keepaspectratio]{media/image117.png}
+  \caption{Esquemático del sistema de alimentación y protecciones.}
+  \label{fig:esq-alimentacion}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1.0\linewidth,keepaspectratio]{media/image77.png}
+  \caption{Esquemático de la línea de distribución de 5\,V.}
+  \label{fig:esq-5v}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1.0\linewidth,keepaspectratio]{media/image69.png}
+  \caption{Esquemático de la línea de distribución de 12\,V.}
+  \label{fig:esq-12v}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\subsection*{G.9\quad Vistas complementarias del análisis estructural (FEA)}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.55\linewidth,keepaspectratio]{media/image31.png}
+  \caption{Tensión de Von Mises, vista inferior del gabinete.}
+  \label{fig:vm-inferior}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\linewidth,keepaspectratio]{media/image141.png}
+  \caption{Distribución de la tercera tensión principal.}
+  \label{fig:tension-p3}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth,keepaspectratio]{media/image99.png}
+  \caption{Desplazamientos en el gabinete.}
+  \label{fig:desplazamiento-gabinete}
+  \fuente{Elaboración propia.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth,keepaspectratio]{media/image1.png}
+  \caption{Factor de seguridad enfocado en el gabinete.}
+  \label{fig:fs-gabinete}
+  \fuente{Elaboración propia.}
+\end{figure}
+
 \endgroup
+
+% ======================================================================
+%                          BIBLIOGRAFÍA
+% ======================================================================
+\chapter*{BIBLIOGRAFÍA}\addcontentsline{toc}{chapter}{BIBLIOGRAFÍA}\label{bibliografia}
+\input{build_v4/bibliografia_items}

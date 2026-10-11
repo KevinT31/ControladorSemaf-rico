@@ -6,14 +6,14 @@ para alimentar el sistema de control semafórico.
 """
 
 import sys
+import importlib
 from pathlib import Path
-import time
 
 # Agregar ruta al path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
-    import traci
+    importlib.import_module("traci")
     TRACI_DISPONIBLE = True
     print("✅ TraCI disponible")
 except ImportError:
@@ -49,7 +49,7 @@ def probar_conexion_traci():
         print(f"\n📍 Usando: Lima Centro ({config_centro})")
     else:
         print("\n❌ No se encontró configuración SUMO")
-        print(f"   Buscado en:")
+        print("   Buscado en:")
         print(f"   - {config_amplio}")
         print(f"   - {config_centro}")
         return
@@ -74,7 +74,7 @@ def probar_conexion_traci():
             print(f"   ... y {len(conector.intersecciones) - 5} más")
         
         # Simular algunos pasos y extraer datos
-        print(f"\n⏱️  Ejecutando simulación continua (presiona Ctrl+C para detener)...")
+        print("\n⏱️  Ejecutando simulación continua (presiona Ctrl+C para detener)...")
         print("\n" + "-"*70)
         print("EXTRACCIÓN DE DATOS SINTÉTICOS")
         print("-"*70)

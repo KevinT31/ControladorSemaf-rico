@@ -44,6 +44,8 @@ def sample_frames(video_path: str | Path, out_dir: str | Path,
         raise FileNotFoundError(f"video no encontrado: {video_path}")
     if every_s <= 0:
         raise ValueError("every_s debe ser > 0")
+    if max_frames is not None and max_frames < 1:
+        raise ValueError("max_frames debe ser >= 1")
 
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -96,7 +98,10 @@ def _cargar_anotaciones(manifest: str | Path) -> List[Tuple[float, int, int]]:
             ns, eo = fila.get("count_ns", ""), fila.get("count_eo", "")
             if ns.strip() == "" or eo.strip() == "":
                 continue                     # sin anotar: se omite, no se inventa
-            filas.append((float(fila["t_s"]), int(ns), int(eo)))
+            ns_i, eo_i = int(ns), int(eo)
+            if ns_i < 0 or eo_i < 0:
+                raise ValueError("los conteos anotados no pueden ser negativos")
+            filas.append((float(fila["t_s"]), ns_i, eo_i))
     return filas
 
 
@@ -129,6 +134,8 @@ def evaluar_conteos(manifest: str | Path, states_jsonl: str | Path,
     (|Δt| <= tol_s, default = medio intervalo canónico). Sin pares no hay
     métricas: se lanza error en lugar de reportar tablas vacías.
     """
+    if not math.isfinite(tol_s) or tol_s < 0:
+        raise ValueError("tol_s debe ser finito y >= 0")
     anotaciones = _cargar_anotaciones(manifest)
     if not anotaciones:
         raise ValueError(

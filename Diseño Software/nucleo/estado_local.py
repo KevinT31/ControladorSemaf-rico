@@ -10,6 +10,7 @@ Componentes principales:
 """
 
 import numpy as np
+import math
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -110,6 +111,7 @@ class EstadoLocalInterseccion:
         # Historial para cálculo de flujo
         self.historial_cruces = {d: [] for d in self.direcciones}
         self.ventana_tiempo_flujo = 60.0  # segundos
+        self._centroides_tracks: Dict[object, Tuple[float, float]] = {}
 
         # Tracking de vehículos de emergencia
         self.vehiculos_emergencia: List[VehiculoEmergencia] = []
@@ -304,6 +306,25 @@ class EstadoLocalInterseccion:
 
         # Verificar si necesita cambio de CamMask (Zonas de activación crítica)
         self._verificar_cambio_cammask_emergencia(veh_emg)
+
+    def actualizar_vehiculo_emergencia(self, vehiculo: VehiculoEmergencia) -> bool:
+        """Registra o actualiza una detección de emergencia ya estructurada.
+
+        Este es el punto de entrada público para integraciones que ya crean un
+        :class:`VehiculoEmergencia` (por ejemplo, TraCI). Las detecciones por
+        debajo del umbral configurado se descartan de la misma forma que en
+        :meth:`detectar_vehiculos_emergencia`.
+
+        Returns:
+            ``True`` si la detección fue incorporada al tracking.
+        """
+        if not isinstance(vehiculo, VehiculoEmergencia):
+            raise TypeError("vehiculo debe ser una instancia de VehiculoEmergencia")
+        if vehiculo.confidence < self.params.EV_CONFIDENCE_THRESHOLD:
+            return False
+
+        self._actualizar_tracking_emergencia(vehiculo)
+        return True
 
     def _verificar_cambio_cammask_emergencia(self, veh_emg: VehiculoEmergencia):
         """
@@ -531,6 +552,11 @@ class EstadoLocalInterseccion:
         - Dominancia eje X → EO; signo dx>0=E, dx<0=O
         Si no hay velocidad_xy, inferir con historial de centroides si disponible.
         """
+        if (isinstance(pixeles_por_metro, bool)
+                or not isinstance(pixeles_por_metro, (int, float))
+                or not math.isfinite(float(pixeles_por_metro))
+                or pixeles_por_metro <= 0):
+            raise ValueError("pixeles_por_metro debe ser mayor que cero")
         if cam_mask is not None:
             self.actualizar_cam_mask(cam_mask)
 
@@ -538,8 +564,10 @@ class EstadoLocalInterseccion:
         vehiculos_por_direccion: Dict[str, List[Dict]] = {d: [] for d in self.direcciones}
         cruces_por_direccion: Dict[str, int] = {d: 0 for d in self.direcciones}
 
-        eps = epsilon_velocidad_kmh if epsilon_velocidad_kmh is not None else self.params.EPSILON_VELOCIDAD
+        if epsilon_velocidad_kmh is not None and epsilon_velocidad_kmh < 0:
+            raise ValueError("epsilon_velocidad_kmh no puede ser negativo")
 
+        ids_actuales = set()
         for t in tracks:
             cx_px, cy_px = t.get('centroide', (None, None))
             if cx_px is None:
@@ -553,12 +581,40 @@ class EstadoLocalInterseccion:
 
             # Velocidad promedio y componentes
             v_kmh = float(t.get('velocidad_promedio', t.get('velocidad', 0.0) or 0.0))
-            vx_px_s, vy_px_s = t.get('velocidad_xy', (0.0, 0.0))
+            track_id = t.get('id', -1)
+            if track_id != -1:
+                ids_actuales.add(track_id)
+
+            velocidad_xy = t.get('velocidad_xy')
+            if velocidad_xy is not None:
+                try:
+                    vx_px_s, vy_px_s = map(float, velocidad_xy)
+                except (TypeError, ValueError):
+                    vx_px_s, vy_px_s = 0.0, 0.0
+            else:
+                vx_px_s, vy_px_s = 0.0, 0.0
+
+            # Algunos trackers solo entregan centroides. Con dos observaciones
+            # consecutivas basta el desplazamiento para inferir el sentido.
+            if vx_px_s == 0.0 and vy_px_s == 0.0 and track_id != -1:
+                previo = self._centroides_tracks.get(track_id)
+                if previo is not None:
+                    vx_px_s = cx_px - previo[0]
+                    vy_px_s = cy_px - previo[1]
+                self._centroides_tracks[track_id] = (cx_px, cy_px)
 
             # Inferir dirección dominante
             dir_grupo = None
             dir_fina = None
-            if abs(vy_px_s) >= abs(vx_px_s):
+            direccion_declarada = t.get('direccion')
+            if direccion_declarada in self.direcciones:
+                dir_fina = direccion_declarada
+                dir_grupo = 'NS' if dir_fina in ('N', 'S') else 'EO'
+            elif vx_px_s == 0.0 and vy_px_s == 0.0:
+                # Sin vector ni historial no hay evidencia para asignar el
+                # vehículo arbitrariamente a Sur.
+                continue
+            elif abs(vy_px_s) >= abs(vx_px_s):
                 dir_grupo = 'NS'
                 dir_fina = 'N' if vy_px_s < 0 else 'S'
             else:
@@ -593,8 +649,23 @@ class EstadoLocalInterseccion:
                 if dir_fina in ['E', 'O'] and ((dir_fina == 'E' and cx_px >= x2) or (dir_fina == 'O' and cx_px <= x1)):
                     cruces_por_direccion[dir_fina] += 1
 
-        # Actualizar estado completo
-        self.actualizar_estado(vehiculos_por_direccion, cruces_por_direccion)
+        # Evitar crecimiento ilimitado y no reutilizar posiciones de tracks
+        # que ya desaparecieron.
+        self._centroides_tracks = {
+            track_id: centroide
+            for track_id, centroide in self._centroides_tracks.items()
+            if track_id in ids_actuales
+        }
+
+        # Actualizar estado completo. El override es local a esta operación y
+        # no altera permanentemente la configuración de la intersección.
+        epsilon_original = self.params.EPSILON_VELOCIDAD
+        if epsilon_velocidad_kmh is not None:
+            self.params.EPSILON_VELOCIDAD = float(epsilon_velocidad_kmh)
+        try:
+            self.actualizar_estado(vehiculos_por_direccion, cruces_por_direccion)
+        finally:
+            self.params.EPSILON_VELOCIDAD = epsilon_original
 
     def obtener_resumen_legible(self) -> str:
         """
@@ -608,7 +679,7 @@ class EstadoLocalInterseccion:
         resumen += f"{'='*70}\n"
         resumen += f"Timestamp: {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}\n"
         resumen += f"CamMask: {'NS' if self.cam_mask == 1 else 'EO'}\n"
-        resumen += f"\n"
+        resumen += "\n"
 
         for idx, dir in enumerate(self.direcciones):
             visible = (dir in ['N', 'S'] and self.cam_mask == 1) or \
@@ -622,7 +693,7 @@ class EstadoLocalInterseccion:
             resumen += f"  ICV (congestión):  {self.ICV[idx]:.3f}\n"
             resumen += f"  PI (intensidad):   {self.PI[idx]:.3f}\n"
             resumen += f"  EV (emergencias):  {int(self.EV[idx])}\n"
-            resumen += f"\n"
+            resumen += "\n"
 
         if self.vehiculos_emergencia:
             resumen += f"Vehículos de Emergencia Activos: {len(self.vehiculos_emergencia)}\n"

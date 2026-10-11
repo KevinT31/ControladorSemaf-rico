@@ -42,6 +42,7 @@ env/
 # Variables de entorno
 .env
 .env.local
+.demo_credentials.json
 
 # Logs
 *.log
@@ -129,6 +130,7 @@ coverage.xml
 
 # Resultados generados (no versionar)
 datos/resultados-video/**
+datos/metricas_red/
 
 # SUMO - outputs de escenarios
 integracion-sumo/escenarios/lima-amplio/*.xml

@@ -161,10 +161,10 @@ def main():
         count_intersecciones = db.query(InterseccionDB).count()
         count_conexiones = db.query(ConexionInterseccionDB).count()
 
-        print(f"📊 Resumen:")
+        print("📊 Resumen:")
         print(f"   - Intersecciones: {count_intersecciones}")
         print(f"   - Conexiones: {count_conexiones}")
-        print(f"\n💾 Archivo: base-datos/semaforos.db\n")
+        print("\n💾 Archivo: base-datos/semaforos.db\n")
     finally:
         db.close()
 

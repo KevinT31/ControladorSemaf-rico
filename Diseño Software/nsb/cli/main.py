@@ -44,6 +44,10 @@ def _configurar_logging(nivel: str) -> None:
         format="%(asctime)s %(levelname)-8s %(name)s: %(message)s",
         stream=sys.stderr,
     )
+    # basicConfig no reconfigura handlers ya creados; el nivel del YAML debe
+    # surtir efecto incluso después del arranque inicial de la CLI.
+    logging.getLogger().setLevel(
+        getattr(logging, nivel.upper(), logging.INFO))
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -136,11 +140,15 @@ def _cmd_record(args) -> int:
     from nsb.sources.manual import ManualTestStateSource
     from nsb.sources.replay import ReplayWriter
 
-    fuente = ManualTestStateSource(
-        escenario=args.escenario, pasos=args.pasos,
-        experiment_id=args.experiment_id,
-        control_interval_s=args.intervalo)
-    writer = ReplayWriter(args.out)
+    try:
+        fuente = ManualTestStateSource(
+            escenario=args.escenario, pasos=args.pasos,
+            experiment_id=args.experiment_id,
+            control_interval_s=args.intervalo)
+        writer = ReplayWriter(args.out)
+    except (OSError, ValueError) as e:
+        print(f"ERROR de configuración: {e}", file=sys.stderr)
+        return 1
     n = 0
     try:
         for st in fuente:
@@ -158,7 +166,12 @@ def _cmd_digest(args) -> int:
     if not Path(args.jsonl).exists():
         print(f"ERROR: no existe {args.jsonl}", file=sys.stderr)
         return 1
-    print(digest_decisiones(args.jsonl))
+    try:
+        digest = digest_decisiones(args.jsonl)
+    except (OSError, ValueError, KeyError) as e:
+        print(f"ERROR: replay inválido: {e}", file=sys.stderr)
+        return 1
+    print(digest)
     return 0
 
 
@@ -187,63 +200,60 @@ def _cmd_run(args) -> int:
     except (OSError, ValueError) as e:
         print(f"ERROR de configuración: {e}", file=sys.stderr)
         return 1
+    _configurar_logging(cfg.log_level)
 
     cli_mode: Optional[Mode] = _MODOS_CLI[args.mode] if args.mode else None
     source_kind = SourceKind(args.source) if args.source else cfg.source
 
     fuente = None
-    if source_kind is SourceKind.REPLAY:
-        if not args.input:
-            print("ERROR: source=replay requiere --input", file=sys.stderr)
-            return 1
-        fuente = ReplayStateSource(args.input)
-        exp_id = f"replay-{Path(args.input).stem}"
-    elif source_kind is SourceKind.MANUAL:
-        exp_id = args.experiment_id or "manual-run"
-        fuente = ManualTestStateSource(
-            escenario=args.escenario, pasos=args.pasos,
-            experiment_id=exp_id,
-            control_interval_s=cfg.control_interval_s)
-    elif source_kind is SourceKind.SUMO_HIL:
-        exp_id = args.experiment_id or "hil-node"
-    elif source_kind is SourceKind.VIDEO:
+    try:
+        if source_kind is SourceKind.REPLAY:
+            if not args.input:
+                print("ERROR: source=replay requiere --input", file=sys.stderr)
+                return 1
+            fuente = ReplayStateSource(args.input)
+            exp_id = f"replay-{Path(args.input).stem}"
+        elif source_kind is SourceKind.MANUAL:
+            exp_id = args.experiment_id or "manual-run"
+            fuente = ManualTestStateSource(
+                escenario=args.escenario, pasos=args.pasos,
+                experiment_id=exp_id,
+                control_interval_s=cfg.control_interval_s)
+        elif source_kind is SourceKind.SUMO_HIL:
+            exp_id = args.experiment_id or "hil-node"
+        elif source_kind is SourceKind.VIDEO:
         # SOLO ADVISORY (spec §15): el video jamás actúa sobre semáforos
-        modo_efectivo = cli_mode if cli_mode is not None else cfg.mode
-        if modo_efectivo is not Mode.ADVISORY:
-            print("ERROR: source=video solo admite ADVISORY (spec §15); "
-                  "use --mode advisory", file=sys.stderr)
-            return 1
-        if not (args.input and args.roi_ns and args.roi_eo):
-            print("ERROR: source=video requiere --input, --roi-ns y --roi-eo",
-                  file=sys.stderr)
-            return 1
-        try:
+            modo_efectivo = cli_mode if cli_mode is not None else cfg.mode
+            if modo_efectivo is not Mode.ADVISORY:
+                print("ERROR: source=video solo admite ADVISORY (spec §15); "
+                      "use --mode advisory", file=sys.stderr)
+                return 1
+            if not (args.input and args.roi_ns and args.roi_eo):
+                print("ERROR: source=video requiere --input, --roi-ns y --roi-eo",
+                      file=sys.stderr)
+                return 1
             roi_ns = _parse_roi(args.roi_ns)
             roi_eo = _parse_roi(args.roi_eo)
-        except ValueError as e:
-            print(f"ERROR: {e}", file=sys.stderr)
-            return 1
-        from nsb.sources.video import VideoStateSource
-        from nsb.vision.provider import DualRoiVideoProvider
-        try:
+            from nsb.sources.video import VideoStateSource
+            from nsb.vision.provider import DualRoiVideoProvider
             provider = DualRoiVideoProvider(
                 args.input, roi_ns=roi_ns, roi_eo=roi_eo,
                 stride=args.stride, px_per_m=args.px_per_m)
-        except (RuntimeError, FileNotFoundError, ValueError) as e:
-            print(f"ERROR: {e}", file=sys.stderr)
+            exp_id = args.experiment_id or f"video-{Path(args.input).stem}"
+            fuente = VideoStateSource(
+                provider, experiment_id=exp_id,
+                intersection_id=cfg.intersection_id,
+                control_interval_s=cfg.control_interval_s,
+                camera_moving=args.camera_moving,
+                calibrated=args.px_per_m is not None,
+                metadata={"video": Path(args.input).name,
+                          "stride": str(args.stride)})
+        else:
+            print(f"ERROR: fuente {source_kind.value} no soportada",
+                  file=sys.stderr)
             return 1
-        exp_id = args.experiment_id or f"video-{Path(args.input).stem}"
-        fuente = VideoStateSource(
-            provider, experiment_id=exp_id,
-            intersection_id=cfg.intersection_id,
-            control_interval_s=cfg.control_interval_s,
-            camera_moving=args.camera_moving,
-            calibrated=args.px_per_m is not None,
-            metadata={"video": Path(args.input).name,
-                      "stride": str(args.stride)})
-    else:
-        print(f"ERROR: fuente {source_kind.value} no soportada",
-              file=sys.stderr)
+    except (OSError, RuntimeError, ValueError) as e:
+        print(f"ERROR de fuente: {e}", file=sys.stderr)
         return 1
 
     try:
@@ -253,6 +263,9 @@ def _cmd_run(args) -> int:
             render_override=True if args.render else None)
     except PermissionError as e:
         print(f"DENEGADO: {e}", file=sys.stderr)
+        return 1
+    except (OSError, RuntimeError, ValueError) as e:
+        print(f"ERROR de configuración del nodo: {e}", file=sys.stderr)
         return 1
 
     if source_kind is SourceKind.SUMO_HIL:
@@ -312,6 +325,10 @@ def _cmd_gateway(args) -> int:
     except GatewayAbort as e:
         print(f"CORRIDA ABORTADA: {e}", file=sys.stderr)
         return 2
+    except (OSError, ImportError, RuntimeError, ValueError) as e:
+        logger.exception("fallo del gateway HIL")
+        print(f"ERROR de ejecución: {e}", file=sys.stderr)
+        return 2
     print(f"experimento        : {s.experiment_id}")
     print(f"puntos de control  : {s.puntos_control}")
     print(f"decisiones aplicadas: {s.decisiones_aplicadas}")
@@ -331,7 +348,7 @@ def _cmd_bench(args) -> int:
 
     try:
         r = run_bench(args.corpus, args.out, args.repeticiones)
-    except FileNotFoundError as e:
+    except (OSError, ValueError, KeyError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 1
     lat = r["latencias_ms"]

@@ -140,7 +140,12 @@ tabla4 = table(...
 
 writetable(tabla4, fullfile(carpeta_resultados, 'Tabla4_Pesos_AHP.csv'));
 disp(tabla4);
-fprintf('   Razón de Consistencia (CR): %.4f %s\n', CR, ternario(CR < 0.1, '✓ Consistente', '✗ Inconsistente'));
+if CR < 0.1
+    estado_consistencia = '✓ Consistente';
+else
+    estado_consistencia = '✗ Inconsistente';
+end
+fprintf('   Razón de Consistencia (CR): %.4f %s\n', CR, estado_consistencia);
 fprintf('   ✓ Guardada en: %s\n\n', fullfile(carpeta_resultados, 'Tabla4_Pesos_AHP.csv'));
 
 %% ========================================
@@ -149,31 +154,30 @@ fprintf('   ✓ Guardada en: %s\n\n', fullfile(carpeta_resultados, 'Tabla4_Pesos
 fprintf('[5/7] Generando Tabla 5: Validación del Modelo...\n');
 
 % Datos simulados (puedes reemplazar con datos reales)
-datos_validacion = [
-    8, 56, 9, 12, "Bajo";
-    18, 48, 14, 22, "Bajo";
-    45, 35, 19, 32, "Medio";
-    80, 24, 23, 43, "Medio";
-    120, 12, 26, 54, "Alto";
-    145, 6, 29, 59, "Alto";
-    25, 45, 16, 25, "Bajo";
-    95, 20, 24, 48, "Medio";
-    130, 10, 28, 56, "Alto";
-    40, 38, 18, 30, "Medio"
-];
+datos_validacion = {
+    8, 56, 9, 12, 'Bajo';
+    18, 48, 14, 22, 'Bajo';
+    45, 35, 19, 32, 'Medio';
+    80, 24, 23, 43, 'Medio';
+    120, 12, 26, 54, 'Alto';
+    145, 6, 29, 59, 'Alto';
+    25, 45, 16, 25, 'Bajo';
+    95, 20, 24, 48, 'Medio';
+    130, 10, 28, 56, 'Alto';
+    40, 38, 18, 30, 'Medio'
+};
 
 n_val = size(datos_validacion, 1);
 tabla5_data = cell(n_val, 8);
 
 for i = 1:n_val
-    L = datos_validacion(i,1);
-    V = datos_validacion(i,2);
-    F = datos_validacion(i,3);
-    N = datos_validacion(i,4);
-    etiqueta_real = datos_validacion(i,5);
+    L = datos_validacion{i,1};
+    V = datos_validacion{i,2};
+    F = datos_validacion{i,3};
+    N = datos_validacion{i,4};
+    etiqueta_real = datos_validacion{i,5};
 
     [ICV, etiqueta_pred, color] = calcular_icv(L, V, F, N, parametros);
-    acierto = strcmp(etiqueta_pred, etiqueta_real);
 
     tabla5_data(i,:) = {i, L, V, F, N, sprintf('%.3f', ICV), etiqueta_pred, etiqueta_real};
 end
@@ -186,7 +190,7 @@ disp(tabla5);
 
 % Calcular precisión
 etiqueta_pred_vec = tabla5.Prediccion;
-etiqueta_real_vec = [datos_validacion{:,5}]';
+etiqueta_real_vec = datos_validacion(:,5);
 aciertos = strcmp(etiqueta_pred_vec, etiqueta_real_vec);
 precision = sum(aciertos) / n_val * 100;
 
@@ -202,8 +206,8 @@ categorias = ["Bajo", "Medio", "Alto"];
 confusion = zeros(3,3);
 
 for i = 1:n_val
-    r = find(categorias == datos_validacion(i,5));
-    p = find(categorias == tabla5_data{i,7});
+    r = find(categorias == string(datos_validacion{i,5}));
+    p = find(categorias == string(tabla5_data{i,7}));
     confusion(r,p) = confusion(r,p) + 1;
 end
 

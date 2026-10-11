@@ -4,11 +4,10 @@ seq raros, bye) y los fallos de red (spec §33-D)."""
 import json
 import socket
 import threading
-import time
 
 import pytest
 
-from nsb.config import HilClientConfig, NodeConfig
+from nsb.config import NodeConfig
 from nsb.domain.contracts import DecisionEnvelope
 from nsb.domain.enums import Mode, SourceKind, WireType
 from nsb.domain.wire import WireEnvelope, decode, encode
@@ -58,6 +57,12 @@ class FakeGateway:
         self._send(WireEnvelope(type=WireType.STATE, seq=state.seq,
                                 experiment_id=state.experiment_id,
                                 payload=state.model_dump(mode="json")))
+
+    def sync(self):
+        """Barrera: el ACK prueba que el nodo consumió mensajes anteriores."""
+        self._send(WireEnvelope(type=WireType.HEARTBEAT))
+        while self._recv().type is not WireType.HEARTBEAT_ACK:
+            pass
 
     def recv_decision(self) -> DecisionEnvelope:
         while True:
@@ -167,5 +172,36 @@ class TestProtocoloHil:
         assert d.seq == 1 and d.verdict.value == "accept"
         assert not node.authority.tsc.safe_mode
         assert client._summary.reconexiones == 1
+        gw.bye()
+        hilo.join(timeout=5.0)
+
+    def test_tick_per_step_avanza_el_espejo_de_fase(self, nodo_hil):
+        gw, node, client, hilo = nodo_hil
+        gw.accept_y_handshake()
+        gw._send(WireEnvelope(
+            type=WireType.TICK,
+            experiment_id="exp-fake",
+            payload={"sim_time_s": 36.0},
+        ))
+        gw.sync()
+
+        assert node.authority.tsc.fsm.fase.value == "eo_verde"
+        gw.bye()
+        hilo.join(timeout=5.0)
+
+    def test_envelope_y_payload_inconsistentes_se_rechazan(self, nodo_hil):
+        gw, node, client, hilo = nodo_hil
+        gw.accept_y_handshake()
+        state = make_state(seq=0, experiment_id="exp-fake")
+        gw._send(WireEnvelope(
+            type=WireType.STATE,
+            seq=state.seq,
+            experiment_id="otro-experimento",
+            payload=state.model_dump(mode="json"),
+        ))
+        gw.send_state(state)
+
+        assert gw.recv_decision().verdict.value == "accept"
+        assert client._summary.errores_protocolo == 1
         gw.bye()
         hilo.join(timeout=5.0)

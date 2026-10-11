@@ -11,12 +11,13 @@ Extrae automáticamente todas las métricas de SUMO y aplica:
 """
 
 import sys
+import math
+import zlib
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 from dataclasses import dataclass
 import logging
-import json
 
 # Importar TraCI si está disponible
 try:
@@ -61,6 +62,17 @@ class ConfiguracionSUMO:
     modo_comparacion: bool = False  # True para comparar con tiempo fijo
     guardar_metricas: bool = True
     directorio_salida: Optional[Path] = None
+
+    def __post_init__(self):
+        self.ruta_config = Path(self.ruta_config)
+        if self.directorio_salida is not None:
+            self.directorio_salida = Path(self.directorio_salida)
+        if not 1 <= int(self.puerto) <= 65535:
+            raise ValueError("puerto debe estar entre 1 y 65535")
+        if self.paso_simulacion <= 0:
+            raise ValueError("paso_simulacion debe ser mayor que cero")
+        if self.intervalo_control < 1:
+            raise ValueError("intervalo_control debe ser al menos 1")
 
 
 class ExtractorMetricasSUMO:
@@ -185,16 +197,23 @@ class ExtractorMetricasSUMO:
                 if 'emergency' in tipo_veh.lower() or 'ambulance' in tipo_veh.lower():
                     pos = traci.vehicle.getPosition(veh_id)
                     vel = traci.vehicle.getSpeed(veh_id)
+                    angulo = float(traci.vehicle.getAngle(veh_id)) % 360.0
+                    # En SUMO: 0°=N, 90°=E, 180°=S y 270°=O.
+                    indice_direccion = int(((angulo + 45.0) % 360.0) // 90.0)
+                    direccion = ("N", "E", "S", "O")[indice_direccion]
+                    angulo_rad = math.radians(angulo)
 
                     # Crear objeto VehiculoEmergencia
                     veh_emergencia = VehiculoEmergencia(
-                        id_tracking=hash(veh_id) % 10000,
+                        # ``hash()`` cambia entre procesos; CRC32 mantiene el ID
+                        # estable durante ejecuciones reproducibles.
+                        id_tracking=zlib.crc32(veh_id.encode("utf-8")),
                         clase='ambulancia',  # Simplificado
                         pos_x=pos[0],
                         pos_y=pos[1],
-                        vel_x=vel,
-                        vel_y=0.0,
-                        direccion_inicial='NS',  # Simplificado
+                        vel_x=vel * math.sin(angulo_rad),
+                        vel_y=vel * math.cos(angulo_rad),
+                        direccion_inicial=direccion,
                         confidence=1.0
                     )
                     vehiculos_emergencia.append(veh_emergencia)
@@ -315,11 +334,8 @@ class ControladorSUMOAdaptativo:
             }
 
             # Crear estado local
-            params = ParametrosInterseccion(
-                id_interseccion=id_sem,
-                nombre=f"Intersección {id_sem}"
-            )
-            self.estados_locales[id_sem] = EstadoLocalInterseccion(params)
+            params = ParametrosInterseccion(SC_MAX=50.0, V_MAX=60.0)
+            self.estados_locales[id_sem] = EstadoLocalInterseccion(id_sem, params)
 
             # Crear controlador difuso
             self.controladores_difusos[id_sem] = ControladorDifusoCapitulo6(
@@ -348,7 +364,9 @@ class ControladorSUMOAdaptativo:
             )
             configuraciones.append(config)
 
-        directorio_datos = self.config.directorio_salida
+        directorio_datos = (
+            self.config.directorio_salida if self.config.guardar_metricas else None
+        )
         if directorio_datos:
             directorio_datos = directorio_datos / "metricas_red"
 
@@ -468,9 +486,6 @@ class ControladorSUMOAdaptativo:
 
             # Actualizar estado local con métricas (simplificado)
             # En implementación real, pasaríamos detecciones de vehículos
-            estado_local.parametros.SC_MAX = 50.0
-            estado_local.parametros.V_MAX = 60.0
-
             # Crear objeto de métricas de intersección
             metricas_inter = MetricasInterseccion(
                 interseccion_id=id_sem,
@@ -483,8 +498,10 @@ class ControladorSUMOAdaptativo:
                 q_eo=metricas_eo.get('flujo_vehicular', 0),
                 k_ns=metricas_ns.get('densidad', 0),
                 k_eo=metricas_eo.get('densidad', 0),
-                ev_ns=sum(1 for v in vehiculos_emergencia if 'NS' in v.direccion_inicial),
-                ev_eo=sum(1 for v in vehiculos_emergencia if 'EO' in v.direccion_inicial)
+                ev_ns=sum(1 for v in vehiculos_emergencia
+                          if v.direccion_inicial in ('N', 'S')),
+                ev_eo=sum(1 for v in vehiculos_emergencia
+                          if v.direccion_inicial in ('E', 'O'))
             )
 
             # Calcular ICV y PI usando las fórmulas del estado local
@@ -547,12 +564,12 @@ class ControladorSUMOAdaptativo:
                 if fase_actual in [0, 1]:  # NS activo
                     traci.trafficlight.setPhaseDuration(
                         id_sem,
-                        int(resultado['T_verde_NS'])
+                        int(resultado['NS']['T_verde'])
                     )
                 else:  # EO activo
                     traci.trafficlight.setPhaseDuration(
                         id_sem,
-                        int(resultado['T_verde_EO'])
+                        int(resultado['EO']['T_verde'])
                     )
 
             except Exception as e:
@@ -586,7 +603,11 @@ class ControladorSUMOAdaptativo:
     def exportar_resultados(self, archivo_salida: Optional[Path] = None):
         """Exporta todos los resultados de la simulación"""
         if not archivo_salida:
-            archivo_salida = self.config.directorio_salida / "resultados_simulacion.json"
+            directorio = (
+                self.config.directorio_salida
+                or self.config.ruta_config.parent / "resultados_sumo"
+            )
+            archivo_salida = directorio / "resultados_simulacion.json"
 
         if self.agregador_metricas:
             self.agregador_metricas.exportar_historico(archivo_salida)

@@ -75,13 +75,21 @@ class ReplayStateSource:
         self._f: Optional[IO[str]] = None
 
     def __iter__(self) -> Iterator[TrafficState]:
-        with open(self._path, encoding="utf-8") as f:
-            self._f = f
-            for num, linea in enumerate(f, start=1):
+        self.close()
+        self._f = open(self._path, encoding="utf-8")
+        try:
+            for num, linea in enumerate(self._f, start=1):
                 linea = linea.strip()
                 if not linea:
                     continue
-                reg = json.loads(linea)
+                try:
+                    reg = json.loads(linea)
+                except json.JSONDecodeError as e:
+                    raise ValueError(
+                        f"{self._path}:{num}: JSON inválido: {e}") from e
+                if not isinstance(reg, dict):
+                    raise ValueError(
+                        f"{self._path}:{num}: se esperaba un objeto JSON")
                 if reg.get("kind") != KIND_STATE:
                     continue
                 try:
@@ -89,11 +97,13 @@ class ReplayStateSource:
                 except Exception as e:
                     raise ValueError(
                         f"{self._path}:{num}: TrafficState inválido: {e}") from e
-        self._f = None
+        finally:
+            self.close()
 
     def close(self) -> None:
-        # El manejador de contexto del iterador cierra el archivo; noop aquí.
-        pass
+        if self._f is not None:
+            self._f.close()
+            self._f = None
 
 
 def leer_decisiones(path: str | Path) -> Iterator[DecisionEnvelope]:

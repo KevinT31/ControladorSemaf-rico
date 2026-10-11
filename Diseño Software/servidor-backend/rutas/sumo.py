@@ -3,7 +3,7 @@ Rutas API para Integración con SUMO
 """
 
 from fastapi import APIRouter, HTTPException, Query
-from typing import Dict, List
+from typing import Dict
 
 from modelos.trafico import MetricasSUMO
 from modelos.respuestas import MensajeResponse
@@ -97,7 +97,7 @@ async def desconectar_sumo():
 
 
 @router.post("/exportar-historico", response_model=MensajeResponse)
-async def exportar_datos_historicos(formato: str = Query(default="csv", regex="^(csv|parquet)$")):
+async def exportar_datos_historicos(formato: str = Query(default="csv", pattern="^(csv|parquet)$")):
     """
     Exporta datos de tráfico de SUMO a formato CSV o Parquet para ML
 

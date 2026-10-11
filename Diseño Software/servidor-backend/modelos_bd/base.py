@@ -3,8 +3,7 @@ Configuración base de SQLAlchemy
 """
 
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from pathlib import Path
 import logging
 
@@ -54,8 +53,15 @@ def init_db():
     """
     logger.info(f"Inicializando base de datos en: {DB_PATH}")
 
-    # Importar todos los modelos para que SQLAlchemy los registre
-    from . import interseccion, metrica, ola_verde, deteccion_video, usuario, evento_auditoria
+    # Importar todos los modelos para que SQLAlchemy los registre.
+    from . import (  # noqa: F401
+        deteccion_video,
+        evento_auditoria,
+        interseccion,
+        metrica,
+        ola_verde,
+        usuario,
+    )
 
     # Crear todas las tablas
     Base.metadata.create_all(bind=engine)

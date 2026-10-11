@@ -13,7 +13,7 @@ Salida:
 """
 
 import numpy as np
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple
 import logging
 
 logger = logging.getLogger(__name__)

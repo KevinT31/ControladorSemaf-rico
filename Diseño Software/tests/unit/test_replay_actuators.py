@@ -1,5 +1,4 @@
 """Tests de replay (writer/reader/digest) y del actuador simulado."""
-import json
 
 import pytest
 

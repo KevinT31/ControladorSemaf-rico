@@ -10,14 +10,26 @@ from fastapi import Request, HTTPException
 
 from config import settings
 from seguridad.jwt_simple import verificar_token
+from seguridad.usuarios import ROLES_VALIDOS
 
 
 def _extraer_token(request: Request) -> Optional[str]:
-    """Lee el token de 'Authorization: Bearer <t>' o, como respaldo, de ?token=."""
+    """Lee el token del encabezado ``Authorization: Bearer <token>``."""
     auth = request.headers.get("Authorization", "")
     if auth.lower().startswith("bearer "):
         return auth[7:].strip()
-    return request.query_params.get("token")
+    return None
+
+
+def identidad_desde_payload(payload: dict) -> dict:
+    """Valida y extrae las claims de identidad utilizadas por el RBAC."""
+    username = payload.get("sub")
+    rol = payload.get("rol")
+    if not isinstance(username, str) or not username.strip():
+        raise ValueError("token sin sujeto válido")
+    if rol not in ROLES_VALIDOS:
+        raise ValueError("token con rol inválido")
+    return {"username": username, "rol": rol}
 
 
 def obtener_usuario_actual(request: Request) -> dict:
@@ -34,9 +46,9 @@ def obtener_usuario_actual(request: Request) -> dict:
         raise HTTPException(status_code=401, detail="No autenticado: falta token")
     try:
         payload = verificar_token(token, settings.SECRET_KEY)
+        return identidad_desde_payload(payload)
     except ValueError as e:
         raise HTTPException(status_code=401, detail=f"Token inválido: {e}")
-    return {"username": payload.get("sub"), "rol": payload.get("rol")}
 
 
 def requiere_rol(*roles_permitidos: str):

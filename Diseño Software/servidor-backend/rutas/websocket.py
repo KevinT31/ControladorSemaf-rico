@@ -2,8 +2,14 @@
 Rutas WebSocket para comunicación en tiempo real
 """
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+import json
 import logging
+
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+
+from config import settings
+from seguridad.dependencias import identidad_desde_payload
+from seguridad.jwt_simple import verificar_token
 
 router = APIRouter(tags=["WebSocket"])
 
@@ -27,10 +33,35 @@ async def websocket_endpoint(websocket: WebSocket):
     """
     from servicios.websocket_manager import WebSocketManager
 
+    if settings.AUTH_ENABLED:
+        token = websocket.query_params.get("token")
+        auth = websocket.headers.get("Authorization", "")
+        if not token and auth.lower().startswith("bearer "):
+            token = auth[7:].strip()
+
+        try:
+            if not token:
+                raise ValueError("falta token")
+            payload = verificar_token(token, settings.SECRET_KEY)
+            usuario = identidad_desde_payload(payload)
+        except ValueError as exc:
+            cliente = websocket.client.host if websocket.client else "desconocido"
+            logger.warning("WebSocket rechazado para %s: %s", cliente, exc)
+            # Aceptar y cerrar sin registrar la conexión permite que clientes
+            # WebSocket reales reciban el close frame 1008 (en vez de un 403
+            # de handshake ambiguo).
+            await websocket.accept()
+            await websocket.close(code=1008, reason="No autenticado")
+            return
+    else:
+        usuario = {"username": "anonimo", "rol": "operador"}
+
     await websocket.accept()
 
     conexion_id = WebSocketManager.agregar_conexion(websocket)
-    logger.info(f"Cliente WebSocket conectado. ID: {conexion_id}. Total: {WebSocketManager.total_conexiones()}")
+    logger.info(
+        "Cliente WebSocket conectado. usuario=%s ID=%s Total=%s",
+        usuario["username"], conexion_id, WebSocketManager.total_conexiones())
 
     try:
         while True:
@@ -39,11 +70,14 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Procesar comandos del cliente (opcional)
             try:
-                import json
                 comando = json.loads(data)
+                if not isinstance(comando, dict):
+                    raise ValueError("el mensaje debe ser un objeto JSON")
 
                 if comando.get('comando') == 'suscribir':
                     interseccion_id = comando.get('interseccion_id')
+                    if not isinstance(interseccion_id, str) or not interseccion_id.strip():
+                        raise ValueError("interseccion_id inválido")
                     WebSocketManager.suscribir_interseccion(conexion_id, interseccion_id)
                     await websocket.send_json({
                         'tipo': 'confirmacion',
@@ -52,6 +86,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
                 elif comando.get('comando') == 'desuscribir':
                     interseccion_id = comando.get('interseccion_id')
+                    if not isinstance(interseccion_id, str) or not interseccion_id.strip():
+                        raise ValueError("interseccion_id inválido")
                     WebSocketManager.desuscribir_interseccion(conexion_id, interseccion_id)
                     await websocket.send_json({
                         'tipo': 'confirmacion',
@@ -62,13 +98,16 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_json({'tipo': 'pong', 'timestamp': comando.get('timestamp')})
 
             except json.JSONDecodeError:
-                logger.warning(f"Mensaje no JSON recibido: {data}")
+                logger.warning("Mensaje WebSocket no JSON (longitud=%s)", len(data))
+            except ValueError as exc:
+                await websocket.send_json({'tipo': 'error', 'mensaje': str(exc)})
             except Exception as e:
                 logger.error(f"Error procesando comando WebSocket: {e}")
 
     except WebSocketDisconnect:
-        WebSocketManager.remover_conexion(conexion_id)
-        logger.info(f"Cliente WebSocket desconectado. ID: {conexion_id}. Total: {WebSocketManager.total_conexiones()}")
+        logger.info("Cliente WebSocket desconectado. ID: %s", conexion_id)
     except Exception as e:
         logger.error(f"Error en WebSocket: {e}")
+    finally:
         WebSocketManager.remover_conexion(conexion_id)
+        logger.info("Conexiones WebSocket activas: %s", WebSocketManager.total_conexiones())

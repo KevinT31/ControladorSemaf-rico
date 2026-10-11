@@ -18,7 +18,6 @@ from dataclasses import dataclass
 from datetime import datetime
 import logging
 import sys
-import torch
 
 # Importar módulos del proyecto
 sys.path.append(str(Path(__file__).parent.parent))
@@ -828,7 +827,7 @@ class ProcesadorVideo:
             cv2.line(frame, (10, y_pos_cap6 - 5), (panel_width - 10, y_pos_cap6 - 5), (100, 100, 100), 1)
 
             cap6_lines = [
-                f"=== METRICAS CAPITULO 6 ===",
+                "=== METRICAS CAPITULO 6 ===",
                 f"SC (detenidos): {m6['stopped_count']} | PI: {m6['parametro_intensidad']:.2f}",
                 f"Vavg (movim.): {m6['velocidad_promedio_movimiento']:.1f} km/h",
                 f"Densidad k: {m6['densidad_vehicular']:.4f} veh/m | Flujo q: {m6['flujo_vehicular']:.1f} veh/min",
@@ -910,9 +909,9 @@ class ProcesadorVideo:
                 writer.writerow(row)
 
         logger.info(f"Resultados exportados a {ruta_salida}")
-        logger.info(f"  NOTA: Todos los valores son REALES (no simulados)")
+        logger.info("  NOTA: Todos los valores son REALES (no simulados)")
         if tiene_cap6:
-            logger.info(f"  Incluye metricas del Capitulo 6 (formulas exactas de la tesis)")
+            logger.info("  Incluye metricas del Capitulo 6 (formulas exactas de la tesis)")
 
 
 # Ejemplo de uso

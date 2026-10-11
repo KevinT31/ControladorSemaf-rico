@@ -50,7 +50,7 @@ async def cambiar_modo(modo: str, request: Request,
                          detalle={'modo': modo}, ip=ip)
         raise HTTPException(
             status_code=400,
-            detail=f"Modo inválido. Debe ser uno de: simulador, video, sumo"
+            detail="Modo inválido. Debe ser uno de: simulador, video, sumo"
         )
 
     try:
