@@ -15,15 +15,21 @@ Notas:
 
 ## Configuración de seguridad local
 
-Antes de iniciar el sistema con autenticación habilitada:
-
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Edita `.env` y reemplaza los placeholders. `SECRET_KEY` debe tener al menos 32 caracteres. Las contraseñas de los usuarios demo se configuran mediante `DEMO_OPERATOR_PASSWORD`, `DEMO_TECHNICIAN_PASSWORD` y `DEMO_ADMIN_PASSWORD`.
+El archivo `.env` está excluido de Git y no debe versionarse. Variables:
 
-El archivo `.env` está excluido de Git y no debe versionarse.
+- `SECRET_KEY`: clave de firma JWT (mínimo 32 caracteres). Si se omite, el
+  backend usa una clave efímera aleatoria; defínela para que las sesiones
+  sobrevivan reinicios o varios workers. Los valores `REPLACE_…` se rechazan.
+- `DEMO_OPERADOR_PASSWORD`, `DEMO_TECNICO_PASSWORD`, `DEMO_ADMIN_PASSWORD`
+  (también se aceptan `DEMO_OPERATOR_PASSWORD` y `DEMO_TECHNICIAN_PASSWORD`):
+  contraseñas de los usuarios demo (12–256 caracteres). Deben definirse las
+  tres o ninguna. Si no se definen, el primer arranque genera claves aleatorias
+  en `.demo_credentials.json`, archivo local ignorado por Git que debe
+  mantenerse privado.
 
 ## Inicio rápido
 
@@ -34,13 +40,6 @@ python ejecutar.py
 # Servidor backend (FastAPI)
 python servidor-backend/main.py
 ```
-
-En el primer arranque, si no se definieron `DEMO_OPERADOR_PASSWORD`,
-`DEMO_TECNICO_PASSWORD` y `DEMO_ADMIN_PASSWORD`, el backend genera claves
-aleatorias en `.demo_credentials.json`. Ese archivo es local, está ignorado por
-Git y debe mantenerse privado. Para despliegues persistentes, copie
-`.env.example` a `.env`, configure las tres claves y defina un `JWT_SECRET`
-aleatorio estable.
 
 ## Menú principal (ejecutar.py)
 
