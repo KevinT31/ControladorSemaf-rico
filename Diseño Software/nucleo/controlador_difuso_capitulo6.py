@@ -68,7 +68,9 @@ class ControladorDifusoCapitulo6:
                  T_base_EO: float = 30.0,
                  T_ambar: float = 3.0,
                  T_todo_rojo: float = 2.0,
-                 T_ciclo: float = 90.0):
+                 T_ciclo: float = 90.0,
+                 puntos_icv: Tuple[float, float, float] = (0.2, 0.4, 0.7),
+                 puntos_pi: Tuple[float, float, float] = (0.3, 0.5, 0.8)):
         """
         Args:
             T_base_NS: Tiempo verde base Norte-Sur (segundos)
@@ -76,7 +78,17 @@ class ControladorDifusoCapitulo6:
             T_ambar: Duración de amarillo (segundos)
             T_todo_rojo: Duración de todo rojo (segundos)
             T_ciclo: Duración total del ciclo (segundos)
+            puntos_icv: Puntos (a, b, c) de las funciones de pertenencia de ICV
+                (Bajo: 1 hasta a y 0 desde b; Medio: pico en b y nulo en a y c;
+                Alto: 0 hasta b y 1 desde c). El valor por defecto es el del
+                Capítulo 6; otros valores se usan en la calibración.
+            puntos_pi: Ídem para PI (Ineficiente, Moderadamente eficiente,
+                Muy eficiente).
         """
+        self._validar_puntos('puntos_icv', puntos_icv)
+        self._validar_puntos('puntos_pi', puntos_pi)
+        self.puntos_icv = tuple(float(v) for v in puntos_icv)
+        self.puntos_pi = tuple(float(v) for v in puntos_pi)
         self.T_base_NS = T_base_NS
         self.T_base_EO = T_base_EO
         self.T_ambar = T_ambar
@@ -98,6 +110,12 @@ class ControladorDifusoCapitulo6:
         logger.info("  - Método Mamdani con defuzzificación por centroide")
         logger.info(f"  - T_ciclo: {T_ciclo}s, T_base_NS: {T_base_NS}s, T_base_EO: {T_base_EO}s")
 
+    @staticmethod
+    def _validar_puntos(nombre: str, puntos) -> None:
+        a, b, c = (float(v) for v in puntos)
+        if not (0.0 < a < b < c < 1.0):
+            raise ValueError(f"{nombre} debe cumplir 0 < a < b < c < 1; recibido {tuple(puntos)}")
+
     def _inicializar_conjuntos_difusos(self):
         """
         Define los conjuntos difusos según las fórmulas exactas del Capítulo 6
@@ -106,53 +124,55 @@ class ControladorDifusoCapitulo6:
 
         # ICV: Índice de Congestión Vehicular [0, 1]
         # μBajo(ICV) = 1 si ICV ≤ 0.2, lineal hasta 0.4, luego 0
+        ia, ib, ic = self.puntos_icv
         self.icv_bajo = ConjuntoDifusoTesis('Bajo', [
             (0.0, 1.0),
-            (0.2, 1.0),
-            (0.4, 0.0),
+            (ia, 1.0),
+            (ib, 0.0),
             (1.0, 0.0)
         ])
 
         # μMedio(ICV) = trapecio en [0.2, 0.4, 0.7]
         self.icv_medio = ConjuntoDifusoTesis('Medio', [
             (0.0, 0.0),
-            (0.2, 0.0),
-            (0.4, 1.0),
-            (0.7, 0.0),
+            (ia, 0.0),
+            (ib, 1.0),
+            (ic, 0.0),
             (1.0, 0.0)
         ])
 
         # μAlto(ICV) = 0 si ICV ≤ 0.4, lineal desde 0.4-0.7, luego 1
         self.icv_alto = ConjuntoDifusoTesis('Alto', [
             (0.0, 0.0),
-            (0.4, 0.0),
-            (0.7, 1.0),
+            (ib, 0.0),
+            (ic, 1.0),
             (1.0, 1.0)
         ])
 
         # PI: Parámetro de Intensidad [0, 1]
         # μIneficiente(PI) = 1 si PI ≤ 0.3, lineal hasta 0.5, luego 0
+        pa, pb, pc = self.puntos_pi
         self.pi_ineficiente = ConjuntoDifusoTesis('Ineficiente', [
             (0.0, 1.0),
-            (0.3, 1.0),
-            (0.5, 0.0),
+            (pa, 1.0),
+            (pb, 0.0),
             (1.0, 0.0)
         ])
 
         # μModeradamente_Eficiente(PI) = trapecio en [0.3, 0.5, 0.8]
         self.pi_moderado = ConjuntoDifusoTesis('Moderadamente_Eficiente', [
             (0.0, 0.0),
-            (0.3, 0.0),
-            (0.5, 1.0),
-            (0.8, 0.0),
+            (pa, 0.0),
+            (pb, 1.0),
+            (pc, 0.0),
             (1.0, 0.0)
         ])
 
         # μMuy_Eficiente(PI) = 0 si PI ≤ 0.5, lineal desde 0.5-0.8, luego 1
         self.pi_muy_eficiente = ConjuntoDifusoTesis('Muy_Eficiente', [
             (0.0, 0.0),
-            (0.5, 0.0),
-            (0.8, 1.0),
+            (pb, 0.0),
+            (pc, 1.0),
             (1.0, 1.0)
         ])
 

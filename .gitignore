@@ -58,3 +58,6 @@ TesisReferencia/
 Diseño Software/10.0.0
 Diseño Software/**/backups/
 Diseño Software/integracion-sumo/resultados/*_backup.*
+
+# Especificación local de diseño (no versionada)
+Raspberry.md

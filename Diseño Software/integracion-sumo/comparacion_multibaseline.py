@@ -264,9 +264,30 @@ def _paso_maxpressure(info: dict, estado: dict, green_t: float = 12.0,
 # ----------------------------------------------------------------------
 # Runner genérico de una estrategia
 # ----------------------------------------------------------------------
+# Parámetros del controlador difuso. 'difuso' conserva los valores del Cap. 6;
+# 'difuso_opt' usa los calibrados (ver calibrar_difuso.py y
+# resultados/parametros_difuso_calibrados.json).
+PARAMS_DIFUSO_BASE = {'alpha': 0.35, 'gamma': 5.0,
+                      'puntos_icv': (0.2, 0.4, 0.7), 'puntos_pi': (0.3, 0.5, 0.8)}
+RUTA_PARAMS_CALIBRADOS = _INTEG / 'resultados' / 'parametros_difuso_calibrados.json'
+
+
+def cargar_params_calibrados(ruta: Path = RUTA_PARAMS_CALIBRADOS) -> dict:
+    datos = json.loads(Path(ruta).read_text(encoding='utf-8'))['parametros']
+    return {'alpha': float(datos['alpha']), 'gamma': float(datos['gamma']),
+            'puntos_icv': tuple(datos['puntos_icv']),
+            'puntos_pi': tuple(datos['puntos_pi'])}
+
+
 def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
-                        intervalo: int = 25, webster_freq: int = 150) -> dict:
-    """Corre una estrategia sobre (cfg, seed) y devuelve métricas agregadas reales."""
+                        intervalo: int = 25, webster_freq: int = 150,
+                        difuso_params: dict = None) -> dict:
+    """Corre una estrategia sobre (cfg, seed) y devuelve métricas agregadas reales.
+
+    `difuso_params` (alpha, gamma, puntos_icv, puntos_pi) solo aplica a las
+    estrategias 'difuso' y 'difuso_opt'; si se omite se usan PARAMS_DIFUSO_BASE
+    (o los calibrados en 'difuso_opt').
+    """
     random.seed(seed)
     params = ParametrosInterseccion()
     es_actuated = (estrategia == 'actuated')
@@ -289,9 +310,13 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
         estado = _init_webster(info)
     elif estrategia == 'maxpressure':
         estado = _init_maxpressure(info)
-    elif estrategia == 'difuso':
+    elif estrategia in ('difuso', 'difuso_opt'):
+        dp = dict(difuso_params) if difuso_params else (
+            cargar_params_calibrados() if estrategia == 'difuso_opt'
+            else dict(PARAMS_DIFUSO_BASE))
         calc_icv = CalculadorICV(params)
-        difuso = ControladorDifusoCapitulo6()
+        difuso = ControladorDifusoCapitulo6(puntos_icv=tuple(dp['puntos_icv']),
+                                            puntos_pi=tuple(dp['puntos_pi']))
 
     metricas: List = []
     demora_total = 0
@@ -321,10 +346,10 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
                                  modificado=(estrategia == 'webster_mod'))
         elif estrategia == 'maxpressure':
             _paso_maxpressure(info, estado)
-        elif estrategia == 'difuso':
+        elif estrategia in ('difuso', 'difuso_opt'):
             if i % intervalo == 0:
                 C._redistribuir_verde(info, calc_icv, difuso, ema=ema,
-                                      alpha=0.35, gamma=5.0)
+                                      alpha=dp['alpha'], gamma=dp['gamma'])
         # 'fijo' y 'actuated' no requieren intervención por paso
 
         met, halting, arrived = C._metricas_instante(base + timedelta(seconds=i), n_int)
@@ -357,6 +382,7 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
 # Campaña completa: todas las estrategias x N semillas
 # ----------------------------------------------------------------------
 ESTRATEGIAS = ['fijo', 'actuated', 'webster', 'webster_mod', 'maxpressure', 'difuso']
+ESTRATEGIAS_TODAS = ESTRATEGIAS + ['difuso_opt']
 
 
 def ejecutar_campana(ruta_cfg: str, semillas: List[int], pasos: int = 700,
