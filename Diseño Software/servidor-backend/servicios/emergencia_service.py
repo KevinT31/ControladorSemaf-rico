@@ -235,10 +235,10 @@ class EmergenciaService:
             # Estadísticas de la BD
             total_historico = db.query(func.count(OlaVerde.id)).scalar()
             total_activas_bd = db.query(func.count(OlaVerde.id)).filter(
-                OlaVerde.activo == True
+                OlaVerde.activo.is_(True)
             ).scalar()
             total_completadas = db.query(func.count(OlaVerde.id)).filter(
-                OlaVerde.completado == True
+                OlaVerde.completado.is_(True)
             ).scalar()
 
             # Por tipo
@@ -252,7 +252,7 @@ class EmergenciaService:
             # Tiempo promedio (solo completadas)
             tiempo_promedio = db.query(
                 func.avg(OlaVerde.tiempo_total_segundos)
-            ).filter(OlaVerde.completado == True).scalar() or 0
+            ).filter(OlaVerde.completado.is_(True)).scalar() or 0
 
             return {
                 'total_historico': total_historico,

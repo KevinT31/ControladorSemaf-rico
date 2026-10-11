@@ -16,11 +16,16 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple
 
 from nsb.actuation.base import ActuatorBackend
 from nsb.core.pipeline import DecisionPipeline
-from nsb.domain.contracts import DecisionEnvelope, RecommendationEnvelope, TrafficState
+from nsb.domain.contracts import (
+    AppliedPhase,
+    DecisionEnvelope,
+    RecommendationEnvelope,
+    TrafficState,
+)
 from nsb.domain.enums import Mode, Verdict
 from nsb.safety.gate import SafetyGate
 from nsb.safety.message_guard import MessageGuard
@@ -59,14 +64,22 @@ class Authority:
 
     # ------------------------------------------------------------------ #
     def process_state(self, state: TrafficState,
-                      edad_s: Optional[float] = None
+                      edad_s: Optional[float] = None,
+                      on_state_accepted: Optional[Callable[[], None]] = None,
                       ) -> Tuple[Optional[RecommendationEnvelope],
                                  DecisionEnvelope]:
-        """Ciclo completo de un punto de control."""
+        """Ciclo completo de un punto de control.
+
+        ``on_state_accepted`` se ejecuta después del guard y antes de decidir.
+        Permite avanzar el reloj de simulación sin que un mensaje rechazado
+        pueda modificar la FSM.
+        """
         verdict = self._guard.check_state(state, edad_s=edad_s)
 
         rec: Optional[RecommendationEnvelope] = None
         if verdict.ok:
+            if on_state_accepted is not None:
+                on_state_accepted()
             rec = self._pipeline.recommend(state)
 
         if self._mode is Mode.ADVISORY:
@@ -120,6 +133,25 @@ class Authority:
                     update={"signal_groups": resultado.groups}),
             })
         return decision.model_copy(update={"actuation_ms": actuation_ms})
+
+    def tick(self) -> AppliedPhase:
+        """Avanza la FSM sin nueva recomendación (espejo HIL ``per_step``).
+
+        En modos con autoridad, la salida pasa por el mismo SafetyGate que
+        una decisión normal. ADVISORY solo mantiene la referencia de fase.
+        """
+        phase = self._tsc.fsm.tick()
+        if self._mode is Mode.ADVISORY:
+            return phase
+
+        assert self._actuator is not None
+        resultado = self._gate.check_output(
+            phase.signal_groups, context="hil_tick")
+        self._actuator.apply(resultado.groups)
+        if not resultado.safe:
+            self._tsc.enter_safe_mode("safety_gate:hil_tick")
+            return phase.model_copy(update={"signal_groups": resultado.groups})
+        return phase
 
     def shutdown(self) -> None:
         """Apagado ordenado del actuador (todo-rojo)."""

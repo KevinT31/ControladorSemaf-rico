@@ -1,5 +1,4 @@
 """Tests de la FSM de fases: ciclo, mínimos, plan pendiente, preempción EV."""
-import pytest
 
 from nsb.domain.contracts import PlanSemaforico
 from nsb.domain.enums import Direction, PhaseId, SignalColor, SignalGroup

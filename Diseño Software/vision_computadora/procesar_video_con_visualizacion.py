@@ -75,7 +75,7 @@ def seleccionar_video_interactivo():
         print(f"  {i}. {video.name} ({tamaño_mb:.1f} MB)")
         print(f"     {video.parent.name}/{video.name}")
 
-    print(f"\n  0. Especificar otra ruta")
+    print("\n  0. Especificar otra ruta")
 
     while True:
         try:
@@ -184,15 +184,15 @@ def procesar_video_con_visualizacion(
 
     # Mostrar optimizaciones activas
     if saltar_frames > 1 or reducir_resolucion < 1.0 or guardar_video or reproducir_despues:
-        print(f"\n⚡ OPTIMIZACIONES:")
+        print("\n⚡ OPTIMIZACIONES:")
         if saltar_frames > 1:
             print(f"  • Procesando 1 de cada {saltar_frames} frames (más rápido)")
         if reducir_resolucion < 1.0:
             print(f"  • Resolución reducida a {reducir_resolucion*100:.0f}%")
         if guardar_video:
-            print(f"  • Guardando video procesado")
+            print("  • Guardando video procesado")
         if reproducir_despues:
-            print(f"  • Reproducirá video al finalizar")
+            print("  • Reproducirá video al finalizar")
 
     try:
         # Crear procesador
@@ -213,7 +213,7 @@ def procesar_video_con_visualizacion(
         ancho_final = int(procesador.ancho * reducir_resolucion)
         alto_final = int(procesador.alto * reducir_resolucion)
 
-        print(f"\n✓ Procesador inicializado")
+        print("\n✓ Procesador inicializado")
         print(f"  Resolución original: {procesador.ancho}x{procesador.alto}")
         if reducir_resolucion < 1.0:
             print(f"  Resolución procesamiento: {ancho_final}x{alto_final}")
@@ -479,7 +479,7 @@ def procesar_video_con_visualizacion(
 
             if modo == 1:
                 # MODO BÁSICO: Solo conteo
-                print(f"\n  💡 Detección básica completada")
+                print("\n  💡 Detección básica completada")
                 print(f"     Total de detecciones realizadas en {len(resultados)} frames")
 
             elif modo == 2:
@@ -499,7 +499,7 @@ def procesar_video_con_visualizacion(
                 moderados = sum(1 for r in resultados if 0.3 <= r.icv < 0.6)
                 congestionados = sum(1 for r in resultados if r.icv >= 0.6)
 
-                print(f"\n  Distribución de congestión:")
+                print("\n  Distribución de congestión:")
                 print(f"    Fluido: {fluidos} frames ({fluidos/len(resultados)*100:.1f}%)")
                 print(f"    Moderado: {moderados} frames ({moderados/len(resultados)*100:.1f}%)")
                 print(f"    Congestionado: {congestionados} frames ({congestionados/len(resultados)*100:.1f}%)")
@@ -513,7 +513,7 @@ def procesar_video_con_visualizacion(
                 if emergencias > 0:
                     print(f"\n  ⚠️ Se detectaron {emergencias} frames con vehículos de emergencia")
                 else:
-                    print(f"\n  ✓ No se detectaron vehículos de emergencia en el video")
+                    print("\n  ✓ No se detectaron vehículos de emergencia en el video")
 
             # Stats comunes para cálculos
             velocidades = [r.velocidad_promedio for r in resultados if r.velocidad_promedio > 0]
@@ -561,7 +561,7 @@ def procesar_video_con_visualizacion(
             with open(ruta_json, 'w', encoding='utf-8') as f:
                 json.dump(stats, f, indent=2, ensure_ascii=False)
 
-            print(f"\n✓ Resultados exportados:")
+            print("\n✓ Resultados exportados:")
             print(f"  CSV: {ruta_csv}")
             print(f"  JSON: {ruta_json}")
 
@@ -605,7 +605,7 @@ def procesar_video_con_visualizacion(
         return resultados
 
     except Exception as e:
-        print(f"\n❌ ERROR durante el procesamiento:")
+        print("\n❌ ERROR durante el procesamiento:")
         print(f"  {type(e).__name__}: {e}")
         import traceback
         traceback.print_exc()

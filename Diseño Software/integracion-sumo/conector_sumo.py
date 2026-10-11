@@ -8,7 +8,7 @@ adaptativo basado en ICV + Lógica Difusa.
 import sys
 from pathlib import Path
 import numpy as np
-from typing import Dict, List, Tuple
+from typing import Dict, List
 import logging
 
 # Conexión con SUMO.

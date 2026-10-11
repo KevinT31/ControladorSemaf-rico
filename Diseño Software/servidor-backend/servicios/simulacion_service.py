@@ -4,6 +4,7 @@ Servicio para control del Simulador de Tráfico
 
 from typing import Dict
 import logging
+import sys
 from .estado_global import estado_sistema
 from .websocket_manager import WebSocketManager
 
@@ -18,7 +19,7 @@ class SimulacionService:
         """Retorna el estado actual del sistema"""
         resumen = estado_sistema.obtener_resumen()
 
-        # Construir métricas por intersección con ICV clamped [0.40, 0.60]
+        # Construir métricas por intersección conservando la salida real del ICV.
         inter_out = []
         try:
             # Intentar usar núcleo para cálculo ICV si hay métricas
@@ -30,7 +31,7 @@ class SimulacionService:
         except Exception:
             calc = None
 
-        for idx, (iid, info) in enumerate(estado_sistema.intersecciones.items()):
+        for iid, info in estado_sistema.intersecciones.items():
             # Tomar métricas si existen; sino, usar valores mínimos
             flujo = float(info.get('flujo', 0.0))
             velocidad = float(info.get('velocidad', 0.0))
@@ -47,11 +48,7 @@ class SimulacionService:
                     icv_val = 0.0
                     clas = 'Fluido'
 
-            # Jitter leve por intersección para diversidad
-            jitter = ((idx % 7) - 3) * 0.005
-            icv_val = icv_val * (1.0 + jitter)
-            # Clamp estricto solicitado
-            icv_val = max(0.50, min(0.60, icv_val)) if resumen.get('modo') == 'simulador' else icv_val
+            icv_val = max(0.0, min(1.0, float(icv_val)))
 
             inter_out.append({
                 'interseccion_id': iid,
@@ -66,9 +63,6 @@ class SimulacionService:
         icv_prom = 0.0
         if inter_out:
             icv_prom = sum(i['icv'] for i in inter_out) / len(inter_out)
-            # Clamp también el promedio en modo simulador
-            if resumen.get('modo') == 'simulador':
-                icv_prom = max(0.50, min(0.60, icv_prom))
 
         resumen['intersecciones'] = inter_out
         resumen['icv_red_promedio'] = round(icv_prom, 3)
@@ -83,6 +77,19 @@ class SimulacionService:
         if nuevo_modo == 'sumo':
             from .sumo_service import SumoService
             SumoService.inicializar_modo_sumo()
+
+        # main.py conserva un diccionario legacy durante la migración a los
+        # servicios modulares. Sincronizarlo evita que sus tareas de fondo sigan
+        # operando en el modo anterior.
+        main_modulo = sys.modules.get("main")
+        estado_legacy = getattr(main_modulo, "estado_sistema", None)
+        if isinstance(estado_legacy, dict):
+            tarea = estado_legacy.get("sumo_auto_step")
+            if tarea is not None and not tarea.done():
+                tarea.cancel()
+            estado_legacy["sumo_auto_step"] = None
+            estado_legacy["modo"] = estado_sistema.modo
+            estado_legacy["conector_sumo"] = estado_sistema.conector_sumo
 
         await WebSocketManager.broadcast({
             'tipo': 'modo_cambiado',

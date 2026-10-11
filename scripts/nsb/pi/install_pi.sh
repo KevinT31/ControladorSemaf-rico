@@ -16,6 +16,10 @@ fi
 
 pyver="$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
 echo "Python detectado: $pyver (piso de sintaxis del proyecto: 3.11 — D-E)"
+python3 -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)' || {
+    echo "ERROR: NSB requiere Python >= 3.11; detectado $pyver" >&2
+    exit 1
+}
 
 if [[ ! -d .venv ]]; then
     echo "Creando venv en $base/.venv ..."
@@ -23,8 +27,9 @@ if [[ ! -d .venv ]]; then
 fi
 # shellcheck disable=SC1091
 source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements-nsb-pi.txt
+# Conservar el pip provisto por el venv evita que cada instalación cambie de
+# herramienta sin control. Las dependencias sí se resuelven desde el lockfile.
+python -m pip install -r requirements-nsb-pi.txt
 
 echo ""
 echo "Verificación mínima (sin hardware):"

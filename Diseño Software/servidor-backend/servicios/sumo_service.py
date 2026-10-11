@@ -2,7 +2,7 @@
 Servicio para Integración con SUMO
 """
 
-from typing import Dict, List
+from typing import Dict
 import logging
 import json
 from pathlib import Path

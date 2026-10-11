@@ -14,7 +14,7 @@ async def trafico_real(
 
     Sin parámetros usa el bbox del escenario metropolitano por defecto.
     """
-    from servicios.trafico_real_service import obtener_trafico_real, BBOX_DEFECTO
+    from servicios.trafico_real_service import obtener_trafico_real
 
     bbox = None
     if None not in (oeste, sur, este, norte):

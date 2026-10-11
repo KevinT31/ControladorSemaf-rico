@@ -23,7 +23,7 @@ def verificar_sumo():
         print(f"✓ SUMO encontrado: {result.stdout.split()[3]}")
         return True
     except Exception as e:
-        print(f"❌ SUMO no encontrado. Instala desde: https://sumo.dlr.de/docs/Downloads.php")
+        print("❌ SUMO no encontrado. Instala desde: https://sumo.dlr.de/docs/Downloads.php")
         print(f"   Error: {e}")
         return False
 
@@ -42,7 +42,7 @@ def descargar_mapa_osm(bbox, output_file):
     overpass_url = "https://overpass-api.de/api/map"
     bbox_str = f"?bbox={min_lon},{min_lat},{max_lon},{max_lat}"
     
-    print(f"\n📥 Descargando mapa de Lima desde OpenStreetMap...")
+    print("\n📥 Descargando mapa de Lima desde OpenStreetMap...")
     print(f"   Área: {bbox}")
     print(f"   URL: {overpass_url}{bbox_str}")
     
@@ -50,7 +50,8 @@ def descargar_mapa_osm(bbox, output_file):
         import urllib.request
         
         # Descargar
-        urllib.request.urlretrieve(
+        # Endpoint HTTPS fijo; solo el bbox numérico se parametriza.
+        urllib.request.urlretrieve(  # nosec B310
             overpass_url + bbox_str,
             output_file
         )
@@ -78,7 +79,7 @@ def convertir_osm_a_sumo(osm_file, net_file):
         osm_file: Archivo .osm de entrada
         net_file: Archivo .net.xml de salida
     """
-    print(f"\n🔧 Convirtiendo OSM a red SUMO...")
+    print("\n🔧 Convirtiendo OSM a red SUMO...")
     
     try:
         cmd = [
@@ -103,7 +104,7 @@ def convertir_osm_a_sumo(osm_file, net_file):
             print(f"✓ Red SUMO creada: {net_file} ({size_mb:.2f} MB)")
             
             # Contar semáforos
-            import xml.etree.ElementTree as ET
+            from defusedxml import ElementTree as ET
             tree = ET.parse(net_file)
             root = tree.getroot()
             num_tls = len(root.findall('tlLogic'))
@@ -111,7 +112,7 @@ def convertir_osm_a_sumo(osm_file, net_file):
             
             return True
         else:
-            print(f"❌ Error en netconvert:")
+            print("❌ Error en netconvert:")
             print(result.stderr)
             return False
             
@@ -162,7 +163,7 @@ main()
             print(f"✓ Tráfico generado: {route_file}")
             return True
         else:
-            print(f"❌ Error generando tráfico:")
+            print("❌ Error generando tráfico:")
             print(result.stderr)
             return False
             
@@ -180,7 +181,7 @@ def crear_configuracion_sumo(net_file, route_file, config_file):
         route_file: Archivo de rutas
         config_file: Archivo de configuración de salida
     """
-    print(f"\n📝 Creando configuración SUMO...")
+    print("\n📝 Creando configuración SUMO...")
     
     config_xml = f'''<?xml version="1.0" encoding="UTF-8"?>
 
@@ -284,8 +285,8 @@ def main():
         -12.0400   # max_lat (norte)
     )
     
-    print(f"\n📍 Área seleccionada:")
-    print(f"   Distritos: Lima Centro, Miraflores, San Isidro, Lince, Jesús María")
+    print("\n📍 Área seleccionada:")
+    print("   Distritos: Lima Centro, Miraflores, San Isidro, Lince, Jesús María")
     print(f"   Coordenadas: {bbox_amplio}")
     
     # Paso 1: Descargar mapa (opcional si ya existe)
@@ -298,12 +299,12 @@ def main():
             print("\n⚠️  No se pudo descargar automáticamente.")
             print("📝 DESCARGA MANUAL:")
             print("   1. Ir a: https://www.openstreetmap.org/export")
-            print(f"   2. Ingresar coordenadas:")
+            print("   2. Ingresar coordenadas:")
             print(f"      - Izquierda: {bbox_amplio[0]}")
             print(f"      - Abajo: {bbox_amplio[1]}")
             print(f"      - Derecha: {bbox_amplio[2]}")
             print(f"      - Arriba: {bbox_amplio[3]}")
-            print(f"   3. Hacer clic en 'Export'")
+            print("   3. Hacer clic en 'Export'")
             print(f"   4. Guardar como: {osm_file}")
             input("\n   Presiona ENTER cuando hayas descargado el archivo...")
             
@@ -369,17 +370,17 @@ def main():
     print(f"   - {net_file.name}")
     print(f"   - {route_file.name}")
     print(f"   - {config_file.name}")
-    print(f"   - view.xml")
-    print(f"   - calles.geojson")
+    print("   - view.xml")
+    print("   - calles.geojson")
     
-    print(f"\n🚀 Para ejecutar:")
+    print("\n🚀 Para ejecutar:")
     print(f"   cd {lima_amplio_dir}")
     print(f"   sumo-gui -c {config_file.name}")
     
-    print(f"\n📝 Para usar en el sistema:")
-    print(f"   1. Edita servidor-backend/main.py")
-    print(f"   2. Cambia 'lima-centro' por 'lima-amplio' en la ruta de configuración")
-    print(f"   3. Reinicia el servidor")
+    print("\n📝 Para usar en el sistema:")
+    print("   1. Edita servidor-backend/main.py")
+    print("   2. Cambia 'lima-centro' por 'lima-amplio' en la ruta de configuración")
+    print("   3. Reinicia el servidor")
 
 
 if __name__ == "__main__":

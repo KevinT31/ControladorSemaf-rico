@@ -13,8 +13,9 @@ import base64
 import hashlib
 import hmac
 import json
+import math
 import time
-from typing import Dict
+from typing import Dict, Any
 
 
 def _b64url_encode(data: bytes) -> str:
@@ -31,8 +32,15 @@ def _firmar(mensaje: str, secret: str) -> str:
     return _b64url_encode(mac)
 
 
-def crear_token(payload: Dict, secret: str, exp_segundos: int = 3600) -> str:
+def crear_token(payload: Dict[str, Any], secret: str, exp_segundos: int = 3600) -> str:
     """Genera un JWT HS256 con expiración (iat/exp incluidos)."""
+    if not isinstance(payload, dict):
+        raise TypeError("payload debe ser un diccionario")
+    if not secret:
+        raise ValueError("secret no puede estar vacío")
+    if isinstance(exp_segundos, bool) or int(exp_segundos) <= 0:
+        raise ValueError("exp_segundos debe ser mayor que cero")
+
     header = {"alg": "HS256", "typ": "JWT"}
     ahora = int(time.time())
     cuerpo = dict(payload)
@@ -45,7 +53,7 @@ def crear_token(payload: Dict, secret: str, exp_segundos: int = 3600) -> str:
     return f"{seg1}.{seg2}.{firma}"
 
 
-def verificar_token(token: str, secret: str) -> Dict:
+def verificar_token(token: str, secret: str) -> Dict[str, Any]:
     """
     Verifica firma y expiración. Devuelve el payload o lanza ValueError.
     """
@@ -59,11 +67,31 @@ def verificar_token(token: str, secret: str) -> Dict:
         raise ValueError("firma inválida")
 
     try:
+        header = json.loads(_b64url_decode(seg1))
         payload = json.loads(_b64url_decode(seg2))
     except Exception:
-        raise ValueError("payload ilegible")
+        raise ValueError("token ilegible") from None
 
-    if "exp" in payload and time.time() > float(payload["exp"]):
+    if not isinstance(header, dict) or header.get("alg") != "HS256" or header.get("typ") != "JWT":
+        raise ValueError("cabecera JWT no permitida")
+    if not isinstance(payload, dict):
+        raise ValueError("payload JWT inválido")
+
+    exp = payload.get("exp")
+    iat = payload.get("iat")
+    if (isinstance(exp, bool) or not isinstance(exp, (int, float))
+            or not math.isfinite(float(exp))):
+        raise ValueError("expiración inválida")
+    if (isinstance(iat, bool) or not isinstance(iat, (int, float))
+            or not math.isfinite(float(iat))):
+        raise ValueError("fecha de emisión inválida")
+    if float(exp) <= float(iat):
+        raise ValueError("intervalo temporal inválido")
+
+    ahora = time.time()
+    if float(iat) > ahora + 60.0:
+        raise ValueError("token emitido en el futuro")
+    if ahora >= float(exp):
         raise ValueError("token expirado")
 
     return payload

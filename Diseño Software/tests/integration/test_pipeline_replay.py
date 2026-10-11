@@ -1,6 +1,5 @@
 """Integración: fuente → nodo → actuador simulado, con determinismo
 verificable por digest (DEMO 1, 2 y 12 de la spec §43)."""
-import pytest
 
 from nsb.config import NodeConfig
 from nsb.domain.enums import Mode, SourceKind

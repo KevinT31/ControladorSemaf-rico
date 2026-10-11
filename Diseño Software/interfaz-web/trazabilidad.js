@@ -10,6 +10,22 @@
 (function () {
     'use strict';
 
+    function escaparHtml(valor) {
+        return String(valor == null ? '' : valor).replace(/[&<>"']/g, function (caracter) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[caracter];
+        });
+    }
+
+    function colorSeguro(valor) {
+        return /^#[0-9a-f]{3,8}$/i.test(String(valor || '')) ? valor : '#2563eb';
+    }
+
     // ---------- Trazabilidad ----------
     function abrirTrazabilidad() {
         var m = document.getElementById('traza-modal');
@@ -28,7 +44,12 @@
         var ev = document.getElementById('traza-ev').checked ? 1 : 0;
         var cont = document.getElementById('traza-result');
         cont.innerHTML = 'Calculando…';
-        var q = 'cola=' + cola + '&velocidad=' + vel + '&flujo=' + flujo + '&ev=' + ev;
+        var q = new URLSearchParams({
+            cola: cola,
+            velocidad: vel,
+            flujo: flujo,
+            ev: String(ev)
+        }).toString();
         try {
             var r = await fetch('/api/interseccion/' + encodeURIComponent(id) + '/explicacion?' + q);
             if (!r.ok) { cont.innerHTML = '<p style="color:#dc2626">No autorizado o error (' + r.status + ')</p>'; return; }
@@ -39,42 +60,48 @@
     }
 
     function renderTraza(d) {
-        var reglas = (d.reglas_disparadas || []).map(function (x) {
-            return '<li><b>P' + x.prioridad + '</b> ' + x.descripcion +
-                ' → <b>' + x.consecuente + '</b> <span style="color:#64748b">(α=' +
+        d = d || {};
+        var entrada = d.entrada || {};
+        var icv = d.icv || {};
+        var limites = d.limites || {};
+        var reglas = (d.reglas_disparadas || []).filter(Boolean).map(function (x) {
+            return '<li><b>P' + escaparHtml(x.prioridad) + '</b> ' + escaparHtml(x.descripcion) +
+                ' → <b>' + escaparHtml(x.consecuente) + '</b> <span style="color:#64748b">(α=' +
                 Number(x.grado).toFixed(2) + ')</span></li>';
         }).join('') || '<li>(ninguna regla activa → mantener)</li>';
 
         var seg = d.seguridad || {};
-        var corr = (seg.correcciones || []).map(function (c) {
-            return c.campo + ': ' + c.solicitado + '→' + c.aplicado + ' (' + c.motivo + ')';
+        var corr = (seg.correcciones || []).filter(Boolean).map(function (c) {
+            return escaparHtml(c.campo) + ': ' + escaparHtml(c.solicitado) + '→' +
+                escaparHtml(c.aplicado) + ' (' + escaparHtml(c.motivo) + ')';
         }).join('<br>') || 'sin correcciones';
-        var nivelColor = (d.icv && d.icv.color) || '#2563eb';
-        var emer = d.entrada.emergencia ? ' · 🚑 EMERGENCIA' : '';
+        var nivelColor = colorSeguro(icv.color);
+        var emer = entrada.emergencia ? ' · 🚑 EMERGENCIA' : '';
         var modoSeguro = seg.modo_seguro ? '<span class="traza-seguro">⚠ MODO SEGURO</span>' : '';
 
         return '' +
             '<div class="traza-chain">' +
             '  <div class="traza-step"><span class="traza-tag">1 · Entrada de tráfico</span>' +
-            'Cola ' + d.entrada.cola_m + ' m · Vel ' + d.entrada.velocidad_kmh + ' km/h · Flujo ' +
-            d.entrada.flujo_veh_min + ' · SC≈' + d.entrada.stopped_count_aprox + emer +
-            '<div class="traza-fuente">fuente: ' + d.fuente_datos + '</div></div>' +
+            'Cola ' + escaparHtml(entrada.cola_m) + ' m · Vel ' + escaparHtml(entrada.velocidad_kmh) +
+            ' km/h · Flujo ' + escaparHtml(entrada.flujo_veh_min) + ' · SC≈' +
+            escaparHtml(entrada.stopped_count_aprox) + emer +
+            '<div class="traza-fuente">fuente: ' + escaparHtml(d.fuente_datos) + '</div></div>' +
             '  <div class="traza-arrow">▼</div>' +
             '  <div class="traza-step"><span class="traza-tag">2 · ICV (Cap 6.2.3) y PI</span>' +
-            '<b style="color:' + nivelColor + '">ICV = ' + d.icv.valor + '</b> — nivel <b>' +
-            d.icv.nivel + '</b> · PI = ' + d.pi + '</div>' +
+            '<b style="color:' + nivelColor + '">ICV = ' + escaparHtml(icv.valor) + '</b> — nivel <b>' +
+            escaparHtml(icv.nivel) + '</b> · PI = ' + escaparHtml(d.pi) + '</div>' +
             '  <div class="traza-arrow">▼</div>' +
             '  <div class="traza-step"><span class="traza-tag">3 · Reglas difusas disparadas (Mamdani)</span>' +
             '<ul class="traza-reglas">' + reglas + '</ul></div>' +
             '  <div class="traza-arrow">▼</div>' +
             '  <div class="traza-step"><span class="traza-tag">4 · Ajuste difuso</span>' +
-            'ΔT verde = <b>' + d.delta_t_porcentaje + '%</b> · base ' + d.verde_base_s +
-            's → bruto ' + d.verde_bruto_s + 's</div>' +
+            'ΔT verde = <b>' + escaparHtml(d.delta_t_porcentaje) + '%</b> · base ' +
+            escaparHtml(d.verde_base_s) + 's → bruto ' + escaparHtml(d.verde_bruto_s) + 's</div>' +
             '  <div class="traza-arrow">▼</div>' +
             '  <div class="traza-step traza-final"><span class="traza-tag">5 · Verde final (tras seguridad funcional)</span>' +
-            '<b style="font-size:18px">' + d.verde_final_s + ' s</b>' + modoSeguro +
+            '<b style="font-size:18px">' + escaparHtml(d.verde_final_s) + ' s</b>' + modoSeguro +
             '<div class="traza-fuente">seguridad: ' + corr + ' · límites ' +
-            d.limites.t_verde_min + '–' + d.limites.t_verde_max + 's</div></div>' +
+            escaparHtml(limites.t_verde_min) + '–' + escaparHtml(limites.t_verde_max) + 's</div></div>' +
             '</div>';
     }
 
@@ -88,11 +115,13 @@
             var r = await fetch('/api/seguridad/demo');
             if (!r.ok) { cont.innerHTML = '<p style="color:#dc2626">No autorizado (' + r.status + ')</p>'; return; }
             var d = await r.json();
-            cont.innerHTML = '<p style="color:#475569;font-size:13px;margin-top:0">' + (d.descripcion || '') + '</p>' +
+            cont.innerHTML = '<p style="color:#475569;font-size:13px;margin-top:0">' +
+                escaparHtml(d.descripcion || '') + '</p>' +
                 (d.casos || []).map(function (c) {
                     var ic = c.seguro ? '✅' : '⛔';
                     return '<div class="seg-caso"><span class="seg-ic">' + ic + '</span>' +
-                        '<div><b>' + c.caso + '</b><br><span style="color:#475569">' + c.resultado + '</span></div></div>';
+                        '<div><b>' + escaparHtml(c.caso) + '</b><br><span style="color:#475569">' +
+                        escaparHtml(c.resultado) + '</span></div></div>';
                 }).join('');
         } catch (e) {
             cont.innerHTML = '<p style="color:#dc2626">Error de conexión</p>';

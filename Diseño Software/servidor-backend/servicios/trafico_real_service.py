@@ -66,7 +66,8 @@ def obtener_trafico_real(bbox=None) -> dict:
     url = f"{_HERE_FLOW_URL}?{urllib.parse.urlencode(params)}"
 
     try:
-        with urllib.request.urlopen(url, timeout=20) as resp:
+        # ``url`` siempre deriva del endpoint HTTPS fijo de HERE.
+        with urllib.request.urlopen(url, timeout=20) as resp:  # nosec B310
             data = json.loads(resp.read().decode('utf-8'))
     except urllib.error.HTTPError as ex:
         detalle = ''

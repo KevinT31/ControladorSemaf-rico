@@ -11,7 +11,7 @@ Incluye utilidad de normalización componente a componente para X_local (28 vars
 """
 
 from typing import Dict, List, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import numpy as np
 
 

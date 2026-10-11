@@ -19,6 +19,24 @@ param(
 )
 $ErrorActionPreference = "Continue"  # exes nativos loguean a stderr; control por $LASTEXITCODE
 
+if ($User -eq "root" -or $User -notmatch '^[a-z_][a-z0-9_-]{0,31}$') {
+    Write-Error "User debe ser un usuario Linux no-root valido."
+    exit 1
+}
+if ($PiHost -notmatch '^[A-Za-z0-9][A-Za-z0-9.-]{0,252}$') {
+    Write-Error "PiHost debe ser una IPv4 o nombre DNS valido."
+    exit 1
+}
+if ($NodeId -notmatch '^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$') {
+    Write-Error "NodeId contiene caracteres no permitidos."
+    exit 1
+}
+if ($Dest -notmatch '^/[A-Za-z0-9._/-]+$' -or
+    ($Dest -split '/') -contains '..') {
+    Write-Error "Dest debe ser una ruta POSIX absoluta sin '..' ni espacios."
+    exit 1
+}
+
 foreach ($exe in @("ssh", "scp")) {
     if (-not (Get-Command $exe -ErrorAction SilentlyContinue)) {
         Write-Error "$exe no encontrado. Habilite el cliente OpenSSH de Windows."
@@ -34,6 +52,7 @@ $destino = "${User}@${PiHost}"
 # --- Staging local sin __pycache__ (robocopy: exit < 8 es éxito) ------------
 $staging = Join-Path $env:TEMP ("nsb-deploy-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
 New-Item -ItemType Directory -Force $staging | Out-Null
+try {
 foreach ($carpeta in @("nucleo", "nsb", "config")) {
     robocopy (Join-Path $sw $carpeta) (Join-Path $staging $carpeta) /E /XD __pycache__ /NFL /NDL /NJH /NJS /NP | Out-Null
     if ($LASTEXITCODE -ge 8) {
@@ -73,8 +92,13 @@ if ($LASTEXITCODE -ne 0) { Write-Error "scp fallo (exit $LASTEXITCODE)"; exit 3 
 
 ssh $destino "chmod 600 '$Dest'/certs/*.key 2>/dev/null; chmod +x '$Dest'/scripts/*.sh"
 if ($LASTEXITCODE -ne 0) { Write-Error "ajuste de permisos fallo"; exit 3 }
-
-Remove-Item -Recurse -Force $staging
+} finally {
+    # El staging puede contener una clave privada del nodo: se elimina incluso
+    # si robocopy/ssh/scp falla o el script sale con un código de error.
+    if (Test-Path -LiteralPath $staging) {
+        Remove-Item -LiteralPath $staging -Recurse -Force
+    }
+}
 Write-Host ""
 Write-Host "Despliegue copiado a ${destino}:$Dest" -ForegroundColor Green
 Write-Host "Siguiente paso EN LA PI:"

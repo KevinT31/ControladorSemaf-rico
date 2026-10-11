@@ -4,7 +4,6 @@ Permite probar la detección de vehículos en tiempo real con YOLO
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Añadir el directorio raíz al path
@@ -23,37 +22,42 @@ def test_con_video(ruta_video: str = None):
     Permite seleccionar el video antes de procesar
     """
 
-    import os
-    from pathlib import Path
-
-    # Carpeta fija donde están los videos
-    carpeta_videos = Path(r"C:/Users/kevin/OneDrive/Desktop/ControladorSemaforicoTFC2/vision_computadora/videos_prueba")
+    carpeta_videos = Path(__file__).resolve().parent / "videos_prueba"
 
     print("\n📹 Carpeta de videos:")
     print(carpeta_videos)
 
-    # Verificar que existan videos
-    lista_videos = list(carpeta_videos.glob("*.mp4"))
+    if ruta_video is not None:
+        ruta_solicitada = Path(ruta_video).expanduser().resolve()
+        if not ruta_solicitada.is_file():
+            print(f"\n❌ El video no existe: {ruta_solicitada}")
+            return
+        lista_videos = [ruta_solicitada]
+    else:
+        lista_videos = sorted(carpeta_videos.glob("*.mp4"), key=lambda p: p.name.lower())
 
     if not lista_videos:
         print("\n❌ No hay videos en la carpeta")
         print("Coloca tus videos MP4 allí y vuelve a intentar")
         return
 
-    print("\nVideos disponibles:")
-    for idx, video in enumerate(lista_videos, start=1):
-        print(f"  {idx}. {video.name}")
+    if ruta_video is not None:
+        ruta_seleccionada = lista_videos[0]
+    else:
+        print("\nVideos disponibles:")
+        for idx, video in enumerate(lista_videos, start=1):
+            print(f"  {idx}. {video.name}")
 
-    # Selección del usuario
-    while True:
-        try:
-            opcion = int(input("\nSelecciona el número de video a procesar: "))
-            if 1 <= opcion <= len(lista_videos):
-                ruta_seleccionada = lista_videos[opcion - 1]
-                break
-            print("❌ Opción inválida. Intente de nuevo.")
-        except ValueError:
-            print("⚠ Solo números por favor.")
+        # Selección del usuario
+        while True:
+            try:
+                opcion = int(input("\nSelecciona el número de video a procesar: "))
+                if 1 <= opcion <= len(lista_videos):
+                    ruta_seleccionada = lista_videos[opcion - 1]
+                    break
+                print("❌ Opción inválida. Intente de nuevo.")
+            except ValueError:
+                print("⚠ Solo números por favor.")
 
     print("\n" + "="*60)
     print("  TEST DE YOLO CON VIDEO")

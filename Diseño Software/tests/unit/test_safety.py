@@ -10,12 +10,12 @@ from nsb.safety.message_guard import MessageGuard
 from tests.conftest import make_state
 
 V, A, R = SignalColor.VERDE, SignalColor.AMBAR, SignalColor.ROJO
-N, S, E, O = (SignalGroup.NORTE, SignalGroup.SUR, SignalGroup.ESTE,
-              SignalGroup.OESTE)
+N, S, E, OESTE = (SignalGroup.NORTE, SignalGroup.SUR, SignalGroup.ESTE,
+                  SignalGroup.OESTE)
 
 
 def combo(n=R, s=R, e=R, o=R):
-    return {N: n, S: s, E: e, O: o}
+    return {N: n, S: s, E: e, OESTE: o}
 
 
 class TestConflictMatrix:

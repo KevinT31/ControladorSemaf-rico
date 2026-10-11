@@ -4,8 +4,10 @@
  */
 
 // ==================== CONFIGURACIÓN ====================
-const API_URL = 'http://localhost:8000';
-const WS_URL = 'ws://localhost:8000/ws';
+const API_URL = window.location.protocol === 'file:'
+    ? 'http://localhost:8000'
+    : window.location.origin;
+const WS_URL = `${API_URL.replace(/^http/, 'ws')}/ws`;
 
 // ==================== ESTADO GLOBAL ====================
 const estado = {
@@ -15,6 +17,7 @@ const estado = {
     callesSUMO: null,  // Layer de calles SUMO
     callesGeoJSON: null,  // Datos GeoJSON de calles
     websocket: null,
+    websocketReconnectTimer: null,
     backendConectado: false,  // Flag para saber si el backend está enviando datos
     intersecciones: [],
     olaVerdeActiva: null,
@@ -40,7 +43,11 @@ const estado = {
 };
 
 // ==================== INICIALIZACIÓN ====================
-document.addEventListener('DOMContentLoaded', async () => {
+let aplicacionInicializada = false;
+
+async function inicializarAplicacion() {
+    if (aplicacionInicializada) return;
+    aplicacionInicializada = true;
     console.log('%c=== SISTEMA DE CONTROL SEMAFÓRICO ===', 'color: #10b981; font-size: 16px; font-weight: bold;');
     console.log('Inicializando sistema...');
 
@@ -73,24 +80,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Conectando WebSocket...');
         conectarWebSocket();  // CRITICO: Conectar WebSocket para recibir actualizaciones
 
-        // Arrancar en modo SUMO por defecto (tráfico real de la simulación).
-        // Se selecciona el modo en el selector y se dispara su lógica de carga,
-        // que trae y colorea las calles desde SUMO.
-        const selModo = document.getElementById('modo-operacion');
-        if (selModo) {
-            selModo.value = 'sumo';
-            selModo.dispatchEvent(new Event('change'));
-        } else {
-            estado.modoActual = 'sumo';
-            cargarYVisualizarCallesSUMO();
-        }
+        await inicializarModoOperacion();
 
-        console.log('%c✓ Sistema inicializado correctamente (modo SUMO)', 'color: #10b981; font-weight: bold;');
+        console.log(`%c✓ Sistema inicializado correctamente (modo ${estado.modoActual})`, 'color: #10b981; font-weight: bold;');
     } catch (error) {
         console.error('%c❌ ERROR en la inicialización:', 'color: #ef4444; font-weight: bold;', error);
         alert('Error al inicializar el sistema. Revisa la consola del navegador (F12) para más detalles.');
     }
-});
+}
+
+function iniciarAplicacionConSesion() {
+    const auth = window.ControlSemaforicoAuth;
+    if (auth && !auth.estaValidada()) return;
+    inicializarAplicacion();
+}
+
+document.addEventListener('DOMContentLoaded', iniciarAplicacionConSesion);
+window.addEventListener('cs:auth-validada', iniciarAplicacionConSesion);
 
 // ==================== PARTÍCULAS DE FONDO ====================
 function inicializarParticulas() {
@@ -856,6 +862,27 @@ function generarMetricasSimuladas() {
  * @param {String} origen - Origen de los datos: 'backend' o 'local'
  */
 function actualizarDatosInterfaz(metricas, origen = 'backend') {
+    if (!Array.isArray(metricas)) {
+        console.warn('Se ignoraron métricas con un formato inválido');
+        return;
+    }
+
+    const numeroSeguro = valor => {
+        const numero = Number(valor);
+        return Number.isFinite(numero) ? numero : 0;
+    };
+    metricas = metricas
+        .filter(metrica => metrica && metrica.interseccion_id != null)
+        .map(metrica => ({
+            ...metrica,
+            interseccion_id: String(metrica.interseccion_id),
+            icv: Math.max(0, Math.min(1, numeroSeguro(metrica.icv))),
+            flujo: Math.max(0, numeroSeguro(metrica.flujo)),
+            velocidad: Math.max(0, numeroSeguro(metrica.velocidad)),
+            cola: Math.max(0, numeroSeguro(metrica.cola)),
+            num_vehiculos: Math.max(0, numeroSeguro(metrica.num_vehiculos))
+        }));
+
     // 1. Si es backend, detener simulación local
     if (origen === 'backend') {
         if (!estado.backendConectado) {
@@ -925,7 +952,18 @@ function actualizarDatosInterfaz(metricas, origen = 'backend') {
         estado.__overridePromedios = null;
     }
 
-    // 4. Actualizar cada intersección
+    // 4. Actualizar cada intersección y retirar tarjetas que ya no llegaron.
+    const idsActuales = new Set(metricas.map(metrica => metrica.interseccion_id));
+    const contenedorMetricas = document.getElementById('metricas-container');
+    if (contenedorMetricas) {
+        Array.from(contenedorMetricas.children).forEach(tarjeta => {
+            if (tarjeta.dataset && tarjeta.dataset.interseccion &&
+                !idsActuales.has(tarjeta.dataset.interseccion)) {
+                tarjeta.remove();
+            }
+        });
+    }
+
     metricas.forEach(metrica => {
         const { interseccion_id, icv, clasificacion, color, flujo, velocidad, cola, estado_semaforo } = metrica;
 
@@ -1129,13 +1167,16 @@ function crearTarjetaMetrica(metrica) {
 
 function actualizarSistemaDifuso(metricas) {
     // Calcular tiempo verde promedio basado en ICV
-    const icvPromedio = metricas.reduce((sum, m) => sum + m.icv, 0) / metricas.length;
+    const icvPromedio = metricas.length
+        ? metricas.reduce((sum, m) => sum + m.icv, 0) / metricas.length
+        : 0;
     const tiempoVerde = icvPromedio < 0.3 ? 30 : icvPromedio < 0.6 ? 45 : 60;
 
     document.getElementById('tiempo-verde-medio').textContent = `${tiempoVerde}s`;
 
     // Reglas activas (basado en estados únicos)
-    const reglasActivas = new Set(metricas.map(m => m.nivel)).size * 3;
+    const niveles = metricas.map(m => m.nivel || m.clasificacion).filter(Boolean);
+    const reglasActivas = new Set(niveles).size * 3;
     document.getElementById('reglas-activas').textContent = reglasActivas;
 }
 
@@ -1229,25 +1270,76 @@ function configurarEventListeners() {
     console.log('Event listeners configurados');
 }
 
-async function cambiarModo(event) {
+async function inicializarModoOperacion() {
+    const selector = document.getElementById('modo-operacion');
+    if (!selector) return;
+
+    // Un operador solo monitorea: refleja el modo del backend sin enviar comandos.
+    if (selector.disabled) {
+        try {
+            const respuesta = await fetch(`${API_URL}/api/simulacion/estado`);
+            if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+            const datos = await respuesta.json();
+            const modo = ['simulador', 'video', 'sumo'].includes(datos.modo)
+                ? datos.modo
+                : 'simulador';
+            selector.value = modo;
+            await cambiarModo({ target: selector }, { notificarBackend: false });
+            return;
+        } catch (error) {
+            console.warn('No se pudo consultar el modo activo; se usará el simulador local');
+            selector.value = 'simulador';
+            await cambiarModo({ target: selector }, { notificarBackend: false });
+            return;
+        }
+    }
+
+    // Técnicos y administradores arrancan la demostración en SUMO.
+    selector.value = 'sumo';
+    const aplicado = await cambiarModo({ target: selector });
+    if (!aplicado) {
+        selector.value = estado.modoActual;
+        await cambiarModo({ target: selector }, { notificarBackend: false });
+    }
+}
+
+async function cambiarModo(event, opciones = {}) {
     const nuevoModo = event.target.value;
     const modoAnterior = estado.modoActual;
-    estado.modoActual = nuevoModo;
+    const notificarBackend = opciones.notificarBackend !== false;
+
+    if (!['simulador', 'video', 'sumo'].includes(nuevoModo)) {
+        event.target.value = modoAnterior;
+        return false;
+    }
 
     console.log(`Cambiando modo de ${modoAnterior} a: ${nuevoModo}`);
 
-    // Si estábamos en modo SUMO, notificar al backend para desconectar
-    if (modoAnterior === 'sumo' && nuevoModo !== 'sumo') {
+    if (notificarBackend) {
         try {
-            console.log('📡 Notificando al backend para cerrar SUMO...');
-            await fetch(`${API_URL}/api/modo/cambiar?modo=${nuevoModo}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            const respuesta = await fetch(
+                `${API_URL}/api/simulacion/modo/cambiar?modo=${encodeURIComponent(nuevoModo)}`,
+                { method: 'POST' }
+            );
+            if (!respuesta.ok) {
+                event.target.value = modoAnterior;
+                mostrarNotificacion(
+                    respuesta.status === 403
+                        ? 'Tu rol no permite cambiar el modo de operación'
+                        : `No se pudo cambiar el modo (HTTP ${respuesta.status})`,
+                    'error'
+                );
+                return false;
+            }
         } catch (error) {
-            console.error('Error desconectando SUMO:', error);
+            event.target.value = modoAnterior;
+            console.error('Error cambiando el modo en el backend:', error);
+            mostrarNotificacion('No se pudo conectar con el backend', 'error');
+            return false;
         }
     }
+
+    estado.modoActual = nuevoModo;
 
     // Detener simulación actual
     if (estado.simulacionInterval) {
@@ -1267,16 +1359,6 @@ async function cambiarModo(event) {
 
     switch (nuevoModo) {
         case 'simulador':
-            // Notificar al backend
-            try {
-                await fetch(`${API_URL}/api/modo/cambiar?modo=simulador`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            } catch (error) {
-                console.error('Error cambiando a modo simulador:', error);
-            }
-            
             iniciarSimulacion();
             if (!estado.actualizacionTraficoInterval) {
                 iniciarActualizacionTrafico();
@@ -1288,17 +1370,6 @@ async function cambiarModo(event) {
         case 'procesador_video':
         case 'procesador-video':
             console.log('Modo Procesador Video seleccionado');
-            
-            // Notificar al backend
-            try {
-                await fetch(`${API_URL}/api/modo/cambiar?modo=video`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            } catch (error) {
-                console.error('Error cambiando a modo video:', error);
-            }
-            
             // NO limpiar tráfico - solo limpiar las capas visuales del mapa
             if (estado.capaTrafico) {
                 estado.capaTrafico.clearLayers();
@@ -1324,23 +1395,6 @@ async function cambiarModo(event) {
                 }
                 sumoPanel.classList.add('sumo-overlay');
                 sumoPanel.style.display = 'flex';
-            }
-            
-            // ⚡ CRÍTICO: Notificar al backend para que inicie SUMO-GUI
-            try {
-                console.log('📡 Notificando al backend para iniciar SUMO...');
-                const response = await fetch(`${API_URL}/api/modo/cambiar?modo=sumo`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('✅ Backend confirmó:', data.mensaje);
-                } else {
-                    console.warn('⚠️  Backend respondió con error:', response.status);
-                }
-            } catch (error) {
-                console.error('❌ Error notificando al backend:', error);
             }
             
             // Limpiar solo capas visuales
@@ -1394,6 +1448,8 @@ async function cambiarModo(event) {
             actualizarDatosInterfaz(sinteticaCero, 'backend');
         }
     }
+
+    return true;
 }
 
 // ==================== REINICIO DE SIMULADOR ====================
@@ -1408,13 +1464,11 @@ async function reiniciarSimulador() {
         
         console.log('🔄 Enviando solicitud de reinicio del simulador...');
         
-        const response = await fetch('http://localhost:8000/api/simulacion/reiniciar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ escenario: 'hora_pico_manana' })
-        });
+        const escenario = 'hora_pico_manana';
+        const response = await fetch(
+            `${API_URL}/api/simulacion/reiniciar?escenario=${encodeURIComponent(escenario)}`,
+            { method: 'POST' }
+        );
         
         if (response.ok) {
             const data = await response.json();
@@ -1793,13 +1847,6 @@ async function activarEmergencia() {
         }
 
         const resultado = await response.json();
-
-
-            // Refuerzo: en modo SUMO, si por cualquier razón quedó en 0/NaN, aplicar mínimos
-            if (estado.modoActual === 'sumo') {
-                if (!isFinite(icvPromedio) || icvPromedio <= 0) icvPromedio = 0.02;
-                if (!isFinite(flujoPromedio) || flujoPromedio <= 0) flujoPromedio = 0.02;
-            }
         console.log('Ruta calculada por backend:', resultado);
 
         // Verificar que haya una ruta válida
@@ -1843,7 +1890,7 @@ async function activarEmergencia() {
             tiempo_estimado: tiempoEstimado,
             vehiculo: {
                 tipo: tipo,
-                velocidad: velocidad,
+                velocidad: velocidadSimulada,
                 prioridad: prioridad.nivel
             }
         };
@@ -2567,18 +2614,68 @@ function limpiarCallesSUMO() {
 
 // ==================== WEBSOCKET - CONEXION CRITICA ====================
 
+function programarReconexionWebSocket() {
+    if (estado.websocketReconnectTimer) return;
+
+    estado.websocketReconnectTimer = setTimeout(async () => {
+        estado.websocketReconnectTimer = null;
+        const auth = window.ControlSemaforicoAuth;
+        if (auth && !auth.estaValidada()) return;
+
+        if (auth) {
+            try {
+                const respuesta = await fetch(`${API_URL}/api/auth/me`);
+                if (!respuesta.ok) {
+                    if (respuesta.status !== 401) programarReconexionWebSocket();
+                    return;
+                }
+            } catch (error) {
+                programarReconexionWebSocket();
+                return;
+            }
+        }
+        conectarWebSocket();
+    }, 3000);
+}
+
 function conectarWebSocket() {
-    console.log('Conectando a WebSocket...');
+    const auth = window.ControlSemaforicoAuth;
+    if (auth && !auth.estaValidada()) {
+        const status = document.getElementById('connection-status');
+        if (status) status.textContent = 'AUTENTICANDO';
+        return;
+    }
 
-    estado.websocket = new WebSocket(WS_URL);
+    const token = auth && auth.obtenerToken();
+    if (auth && !token) return;
+    if (estado.websocket &&
+        (estado.websocket.readyState === WebSocket.OPEN ||
+         estado.websocket.readyState === WebSocket.CONNECTING)) {
+        return;
+    }
 
-    estado.websocket.onopen = () => {
+    if (estado.websocketReconnectTimer) {
+        clearTimeout(estado.websocketReconnectTimer);
+        estado.websocketReconnectTimer = null;
+    }
+
+    const url = new URL(WS_URL);
+    if (token) url.searchParams.set('token', token);
+
+    console.log('Conectando al canal WebSocket autenticado...');
+    const socket = new WebSocket(url.toString());
+    estado.websocket = socket;
+
+    socket.onopen = () => {
+        if (estado.websocket !== socket) return;
         console.log('[OK] WebSocket conectado');
-        document.getElementById('connection-status').textContent = 'CONECTADO';
-        document.querySelector('.status-dot').classList.add('pulsing');
+        const status = document.getElementById('connection-status');
+        const dot = document.querySelector('.status-dot');
+        if (status) status.textContent = 'CONECTADO';
+        if (dot) dot.classList.add('pulsing');
     };
 
-    estado.websocket.onmessage = (event) => {
+    socket.onmessage = (event) => {
         try {
             const mensaje = JSON.parse(event.data);
             procesarMensajeWebSocket(mensaje);
@@ -2587,18 +2684,31 @@ function conectarWebSocket() {
         }
     };
 
-    estado.websocket.onerror = (error) => {
-        console.error('Error WebSocket:', error);
-        document.getElementById('connection-status').textContent = 'ERROR';
+    socket.onerror = () => {
+        console.error('Error en el canal WebSocket');
+        const status = document.getElementById('connection-status');
+        if (status) status.textContent = 'ERROR';
     };
 
-    estado.websocket.onclose = () => {
-        console.log('WebSocket desconectado. Reintentando en 3s...');
-        document.getElementById('connection-status').textContent = 'DESCONECTADO';
-        document.querySelector('.status-dot').classList.remove('pulsing');
+    socket.onclose = (event) => {
+        if (estado.websocket !== socket) return;
+        estado.websocket = null;
+
+        const status = document.getElementById('connection-status');
+        const dot = document.querySelector('.status-dot');
+        if (status) status.textContent = 'DESCONECTADO';
+        if (dot) dot.classList.remove('pulsing');
 
         // Marcar backend como desconectado
         estado.backendConectado = false;
+
+        // 1008 indica que el backend rechazó/expiró la autenticación.
+        if (event.code === 1008 && auth) {
+            console.warn('La sesión del WebSocket dejó de ser válida');
+            auth.invalidarSesion();
+            if (status) status.textContent = 'SESIÓN EXPIRADA';
+            return;
+        }
 
         // Iniciar simulación local como fallback si estamos en modo simulador
         if (estado.modoActual === 'simulador' && !estado.simulacionInterval) {
@@ -2606,14 +2716,33 @@ function conectarWebSocket() {
             iniciarSimulacion();
         }
 
-        // Reconectar automáticamente
-        setTimeout(() => {
-            if (estado.websocket.readyState === WebSocket.CLOSED) {
-                conectarWebSocket();
-            }
-        }, 3000);
+        if (!auth || auth.estaValidada()) {
+            console.log('WebSocket desconectado. Reintentando en 3s...');
+            programarReconexionWebSocket();
+        }
     };
 }
+
+function desconectarWebSocketPorSesion() {
+    if (estado.websocketReconnectTimer) {
+        clearTimeout(estado.websocketReconnectTimer);
+        estado.websocketReconnectTimer = null;
+    }
+
+    const socket = estado.websocket;
+    estado.websocket = null;
+    if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+        try { socket.close(1000, 'Sesion finalizada'); } catch (error) { /* cierre en progreso */ }
+    }
+
+    const status = document.getElementById('connection-status');
+    const dot = document.querySelector('.status-dot');
+    if (status) status.textContent = 'SIN SESIÓN';
+    if (dot) dot.classList.remove('pulsing');
+}
+
+window.addEventListener('cs:auth-validada', conectarWebSocket);
+window.addEventListener('cs:auth-invalidada', desconectarWebSocketPorSesion);
 
 function procesarMensajeWebSocket(mensaje) {
     const { tipo, datos } = mensaje;
@@ -2656,47 +2785,69 @@ function procesarMensajeWebSocket(mensaje) {
 }
 
 function actualizarMetricasDesdeBackend(metricas) {
+    if (!Array.isArray(metricas)) {
+        console.warn('[Backend] Mensaje de métricas inválido');
+        return;
+    }
     console.log(`[Backend] Recibidas ${metricas.length} métricas, actualizando interfaz...`);
     // Función actualizada - ahora usa la función unificada
     actualizarDatosInterfaz(metricas, 'backend');
 }
 
 function actualizarTarjetaMetrica(interseccionId, metricas) {
-    // Buscar o crear tarjeta de métrica
-    let tarjeta = document.querySelector(`[data-interseccion="${interseccionId}"]`);
+    const container = document.getElementById('metricas-container');
+    if (!container) return;
+
+    const id = String(interseccionId);
+    let tarjeta = Array.from(container.children).find(
+        elemento => elemento.dataset && elemento.dataset.interseccion === id
+    );
 
     if (!tarjeta) {
-        const container = document.getElementById('metricas-container');
         tarjeta = document.createElement('div');
         tarjeta.className = 'metrica-card';
-        tarjeta.setAttribute('data-interseccion', interseccionId);
+        tarjeta.dataset.interseccion = id;
         container.appendChild(tarjeta);
     }
 
-    const interseccion = INTERSECCIONES_LIMA.find(i => i.id === interseccionId);
-    if (!interseccion) return;
+    const interseccion = INTERSECCIONES_LIMA.find(i => i.id === id);
+    const nombre = interseccion ? interseccion.nombre : id;
+    const icv = Number(metricas.icv) || 0;
+    const flujo = Number(metricas.flujo) || 0;
+    const velocidad = Number(metricas.velocidad) || 0;
 
     // Determinar color según ICV
     let colorClass = 'verde';
-    if (metricas.icv >= 0.6) colorClass = 'rojo';
-    else if (metricas.icv >= 0.3) colorClass = 'amarillo';
+    if (icv >= 0.6) colorClass = 'rojo';
+    else if (icv >= 0.3) colorClass = 'amarillo';
 
-    tarjeta.innerHTML = `
-        <div class="metrica-header">
-            <span class="metrica-nombre">${interseccion.nombre || interseccionId}</span>
-            <span class="metrica-icv icv-${colorClass}">${metricas.icv.toFixed(2)}</span>
-        </div>
-        <div class="metrica-detalles">
-            <div class="metrica-detalle">
-                <span class="label">Flujo:</span>
-                <span class="valor">${metricas.flujo.toFixed(1)} veh/min</span>
-            </div>
-            <div class="metrica-detalle">
-                <span class="label">Velocidad:</span>
-                <span class="valor">${metricas.velocidad.toFixed(1)} km/h</span>
-            </div>
-        </div>
-    `;
+    const header = document.createElement('div');
+    header.className = 'metrica-header';
+    const nombreElemento = document.createElement('span');
+    nombreElemento.className = 'metrica-nombre';
+    nombreElemento.textContent = nombre;
+    const icvElemento = document.createElement('span');
+    icvElemento.className = `metrica-icv icv-${colorClass}`;
+    icvElemento.textContent = icv.toFixed(2);
+    header.append(nombreElemento, icvElemento);
+
+    const detalles = document.createElement('div');
+    detalles.className = 'metrica-detalles';
+    [['Flujo:', `${flujo.toFixed(1)} veh/min`], ['Velocidad:', `${velocidad.toFixed(1)} km/h`]]
+        .forEach(([etiqueta, valor]) => {
+            const detalle = document.createElement('div');
+            detalle.className = 'metrica-detalle';
+            const label = document.createElement('span');
+            label.className = 'label';
+            label.textContent = etiqueta;
+            const valorElemento = document.createElement('span');
+            valorElemento.className = 'valor';
+            valorElemento.textContent = valor;
+            detalle.append(label, valorElemento);
+            detalles.appendChild(detalle);
+        });
+
+    tarjeta.replaceChildren(header, detalles);
 }
 
 // ==================== MODO Procesador Video ====================
@@ -2762,6 +2913,21 @@ function detenerCamaraLocal() {
     }
 }
 
+function construirUrlProtegida(url) {
+    const auth = window.ControlSemaforicoAuth;
+    const token = auth && auth.obtenerToken();
+    const protegida = new URL(url, window.location.href);
+    if (token) protegida.searchParams.set('token', token);
+    return protegida.toString();
+}
+
+function actualizarUrlStream(url, intento) {
+    const actualizada = new URL(url, window.location.href);
+    actualizada.searchParams.set('t', Date.now().toString());
+    actualizada.searchParams.set('_r', String(intento));
+    return actualizada.toString();
+}
+
 async function activarModoVideo(videoIndex) {
     try {
         console.log(`Activando MIR ${String(videoIndex).padStart(3, '0')}...`);
@@ -2781,7 +2947,7 @@ async function activarModoVideo(videoIndex) {
             streamUrl = `${API_URL}/api/video/stream-video-index/${videoIndex - 1}?t=${Date.now()}`;
         }
 
-        console.log('URL del stream:', streamUrl);
+        streamUrl = construirUrlProtegida(streamUrl);
         procesandoVideo = true;
 
         // Para la cámara MIR000, usar SIEMPRE el stream del backend con YOLO
@@ -2822,12 +2988,11 @@ async function activarModoVideo(videoIndex) {
             imgElement.onerror = () => {
                 imgElement._retryCount = (imgElement._retryCount || 0) + 1;
                 console.error(`Error conectando al stream de cámara (intento ${imgElement._retryCount})`);
-                console.error('URL intentada:', streamUrl);
 
                 if (imgElement._retryCount <= 5) {
                     setTimeout(() => {
                         try {
-                            imgElement.src = `${streamUrl}?t=${Date.now()}&_r=${imgElement._retryCount}`;
+                            imgElement.src = actualizarUrlStream(streamUrl, imgElement._retryCount);
                         } catch (e) {
                             console.error('Error reintentando cargar stream de cámara:', e);
                         }
@@ -2847,7 +3012,7 @@ async function activarModoVideo(videoIndex) {
             document.body.appendChild(imgElement);
 
             imgElement.src = streamUrl;
-            console.log('Cargando video procesado:', streamUrl);
+            console.log('Cargando video procesado autenticado');
 
             const actualizarCanvas = () => {
                 if (!procesandoVideo || !modoEsProcesadorVideo()) {
@@ -2876,13 +3041,12 @@ async function activarModoVideo(videoIndex) {
             imgElement.onerror = () => {
                 imgElement._retryCount = (imgElement._retryCount || 0) + 1;
                 console.error(`Error conectando al stream de video (intento ${imgElement._retryCount})`);
-                console.error('URL intentada:', streamUrl);
 
                 if (imgElement._retryCount <= 5) {
                     // Reintentar con timestamp nuevo para evitar cache
                     setTimeout(() => {
                         try {
-                            imgElement.src = `${streamUrl.split('?')[0]}?t=${Date.now()}&_r=${imgElement._retryCount}`;
+                            imgElement.src = actualizarUrlStream(streamUrl, imgElement._retryCount);
                         } catch (e) {
                             console.error('Error reintentando cargar video procesado:', e);
                         }

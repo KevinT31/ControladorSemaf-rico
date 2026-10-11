@@ -5,6 +5,7 @@ TSC local entra en modo seguro (spec §26-B) y se reintenta.
 from __future__ import annotations
 
 import logging
+import math
 import socket
 import time
 from dataclasses import dataclass
@@ -37,6 +38,7 @@ class HilNodeClient:
         self._cfg = cfg
         self._node_id = node_id
         self._summary = ClientSummary()
+        self._experiment_id: Optional[str] = None
 
     # ------------------------------------------------------------------ #
     def _conectar(self) -> Optional[LineChannel]:
@@ -44,6 +46,8 @@ class HilNodeClient:
         backoff = 1.0
         intentos = 0
         while True:
+            sock: Optional[socket.socket] = None
+            channel: Optional[LineChannel] = None
             try:
                 sock = socket.create_connection(
                     (self._cfg.host, self._cfg.port),
@@ -57,10 +61,19 @@ class HilNodeClient:
                 ack = channel.recv(timeout_s=10.0)
                 if ack.type is not WireType.HELLO_ACK:
                     raise ChannelClosed(f"se esperaba hello_ack: {ack.type}")
+                if not ack.experiment_id:
+                    raise WireDecodeError("hello_ack sin experiment_id")
+                self._experiment_id = ack.experiment_id
                 logger.info("conectado al gateway (experiment=%s, seed=%s)",
                             ack.experiment_id, ack.payload.get("seed"))
                 return channel
             except (OSError, ChannelClosed, WireDecodeError) as e:
+                # Un handshake fallido también debe liberar el descriptor. En
+                # reconexiones repetidas, omitir este cierre agota los sockets.
+                if channel is not None:
+                    channel.close()
+                elif sock is not None:
+                    sock.close()
                 intentos += 1
                 if intentos > 30:
                     logger.error("reconexión agotada tras %d intentos", intentos)
@@ -83,7 +96,11 @@ class HilNodeClient:
                 self._node._emit(evento(
                     "hil_disconnect", self._node_id, WARNING))
                 self._summary.reconexiones += 1
-                channel = self._conectar()
+            finally:
+                # Cierra tanto tras BYE como tras caída o excepción inesperada.
+                # La siguiente conexión, si aplica, se crea después del cierre.
+                channel.close()
+            channel = self._conectar()
         return self._summary
 
     def _servir(self, channel: LineChannel) -> None:
@@ -103,8 +120,18 @@ class HilNodeClient:
                 logger.info("gateway cerró la sesión: %s", env.payload)
                 self._summary.terminado_por_bye = True
                 return
-            if env.type in (WireType.HEARTBEAT_ACK, WireType.TICK,
-                            WireType.ERROR):
+            if env.type is WireType.TICK:
+                try:
+                    sim_time = float(env.payload["sim_time_s"])
+                    if (env.experiment_id != self._experiment_id
+                            or not math.isfinite(sim_time) or sim_time < 0):
+                        raise ValueError("experimento o sim_time inválido")
+                    self._node.process_tick(sim_time)
+                except (KeyError, TypeError, ValueError) as e:
+                    self._summary.errores_protocolo += 1
+                    logger.error("tick HIL inválido: %s", e)
+                continue
+            if env.type in (WireType.HEARTBEAT_ACK, WireType.ERROR):
                 if env.type is WireType.ERROR:
                     self._summary.errores_protocolo += 1
                     logger.warning("error del gateway: %s", env.payload)
@@ -122,6 +149,16 @@ class HilNodeClient:
                 # NaN/inf/esquema roto mueren AQUÍ, en la frontera (D-G)
                 self._summary.errores_protocolo += 1
                 logger.error("TrafficState inválido (seq=%s): %s", env.seq, e)
+                continue
+            if (env.experiment_id != self._experiment_id
+                    or env.experiment_id != state.experiment_id
+                    or env.seq != state.seq):
+                self._summary.errores_protocolo += 1
+                logger.error(
+                    "state HIL inconsistente: envelope=(exp=%r, seq=%r), "
+                    "payload=(exp=%r, seq=%r)",
+                    env.experiment_id, env.seq,
+                    state.experiment_id, state.seq)
                 continue
 
             _rec, decision = self._node.process_one(

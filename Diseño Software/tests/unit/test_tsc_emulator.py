@@ -1,10 +1,9 @@
 """Tests del TSC Emulator: veredictos ACCEPT/CLAMP/DEFER/REJECT y fail-safe
 de silencio."""
-import pytest
 
 from nsb.core.adapters import AdaptadorDifuso, AdaptadorICV
 from nsb.core.pipeline import DecisionPipeline
-from nsb.domain.contracts import PlanSemaforico, RecommendationEnvelope
+from nsb.domain.contracts import PlanSemaforico
 from nsb.domain.enums import Direction, Mode, PhaseId, Verdict
 from nsb.safety.limits import CONFIG_SEGURA
 from nsb.tsc.clock import ManualClock

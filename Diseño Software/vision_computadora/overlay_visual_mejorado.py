@@ -493,7 +493,6 @@ class OverlayVisualModerno:
         # 5. Zonas de activación de CamMask (visualización sutil)
         # Dibuja bandas suaves cerca de extremos para NS y EO basadas en R y R_trigger si están en resultado
         try:
-            params = resultado.get('metricas_cap6') or {}
             # Usar parámetros del sistema si están disponibles en resultado
             R = resultado.get('radio_cobertura', None)
             Rtrig = resultado.get('radio_trigger', None)

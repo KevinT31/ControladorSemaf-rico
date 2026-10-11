@@ -10,6 +10,13 @@ const cacheRutas = new Map();
 let solicitudesActivas = 0;
 const MAX_SOLICITUDES_CONCURRENTES = 5;
 
+function tieneTokenMapbox() {
+    return typeof CONFIG !== 'undefined' &&
+        typeof CONFIG.MAPBOX_TOKEN === 'string' &&
+        CONFIG.MAPBOX_TOKEN.trim() !== '' &&
+        CONFIG.MAPBOX_TOKEN !== 'TU_TOKEN_MAPBOX_AQUI';
+}
+
 /**
  * Genera una clave única para una ruta
  * @param {Array} inicio - [latitud, longitud]
@@ -65,7 +72,7 @@ async function obtenerRutaOSRM(inicio, fin) {
 
 async function obtenerRutaMapbox(inicio, fin, profile = 'driving') {
     // Sin token Mapbox -> usar OSRM gratuito (la ruta igual sigue las calles)
-    if (CONFIG.MAPBOX_TOKEN === 'TU_TOKEN_MAPBOX_AQUI') {
+    if (!tieneTokenMapbox()) {
         return await obtenerRutaOSRM(inicio, fin);
     }
 
@@ -76,6 +83,7 @@ async function obtenerRutaMapbox(inicio, fin, profile = 'driving') {
         return cacheRutas.get(claveCache);
     }
 
+    let solicitudRegistrada = false;
     try {
         // Esperar si hay demasiadas solicitudes concurrentes
         while (solicitudesActivas >= MAX_SOLICITUDES_CONCURRENTES) {
@@ -83,6 +91,7 @@ async function obtenerRutaMapbox(inicio, fin, profile = 'driving') {
         }
 
         solicitudesActivas++;
+        solicitudRegistrada = true;
 
         // Convertir de [lat, lng] a [lng, lat] (formato Mapbox)
         const coordsInicio = `${inicio[1]},${inicio[0]}`;
@@ -141,13 +150,13 @@ async function obtenerRutaMapbox(inicio, fin, profile = 'driving') {
         // Guardar en caché para futuras solicitudes
         cacheRutas.set(claveCache, resultado);
 
-        solicitudesActivas--;
         return resultado;
 
     } catch (error) {
         console.error('Error obteniendo ruta de Mapbox:', error);
-        solicitudesActivas--;
         return null;
+    } finally {
+        if (solicitudRegistrada) solicitudesActivas--;
     }
 }
 
@@ -190,7 +199,7 @@ async function obtenerRutaOSRMMultiple(waypoints) {
 
 async function obtenerRutaMapboxMultiple(waypoints, profile = 'driving') {
     // Sin token Mapbox -> OSRM gratuito (la ruta sigue las calles por cada waypoint)
-    if (CONFIG.MAPBOX_TOKEN === 'TU_TOKEN_MAPBOX_AQUI') {
+    if (!tieneTokenMapbox()) {
         return await obtenerRutaOSRMMultiple(waypoints);
     }
 
@@ -204,6 +213,7 @@ async function obtenerRutaMapboxMultiple(waypoints, profile = 'driving') {
         waypoints = waypoints.slice(0, 25);
     }
 
+    let solicitudRegistrada = false;
     try {
         // Esperar si hay demasiadas solicitudes concurrentes
         while (solicitudesActivas >= MAX_SOLICITUDES_CONCURRENTES) {
@@ -211,6 +221,7 @@ async function obtenerRutaMapboxMultiple(waypoints, profile = 'driving') {
         }
 
         solicitudesActivas++;
+        solicitudRegistrada = true;
 
         // Convertir waypoints de [lat, lng] a [lng, lat] y unirlos con ';'
         const coordsString = waypoints.map(w => `${w[1]},${w[0]}`).join(';');
@@ -233,7 +244,6 @@ async function obtenerRutaMapboxMultiple(waypoints, profile = 'driving') {
 
         if (!data.routes || data.routes.length === 0) {
             console.error('No se encontró una ruta para los waypoints dados');
-            solicitudesActivas--;
             return null;
         }
 
@@ -248,14 +258,14 @@ async function obtenerRutaMapboxMultiple(waypoints, profile = 'driving') {
             legs: route.legs
         };
 
-        solicitudesActivas--;
         console.log(`✓ Ruta múltiple calculada: ${waypoints.length} waypoints, ${route.distance.toFixed(0)}m`);
         return resultado;
 
     } catch (error) {
         console.error('Error obteniendo ruta múltiple de Mapbox:', error);
-        solicitudesActivas--;
         return null;
+    } finally {
+        if (solicitudRegistrada) solicitudesActivas--;
     }
 }
 
@@ -272,13 +282,18 @@ async function obtenerRutaMultipuntos(interseccionesIds, interseccionesData) {
 
     const coordenadasFinales = [];
 
-    // Si no hay token de Mapbox, devolver línea recta
-    if (CONFIG.MAPBOX_TOKEN === 'TU_TOKEN_MAPBOX_AQUI') {
-        console.warn('Sin token Mapbox - usando línea recta');
-        return interseccionesIds.map(id => {
+    // Sin token de Mapbox, OSRM permite conservar una ruta que siga las calles.
+    if (!tieneTokenMapbox()) {
+        const puntos = interseccionesIds.map(id => {
             const inter = interseccionesData.find(i => i.id === id);
             return inter ? [inter.latitud, inter.longitud] : null;
         }).filter(c => c !== null);
+
+        const rutaOSRM = await obtenerRutaOSRMMultiple(puntos);
+        if (rutaOSRM && rutaOSRM.geometry && Array.isArray(rutaOSRM.geometry.coordinates)) {
+            return rutaOSRM.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+        }
+        return puntos;
     }
 
     // Obtener ruta real entre cada par de intersecciones consecutivas
@@ -359,10 +374,7 @@ async function dibujarRutaEnMapa(mapa, rutaIds, interseccionesData, opciones = {
     // Combinar con opciones proporcionadas
     const opcionesFinales = { ...opcionesDefecto, ...opciones };
 
-    // Dibujar la ruta principal
-    const rutaPrincipal = L.polyline(coordenadas, opcionesFinales).addTo(mapa);
-
-    // Dibujar sombra para mejor visibilidad
+    // Dibujar primero la sombra para que no cubra la ruta principal.
     const sombra = L.polyline(coordenadas, {
         color: '#000000',
         weight: opcionesFinales.weight + 2,
@@ -371,6 +383,8 @@ async function dibujarRutaEnMapa(mapa, rutaIds, interseccionesData, opciones = {
         lineCap: 'round',
         lineJoin: 'round'
     }).addTo(mapa);
+
+    const rutaPrincipal = L.polyline(coordenadas, opcionesFinales).addTo(mapa);
 
     // Ajustar vista del mapa a la ruta
     mapa.fitBounds(coordenadas);
@@ -472,10 +486,10 @@ console.log('✓ Módulo routing-utils.js cargado');
 // Verificación de configuración
 if (typeof CONFIG !== 'undefined') {
     console.log('✓ CONFIG disponible para routing-utils');
-    if (CONFIG.MAPBOX_TOKEN && CONFIG.MAPBOX_TOKEN !== 'TU_TOKEN_MAPBOX_AQUI') {
+    if (tieneTokenMapbox()) {
         console.log('✓ Token de Mapbox configurado - Rutas reales habilitadas');
     } else {
-        console.log('⚠️ Token de Mapbox no configurado - Usando modo fallback (líneas rectas)');
+        console.log('⚠️ Token de Mapbox no configurado - Usando OSRM con respaldo en línea recta');
     }
 } else {
     console.error('❌ CONFIG no está definido - Verifica el orden de carga de scripts');

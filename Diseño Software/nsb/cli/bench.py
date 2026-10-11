@@ -33,6 +33,9 @@ def _cargar_corpus_state(corpus_path: Path) -> list:
 
 
 def run_bench(corpus_path: str, out_path: str, repeticiones: int = 5) -> dict:
+    if (isinstance(repeticiones, bool) or not isinstance(repeticiones, int)
+            or repeticiones < 1):
+        raise ValueError("repeticiones debe ser un entero >= 1")
     corpus = Path(corpus_path)
     if not corpus.exists():
         raise FileNotFoundError(

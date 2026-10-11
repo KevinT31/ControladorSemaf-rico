@@ -45,7 +45,9 @@ datos/  ←──────────────── Archivos temporales 
 
 ## 📊 **Esquema de Base de Datos**
 
-Ver **`schema.sql`** para el esquema completo.
+`schema.sql` describe exclusivamente el despliegue PostgreSQL + TimescaleDB.
+La base SQLite de desarrollo no ejecuta ese archivo: sus tablas se crean desde
+los modelos ORM con `modelos_bd.init_db()` (`Base.metadata.create_all`).
 
 ### **Tablas Principales:**
 
@@ -63,11 +65,13 @@ Ver **`schema.sql`** para el esquema completo.
 
 ### **Desarrollo (SQLite)**
 
-SQLite se usa automáticamente en desarrollo:
+SQLite se usa automáticamente en desarrollo y deriva su ruta desde la ubicación
+del proyecto, no desde el directorio de trabajo:
 
 ```python
-# En servidor-backend/config.py
-DATABASE_URL = "sqlite:///./base-datos/semaforos.db"
+from modelos_bd import init_db
+
+init_db()  # crea/actualiza las tablas declaradas por SQLAlchemy
 ```
 
 ### **Producción (PostgreSQL + TimescaleDB)**
@@ -249,28 +253,15 @@ GROUP BY tipo_vehiculo;
 
 ```python
 # tests/test_database.py
-import pytest
-from sqlalchemy import create_engine
-from datetime import datetime
+from sqlalchemy import create_engine, inspect
+from modelos_bd import Base
 
-def test_insertar_metrica():
+def test_crear_esquema_sqlite():
     engine = create_engine('sqlite:///:memory:')
-    # ... crear tablas con schema.sql
-
-    # Insertar métrica
-    conn = engine.connect()
-    conn.execute("""
-        INSERT INTO metricas_trafico
-        (timestamp, interseccion_id, icv, fuente)
-        VALUES (?, ?, ?, ?)
-    """, (datetime.now(), 'LC-001', 0.65, 'test'))
-
-    # Verificar
-    result = conn.execute(
-        "SELECT COUNT(*) FROM metricas_trafico"
-    ).scalar()
-
-    assert result == 1
+    # SQLite se prueba con los modelos ORM; schema.sql contiene sintaxis
+    # específica de PostgreSQL/TimescaleDB.
+    Base.metadata.create_all(engine)
+    assert 'metricas_trafico' in inspect(engine).get_table_names()
 ```
 
 ---
@@ -297,7 +288,7 @@ DATABASE_URL = "sqlite:///./base-datos/semaforos.db"
 
 ```python
 # ❌ MAL - Nunca hardcodear credenciales
-DATABASE_URL = "postgresql://admin:1234@localhost/semaforos"
+DATABASE_URL = "postgresql://USUARIO:CLAVE_INSEGURA@localhost/semaforos"
 
 # ✅ BIEN - Usar variables de entorno
 import os
@@ -306,7 +297,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 **.env:**
 ```
-DATABASE_URL=postgresql://admin:password@localhost:5432/semaforos
+DATABASE_URL=postgresql://USUARIO:CLAVE_ALEATORIA_LARGA@localhost:5432/semaforos
 ```
 
 ---

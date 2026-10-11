@@ -15,9 +15,9 @@ Métricas calculadas:
 - PI_red: Parámetro de Intensidad Promedio de la Red
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import deque
 import numpy as np
 import json
@@ -521,6 +521,8 @@ class AgregadorMetricasRed:
             True si se exportó correctamente
         """
         try:
+            archivo_salida = Path(archivo_salida)
+            archivo_salida.parent.mkdir(parents=True, exist_ok=True)
             datos_exportacion = {
                 'metadata': {
                     'fecha_exportacion': datetime.now().isoformat(),
@@ -687,13 +689,13 @@ if __name__ == "__main__":
     if resumen_final:
         print(f"📍 Intersecciones monitoreadas: {len(configuraciones)}")
         print(f"📊 Estado de la red: {resumen_final['estado_general']}")
-        print(f"\nMétricas actuales:")
+        print("\nMétricas actuales:")
         print(f"  • ICV_red (Congestión): {resumen_final['metricas_actuales']['ICV_red']:.3f}")
         print(f"  • Vavg_red (Velocidad): {resumen_final['metricas_actuales']['Vavg_red']:.1f} km/h")
         print(f"  • q_red (Flujo): {resumen_final['metricas_actuales']['q_red']:.1f} veh/min")
         print(f"  • QL_red (Saturación): {resumen_final['metricas_actuales']['QL_red']:.3f}")
 
-        print(f"\nTendencias (último minuto):")
+        print("\nTendencias (último minuto):")
         print(f"  • ICV: {resumen_final['tendencias']['ICV_red']['tendencia']:.4f}/s")
         print(f"  • Velocidad: {resumen_final['tendencias']['Vavg_red']['tendencia']:.4f} km/h/s")
 

@@ -145,6 +145,14 @@ def test_publish_que_lanza_no_propaga_al_control():
     assert s.dropped == 1
 
 
+def test_close_limpia_cliente_aunque_publish_falle():
+    fake = FakeClient(publish_exc=RuntimeError("boom al despedir"))
+    s = _sink(fake)
+    s.close()
+    assert fake.disconnected is True
+    assert fake.loop_started is False
+
+
 # ------------------------------------------------------ fail-fast de TLS
 def test_tls_sin_ca_falla_al_construir():
     with pytest.raises(ValueError, match="mqtt_ca_cert"):

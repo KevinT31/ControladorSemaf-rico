@@ -3,7 +3,7 @@ Gestor de Conexiones WebSocket
 """
 
 from fastapi import WebSocket
-from typing import Dict, List, Set, Any
+from typing import Dict, Set, Any
 import logging
 import uuid
 

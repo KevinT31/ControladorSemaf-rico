@@ -12,23 +12,23 @@ parametros.pesos = [0.35, 0.25, 0.25, 0.15];
 
 %% Datos simulados (puedes reemplazar con CSV real)
 % Cada fila: [L, V, F, N, etiqueta_real]
-datos = [
-    10, 55, 10, 15, "Bajo";
-    75, 25, 22, 40, "Medio";
-    140, 8, 28, 60, "Alto";
-    50, 40, 18, 30, "Medio";
-    130, 10, 25, 55, "Alto";
-    20, 50, 12, 20, "Bajo"
-];
+datos = {
+    10, 55, 10, 15, 'Bajo';
+    75, 25, 22, 40, 'Medio';
+    140, 8, 28, 60, 'Alto';
+    50, 40, 18, 30, 'Medio';
+    130, 10, 25, 55, 'Alto';
+    20, 50, 12, 20, 'Bajo'
+};
 
 n = size(datos, 1);
 ICV_pred = zeros(n, 1);
 etiqueta_pred = strings(n, 1);
-etiqueta_real = datos(:, 5);
+etiqueta_real = string(datos(:, 5));
 
 %% Clasificación automática
 for i = 1:n
-    L = datos(i,1); V = datos(i,2); F = datos(i,3); N = datos(i,4);
+    L = datos{i,1}; V = datos{i,2}; F = datos{i,3}; N = datos{i,4};
     [ICV, clase, ~] = calcular_icv(L, V, F, N, parametros);
     ICV_pred(i) = ICV;
     etiqueta_pred(i) = clase;

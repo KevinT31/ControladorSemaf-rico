@@ -11,7 +11,6 @@ from modelos.interseccion import (
     MetricasInterseccion,
     EstadisticasInterseccion
 )
-from modelos.respuestas import ListaResponse
 
 router = APIRouter(
     prefix="/api/intersecciones",

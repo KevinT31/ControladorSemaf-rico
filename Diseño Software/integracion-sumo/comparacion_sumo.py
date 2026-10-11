@@ -23,10 +23,10 @@ _RAIZ = Path(__file__).parent.parent
 if str(_RAIZ) not in sys.path:
     sys.path.insert(0, str(_RAIZ))
 
-from nucleo.metricas_red import MetricasRed
-from nucleo.indice_congestion import CalculadorICV, ParametrosInterseccion
-from nucleo.controlador_difuso_capitulo6 import ControladorDifusoCapitulo6
-from nucleo.seguridad_semaforica import LIMITES as _LIMITES_SEG
+from nucleo.metricas_red import MetricasRed  # noqa: E402
+from nucleo.indice_congestion import CalculadorICV, ParametrosInterseccion  # noqa: E402
+from nucleo.controlador_difuso_capitulo6 import ControladorDifusoCapitulo6  # noqa: E402
+from nucleo.seguridad_semaforica import LIMITES as _LIMITES_SEG  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

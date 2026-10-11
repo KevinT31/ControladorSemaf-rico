@@ -7,6 +7,7 @@ resuelve aquí con la triple compuerta y ya no puede elevarse — D-H).
 from __future__ import annotations
 
 import logging
+import math
 from dataclasses import dataclass, field
 from typing import Dict, Optional
 
@@ -47,12 +48,13 @@ class NsbNode:
 
     def __init__(self, cfg: NodeConfig, authority: Authority,
                  clock: Clock, sink: Optional[JsonlSink],
-                 mqtt_sink=None):
+                 mqtt_sink=None, http_sink=None):
         self._cfg = cfg
         self._authority = authority
         self._clock = clock
         self._sink = sink
         self._mqtt = mqtt_sink   # MqttTelemetrySink opcional (D-F, spec §28)
+        self._http = http_sink   # HttpSink opcional, worker no bloqueante
 
     # ------------------------------------------------------------------ #
     @classmethod
@@ -109,12 +111,26 @@ class NsbNode:
         sink = JsonlSink(cfg.telemetry.jsonl_dir, cfg.node_id,
                          experiment_id=experiment_id)
         mqtt_sink = None
-        if cfg.telemetry.mqtt_enabled:
-            # Import perezoso: la base no exige paho-mqtt (spec §23 análogo).
-            # Config TLS inválida falla AQUÍ (arranque), no en runtime.
-            from nsb.comms.mqtt_telemetry import MqttTelemetrySink
-            mqtt_sink = MqttTelemetrySink(cfg.telemetry, cfg.node_id)
-        node = cls(cfg, authority, reloj, sink, mqtt_sink=mqtt_sink)
+        http_sink = None
+        try:
+            if cfg.telemetry.mqtt_enabled:
+                # Import perezoso: la base no exige paho-mqtt (spec §23 análogo).
+                # Config TLS inválida falla AQUÍ (arranque), no en runtime.
+                from nsb.comms.mqtt_telemetry import MqttTelemetrySink
+                mqtt_sink = MqttTelemetrySink(cfg.telemetry, cfg.node_id)
+            if cfg.telemetry.http_enabled:
+                from nsb.telemetry.http_sink import HttpSink
+                http_sink = HttpSink(cfg.telemetry.http_url)
+        except Exception:
+            if mqtt_sink is not None:
+                mqtt_sink.close()
+            if http_sink is not None:
+                http_sink.close()
+            authority.shutdown()
+            sink.close()
+            raise
+        node = cls(cfg, authority, reloj, sink, mqtt_sink=mqtt_sink,
+                   http_sink=http_sink)
         node._emit(evento("node_start", cfg.node_id, INFO,
                           mode=mode.value, source=cfg.source.value,
                           actuator=cfg.actuator.type))
@@ -148,12 +164,15 @@ class NsbNode:
     def process_one(self, state: TrafficState,
                     edad_s: Optional[float] = None):
         """Procesa un TrafficState: avanza reloj, decide, actúa, telemetriza."""
-        if state.sim_time_s is not None and isinstance(self._clock, SimClock):
-            if not self._clock.set_time(state.sim_time_s):
-                logger.warning("sim_time retrocedio (%.1f); ignorado",
-                               state.sim_time_s)
+        def avanzar_reloj_validado() -> None:
+            if state.sim_time_s is not None and isinstance(self._clock, SimClock):
+                if not self._clock.set_time(state.sim_time_s):
+                    logger.warning("sim_time retrocedio (%.1f); ignorado",
+                                   state.sim_time_s)
 
-        rec, decision = self._authority.process_state(state, edad_s=edad_s)
+        rec, decision = self._authority.process_state(
+            state, edad_s=edad_s,
+            on_state_accepted=avanzar_reloj_validado)
 
         severidad = INFO if decision.verdict.value in ("accept", "clamp") else WARNING
         self._emit(evento(
@@ -168,7 +187,24 @@ class NsbNode:
             icv_eo=rec.computed.icv_eo if rec else None,
             processing_ms=decision.processing_ms,
         ))
+        if self._http is not None:
+            self._http.emit_state(state, rec)
         return rec, decision
+
+    def process_tick(self, sim_time_s: float) -> bool:
+        """Avanza el espejo de fase HIL sin ejecutar una recomendación.
+
+        Devuelve False ante retroceso. Solo se usa con ``SimClock``; el
+        cliente HIL valida experimento y esquema antes de llamar aquí.
+        """
+        if (not isinstance(self._clock, SimClock)
+                or not math.isfinite(sim_time_s) or sim_time_s < 0):
+            raise ValueError("tick HIL requiere sim_time_s finito y >= 0")
+        if not self._clock.set_time(sim_time_s):
+            logger.warning("tick HIL retrocedió (%.3f); ignorado", sim_time_s)
+            return False
+        self._authority.tick()
+        return True
 
     def run(self, source: TrafficStateSource,
             writer: Optional[ReplayWriter] = None,
@@ -212,5 +248,7 @@ class NsbNode:
         self._authority.shutdown()
         if self._mqtt is not None:
             self._mqtt.close()
+        if self._http is not None:
+            self._http.close()
         if self._sink is not None:
             self._sink.close()

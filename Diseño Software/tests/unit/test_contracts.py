@@ -1,6 +1,5 @@
 """Tests de los contratos de dominio: rechazo de NaN/inf, campos extra,
 direcciones faltantes y framing del protocolo HIL."""
-import math
 
 import pytest
 from pydantic import ValidationError
@@ -9,7 +8,6 @@ from nsb.domain.contracts import (
     ApproachState,
     AppliedPhase,
     PlanSemaforico,
-    QualityFlags,
     TrafficState,
 )
 from nsb.domain.enums import (

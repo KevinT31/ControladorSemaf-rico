@@ -12,10 +12,10 @@ Soporta:
 """
 
 import numpy as np
-from scipy.io import savemat, loadmat
+from scipy.io import savemat
 import csv
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 from datetime import datetime
 import logging
 
@@ -24,7 +24,6 @@ try:
     import matplotlib
     matplotlib.use('Agg')  # Backend sin GUI
     import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
     MATPLOTLIB_DISPONIBLE = True
 except ImportError:
     MATPLOTLIB_DISPONIBLE = False
@@ -444,6 +443,6 @@ if __name__ == "__main__":
     print(f"Archivo MATLAB: {resultado['archivo_mat']}")
     print(f"Archivo CSV: {resultado['archivo_csv']}")
     print(f"Puntos exportados: {resultado['num_puntos']}")
-    print(f"\nEstadísticas:")
+    print("\nEstadísticas:")
     for clave, valor in resultado['estadisticas'].items():
         print(f"  {clave}: {valor:.4f}")

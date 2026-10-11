@@ -650,6 +650,6 @@ if __name__ == "__main__":
         print(f"  Velocidad promedio: {v.velocidad_promedio:.2f} km/h")
 
     stats = tracker.obtener_estadisticas()
-    print(f"\nEstadísticas generales:")
+    print("\nEstadísticas generales:")
     print(f"  Vehículos activos: {stats['num_vehiculos']}")
     print(f"  Velocidad promedio: {stats['velocidad_promedio']:.2f} km/h")

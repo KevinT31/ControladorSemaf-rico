@@ -20,10 +20,10 @@ if sys.platform == 'win32':
     if hasattr(sys.stderr, 'buffer'):
         sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional, List, Dict
@@ -44,6 +44,15 @@ from nucleo.metricas_red import (
     AgregadorMetricasRed
 )
 from nucleo.sistema_comparacion import SistemaComparacion, TipoControl
+from config import settings
+from seguridad.dependencias import identidad_desde_payload, requiere_rol
+from seguridad.jwt_simple import verificar_token
+from seguridad.middleware import AuthMiddleware
+from rutas import auth as auth_router
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+INTERFAZ_WEB_DIR = BASE_DIR / "interfaz-web"
+settings.LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 # Configurar logging
 logging.basicConfig(
@@ -51,7 +60,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('sistema_control.log', encoding='utf-8')
+        logging.FileHandler(settings.LOG_FILE, encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)
@@ -61,13 +70,10 @@ logger = logging.getLogger(__name__)
 # CONFIGURACIÓN GLOBAL
 # ============================================================================
 
-BASE_DIR = Path(__file__).parent.parent
-INTERFAZ_WEB_DIR = BASE_DIR / "interfaz-web"
-
 APP_NAME = "Sistema de Control Semafórico Adaptativo Inteligente"
 APP_VERSION = "2.0.0-Capitulo6"
-HOST = "0.0.0.0"
-PORT = 8000
+HOST = settings.HOST
+PORT = settings.PORT
 
 
 # ============================================================================
@@ -131,11 +137,8 @@ class EstadoSistema:
         self.configuraciones_intersecciones[id_inter] = config
 
         # Crear estado local
-        params = ParametrosInterseccion(
-            id_interseccion=id_inter,
-            nombre=nombre
-        )
-        self.estados_locales[id_inter] = EstadoLocalInterseccion(params)
+        params = ParametrosInterseccion(SC_MAX=50.0, V_MAX=60.0)
+        self.estados_locales[id_inter] = EstadoLocalInterseccion(id_inter, params)
 
         # Crear controlador difuso
         self.controladores_difusos[id_inter] = ControladorDifusoCapitulo6(
@@ -179,7 +182,7 @@ class EstadoSistema:
         for ws in self.conexiones_ws:
             try:
                 await ws.send_text(mensaje_json)
-            except:
+            except (OSError, RuntimeError, WebSocketDisconnect):
                 conexiones_cerradas.append(ws)
 
         # Limpiar conexiones cerradas
@@ -318,8 +321,8 @@ async def bucle_simulacion():
                             ev_eo=metricas.ev_eo
                         )
 
-                        metricas.T_verde_ns = resultado['T_verde_NS']
-                        metricas.T_verde_eo = resultado['T_verde_EO']
+                        metricas.T_verde_ns = resultado['NS']['T_verde']
+                        metricas.T_verde_eo = resultado['EO']['T_verde']
 
                 # Obtener métricas de red actualizadas
                 metricas_red = estado_sistema.agregador_metricas.obtener_metricas_red_actual()
@@ -348,6 +351,11 @@ async def bucle_simulacion():
 async def lifespan(app_instance: FastAPI):
     """Manejador de ciclo de vida de la aplicación"""
     # Startup
+    from modelos_bd import init_db
+    from seguridad.usuarios import seed_usuarios
+
+    init_db()
+    seed_usuarios()
     inicializar_sistema()
     tarea_simulacion = asyncio.create_task(bucle_simulacion())
 
@@ -374,14 +382,17 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configurar CORS
+# Autenticación global de /api/* y CORS con lista blanca.
+app.add_middleware(AuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
 )
+
+app.include_router(auth_router.router)
 
 
 # ============================================================================
@@ -472,7 +483,9 @@ async def obtener_resumen_red():
 
 
 @app.post("/api/simulacion/pausar")
-async def pausar_simulacion():
+async def pausar_simulacion(
+    _usuario: dict = Depends(requiere_rol("tecnico", "admin")),
+):
     """Pausa la simulación"""
     estado_sistema.simulacion_pausada = True
     logger.info("⏸️  Simulación pausada")
@@ -480,7 +493,9 @@ async def pausar_simulacion():
 
 
 @app.post("/api/simulacion/reanudar")
-async def reanudar_simulacion():
+async def reanudar_simulacion(
+    _usuario: dict = Depends(requiere_rol("tecnico", "admin")),
+):
     """Reanuda la simulación"""
     estado_sistema.simulacion_pausada = False
     logger.info("▶️  Simulación reanudada")
@@ -488,7 +503,10 @@ async def reanudar_simulacion():
 
 
 @app.post("/api/simulacion/modo")
-async def cambiar_modo(modo: str):
+async def cambiar_modo(
+    modo: str,
+    _usuario: dict = Depends(requiere_rol("tecnico", "admin")),
+):
     """Cambia el modo de simulación"""
     modos_validos = ['simulador', 'video', 'sumo']
     if modo not in modos_validos:
@@ -505,6 +523,20 @@ async def cambiar_modo(modo: str):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket para comunicación en tiempo real con el frontend"""
+    if settings.AUTH_ENABLED:
+        token = websocket.query_params.get("token")
+        try:
+            if not token:
+                raise ValueError("falta token")
+            usuario = identidad_desde_payload(
+                verificar_token(token, settings.SECRET_KEY))
+        except ValueError:
+            await websocket.accept()
+            await websocket.close(code=1008, reason="No autenticado")
+            return
+    else:
+        usuario = {"username": "anonimo", "rol": "operador"}
+
     await websocket.accept()
     estado_sistema.conexiones_ws.append(websocket)
 
@@ -525,6 +557,11 @@ async def websocket_endpoint(websocket: WebSocket):
             # Recibir mensajes del cliente
             data = await websocket.receive_text()
             mensaje = json.loads(data)
+            if not isinstance(mensaje, dict):
+                await websocket.send_json({
+                    'tipo': 'error', 'mensaje': 'Se esperaba un objeto JSON'
+                })
+                continue
 
             # Procesar comandos del cliente
             if mensaje.get('tipo') == 'solicitar_resumen':
@@ -535,6 +572,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 })
 
             elif mensaje.get('tipo') == 'pausar_simulacion':
+                if usuario['rol'] not in ('tecnico', 'admin'):
+                    await websocket.send_json({
+                        'tipo': 'error', 'mensaje': 'Permiso denegado'
+                    })
+                    continue
                 estado_sistema.simulacion_pausada = True
                 await websocket.send_json({
                     'tipo': 'simulacion_pausada',

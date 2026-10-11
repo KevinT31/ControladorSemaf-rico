@@ -98,7 +98,7 @@ class SumoBridge:
 
         programa = t.trafficlight.getProgram(pm.tls_id)
         logics = t.trafficlight.getAllProgramLogics(pm.tls_id)
-        self._logic = next(l for l in logics if l.programID == programa)
+        self._logic = next(logic for logic in logics if logic.programID == programa)
 
         n_fases = len(self._logic.phases)
         for nombre, idx in (("ns_green_index", pm.ns_green_index),

@@ -3,7 +3,7 @@ Modelos Pydantic para Vehículos de Emergencia y Olas Verdes
 """
 
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Dict, Optional
+from typing import List, Optional
 from datetime import datetime
 from enum import Enum
 

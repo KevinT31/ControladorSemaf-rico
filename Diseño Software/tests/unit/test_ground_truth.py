@@ -84,7 +84,8 @@ def test_sample_frames_video_sintetico(tmp_path):
     # en Windows (hallazgo del red team); imencode+tofile no
     out = tmp_path / "gt-año"
     manifest = sample_frames(video, out, every_s=1.0)
-    filas = list(csv.DictReader(open(manifest, encoding="utf-8")))
+    with open(manifest, encoding="utf-8", newline="") as f:
+        filas = list(csv.DictReader(f))
     assert len(filas) == 3                    # t = 0, 1, 2 s
     assert all((out / f["archivo"]).exists() for f in filas)
     assert filas[0]["count_ns"] == ""         # columnas para anotar A MANO

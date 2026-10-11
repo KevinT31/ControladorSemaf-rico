@@ -9,9 +9,11 @@ Solo usa la librería estándar (urllib). Imprime un resumen PASS/FAIL de los
 """
 
 import json
+import os
 import sys
 import urllib.error
 import urllib.request
+from pathlib import Path
 
 # Consola UTF-8 (Windows/cp1252 no imprime emojis por defecto)
 try:
@@ -22,6 +24,26 @@ except Exception:
 BASE = "http://localhost:8000"
 
 
+def cargar_password_demo(usuario):
+    variable = f"DEMO_{'TECNICO' if usuario == 'tecnico' else usuario.upper()}_PASSWORD"
+    password = os.environ.get(variable)
+    if password:
+        return password
+
+    archivo = Path(__file__).resolve().parent / ".demo_credentials.json"
+    try:
+        datos = json.loads(archivo.read_text(encoding="utf-8"))
+        password = datos.get(usuario)
+    except (OSError, json.JSONDecodeError):
+        password = None
+    if not password:
+        raise RuntimeError(
+            f"No se encontró la clave de {usuario}; define {variable} o inicia "
+            "el backend para generar .demo_credentials.json"
+        )
+    return password
+
+
 def req(method, path, token=None, body=None):
     data = json.dumps(body).encode() if body is not None else None
     r = urllib.request.Request(BASE + path, data=data, method=method)
@@ -30,7 +52,8 @@ def req(method, path, token=None, body=None):
     if token:
         r.add_header("Authorization", "Bearer " + token)
     try:
-        with urllib.request.urlopen(r, timeout=8) as resp:
+        # BASE es una constante HTTP local definida por este script.
+        with urllib.request.urlopen(r, timeout=8) as resp:  # nosec B310
             txt = resp.read().decode() or "{}"
             return resp.status, json.loads(txt)
     except urllib.error.HTTPError as e:
@@ -65,14 +88,23 @@ def main():
     s, _ = req("GET", "/api/intersecciones")
     chk("La telemetría exige token (401 sin sesión)", s == 401)
 
-    s, d = req("POST", "/api/auth/login", body={"username": "tecnico", "password": "tecnico123"})
+    try:
+        password_tecnico = cargar_password_demo("tecnico")
+        password_operador = cargar_password_demo("operador")
+    except RuntimeError as exc:
+        print(f"\n❌ {exc}")
+        sys.exit(1)
+
+    s, d = req("POST", "/api/auth/login", body={
+        "username": "tecnico", "password": password_tecnico})
     tok = d.get("access_token")
     chk("Login de técnico emite token JWT", s == 200 and bool(tok))
 
     s, _ = req("GET", "/api/intersecciones", token=tok)
     chk("Lectura autorizada con token", s == 200)
 
-    s, do = req("POST", "/api/auth/login", body={"username": "operador", "password": "operador123"})
+    s, do = req("POST", "/api/auth/login", body={
+        "username": "operador", "password": password_operador})
     tok_op = do.get("access_token")
     s, _ = req("PUT", "/api/control/parametros", token=tok_op, body={"t_verde_ns": 45})
     chk("Operador (solo lectura) NO puede enviar comandos (403)", s == 403)

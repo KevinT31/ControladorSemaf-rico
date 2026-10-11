@@ -3,7 +3,6 @@ Servicio para gestión de Intersecciones
 """
 
 from typing import List, Optional, Dict
-from datetime import datetime
 import logging
 
 from .estado_global import estado_sistema

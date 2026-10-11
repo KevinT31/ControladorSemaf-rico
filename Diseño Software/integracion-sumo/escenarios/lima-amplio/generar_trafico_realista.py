@@ -8,11 +8,13 @@ Genera tráfico realista para Lima con diferentes niveles de congestión
 import random
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
+from defusedxml.ElementTree import parse as parse_xml
 
 def prettify_xml(elem):
     """Retorna XML formateado bonito"""
     rough_string = ET.tostring(elem, encoding='unicode')
-    reparsed = minidom.parseString(rough_string)
+    # ``rough_string`` lo acaba de producir ElementTree; no contiene XML externo.
+    reparsed = minidom.parseString(rough_string)  # nosec B318
     return reparsed.toprettyxml(indent="    ")
 
 # Configuración
@@ -31,7 +33,7 @@ print(f"   Duración: {DURACION_SIMULACION}s (1 hora)")
 # Leer la red para obtener calles
 print("📍 Cargando red de calles...")
 try:
-    tree = ET.parse('lima_amplio.net.xml')
+    tree = parse_xml('lima_amplio.net.xml')
     root = tree.getroot()
     
     # Extraer todas las calles (edges)
@@ -62,7 +64,7 @@ arterias_principales = edges[:num_arterias]
 calles_secundarias = edges[num_arterias:num_arterias + num_secundarias]
 calles_locales = edges[num_arterias + num_secundarias:]
 
-print(f"   📊 Clasificación:")
+print("   📊 Clasificación:")
 print(f"      - Arterias principales: {len(arterias_principales)} (alto tráfico)")
 print(f"      - Calles secundarias: {len(calles_secundarias)} (medio tráfico)")
 print(f"      - Calles locales: {len(calles_locales)} (bajo tráfico)")
@@ -143,8 +145,8 @@ with open(output_file, 'w', encoding='utf-8') as f:
     f.write(xml_string)
 
 print(f"✅ Archivo guardado: {output_file}")
-print(f"📈 Estadísticas:")
+print("📈 Estadísticas:")
 print(f"   - Vehículos totales: {vehiculos_generados}")
 print(f"   - Duración: {DURACION_SIMULACION}s")
 print(f"   - Densidad promedio: {vehiculos_generados/DURACION_SIMULACION:.2f} veh/s")
-print(f"   - Distribución: 50% arterias, 35% secundarias, 15% locales")
+print("   - Distribución: 50% arterias, 35% secundarias, 15% locales")

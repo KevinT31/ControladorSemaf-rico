@@ -17,7 +17,7 @@ Métricas comparadas:
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from datetime import datetime, timedelta
 from pathlib import Path
 import numpy as np
@@ -25,12 +25,17 @@ import json
 import logging
 from enum import Enum
 
-from metricas_red import (
-    MetricasInterseccion,
-    MetricasRed,
-    ConfiguracionInterseccion,
-    AgregadorMetricasRed
-)
+try:
+    # Import normal cuando ``nucleo`` se usa como paquete.
+    from .metricas_red import (
+        MetricasRed,
+        ConfiguracionInterseccion,
+    )
+except ImportError:  # Compatibilidad al ejecutar este archivo directamente.
+    from metricas_red import (  # type: ignore[no-redef]
+        MetricasRed,
+        ConfiguracionInterseccion,
+    )
 
 logger = logging.getLogger(__name__)
 
