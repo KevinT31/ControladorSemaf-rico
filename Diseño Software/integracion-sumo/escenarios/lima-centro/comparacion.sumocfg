@@ -6,8 +6,8 @@
                    xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
-        <net-file value="lima_centro.net.xml"/>
-        <route-files value="lima_centro_denso.rou.xml"/>
+        <net-file value="lima_centro.net.xml.gz"/>
+        <route-files value="lima_centro_alta.rou.xml.gz"/>
     </input>
 
     <time>

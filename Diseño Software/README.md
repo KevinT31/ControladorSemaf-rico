@@ -41,6 +41,14 @@ python ejecutar.py
 python servidor-backend/main.py
 ```
 
+## Reproducibilidad de la campaña SUMO
+
+La red, la demanda, las semillas y los scripts de la campaña que compara el
+controlador difuso con el plan fijo, el control actuado, Webster y Max-Pressure
+están versionados. Las órdenes para repetirla, analizarla y calibrar el
+controlador difuso están en
+[`integracion-sumo/REPRODUCIBILIDAD.md`](integracion-sumo/REPRODUCIBILIDAD.md).
+
 ## Menú principal (ejecutar.py)
 
 1. Iniciar Dashboard

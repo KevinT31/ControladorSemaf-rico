@@ -1,6 +1,7 @@
 # Auditoría del repositorio — NSB v2.1
 
-Fecha: 2026-07-05 · Alcance: núcleo/SUMO, backend/comms/seguridad, visión/datos/experimentos.
+Fecha: 2026-07-05 · Alcance: núcleo/SUMO, backend/comms/seguridad y
+visión/datos/experimentos.
 Clasificación de evidencia según spec §50: todo lo listado aquí es **OBSERVADO**
 directamente en el repositorio, salvo indicación.
 
