@@ -61,3 +61,6 @@ Diseño Software/integracion-sumo/resultados/*_backup.*
 
 # Especificación local de diseño (no versionada)
 Raspberry.md
+
+# Series de entrenamiento regenerables (experimento difuso-IA)
+Diseño Software/integracion-sumo/data/

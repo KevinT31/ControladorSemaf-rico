@@ -98,3 +98,43 @@ python calibrar_difuso.py --workers 8 --salida resultados/parametros_difuso_cali
   vehículos que siguen en la red al terminar el horizonte de 700 s.
 - Webster y Max-Pressure son reimplementaciones propias de los algoritmos
   publicados, no el código de terceros.
+
+## Experimento: controlador de fase con difuso y predictor (rama `experimento/difuso-ia`)
+
+Protocolo, decisiones y resultados en `PROTOCOLO_DIFUSO_IA.md`. Estrategias
+nuevas: `difuso_fase` (selección acíclica de fase, gap-out, anti-inanición y
+duración de verde por Mamdani) y `difuso_ia` (el mismo controlador con un
+predictor CNN-LSTM de cola por fase como guardia). Desde `Diseño Software/integracion-sumo/`:
+
+```powershell
+# 1. Recolección de series en semillas de entrenamiento y validación
+python campana_paralela.py --cfg escenarios/lima-centro/comparacion.sumocfg `
+    --semillas 101-104,201-204 --estrategias fijo,difuso_fase `
+    --control-params resultados/params_recoleccion.json `
+    --salida resultados/difuso_fase_ALTA_desarrollo.json
+# (igual con comparacion_media.sumocfg y semillas 101-103,201-203)
+
+# 2. Entrenamiento del predictor (desde 'Diseño Software/')
+python -m ia.entrenamiento_fase --epocas 60
+
+# 3. Validación de difuso_ia y elección según el protocolo
+python campana_paralela.py --cfg escenarios/lima-centro/comparacion.sumocfg `
+    --semillas 201-204 --estrategias difuso_ia `
+    --control-params resultados/params_ia_abierta.json `
+    --salida resultados/difuso_ia_abierta_ALTA_validacion.json
+python elegir_validacion.py
+
+# 4. Prueba, una sola vez
+python campana_paralela.py --cfg escenarios/lima-centro/comparacion.sumocfg `
+    --semillas 1-30 --estrategias difuso_fase,difuso_ia `
+    --control-params resultados/params_ia_abierta.json `
+    --salida resultados/prueba_difuso_ALTA30.json
+python unir_resultados_nuevos.py resultados/multibaseline_ALTA30.json `
+    resultados/prueba_difuso_ALTA30.json resultados/experimento_ALTA30.json
+python analizar_resultados.py resultados/experimento_ALTA30.json `
+    --salida resultados/analisis_experimento_ALTA30.json
+```
+
+Las series de entrenamiento (`data/fases_desarrollo/`) no se versionan: se
+regeneran con el paso 1. Los artefactos del predictor sí están versionados en
+`ia/artifacts_fase/`.

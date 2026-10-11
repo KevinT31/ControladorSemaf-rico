@@ -1,0 +1,53 @@
+{
+  "entrenado_en": "2026-10-11T15:45:18",
+  "datos": "C:\\ControladorSemafrico\\Diseño Software\\integracion-sumo\\data\\fases_desarrollo",
+  "ventana": 8,
+  "caracteristicas": [
+    "cola_n",
+    "nveh_n",
+    "ocupacion",
+    "vel_n",
+    "verde_activa",
+    "espera_fase_n"
+  ],
+  "objetivo": "cola_n",
+  "normalizacion": {
+    "cola_veh": 30.0,
+    "nveh": 40.0,
+    "vel_kmh": 50.0,
+    "espera_s": 120.0
+  },
+  "hiperparametros": {
+    "n_caracteristicas": 6,
+    "canales": 16,
+    "oculto": 32,
+    "capas_lstm": 1,
+    "dropout": 0.1,
+    "n_salidas": 1
+  },
+  "optimizacion": {
+    "lr": 0.001,
+    "batch": 256,
+    "epocas_max": 60,
+    "paciencia": 10,
+    "semilla": 7,
+    "mejor_epoca": 59,
+    "mejor_val_mse": 0.001574
+  },
+  "secuencias": {
+    "train": 18291,
+    "val": 18291
+  },
+  "metricas_validacion": {
+    "mse": 0.001574,
+    "mae": 0.021145,
+    "rmse": 0.039673
+  },
+  "baseline_persistencia_validacion": {
+    "mse": 0.002958,
+    "mae": 0.022849,
+    "rmse": 0.054383
+  },
+  "supera_persistencia": true,
+  "duracion_s": 48.7
+}

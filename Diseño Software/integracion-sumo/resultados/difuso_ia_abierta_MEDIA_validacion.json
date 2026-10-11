@@ -1,0 +1,149 @@
+{
+  "generado": "2026-10-11T15:47:58",
+  "cfg": "comparacion_media.sumocfg",
+  "pasos": 700,
+  "intervalo_control": 25,
+  "semillas": [
+    201,
+    202,
+    203
+  ],
+  "motor": "traci",
+  "limites_verde": [
+    10.0,
+    120.0
+  ],
+  "sumo": "Eclipse SUMO sumo Version 1.24.0",
+  "python": "3.12.5",
+  "huellas_sha256": {
+    "comparacion_media.sumocfg": "0375a98151751faa2cbe909da44ef3b231a46f8baa853b0744df5d35c2c6d98c",
+    "lima_centro.net.xml.gz": "58db74c0a3d4157b40c7256e9f3ffbcb39b14555916a03d2d50757c1e29e8890",
+    "lima_centro_media.rou.xml.gz": "aac2d1d5e576a762434a2067ddf23638dc780a347a9b2346226c7f055017635e"
+  },
+  "errores": [],
+  "por_estrategia": {
+    "difuso_ia": [
+      {
+        "ICV_red": 0.4126504080582141,
+        "Vavg_red": 24.586112603395026,
+        "QL_red": 0.316983733550934,
+        "q_red": 33.77142857142857,
+        "throughput": 394,
+        "demora_media_s": 150.8477157360406,
+        "tviaje_media_s": 187.9238578680203,
+        "tviaje_mediana_s": 164.5,
+        "tviaje_sd_s": 99.44727597997678,
+        "n_arribos": 394,
+        "diagnostico_control": {
+          "ia_activa": true,
+          "modo_ia": "guardia",
+          "beta": 0.0,
+          "predicciones": 795,
+          "fallbacks_ia": 120,
+          "fallbacks_por_motivo": {
+            "buffer_incompleto": 120
+          },
+          "vetos_skip": 96,
+          "vetos_sombra": 0,
+          "margen_veto": 0.0,
+          "extensiones": 0,
+          "seg_extension": 0.0,
+          "gate_cerrado": 0,
+          "dens_red_final": 17.75,
+          "latencia_ms_p50": 1.711,
+          "latencia_ms_p95": 1.989,
+          "errores_paso": 0,
+          "fallos_sensor": 0,
+          "ambar_sintetico": 0,
+          "todo_rojo_servidos": 859,
+          "cortes_inanicion": 110,
+          "verde_continuo_max_s": 39.0,
+          "error_ia": null
+        },
+        "seed": 201
+      },
+      {
+        "ICV_red": 0.3939995292301888,
+        "Vavg_red": 25.391751586363906,
+        "QL_red": 0.2957934666350018,
+        "q_red": 34.885714285714286,
+        "throughput": 407,
+        "demora_media_s": 132.34152334152333,
+        "tviaje_media_s": 191.47911547911548,
+        "tviaje_mediana_s": 170,
+        "tviaje_sd_s": 102.16238907122799,
+        "n_arribos": 407,
+        "diagnostico_control": {
+          "ia_activa": true,
+          "modo_ia": "guardia",
+          "beta": 0.0,
+          "predicciones": 818,
+          "fallbacks_ia": 120,
+          "fallbacks_por_motivo": {
+            "buffer_incompleto": 120
+          },
+          "vetos_skip": 129,
+          "vetos_sombra": 0,
+          "margen_veto": 0.0,
+          "extensiones": 0,
+          "seg_extension": 0.0,
+          "gate_cerrado": 0,
+          "dens_red_final": 17.15,
+          "latencia_ms_p50": 1.748,
+          "latencia_ms_p95": 2.013,
+          "errores_paso": 0,
+          "fallos_sensor": 0,
+          "ambar_sintetico": 0,
+          "todo_rojo_servidos": 857,
+          "cortes_inanicion": 106,
+          "verde_continuo_max_s": 41.0,
+          "error_ia": null
+        },
+        "seed": 202
+      },
+      {
+        "ICV_red": 0.43099689716674067,
+        "Vavg_red": 23.77179691047209,
+        "QL_red": 0.33739170071041297,
+        "q_red": 32.05714285714286,
+        "throughput": 374,
+        "demora_media_s": 173.524064171123,
+        "tviaje_media_s": 183.55080213903744,
+        "tviaje_mediana_s": 161.0,
+        "tviaje_sd_s": 101.01041052345016,
+        "n_arribos": 374,
+        "diagnostico_control": {
+          "ia_activa": true,
+          "modo_ia": "guardia",
+          "beta": 0.0,
+          "predicciones": 813,
+          "fallbacks_ia": 120,
+          "fallbacks_por_motivo": {
+            "buffer_incompleto": 120
+          },
+          "vetos_skip": 106,
+          "vetos_sombra": 0,
+          "margen_veto": 0.0,
+          "extensiones": 0,
+          "seg_extension": 0.0,
+          "gate_cerrado": 0,
+          "dens_red_final": 18.8,
+          "latencia_ms_p50": 1.727,
+          "latencia_ms_p95": 1.99,
+          "errores_paso": 0,
+          "fallos_sensor": 0,
+          "ambar_sintetico": 0,
+          "todo_rojo_servidos": 855,
+          "cortes_inanicion": 89,
+          "verde_continuo_max_s": 69.0,
+          "error_ia": null
+        },
+        "seed": 203
+      }
+    ]
+  },
+  "control_params": {
+    "ia_gate_sat": 1000000000.0,
+    "ia_gate_dens": 1000000000.0
+  }
+}

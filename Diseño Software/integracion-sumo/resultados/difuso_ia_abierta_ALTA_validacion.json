@@ -1,0 +1,189 @@
+{
+  "generado": "2026-10-11T15:48:41",
+  "cfg": "comparacion.sumocfg",
+  "pasos": 700,
+  "intervalo_control": 25,
+  "semillas": [
+    201,
+    202,
+    203,
+    204
+  ],
+  "motor": "traci",
+  "limites_verde": [
+    10.0,
+    120.0
+  ],
+  "sumo": "Eclipse SUMO sumo Version 1.24.0",
+  "python": "3.12.5",
+  "huellas_sha256": {
+    "comparacion.sumocfg": "8e3df460d2744750da0a6f6cdab6659f7d8252177d88086779d85d7792c90dda",
+    "lima_centro.net.xml.gz": "58db74c0a3d4157b40c7256e9f3ffbcb39b14555916a03d2d50757c1e29e8890",
+    "lima_centro_alta.rou.xml.gz": "5af327ae051486322acbb740a691b33f35ad5e95a20ed4e1429539e4529082e2"
+  },
+  "errores": [],
+  "por_estrategia": {
+    "difuso_ia": [
+      {
+        "ICV_red": 0.4944143757937923,
+        "Vavg_red": 20.428440215968745,
+        "QL_red": 0.3973648730172452,
+        "q_red": 68.82857142857142,
+        "throughput": 803,
+        "demora_media_s": 259.1755915317559,
+        "tviaje_media_s": 187.1332503113325,
+        "tviaje_mediana_s": 169,
+        "tviaje_sd_s": 94.04305168052376,
+        "n_arribos": 803,
+        "diagnostico_control": {
+          "ia_activa": true,
+          "modo_ia": "guardia",
+          "beta": 0.0,
+          "predicciones": 867,
+          "fallbacks_ia": 123,
+          "fallbacks_por_motivo": {
+            "buffer_incompleto": 123
+          },
+          "vetos_skip": 201,
+          "vetos_sombra": 0,
+          "margen_veto": 0.0,
+          "extensiones": 0,
+          "seg_extension": 0.0,
+          "gate_cerrado": 0,
+          "dens_red_final": 52.1,
+          "latencia_ms_p50": 1.729,
+          "latencia_ms_p95": 2.037,
+          "errores_paso": 0,
+          "fallos_sensor": 0,
+          "ambar_sintetico": 0,
+          "todo_rojo_servidos": 802,
+          "cortes_inanicion": 148,
+          "verde_continuo_max_s": 119.0,
+          "error_ia": null
+        },
+        "seed": 201
+      },
+      {
+        "ICV_red": 0.49478991072361933,
+        "Vavg_red": 20.380574427666232,
+        "QL_red": 0.39715870368998385,
+        "q_red": 67.88571428571429,
+        "throughput": 792,
+        "demora_media_s": 263.739898989899,
+        "tviaje_media_s": 187.37626262626262,
+        "tviaje_mediana_s": 167.0,
+        "tviaje_sd_s": 96.25712536748557,
+        "n_arribos": 792,
+        "diagnostico_control": {
+          "ia_activa": true,
+          "modo_ia": "guardia",
+          "beta": 0.0,
+          "predicciones": 841,
+          "fallbacks_ia": 122,
+          "fallbacks_por_motivo": {
+            "buffer_incompleto": 122
+          },
+          "vetos_skip": 206,
+          "vetos_sombra": 0,
+          "margen_veto": 0.0,
+          "extensiones": 0,
+          "seg_extension": 0.0,
+          "gate_cerrado": 0,
+          "dens_red_final": 52.75,
+          "latencia_ms_p50": 1.738,
+          "latencia_ms_p95": 2.019,
+          "errores_paso": 0,
+          "fallos_sensor": 0,
+          "ambar_sintetico": 0,
+          "todo_rojo_servidos": 794,
+          "cortes_inanicion": 156,
+          "verde_continuo_max_s": 119.0,
+          "error_ia": null
+        },
+        "seed": 202
+      },
+      {
+        "ICV_red": 0.4864852324054873,
+        "Vavg_red": 20.61452256677502,
+        "QL_red": 0.3852279355488159,
+        "q_red": 68.65714285714286,
+        "throughput": 801,
+        "demora_media_s": 251.1510611735331,
+        "tviaje_media_s": 189.33208489388264,
+        "tviaje_mediana_s": 172,
+        "tviaje_sd_s": 94.96296449664098,
+        "n_arribos": 801,
+        "diagnostico_control": {
+          "ia_activa": true,
+          "modo_ia": "guardia",
+          "beta": 0.0,
+          "predicciones": 850,
+          "fallbacks_ia": 119,
+          "fallbacks_por_motivo": {
+            "buffer_incompleto": 119
+          },
+          "vetos_skip": 185,
+          "vetos_sombra": 0,
+          "margen_veto": 0.0,
+          "extensiones": 0,
+          "seg_extension": 0.0,
+          "gate_cerrado": 0,
+          "dens_red_final": 52.75,
+          "latencia_ms_p50": 1.747,
+          "latencia_ms_p95": 2.031,
+          "errores_paso": 0,
+          "fallos_sensor": 0,
+          "ambar_sintetico": 0,
+          "todo_rojo_servidos": 783,
+          "cortes_inanicion": 154,
+          "verde_continuo_max_s": 119.0,
+          "error_ia": null
+        },
+        "seed": 203
+      },
+      {
+        "ICV_red": 0.4899482803501449,
+        "Vavg_red": 20.68293627608701,
+        "QL_red": 0.39352219617119233,
+        "q_red": 69.0,
+        "throughput": 805,
+        "demora_media_s": 256.2608695652174,
+        "tviaje_media_s": 188.1329192546584,
+        "tviaje_mediana_s": 167,
+        "tviaje_sd_s": 97.27207650005849,
+        "n_arribos": 805,
+        "diagnostico_control": {
+          "ia_activa": true,
+          "modo_ia": "guardia",
+          "beta": 0.0,
+          "predicciones": 901,
+          "fallbacks_ia": 119,
+          "fallbacks_por_motivo": {
+            "buffer_incompleto": 119
+          },
+          "vetos_skip": 219,
+          "vetos_sombra": 0,
+          "margen_veto": 0.0,
+          "extensiones": 0,
+          "seg_extension": 0.0,
+          "gate_cerrado": 0,
+          "dens_red_final": 51.95,
+          "latencia_ms_p50": 1.74,
+          "latencia_ms_p95": 2.009,
+          "errores_paso": 0,
+          "fallos_sensor": 0,
+          "ambar_sintetico": 0,
+          "todo_rojo_servidos": 777,
+          "cortes_inanicion": 166,
+          "verde_continuo_max_s": 119.0,
+          "error_ia": null
+        },
+        "seed": 204
+      }
+    ]
+  },
+  "control_params": {
+    "ia_gate_sat": 1000000000.0,
+    "ia_gate_dens": 1000000000.0
+  }
+}

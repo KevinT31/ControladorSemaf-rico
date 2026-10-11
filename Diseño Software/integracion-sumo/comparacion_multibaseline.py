@@ -281,7 +281,7 @@ def cargar_params_calibrados(ruta: Path = RUTA_PARAMS_CALIBRADOS) -> dict:
 
 def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
                         intervalo: int = 25, webster_freq: int = 150,
-                        difuso_params: dict = None) -> dict:
+                        difuso_params: dict = None, control_params: dict = None) -> dict:
     """Corre una estrategia sobre (cfg, seed) y devuelve métricas agregadas reales.
 
     `difuso_params` (alpha, gamma, puntos_icv, puntos_pi) solo aplica a las
@@ -317,6 +317,13 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
         calc_icv = CalculadorICV(params)
         difuso = ControladorDifusoCapitulo6(puntos_icv=tuple(dp['puntos_icv']),
                                             puntos_pi=tuple(dp['puntos_pi']))
+    elif estrategia in ('difuso_fase', 'difuso_ia'):
+        from difuso_ia import ControladorDifusoIA
+        cp = dict(control_params or {})
+        cp['modo_ia'] = 'off' if estrategia == 'difuso_fase' else cp.get('modo_ia', 'guardia')
+        controlador_fase = ControladorDifusoIA(info, cp)
+        if estrategia == 'difuso_ia' and not controlador_fase.ia_activa:
+            raise RuntimeError(f'Predictor no disponible: {controlador_fase._error_ia}')
 
     metricas: List = []
     demora_total = 0
@@ -350,6 +357,8 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
             if i % intervalo == 0:
                 C._redistribuir_verde(info, calc_icv, difuso, ema=ema,
                                       alpha=dp['alpha'], gamma=dp['gamma'])
+        elif estrategia in ('difuso_fase', 'difuso_ia'):
+            controlador_fase.paso(i)
         # 'fijo' y 'actuated' no requieren intervención por paso
 
         met, halting, arrived = C._metricas_instante(base + timedelta(seconds=i), n_int)
@@ -358,6 +367,8 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
         arrivals += arrived
 
     traci.close()
+    if estrategia in ('difuso_fase', 'difuso_ia'):
+        controlador_fase.cerrar()
 
     def _ag(attr):
         vals = [getattr(m, attr) for m in metricas]
@@ -375,6 +386,10 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
         'tviaje_sd_s': st.pstdev(travel) if len(travel) > 1 else 0.0,
         'n_arribos': arrivals,
     }
+    if estrategia in ('difuso_fase', 'difuso_ia'):
+        res['diagnostico_control'] = controlador_fase.resumen_ia()
+        if controlador_fase.n_error_paso:
+            raise RuntimeError(f'{controlador_fase.n_error_paso} errores en el lazo de control')
     return res
 
 
@@ -382,7 +397,7 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
 # Campaña completa: todas las estrategias x N semillas
 # ----------------------------------------------------------------------
 ESTRATEGIAS = ['fijo', 'actuated', 'webster', 'webster_mod', 'maxpressure', 'difuso']
-ESTRATEGIAS_TODAS = ESTRATEGIAS + ['difuso_opt']
+ESTRATEGIAS_TODAS = ESTRATEGIAS + ['difuso_opt', 'difuso_fase', 'difuso_ia']
 
 
 def ejecutar_campana(ruta_cfg: str, semillas: List[int], pasos: int = 700,

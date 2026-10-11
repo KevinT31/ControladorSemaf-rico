@@ -36,10 +36,16 @@ def parsear_semillas(texto: str):
 
 
 def _trabajo(args):
-    cfg, semilla, pasos, estrategia, intervalo = args
+    cfg, semilla, pasos, estrategia, intervalo, control_params = args
     import comparacion_multibaseline as M
     try:
-        r = M.ejecutar_estrategia(cfg, semilla, pasos, estrategia, intervalo)
+        params = dict(control_params)
+        recolector = params.pop('recolector_dir', None)
+        if recolector and estrategia == 'difuso_fase':
+            params['recolector'] = str(Path(recolector) / f'{Path(cfg).stem}_{semilla}.csv')
+            params['serie_prefix'] = f'{Path(cfg).stem}_{semilla}'
+        r = M.ejecutar_estrategia(cfg, semilla, pasos, estrategia, intervalo,
+                                 control_params=params)
         r['seed'] = semilla
         return estrategia, semilla, r, None
     except Exception as e:  # una réplica fallida no debe abortar la campaña
@@ -69,9 +75,10 @@ def version_sumo() -> str:
         return 'desconocida'
 
 
-def campana(cfg: Path, semillas, estrategias, pasos, intervalo, workers):
+def campana(cfg: Path, semillas, estrategias, pasos, intervalo, workers,
+            control_params=None):
     import comparacion_multibaseline as M
-    trabajos = [(str(cfg), s, pasos, e, intervalo)
+    trabajos = [(str(cfg), s, pasos, e, intervalo, control_params or {})
                 for e in estrategias for s in semillas]
     por_estrategia = {e: [] for e in estrategias}
     errores = []
@@ -96,6 +103,7 @@ def campana(cfg: Path, semillas, estrategias, pasos, intervalo, workers):
         'sumo': version_sumo(), 'python': platform.python_version(),
         'huellas_sha256': huellas_entradas(cfg),
         'errores': errores, 'por_estrategia': por_estrategia,
+        'control_params': control_params or {},
     }
 
 
@@ -109,12 +117,14 @@ if __name__ == '__main__':
     ap.add_argument('--intervalo', type=int, default=25)
     ap.add_argument('--workers', type=int, default=max(1, (mp.cpu_count() or 2) - 2))
     ap.add_argument('--salida', required=True)
+    ap.add_argument('--control-params', default='', help='JSON de parámetros del nuevo controlador')
     ap.add_argument('--anexar', default='',
                     help='JSON previo al que se añaden las estrategias ejecutadas '
                          '(mismas semillas y configuración)')
     a = ap.parse_args()
+    cp = json.loads(Path(a.control_params).read_text(encoding='utf-8')) if a.control_params else {}
     out = campana(Path(a.cfg).resolve(), parsear_semillas(a.semillas),
-                  a.estrategias.split(','), a.pasos, a.intervalo, a.workers)
+                  a.estrategias.split(','), a.pasos, a.intervalo, a.workers, cp)
     if a.anexar:
         previo = json.loads(Path(a.anexar).read_text(encoding='utf-8'))
         for clave in ('cfg', 'pasos', 'intervalo_control', 'semillas'):
