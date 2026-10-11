@@ -1,44 +1,122 @@
-# OverLeaf Local
+<div align="center">
 
-Editor LaTeX local tipo Overleaf: arbol de archivos, editor con resaltado,
-subida/importacion de ZIP y preview PDF en el navegador.
+# Adaptive Traffic Control — Research Workspace
 
-## Uso rapido
+### Thesis Workspace · Simulation · Security Experiments · Documentation Tooling
 
-```powershell
+</div>
+
+---
+
+## Purpose
+
+This repository is the **broader research workspace** around an adaptive traffic-signal control project.
+
+It intentionally contains more than the clean implementation:
+
+- the traffic-control software under **Diseño Software/**
+- experimental SUMO scenarios and comparison outputs
+- thesis-oriented research material
+- security/authentication experiments
+- a local LaTeX/documentation utility
+- references and supporting tooling
+
+For the cleaner implementation-focused repository, use:
+
+**[ControladorSemaforicoTFC](https://github.com/KevinT31/ControladorSemaforicoTFC)**
+
+## Workspace Map
+
+~~~text
+.
+├── Diseño Software/   adaptive traffic-control research implementation
+├── Ejemplos/          supporting examples
+├── REFERENCES.md      external research references
+├── public/             local LaTeX editor frontend
+├── scripts/            local tooling
+├── server.js           local editor server
+└── package.json
+~~~
+
+## Main Research System
+
+The project under **Diseño Software/** extends the adaptive traffic-control work with research-oriented capabilities and experiments around:
+
+- computer vision
+- congestion estimation
+- fuzzy/adaptive traffic control
+- SUMO / TraCI
+- comparative simulation
+- FastAPI services
+- web visualization
+- functional-safety checks
+- authentication/RBAC experiments
+- auditability and traceability
+- broader Lima scenarios
+
+See [Diseño Software/README.md](Dise%C3%B1o%20Software/README.md) for implementation notes.
+
+## Security Hygiene
+
+This public workspace does **not** hardcode demo passwords or a fixed JWT signing key.
+
+The demo-oriented authentication layer expects local environment configuration derived from the included environment template.
+
+The repository also excludes local backups, runtime artifacts, model binaries and generated workspace files from normal version control.
+
+## Research References
+
+Third-party research papers are not stored as bundled PDFs.
+
+[REFERENCES.md](REFERENCES.md) keeps traceable external references instead, reducing repository weight and avoiding unnecessary redistribution of third-party documents.
+
+## Local Documentation Utility
+
+The repository root contains a lightweight local LaTeX editor built with Node.js and Express.
+
+Capabilities include:
+
+- file-tree navigation
+- source editing
+- ZIP import
+- PDF preview
+- local Tectonic / LaTeX compilation
+
+### Run locally
+
+~~~powershell
 npm install
 npm run install-tectonic
 npm start
-```
+~~~
 
-Abre la URL que imprime la consola, normalmente:
+Default local address:
 
-```text
+~~~text
 http://127.0.0.1:3042
-```
+~~~
 
-Tus archivos LaTeX van dentro de `workspace/`. Puedes pegar ahi un proyecto
-grande, subir archivos desde la interfaz o importar un `.zip` exportado de
-Overleaf.
+## Why This Repo Exists Separately
 
-## Compiladores
+The research workspace preserves context that would make the implementation repository unnecessarily noisy:
 
-La app usa el primer compilador disponible en este orden:
+- experiments
+- thesis-specific material
+- presentation/demo workflows
+- security extensions
+- comparison outputs
+- supporting documentation tools
 
-```text
-tools/tectonic/tectonic.exe
-tectonic
-latexmk
-lualatex
-xelatex
-pdflatex
-```
+That separation keeps **ControladorSemaforicoTFC** easier to evaluate as a software project while retaining the broader research history here.
 
-Si ya tienes MiKTeX o TeX Live instalado, tambien funcionara. Si no, el comando
-`npm run install-tectonic` descarga Tectonic de forma portatil en `tools/`.
+## Repository Boundaries
 
-## Limites locales
+This is not a production traffic-management system.
 
-No hay limite de proyecto impuesto por Overleaf. El limite real sera tu disco,
-RAM y el compilador LaTeX. Para proyectos enormes, deja los archivos pesados en
-`workspace/` y compila desde el navegador.
+The project is research/simulation oriented and should not be interpreted as field-certified infrastructure or a safety-certified traffic controller.
+
+---
+
+### What this workspace demonstrates
+
+**Research engineering · experiment organization · simulation workflows · software/security prototyping · technical documentation discipline**

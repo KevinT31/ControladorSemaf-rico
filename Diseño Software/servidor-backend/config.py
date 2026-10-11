@@ -35,13 +35,18 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
     # ==================== Ciberseguridad ====================
-    # Clave de firma JWT (HS256). En producción: definir SECRET_KEY en .env / KeyVault.
+    # Clave de firma JWT (HS256). Debe definirse fuera del repositorio.
     SECRET_KEY: str = Field(
-        default="cambia-esta-clave-en-produccion-tesis-pucp-2026",
+        default="",
         description="Clave HMAC-SHA256 para firmar tokens JWT")
     TOKEN_EXP_MIN: int = Field(default=480, description="Expiración del token en minutos")
     AUTH_ENABLED: bool = Field(
         default=True, description="Exigir autenticación en la API (desactivar solo para depurar)")
+
+    # Credenciales de demostración. Configurarlas únicamente mediante .env.
+    DEMO_OPERATOR_PASSWORD: str = ""
+    DEMO_TECHNICIAN_PASSWORD: str = ""
+    DEMO_ADMIN_PASSWORD: str = ""
 
     # WebSocket
     WS_HEARTBEAT_INTERVAL: int = 30  # segundos
@@ -59,3 +64,20 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+if settings.AUTH_ENABLED:
+    if len(settings.SECRET_KEY) < 32 or settings.SECRET_KEY.startswith("REPLACE_"):
+        raise RuntimeError(
+            "SECRET_KEY debe reemplazarse en .env por una clave aleatoria "
+            "de al menos 32 caracteres cuando AUTH_ENABLED=true."
+        )
+
+    for nombre, valor in {
+        "DEMO_OPERATOR_PASSWORD": settings.DEMO_OPERATOR_PASSWORD,
+        "DEMO_TECHNICIAN_PASSWORD": settings.DEMO_TECHNICIAN_PASSWORD,
+        "DEMO_ADMIN_PASSWORD": settings.DEMO_ADMIN_PASSWORD,
+    }.items():
+        if valor.startswith("REPLACE_"):
+            raise RuntimeError(
+                f"{nombre} todavía contiene el placeholder de .env.example."
+            )
