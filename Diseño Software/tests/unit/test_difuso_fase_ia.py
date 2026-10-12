@@ -80,3 +80,40 @@ def test_renovacion_no_supera_120_segundos(monkeypatch):
     ctrl._decidir('t', info['t'], 115.)
     assert cambios and cambios[0][0:2] == (0, 3)
     assert 10 <= cambios[0][2] <= 120
+
+
+def _ctrl_dos_fases(monkeypatch, params):
+    import difuso_ia
+    monkeypatch.setattr(difuso_ia.traci.lane, 'getLinks', lambda lane: [])
+    logic = SimpleNamespace(phases=[SimpleNamespace(state=s) for s in
+                                    ('Grr', 'yrr', 'rrr', 'rGr', 'ryr', 'rrr', 'rrG', 'rry', 'rrr')])
+    info = {'t': {'logic': logic, 'fases_verdes': [
+        {'idx': 0, 'lanes': ['a']}, {'idx': 3, 'lanes': ['b']}, {'idx': 6, 'lanes': ['c']}]}}
+    ctrl = ControladorDifusoIA(info, {'modo_ia': 'off', **params})
+    monkeypatch.setattr(difuso_ia.C, '_demanda_fase', lambda lanes, calc: (0.5, 0.5))
+    cambios = []
+    monkeypatch.setattr(ctrl, '_iniciar_transicion',
+                        lambda tls, data, actual, objetivo, dur: cambios.append((actual, objetivo, dur)))
+    return difuso_ia, ctrl, info, cambios
+
+
+def test_seleccion_por_presion_elige_la_fase_de_mayor_demanda(monkeypatch):
+    difuso_ia, ctrl, info, cambios = _ctrl_dos_fases(monkeypatch, {'seleccion': 'presion'})
+    colas = {'a': 2., 'b': 3., 'c': 9.}
+    monkeypatch.setattr(difuso_ia, '_medir_fase',
+                        lambda lanes, stats=None: (colas[lanes[0]], colas[lanes[0]], 0., 0.))
+    ctrl._decidir('t', info['t'], 30.)
+    # la rotación habría servido la fase 3; la presión sirve la 6 (cola 9)
+    assert cambios and cambios[0][0:2] == (0, 6)
+    assert 10 <= cambios[0][2] <= 120
+
+
+def test_presion_respeta_la_anti_inanicion(monkeypatch):
+    difuso_ia, ctrl, info, cambios = _ctrl_dos_fases(monkeypatch, {'seleccion': 'presion', 't_starve': 45})
+    colas = {'a': 2., 'b': 1., 'c': 9.}
+    monkeypatch.setattr(difuso_ia, '_medir_fase',
+                        lambda lanes, stats=None: (colas[lanes[0]], colas[lanes[0]], 0., 0.))
+    ctrl.estado['t']['ultimo_fin'] = {0: 100., 3: 0., 6: 95.}
+    ctrl._decidir('t', info['t'], 100.)
+    # la fase 3 lleva 100 s esperando con cola: tiene prioridad sobre la 6
+    assert cambios and cambios[0][0:2] == (0, 3)

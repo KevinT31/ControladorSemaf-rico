@@ -71,6 +71,10 @@ PARAMS_DEFECTO = {
                             # movimiento (no corta verde con pelotón cruzando)
     'w_mov': 0.4,           # peso de vehículos en movimiento en la demanda
     'umbral_skip': 1.0,     # demanda efectiva mínima para servir una fase
+    'seleccion': 'rotacion',  # 'rotacion': siguiente fase con demanda (cíclica)
+                            # 'presion' : fase de mayor demanda efectiva menos
+                            #            w_out x cola de sus carriles de salida
+    'w_out': 0.0,           # peso de la cola de salida en modo 'presion'
     'k_ext_cola': 1.0,      # s extra de verde por vehículo en cola (cap 12 s)
     'ia_veto': True,        # guardia: la cola predicha veta saltos de fase
     'ia_margen_veto': 0.0,  # margen de cola predicha para vetar un salto
@@ -448,11 +452,31 @@ class ControladorDifusoIA:
 
         k_act = next((k for k, g in enumerate(gps)
                       if g['idx'] == stt['fase_idx']), 0)
+        umbral_sel = float(self.p['umbral_skip'])
         if k_starve is not None:
             k_sel = k_starve
+        elif str(self.p.get('seleccion', 'rotacion')) == 'presion' and any(
+                dm >= umbral_sel for dm in demanda_ef):
+            # PRESIÓN: fase con más demanda efectiva, descontando la cola de
+            # sus carriles de salida (no servir verde hacia una salida
+            # bloqueada). La anti-inanición anterior conserva la equidad.
+            w_out = float(self.p.get('w_out', 0.0))
+            puntaje = []
+            for k, g in enumerate(gps):
+                cola_out = 0.0
+                if w_out > 0.0:
+                    for ln in g.get('out_lanes', []):
+                        try:
+                            cola_out += traci.lane.getLastStepHaltingNumber(ln)
+                        except Exception:
+                            self._stats['fallos_sensor'] = \
+                                self._stats.get('fallos_sensor', 0) + 1
+                puntaje.append(demanda_ef[k] - w_out * cola_out)
+            candidatos = [k for k in range(len(gps)) if demanda_ef[k] >= umbral_sel]
+            k_sel = max(candidatos, key=lambda k: (puntaje[k], k != k_act))
         else:
             # ROTACIÓN: siguiente fase del ciclo, saltando las vacías
-            umbral = float(self.p['umbral_skip'])
+            umbral = umbral_sel
             n_f = len(gps)
             k_sel = None
             for salto in range(1, n_f + 1):

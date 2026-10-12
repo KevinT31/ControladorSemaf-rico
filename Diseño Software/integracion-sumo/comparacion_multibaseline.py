@@ -332,13 +332,18 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
     depart_t: Dict[str, int] = {}
     base = datetime.now()
 
+    veh_s_red = 0      # vehículo-segundos en la red (incluye a quienes no llegan)
+    n_salidos = 0      # vehículos insertados en la red
     for i in range(pasos):
         traci.simulationStep()
 
         # tiempos de viaje por vehículo (MOE principal, como Genders 2019)
         try:
-            for v in traci.simulation.getDepartedIDList():
+            salidos = traci.simulation.getDepartedIDList()
+            n_salidos += len(salidos)
+            for v in salidos:
                 depart_t[v] = i
+            veh_s_red += traci.vehicle.getIDCount()
             for v in traci.simulation.getArrivedIDList():
                 if v in depart_t:
                     travel.append(i - depart_t.pop(v))
@@ -366,6 +371,11 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
         demora_total += halting
         arrivals += arrived
 
+    try:
+        en_red_fin = traci.vehicle.getIDCount()
+        pendientes = len(traci.simulation.getPendingVehicles())
+    except Exception:
+        en_red_fin, pendientes = None, None
     traci.close()
     if estrategia in ('difuso_fase', 'difuso_ia'):
         controlador_fase.cerrar()
@@ -385,6 +395,13 @@ def ejecutar_estrategia(ruta_cfg: str, seed: int, pasos: int, estrategia: str,
         'tviaje_mediana_s': st.median(travel) if travel else 0.0,
         'tviaje_sd_s': st.pstdev(travel) if len(travel) > 1 else 0.0,
         'n_arribos': arrivals,
+        # métricas sin sesgo de supervivencia: cuentan también a los vehículos
+        # que siguen en la red al final del horizonte
+        'veh_s_red': veh_s_red,
+        'n_insertados': n_salidos,
+        'tiempo_red_por_veh_s': (veh_s_red / n_salidos) if n_salidos else 0.0,
+        'en_red_al_final': en_red_fin,
+        'pendientes_insercion': pendientes,
     }
     if estrategia in ('difuso_fase', 'difuso_ia'):
         res['diagnostico_control'] = controlador_fase.resumen_ia()

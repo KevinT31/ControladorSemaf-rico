@@ -1,0 +1,12 @@
+{
+  "seleccion": "presion",
+  "w_out": 0.811,
+  "t_base": 33.1,
+  "t_verde_max": 39.0,
+  "gap_umbral_s": 2.9,
+  "gap_considera_mov": true,
+  "t_starve": 42.3,
+  "umbral_skip": 0.53,
+  "w_mov": 0.88,
+  "k_ext_cola": 0.06
+}

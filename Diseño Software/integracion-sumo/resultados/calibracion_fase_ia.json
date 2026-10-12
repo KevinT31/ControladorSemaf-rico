@@ -1,0 +1,108 @@
+{
+  "generado": "2026-10-11T17:29:21",
+  "J_validacion_sin_ia": 0.8206252512682489,
+  "margen_requerido": 0.01,
+  "variantes": [
+    {
+      "variante": "guardia_ext",
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.811,
+        "t_base": 33.1,
+        "t_verde_max": 39.0,
+        "gap_umbral_s": 2.9,
+        "gap_considera_mov": true,
+        "t_starve": 42.3,
+        "umbral_skip": 0.53,
+        "w_mov": 0.88,
+        "k_ext_cola": 0.06,
+        "ia_gate_sat": 1000000000.0,
+        "ia_gate_dens": 1000000000.0,
+        "modo_ia": "guardia",
+        "ia_ext": true
+      },
+      "J_validacion": 0.8152359614194973
+    },
+    {
+      "variante": "guardia_margen1",
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.811,
+        "t_base": 33.1,
+        "t_verde_max": 39.0,
+        "gap_umbral_s": 2.9,
+        "gap_considera_mov": true,
+        "t_starve": 42.3,
+        "umbral_skip": 0.53,
+        "w_mov": 0.88,
+        "k_ext_cola": 0.06,
+        "ia_gate_sat": 1000000000.0,
+        "ia_gate_dens": 1000000000.0,
+        "modo_ia": "guardia",
+        "ia_margen_veto": 1.0
+      },
+      "J_validacion": 0.8147956807267269
+    },
+    {
+      "variante": "mezcla_b03",
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.811,
+        "t_base": 33.1,
+        "t_verde_max": 39.0,
+        "gap_umbral_s": 2.9,
+        "gap_considera_mov": true,
+        "t_starve": 42.3,
+        "umbral_skip": 0.53,
+        "w_mov": 0.88,
+        "k_ext_cola": 0.06,
+        "ia_gate_sat": 1000000000.0,
+        "ia_gate_dens": 1000000000.0,
+        "modo_ia": "mezcla",
+        "beta": 0.3
+      },
+      "J_validacion": 0.8138675293923914
+    },
+    {
+      "variante": "mezcla_b05",
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.811,
+        "t_base": 33.1,
+        "t_verde_max": 39.0,
+        "gap_umbral_s": 2.9,
+        "gap_considera_mov": true,
+        "t_starve": 42.3,
+        "umbral_skip": 0.53,
+        "w_mov": 0.88,
+        "k_ext_cola": 0.06,
+        "ia_gate_sat": 1000000000.0,
+        "ia_gate_dens": 1000000000.0,
+        "modo_ia": "mezcla",
+        "beta": 0.5
+      },
+      "J_validacion": 0.8171224460199894
+    }
+  ],
+  "mejor_variante": {
+    "variante": "mezcla_b03",
+    "params": {
+      "seleccion": "presion",
+      "w_out": 0.811,
+      "t_base": 33.1,
+      "t_verde_max": 39.0,
+      "gap_umbral_s": 2.9,
+      "gap_considera_mov": true,
+      "t_starve": 42.3,
+      "umbral_skip": 0.53,
+      "w_mov": 0.88,
+      "k_ext_cola": 0.06,
+      "ia_gate_sat": 1000000000.0,
+      "ia_gate_dens": 1000000000.0,
+      "modo_ia": "mezcla",
+      "beta": 0.3
+    },
+    "J_validacion": 0.8138675293923914
+  },
+  "se_adopta_ia": false
+}

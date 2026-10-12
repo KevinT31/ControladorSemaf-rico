@@ -27,8 +27,17 @@ from scipy import stats
 METRICAS = ('ICV_red', 'Vavg_red', 'QL_red', 'q_red', 'throughput',
             'demora_media_s', 'tviaje_media_s', 'tviaje_mediana_s')
 MENORES_MEJOR = {'ICV_red', 'QL_red', 'demora_media_s', 'tviaje_media_s',
-                 'tviaje_mediana_s'}
-DIFUSOS = ('difuso', 'difuso_opt', 'difuso_fase', 'difuso_ia')
+                 'tviaje_mediana_s', 'tiempo_red_por_veh_s'}
+# métrica sin sesgo de supervivencia (solo en campañas que la registran)
+METRICAS_TODAS = METRICAS + ('tiempo_red_por_veh_s',)
+
+
+def metricas_presentes(datos):
+    reps = [r for rs in datos['por_estrategia'].values() for r in rs]
+    return [m for m in METRICAS_TODAS if all(r.get(m) is not None for r in reps)]
+DIFUSOS = ('difuso', 'difuso_opt', 'difuso_fase', 'difuso_ia', 'difuso_fase_cal', 'difuso_ia_cal')
+# controladores de fase del experimento: se comparan contra todas las demás estrategias
+FASE = ('difuso_fase', 'difuso_ia', 'difuso_fase_cal', 'difuso_ia_cal')
 
 
 def vector(datos, estrategia, metrica):
@@ -49,7 +58,7 @@ def resumen(datos):
     filas = {}
     for e in datos['por_estrategia']:
         filas[e] = {'n': len(datos['por_estrategia'][e])}
-        for m in METRICAS:
+        for m in metricas_presentes(datos):
             v = vector(datos, e, m)
             filas[e][m] = {'media': float(v.mean()),
                            'sd': float(v.std(ddof=1)) if len(v) > 1 else 0.0}
@@ -59,7 +68,7 @@ def resumen(datos):
 def pareado_vs_fijo(datos, controlador, base='fijo'):
     """Contraste pareado de `controlador` frente a `base` (por defecto, el plan fijo)."""
     filas, p_crudos = [], {}
-    for m in METRICAS:
+    for m in metricas_presentes(datos):
         fijo, ctrl = vector(datos, base, m), vector(datos, controlador, m)
         dif = ctrl - fijo
         res = stats.ttest_rel(ctrl, fijo)
@@ -119,16 +128,19 @@ def analizar(datos):
            'wilcoxon_vs_lineas_base': {}}
     for d in difusos:
         out['pareado_vs_fijo'][d] = pareado_vs_fijo(datos, d)
-        rivales = ([e for e in estrategias if e not in ('difuso_fase', 'difuso_ia')]
-                   if d in ('difuso_fase', 'difuso_ia') else bases)
+        rivales = ([e for e in estrategias if e != d] if d in FASE else bases)
         out['wilcoxon_vs_lineas_base'][d] = {
             m: wilcoxon_vs_lineas_base(datos, d, m, [b for b in rivales if b != 'fijo'] + ['fijo'])
             for m in ('demora_media_s', 'tviaje_media_s')}
     for m in ('demora_media_s', 'tviaje_media_s'):
         out['friedman'][m] = friedman(datos, m, estrategias)
-    if 'difuso_fase' in estrategias and 'difuso_ia' in estrategias:
-        # ablación del predictor: mismo controlador de fase con y sin IA
-        out['ablacion_ia'] = pareado_vs_fijo(datos, 'difuso_ia', base='difuso_fase')
+    # ablaciones: (variante, referencia)
+    pares = {'ablacion_ia': ('difuso_ia', 'difuso_fase'),
+             'ablacion_ia_cal': ('difuso_ia_cal', 'difuso_fase_cal'),
+             'efecto_calibracion': ('difuso_fase_cal', 'difuso_fase')}
+    for nombre, (a, b) in pares.items():
+        if a in estrategias and b in estrategias:
+            out[nombre] = pareado_vs_fijo(datos, a, base=b)
     return out
 
 

@@ -1,0 +1,1125 @@
+{
+  "generado": "2026-10-11T17:22:27",
+  "protocolo": {
+    "entrenamiento": {
+      "alta": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "media": [
+        101,
+        102,
+        103
+      ]
+    },
+    "validacion": {
+      "alta": [
+        201,
+        202,
+        203,
+        204
+      ],
+      "media": [
+        201,
+        202,
+        203
+      ]
+    },
+    "n_aleatorios": 40,
+    "n_locales": 20,
+    "top_k": 3,
+    "semilla_busqueda": 20261011
+  },
+  "defecto": {
+    "params": {
+      "seleccion": "rotacion",
+      "w_out": 0.0,
+      "t_base": 25.0,
+      "t_verde_max": 45.0,
+      "gap_umbral_s": 2.0,
+      "gap_considera_mov": false,
+      "t_starve": 45.0,
+      "umbral_skip": 1.0,
+      "w_mov": 0.4,
+      "k_ext_cola": 1.0
+    },
+    "J_entrenamiento": 0.8381283257729758,
+    "J_validacion": 0.8272543906069643
+  },
+  "parametros": {
+    "seleccion": "presion",
+    "w_out": 0.811,
+    "t_base": 33.1,
+    "t_verde_max": 39.0,
+    "gap_umbral_s": 2.9,
+    "gap_considera_mov": true,
+    "t_starve": 42.3,
+    "umbral_skip": 0.53,
+    "w_mov": 0.88,
+    "k_ext_cola": 0.06
+  },
+  "J_entrenamiento": 0.8200033699817831,
+  "J_validacion": 0.8206252512682489,
+  "registro": [
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 25.0,
+        "t_verde_max": 45.0,
+        "gap_umbral_s": 2.0,
+        "gap_considera_mov": false,
+        "t_starve": 45.0,
+        "umbral_skip": 1.0,
+        "w_mov": 0.4,
+        "k_ext_cola": 1.0
+      },
+      "J": 0.8381283257729758,
+      "verde_max": 119.0,
+      "J_valid": 0.8272543906069643,
+      "verde_max_valid": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.347,
+        "t_base": 21.8,
+        "t_verde_max": 31.6,
+        "gap_umbral_s": 2.1,
+        "gap_considera_mov": true,
+        "t_starve": 30.9,
+        "umbral_skip": 2.66,
+        "w_mov": 0.67,
+        "k_ext_cola": 0.43
+      },
+      "J": 0.8272055507070148,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 24.4,
+        "t_verde_max": 30.8,
+        "gap_umbral_s": 1.7,
+        "gap_considera_mov": false,
+        "t_starve": 44.5,
+        "umbral_skip": 0.99,
+        "w_mov": 0.9,
+        "k_ext_cola": 1.42
+      },
+      "J": 0.8391526799084031,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.016,
+        "t_base": 20.1,
+        "t_verde_max": 42.5,
+        "gap_umbral_s": 2.1,
+        "gap_considera_mov": false,
+        "t_starve": 48.3,
+        "umbral_skip": 2.62,
+        "w_mov": 0.51,
+        "k_ext_cola": 1.38
+      },
+      "J": 0.834535791319257,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.069,
+        "t_base": 32.4,
+        "t_verde_max": 40.3,
+        "gap_umbral_s": 2.1,
+        "gap_considera_mov": true,
+        "t_starve": 82.5,
+        "umbral_skip": 2.52,
+        "w_mov": 0.22,
+        "k_ext_cola": 0.23
+      },
+      "J": 0.8285802327500212,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 15.6,
+        "t_verde_max": 45.0,
+        "gap_umbral_s": 2.2,
+        "gap_considera_mov": false,
+        "t_starve": 51.2,
+        "umbral_skip": 2.86,
+        "w_mov": 0.98,
+        "k_ext_cola": 0.53
+      },
+      "J": 0.8338283269196978,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.802,
+        "t_base": 19.3,
+        "t_verde_max": 42.0,
+        "gap_umbral_s": 2.1,
+        "gap_considera_mov": false,
+        "t_starve": 84.3,
+        "umbral_skip": 0.75,
+        "w_mov": 0.62,
+        "k_ext_cola": 0.96
+      },
+      "J": 0.8355966640943807,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 30.3,
+        "t_verde_max": 56.5,
+        "gap_umbral_s": 1.9,
+        "gap_considera_mov": false,
+        "t_starve": 68.0,
+        "umbral_skip": 2.41,
+        "w_mov": 0.56,
+        "k_ext_cola": 1.38
+      },
+      "J": 0.8615198772295669,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 27.1,
+        "t_verde_max": 32.8,
+        "gap_umbral_s": 3.2,
+        "gap_considera_mov": false,
+        "t_starve": 67.0,
+        "umbral_skip": 2.78,
+        "w_mov": 0.77,
+        "k_ext_cola": 1.07
+      },
+      "J": 0.8446188541413753,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 22.7,
+        "t_verde_max": 44.7,
+        "gap_umbral_s": 2.0,
+        "gap_considera_mov": true,
+        "t_starve": 49.8,
+        "umbral_skip": 2.4,
+        "w_mov": 0.01,
+        "k_ext_cola": 0.8
+      },
+      "J": 0.8404142216761779,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 23.9,
+        "t_verde_max": 39.3,
+        "gap_umbral_s": 2.5,
+        "gap_considera_mov": false,
+        "t_starve": 77.3,
+        "umbral_skip": 1.64,
+        "w_mov": 0.84,
+        "k_ext_cola": 1.17
+      },
+      "J": 0.8506313025414133,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.808,
+        "t_base": 19.3,
+        "t_verde_max": 45.8,
+        "gap_umbral_s": 2.3,
+        "gap_considera_mov": true,
+        "t_starve": 46.2,
+        "umbral_skip": 2.14,
+        "w_mov": 0.61,
+        "k_ext_cola": 1.88
+      },
+      "J": 0.8290885886775322,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.811,
+        "t_base": 33.1,
+        "t_verde_max": 39.0,
+        "gap_umbral_s": 2.9,
+        "gap_considera_mov": true,
+        "t_starve": 42.3,
+        "umbral_skip": 0.53,
+        "w_mov": 0.88,
+        "k_ext_cola": 0.06
+      },
+      "J": 0.8200033699817831,
+      "verde_max": 119.0,
+      "J_valid": 0.8206252512682489,
+      "verde_max_valid": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.327,
+        "t_base": 21.8,
+        "t_verde_max": 31.7,
+        "gap_umbral_s": 2.1,
+        "gap_considera_mov": false,
+        "t_starve": 58.6,
+        "umbral_skip": 2.69,
+        "w_mov": 0.91,
+        "k_ext_cola": 0.26
+      },
+      "J": 0.8369131489791966,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.772,
+        "t_base": 31.1,
+        "t_verde_max": 54.4,
+        "gap_umbral_s": 1.5,
+        "gap_considera_mov": true,
+        "t_starve": 83.4,
+        "umbral_skip": 2.6,
+        "w_mov": 0.15,
+        "k_ext_cola": 1.41
+      },
+      "J": 0.8517578795526405,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.68,
+        "t_base": 25.9,
+        "t_verde_max": 44.4,
+        "gap_umbral_s": 2.5,
+        "gap_considera_mov": false,
+        "t_starve": 87.4,
+        "umbral_skip": 1.42,
+        "w_mov": 0.64,
+        "k_ext_cola": 0.91
+      },
+      "J": 0.8489850389053651,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.161,
+        "t_base": 24.0,
+        "t_verde_max": 34.0,
+        "gap_umbral_s": 3.9,
+        "gap_considera_mov": false,
+        "t_starve": 64.0,
+        "umbral_skip": 2.04,
+        "w_mov": 0.93,
+        "k_ext_cola": 1.76
+      },
+      "J": 0.8403243051229893,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.845,
+        "t_base": 18.4,
+        "t_verde_max": 48.7,
+        "gap_umbral_s": 1.5,
+        "gap_considera_mov": true,
+        "t_starve": 80.2,
+        "umbral_skip": 1.85,
+        "w_mov": 0.3,
+        "k_ext_cola": 1.65
+      },
+      "J": 0.8269489108514068,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.954,
+        "t_base": 26.5,
+        "t_verde_max": 30.5,
+        "gap_umbral_s": 2.8,
+        "gap_considera_mov": true,
+        "t_starve": 63.9,
+        "umbral_skip": 2.29,
+        "w_mov": 0.94,
+        "k_ext_cola": 0.17
+      },
+      "J": 0.839321381562093,
+      "verde_max": 117.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 20.6,
+        "t_verde_max": 35.7,
+        "gap_umbral_s": 2.0,
+        "gap_considera_mov": true,
+        "t_starve": 43.9,
+        "umbral_skip": 2.84,
+        "w_mov": 0.69,
+        "k_ext_cola": 0.66
+      },
+      "J": 0.8268158698529652,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.328,
+        "t_base": 27.0,
+        "t_verde_max": 51.3,
+        "gap_umbral_s": 3.0,
+        "gap_considera_mov": false,
+        "t_starve": 61.1,
+        "umbral_skip": 2.01,
+        "w_mov": 0.6,
+        "k_ext_cola": 0.84
+      },
+      "J": 0.8505819653365568,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.668,
+        "t_base": 27.6,
+        "t_verde_max": 38.3,
+        "gap_umbral_s": 4.0,
+        "gap_considera_mov": true,
+        "t_starve": 79.6,
+        "umbral_skip": 1.3,
+        "w_mov": 0.47,
+        "k_ext_cola": 0.43
+      },
+      "J": 0.8338278482707259,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.042,
+        "t_base": 34.5,
+        "t_verde_max": 54.2,
+        "gap_umbral_s": 3.5,
+        "gap_considera_mov": true,
+        "t_starve": 66.5,
+        "umbral_skip": 0.63,
+        "w_mov": 0.93,
+        "k_ext_cola": 1.09
+      },
+      "J": 0.8388323527158172,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.38,
+        "t_base": 30.6,
+        "t_verde_max": 55.6,
+        "gap_umbral_s": 2.9,
+        "gap_considera_mov": true,
+        "t_starve": 76.1,
+        "umbral_skip": 2.4,
+        "w_mov": 0.03,
+        "k_ext_cola": 0.69
+      },
+      "J": 0.8429262633999011,
+      "verde_max": 117.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 15.4,
+        "t_verde_max": 44.6,
+        "gap_umbral_s": 2.3,
+        "gap_considera_mov": false,
+        "t_starve": 81.7,
+        "umbral_skip": 1.28,
+        "w_mov": 0.61,
+        "k_ext_cola": 0.07
+      },
+      "J": 0.846164387430256,
+      "verde_max": 113.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 24.6,
+        "t_verde_max": 49.1,
+        "gap_umbral_s": 3.0,
+        "gap_considera_mov": true,
+        "t_starve": 59.1,
+        "umbral_skip": 2.57,
+        "w_mov": 0.85,
+        "k_ext_cola": 1.15
+      },
+      "J": 0.8353414347243158,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 19.1,
+        "t_verde_max": 31.5,
+        "gap_umbral_s": 2.7,
+        "gap_considera_mov": true,
+        "t_starve": 32.9,
+        "umbral_skip": 1.46,
+        "w_mov": 0.82,
+        "k_ext_cola": 0.37
+      },
+      "J": 0.8332320965311311,
+      "verde_max": 116.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 34.3,
+        "t_verde_max": 56.3,
+        "gap_umbral_s": 1.4,
+        "gap_considera_mov": false,
+        "t_starve": 89.5,
+        "umbral_skip": 1.79,
+        "w_mov": 0.96,
+        "k_ext_cola": 0.99
+      },
+      "J": 0.8586048734522728,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.368,
+        "t_base": 15.7,
+        "t_verde_max": 56.1,
+        "gap_umbral_s": 2.7,
+        "gap_considera_mov": false,
+        "t_starve": 73.7,
+        "umbral_skip": 0.51,
+        "w_mov": 0.68,
+        "k_ext_cola": 1.95
+      },
+      "J": 0.8254843600741576,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.882,
+        "t_base": 30.6,
+        "t_verde_max": 39.5,
+        "gap_umbral_s": 1.6,
+        "gap_considera_mov": false,
+        "t_starve": 39.8,
+        "umbral_skip": 1.25,
+        "w_mov": 0.76,
+        "k_ext_cola": 1.77
+      },
+      "J": 0.8344163590189563,
+      "verde_max": 117.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 32.1,
+        "t_verde_max": 52.5,
+        "gap_umbral_s": 1.1,
+        "gap_considera_mov": false,
+        "t_starve": 41.3,
+        "umbral_skip": 1.83,
+        "w_mov": 0.97,
+        "k_ext_cola": 1.06
+      },
+      "J": 0.8399716325070808,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 1.0,
+        "t_base": 22.1,
+        "t_verde_max": 45.0,
+        "gap_umbral_s": 3.5,
+        "gap_considera_mov": false,
+        "t_starve": 78.1,
+        "umbral_skip": 0.83,
+        "w_mov": 0.44,
+        "k_ext_cola": 0.72
+      },
+      "J": 0.8364258325124596,
+      "verde_max": 117.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 29.0,
+        "t_verde_max": 38.1,
+        "gap_umbral_s": 2.0,
+        "gap_considera_mov": false,
+        "t_starve": 56.8,
+        "umbral_skip": 2.01,
+        "w_mov": 0.74,
+        "k_ext_cola": 0.14
+      },
+      "J": 0.8573332885414453,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 31.3,
+        "t_verde_max": 36.1,
+        "gap_umbral_s": 3.7,
+        "gap_considera_mov": true,
+        "t_starve": 31.8,
+        "umbral_skip": 2.47,
+        "w_mov": 0.21,
+        "k_ext_cola": 1.19
+      },
+      "J": 0.8223861785178475,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.266,
+        "t_base": 32.2,
+        "t_verde_max": 50.2,
+        "gap_umbral_s": 2.8,
+        "gap_considera_mov": true,
+        "t_starve": 43.6,
+        "umbral_skip": 1.15,
+        "w_mov": 0.52,
+        "k_ext_cola": 1.66
+      },
+      "J": 0.8276365359831764,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 27.8,
+        "t_verde_max": 48.6,
+        "gap_umbral_s": 3.2,
+        "gap_considera_mov": false,
+        "t_starve": 85.3,
+        "umbral_skip": 1.5,
+        "w_mov": 0.21,
+        "k_ext_cola": 1.49
+      },
+      "J": 0.8583997217959698,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.607,
+        "t_base": 28.2,
+        "t_verde_max": 40.7,
+        "gap_umbral_s": 2.8,
+        "gap_considera_mov": false,
+        "t_starve": 58.6,
+        "umbral_skip": 1.81,
+        "w_mov": 0.25,
+        "k_ext_cola": 0.43
+      },
+      "J": 0.8622566183514584,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 16.8,
+        "t_verde_max": 57.3,
+        "gap_umbral_s": 3.7,
+        "gap_considera_mov": true,
+        "t_starve": 62.8,
+        "umbral_skip": 0.73,
+        "w_mov": 0.81,
+        "k_ext_cola": 1.42
+      },
+      "J": 0.8203661664347315,
+      "verde_max": 119.0,
+      "J_valid": 0.825437894285145,
+      "verde_max_valid": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 25.7,
+        "t_verde_max": 38.4,
+        "gap_umbral_s": 1.0,
+        "gap_considera_mov": false,
+        "t_starve": 51.2,
+        "umbral_skip": 1.38,
+        "w_mov": 0.49,
+        "k_ext_cola": 0.21
+      },
+      "J": 0.8447263198759783,
+      "verde_max": 113.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.846,
+        "t_base": 30.9,
+        "t_verde_max": 56.7,
+        "gap_umbral_s": 2.9,
+        "gap_considera_mov": true,
+        "t_starve": 34.4,
+        "umbral_skip": 2.77,
+        "w_mov": 0.58,
+        "k_ext_cola": 0.41
+      },
+      "J": 0.8281018189729801,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.776,
+        "t_base": 25.9,
+        "t_verde_max": 43.7,
+        "gap_umbral_s": 1.0,
+        "gap_considera_mov": true,
+        "t_starve": 48.4,
+        "umbral_skip": 2.56,
+        "w_mov": 0.7,
+        "k_ext_cola": 0.02
+      },
+      "J": 0.8223049285721622,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.669,
+        "t_base": 27.9,
+        "t_verde_max": 45.2,
+        "gap_umbral_s": 3.2,
+        "gap_considera_mov": true,
+        "t_starve": 46.7,
+        "umbral_skip": 0.64,
+        "w_mov": 0.9,
+        "k_ext_cola": 0.14
+      },
+      "J": 0.831015314089462,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.953,
+        "t_base": 29.9,
+        "t_verde_max": 41.2,
+        "gap_umbral_s": 3.2,
+        "gap_considera_mov": true,
+        "t_starve": 30,
+        "umbral_skip": 0.5,
+        "w_mov": 0.96,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.8347781084294987,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.844,
+        "t_base": 30.6,
+        "t_verde_max": 34.6,
+        "gap_umbral_s": 2.3,
+        "gap_considera_mov": true,
+        "t_starve": 44.5,
+        "umbral_skip": 0.66,
+        "w_mov": 0.89,
+        "k_ext_cola": 0.29
+      },
+      "J": 0.8316776731030102,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.866,
+        "t_base": 29.1,
+        "t_verde_max": 38.7,
+        "gap_umbral_s": 3.7,
+        "gap_considera_mov": true,
+        "t_starve": 44.4,
+        "umbral_skip": 0.6,
+        "w_mov": 1.0,
+        "k_ext_cola": 0.09
+      },
+      "J": 0.8211975565731598,
+      "verde_max": 119.0,
+      "J_valid": 0.8279511218374074,
+      "verde_max_valid": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.827,
+        "t_base": 31.1,
+        "t_verde_max": 40.6,
+        "gap_umbral_s": 2.2,
+        "gap_considera_mov": true,
+        "t_starve": 50.5,
+        "umbral_skip": 0.91,
+        "w_mov": 1.0,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.823982214029677,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.847,
+        "t_base": 30.2,
+        "t_verde_max": 30,
+        "gap_umbral_s": 2.5,
+        "gap_considera_mov": true,
+        "t_starve": 51.6,
+        "umbral_skip": 0.5,
+        "w_mov": 0.88,
+        "k_ext_cola": 0.11
+      },
+      "J": 0.8245133790037358,
+      "verde_max": 116.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.811,
+        "t_base": 34.4,
+        "t_verde_max": 39.6,
+        "gap_umbral_s": 2.6,
+        "gap_considera_mov": true,
+        "t_starve": 37.9,
+        "umbral_skip": 0.5,
+        "w_mov": 0.82,
+        "k_ext_cola": 0.44
+      },
+      "J": 0.8260720676527881,
+      "verde_max": 117.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.83,
+        "t_base": 34.8,
+        "t_verde_max": 35.4,
+        "gap_umbral_s": 3.5,
+        "gap_considera_mov": true,
+        "t_starve": 46.0,
+        "umbral_skip": 0.5,
+        "w_mov": 0.9,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.8237127027316429,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.766,
+        "t_base": 33.2,
+        "t_verde_max": 39.8,
+        "gap_umbral_s": 3.0,
+        "gap_considera_mov": true,
+        "t_starve": 42.0,
+        "umbral_skip": 0.5,
+        "w_mov": 1.0,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.8231456325571889,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.831,
+        "t_base": 29.9,
+        "t_verde_max": 39.3,
+        "gap_umbral_s": 3.7,
+        "gap_considera_mov": true,
+        "t_starve": 43.4,
+        "umbral_skip": 0.84,
+        "w_mov": 0.88,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.8270829878286836,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.894,
+        "t_base": 30.7,
+        "t_verde_max": 40.9,
+        "gap_umbral_s": 3.3,
+        "gap_considera_mov": false,
+        "t_starve": 32.1,
+        "umbral_skip": 0.5,
+        "w_mov": 0.92,
+        "k_ext_cola": 0.05
+      },
+      "J": 0.8386053925143522,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.724,
+        "t_base": 34.2,
+        "t_verde_max": 37.7,
+        "gap_umbral_s": 3.1,
+        "gap_considera_mov": true,
+        "t_starve": 47.1,
+        "umbral_skip": 0.71,
+        "w_mov": 0.9,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.8316090707665125,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.748,
+        "t_base": 34.5,
+        "t_verde_max": 36.8,
+        "gap_umbral_s": 3.0,
+        "gap_considera_mov": false,
+        "t_starve": 39.6,
+        "umbral_skip": 0.5,
+        "w_mov": 0.93,
+        "k_ext_cola": 0.3
+      },
+      "J": 0.830947783898306,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.899,
+        "t_base": 33.9,
+        "t_verde_max": 40.5,
+        "gap_umbral_s": 3.1,
+        "gap_considera_mov": true,
+        "t_starve": 46.0,
+        "umbral_skip": 0.5,
+        "w_mov": 0.88,
+        "k_ext_cola": 0.27
+      },
+      "J": 0.8272119622508517,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.69,
+        "t_base": 35,
+        "t_verde_max": 41.0,
+        "gap_umbral_s": 2.7,
+        "gap_considera_mov": true,
+        "t_starve": 41.4,
+        "umbral_skip": 0.54,
+        "w_mov": 0.84,
+        "k_ext_cola": 0.23
+      },
+      "J": 0.8456687885065741,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.808,
+        "t_base": 35,
+        "t_verde_max": 33.8,
+        "gap_umbral_s": 3.1,
+        "gap_considera_mov": false,
+        "t_starve": 40.3,
+        "umbral_skip": 0.62,
+        "w_mov": 0.96,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.8235335686306384,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.787,
+        "t_base": 35.0,
+        "t_verde_max": 42.4,
+        "gap_umbral_s": 3.2,
+        "gap_considera_mov": true,
+        "t_starve": 46.5,
+        "umbral_skip": 0.68,
+        "w_mov": 0.83,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.8312623610104389,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.708,
+        "t_base": 35,
+        "t_verde_max": 42.9,
+        "gap_umbral_s": 2.2,
+        "gap_considera_mov": true,
+        "t_starve": 49.7,
+        "umbral_skip": 0.89,
+        "w_mov": 0.87,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.8291942855755432,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.752,
+        "t_base": 30.7,
+        "t_verde_max": 36.7,
+        "gap_umbral_s": 2.6,
+        "gap_considera_mov": true,
+        "t_starve": 30,
+        "umbral_skip": 0.87,
+        "w_mov": 0.9,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.8244156826466644,
+      "verde_max": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.862,
+        "t_base": 31.0,
+        "t_verde_max": 31.9,
+        "gap_umbral_s": 2.7,
+        "gap_considera_mov": true,
+        "t_starve": 45.5,
+        "umbral_skip": 0.5,
+        "w_mov": 0.71,
+        "k_ext_cola": 0.0
+      },
+      "J": 0.829087618417096,
+      "verde_max": 119.0
+    }
+  ],
+  "top": [
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.811,
+        "t_base": 33.1,
+        "t_verde_max": 39.0,
+        "gap_umbral_s": 2.9,
+        "gap_considera_mov": true,
+        "t_starve": 42.3,
+        "umbral_skip": 0.53,
+        "w_mov": 0.88,
+        "k_ext_cola": 0.06
+      },
+      "J": 0.8200033699817831,
+      "verde_max": 119.0,
+      "J_valid": 0.8206252512682489,
+      "verde_max_valid": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 16.8,
+        "t_verde_max": 57.3,
+        "gap_umbral_s": 3.7,
+        "gap_considera_mov": true,
+        "t_starve": 62.8,
+        "umbral_skip": 0.73,
+        "w_mov": 0.81,
+        "k_ext_cola": 1.42
+      },
+      "J": 0.8203661664347315,
+      "verde_max": 119.0,
+      "J_valid": 0.825437894285145,
+      "verde_max_valid": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "presion",
+        "w_out": 0.866,
+        "t_base": 29.1,
+        "t_verde_max": 38.7,
+        "gap_umbral_s": 3.7,
+        "gap_considera_mov": true,
+        "t_starve": 44.4,
+        "umbral_skip": 0.6,
+        "w_mov": 1.0,
+        "k_ext_cola": 0.09
+      },
+      "J": 0.8211975565731598,
+      "verde_max": 119.0,
+      "J_valid": 0.8279511218374074,
+      "verde_max_valid": 119.0
+    },
+    {
+      "params": {
+        "seleccion": "rotacion",
+        "w_out": 0.0,
+        "t_base": 25.0,
+        "t_verde_max": 45.0,
+        "gap_umbral_s": 2.0,
+        "gap_considera_mov": false,
+        "t_starve": 45.0,
+        "umbral_skip": 1.0,
+        "w_mov": 0.4,
+        "k_ext_cola": 1.0
+      },
+      "J": 0.8381283257729758,
+      "verde_max": 119.0,
+      "J_valid": 0.8272543906069643,
+      "verde_max_valid": 119.0
+    }
+  ]
+}

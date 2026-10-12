@@ -136,3 +136,109 @@ reciben observación ideal por TraCI; el predictor estima cola normalizada por
 fase, no el ICV numérico; demanda sintética sin aforos de campo. El diseño del
 controlador de fase se iteró con semillas de desarrollo y validación; las de
 prueba se ejecutaron una sola vez.
+
+## Fase 2: calibración del controlador de fase (registrada antes de ejecutarla)
+
+Objetivo: comprobar si una calibración sistemática de `difuso_fase`, y
+después una variante con predictor, logra una mejora más contundente. Las
+semillas de prueba ya se usaron una vez para `difuso_fase` por defecto; en esta
+fase solo se usan entrenamiento y validación, y la configuración elegida se
+ejecutará en prueba una única vez. Se declarará que el conjunto de prueba se
+consultó dos veces en total (configuración por defecto y configuración
+calibrada).
+
+1. Búsqueda sin IA (`calibrar_fase.py`): 40 candidatos aleatorios y 20
+   perturbaciones del mejor sobre `seleccion` (rotación o presión), `w_out`,
+   `t_base`, `t_verde_max`, `gap_umbral_s`, `gap_considera_mov`, `t_starve`,
+   `umbral_skip`, `w_mov` y `k_ext_cola`. El verde mínimo (10 s), el máximo de
+   seguridad (120 s), el ámbar y el despeje no son calibrables. Objetivo J
+   (el mismo del protocolo), en entrenamiento (101-104 / 101-103); de los tres
+   mejores se elige el de menor J en validación (201-204 / 201-203). La
+   configuración por defecto se incluye como candidato.
+2. Variantes con IA sobre la mejor configuración sin IA: guardia con
+   extensión anticipada, guardia con margen de veto 1 y mezcla con beta 0,3 y
+   0,5, todas con compuertas abiertas. Se adopta una variante con IA solo si
+   reduce el J de validación en más de 0,01 frente a la mejor sin IA.
+3. Prueba única de la configuración elegida (y, como ablación, de su variante
+   con IA si existe) en semillas 1-30 / 1-10, con las mismas métricas y
+   pruebas estadísticas.
+4. Robustez, después de la prueba: horizonte de 1800 s (frente a 700 s) en
+   demanda alta con semillas 1-10, para las estrategias principales, para
+   verificar que la conclusión no depende del transitorio inicial ni de la
+   censura de D_stop.
+
+### Resultado de la calibración (fase 2), registrado antes de ejecutar prueba
+
+Sin IA (`resultados/calibracion_fase.json`): J de entrenamiento 0,8381 con los
+parámetros por defecto y 0,8200 con el mejor candidato; en validación, 0,8273
+frente a 0,8206. Configuración elegida: selección por presión (w_out 0,811),
+t_base 33,1 s, t_verde_max 39 s, gap-out a 2,9 s considerando vehículos en
+movimiento, t_starve 42,3 s, umbral de demanda 0,53, w_mov 0,88 y extensión
+por cola 0,06 s/veh. Mejora en validación: 0,7 puntos de J.
+
+Con IA sobre esa configuración (`resultados/calibracion_fase_ia.json`), J de
+validación: guardia con extensión 0,8152; guardia con margen 1 0,8148; mezcla
+beta 0,3 0,8139; mezcla beta 0,5 0,8171. La mejor variante mejora 0,0067, por
+debajo del margen fijado (0,01): no se adopta la IA. Se ejecuta en prueba como
+ablación la variante mezcla beta 0,3. Prueba: semillas 1-30 y 1-10, una vez.
+
+## Métrica adicional sin sesgo de supervivencia (añadida antes de ver sus valores)
+
+El tiempo de viaje medio solo promedia a los vehículos que llegan dentro del
+horizonte. En la réplica 1 del plan fijo en demanda alta se insertaron 1860
+vehículos y solo 741 llegaron: el promedio puede favorecer a una estrategia
+que entrega viajes cortos y retiene los largos. Por eso se añadió
+`tiempo_red_por_veh_s` (vehículo-segundos en la red divididos entre vehículos
+insertados, que incluye a quienes siguen circulando) junto con los vehículos
+que quedan en la red y los que esperan inserción al final. Las métricas
+anteriores no cambian (la simulación es determinista; se comprobó en la
+réplica 1 del plan fijo). Se re-ejecutan todas las estrategias en las semillas
+de prueba solo para obtener esta métrica, y la robustez a 1800 s la incluye.
+Si la ventaja en tiempo de viaje no se sostiene con esta métrica, se reportará
+así.
+
+## Resultados de la fase 2 y conclusión
+
+Archivos: `completo_ALTA30.json` y `completo_MEDIA10.json` (todas las
+estrategias en las semillas de prueba, con la métrica sin sesgo),
+`robustez_1800_ALTA10.json` y sus `analisis_*.json`; además
+`prueba_fase_cal_*`, `prueba_ia_cal_*` y `experimento2_*`. Ninguna réplica tuvo
+errores en el lazo de control; el mayor verde continuo fue de 119 s.
+
+Demanda alta, 700 s, 30 semillas. T_red: tiempo en red por vehículo insertado
+(s), incluye a los que no llegan.
+
+| Estrategia | T_red | D_stop | Viaje de los que llegan |
+|---|---|---|---|
+| Actuado | 232,6 | 222,7 | 202,6 |
+| Max-Pressure | 233,0 | 234,8 | 190,8 |
+| `difuso_fase` calibrado | 236,4 | 257,7 | 185,9 |
+| `difuso_fase` | 237,0 | 257,8 | 187,8 |
+| Webster | 244,5 | 280,2 | 218,1 |
+| Plan fijo | 249,6 | 323,7 | 211,0 |
+
+Demanda media, 700 s, 10 semillas: T_red 204,5 (actuado), 212,8 (`difuso_fase`
+calibrado), 213,5 (`difuso_fase`), 215,1 (Webster), 215,5 (Max-Pressure) y
+229,8 (plan fijo).
+
+Robustez, demanda alta, 1800 s, 10 semillas: T_red 490,0 (actuado), 499,9
+(Max-Pressure), 500,6 (Webster), 513,6 (`difuso_fase`), 514,8 (calibrado) y
+530,7 (plan fijo).
+
+Conclusiones:
+
+1. El controlador de fase supera al plan fijo en todas las métricas, los dos
+   niveles de demanda y los dos horizontes, en todas o casi todas las semillas:
+   D_stop -20 % y T_red -5 % en alta a 700 s; T_red -3 % a 1800 s.
+2. La ventaja en "tiempo de viaje medio" que se observó primero era en buena
+   parte sesgo de supervivencia: con T_red el actuado y Max-Pressure son
+   mejores en demanda alta (3,8 y 3,4 s menos, 30 de 30 semillas). En demanda
+   media el controlador de fase supera a Max-Pressure y a Webster en T_red,
+   pero no al actuado. Con saturación sostenida (1800 s) queda cuarto.
+3. La calibración aporta poco (-1 % en tiempo de viaje en alta; sin cambio en
+   D_stop ni en T_red). El predictor no tiene efecto significativo en ninguna
+   de sus variantes.
+4. Afirmación defendible: un controlador difuso interpretable con selección de
+   fase por demanda y gap-out mejora con claridad al plan fijo y queda cerca de
+   las estrategias adaptativas clásicas (a 1,5-2 % del actuado en T_red con
+   700 s), sin superarlas.
