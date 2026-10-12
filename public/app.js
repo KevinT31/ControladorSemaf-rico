@@ -140,10 +140,19 @@ function renderMainFiles(texFiles) {
     el.mainFile.appendChild(option);
   }
 
+  let guardado = "";
+  try { guardado = localStorage.getItem("mainFile") || ""; } catch (_) { guardado = ""; }
+  // Documentos raíz probables: archivos cuyo nombre empieza por "main" (p. ej. mainV4Sol.tex)
+  const raices = texFiles.filter((f) => /^main.*\.tex$/i.test(f.split("/").pop())).sort();
+
   if (texFiles.includes(previous)) {
     el.mainFile.value = previous;
+  } else if (texFiles.includes(guardado)) {
+    el.mainFile.value = guardado;
   } else if (texFiles.includes("main.tex")) {
     el.mainFile.value = "main.tex";
+  } else if (raices.length) {
+    el.mainFile.value = raices[raices.length - 1];
   } else if (texFiles[0]) {
     el.mainFile.value = texFiles[0];
   }
@@ -389,3 +398,8 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 init();
+
+// Recordar el archivo principal elegido entre sesiones
+el.mainFile.addEventListener("change", () => {
+  try { localStorage.setItem("mainFile", el.mainFile.value); } catch (_) { /* almacenamiento no disponible */ }
+});
