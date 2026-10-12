@@ -96,10 +96,15 @@ python calibrar_difuso.py --workers 8 --salida resultados/parametros_difuso_cali
 - `demora_media_s` (denominada `D_stop` en la tesis) es la carga acumulada de
   detención dividida entre los vehículos que completan su viaje; incluye
   vehículos que siguen en la red al terminar el horizonte de 700 s.
+- `tviaje_media_s` promedia solo a los vehículos que llegan dentro del horizonte
+  (sesgo de supervivencia). `tiempo_red_por_veh_s` (vehículo-segundos en la red
+  entre vehículos insertados) cuenta también a los que siguen circulando y es la
+  medida de tiempo usada para comparar estrategias; los JSON registran además
+  los vehículos que quedan en la red y los que esperan inserción al final.
 - Webster y Max-Pressure son reimplementaciones propias de los algoritmos
   publicados, no el código de terceros.
 
-## Experimento: controlador de fase con difuso y predictor (rama `experimento/difuso-ia`)
+## Controlador de fase con difuso y predictor
 
 Protocolo, decisiones y resultados en `PROTOCOLO_DIFUSO_IA.md`. Estrategias
 nuevas: `difuso_fase` (selección acíclica de fase, gap-out, anti-inanición y
@@ -138,3 +143,27 @@ python analizar_resultados.py resultados/experimento_ALTA30.json `
 Las series de entrenamiento (`data/fases_desarrollo/`) no se versionan: se
 regeneran con el paso 1. Los artefactos del predictor sí están versionados en
 `ia/artifacts_fase/`.
+
+### Calibración, métrica sin sesgo y robustez
+
+```powershell
+# Calibración sin IA y variantes con IA (solo entrenamiento y validación)
+python calibrar_fase.py sin-ia --workers 10 --salida resultados/calibracion_fase.json
+python calibrar_fase.py ia --base resultados/calibracion_fase.json --salida resultados/calibracion_fase_ia.json
+# Los parámetros elegidos quedan en resultados/params_fase_calibrado.json
+
+# Todas las estrategias en las semillas de prueba (incluye tiempo_red_por_veh_s)
+python campana_paralela.py --cfg escenarios/lima-centro/comparacion.sumocfg --semillas 1-30 `
+    --estrategias fijo,actuated,webster,webster_mod,maxpressure,difuso,difuso_opt,difuso_fase `
+    --salida resultados/completo_ALTA30_a.json
+python campana_paralela.py --cfg escenarios/lima-centro/comparacion.sumocfg --semillas 1-30 `
+    --estrategias difuso_fase --control-params resultados/params_fase_calibrado.json `
+    --salida resultados/completo_ALTA30_b.json
+python unir_completo.py completo_ALTA30_a.json completo_ALTA30_b.json completo_ALTA30.json
+python analizar_resultados.py resultados/completo_ALTA30.json --salida resultados/analisis_completo_ALTA30.json
+# (igual con comparacion_media.sumocfg y semillas 1-10)
+
+# Robustez: horizonte de 1800 s, demanda alta, semillas 1-10 (mismos pasos con --pasos 1800)
+```
+
+El mapa de todos los archivos de resultados está en `resultados/LEEME.md`.

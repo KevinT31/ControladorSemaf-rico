@@ -117,7 +117,6 @@ def perturbar(p, rng):
 def sin_ia(workers, salida):
     rng = random.Random(SEMILLA_BUSQUEDA)
     ref = referencia_fijo()
-    reg = {}
     with mp.get_context('spawn').Pool(workers) as pool:
         cands = [dict(DEFECTO)] + [muestrear(rng) for _ in range(N_ALEATORIOS)]
         ent = evaluar(pool, cands, ENTRENAMIENTO, ref, 'difuso_fase')

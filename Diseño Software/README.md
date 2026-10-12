@@ -49,6 +49,22 @@ están versionados. Las órdenes para repetirla, analizarla y calibrar el
 controlador difuso están en
 [`integracion-sumo/REPRODUCIBILIDAD.md`](integracion-sumo/REPRODUCIBILIDAD.md).
 
+### Resultados principales (demanda alta, 700 s, 30 semillas)
+
+| Estrategia | Tiempo en red por vehículo (s) | Carga de detención (s/veh) |
+|---|---|---|
+| Actuado (SUMO) | 232,6 | 222,7 |
+| Max-Pressure | 233,0 | 234,8 |
+| Controlador de fase difuso, calibrado | 236,4 | 257,7 |
+| Webster | 244,5 | 280,2 |
+| Plan fijo | 249,6 | 323,7 |
+
+El controlador de fase (`integracion-sumo/difuso_ia.py`, estrategia
+`difuso_fase`) mejora al plan fijo en todas las semillas y queda cerca del
+actuado y de Max-Pressure sin superarlos; el predictor CNN-LSTM no aporta
+mejora significativa. Detalle, protocolo y robustez en
+`integracion-sumo/PROTOCOLO_DIFUSO_IA.md` y `integracion-sumo/resultados/LEEME.md`.
+
 ## Menú principal (ejecutar.py)
 
 1. Iniciar Dashboard

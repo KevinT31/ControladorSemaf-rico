@@ -9,6 +9,10 @@ Compara, sobre el MISMO escenario, demanda y semilla, varios controladores:
   - webster_mod     : Webster modificado (ciclo práctico de Akçelik, 1981).
   - maxpressure     : política Max-Pressure (acíclica, Varaiya, 2013).
   - difuso          : NUESTRO núcleo (ICV + control difuso Mamdani, Cap. 6).
+  - difuso_opt      : el mismo núcleo con parámetros calibrados (calibrar_difuso.py).
+  - difuso_fase     : controlador de fase (difuso_ia.py): selección de fase por
+                      demanda, gap-out, anti-inanición y verde por Mamdani.
+  - difuso_ia       : difuso_fase con un predictor CNN-LSTM de cola por fase.
 
 Las métricas provienen de la simulación REAL (no se usan números aleatorios
 sintéticos): tiempo de viaje y espera por vehículo, velocidad media, cola,

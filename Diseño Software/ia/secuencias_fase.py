@@ -12,7 +12,7 @@ from __future__ import annotations
 import csv
 import math
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, List, Tuple
 
 #: debe coincidir con difuso_ia.CARACTERISTICAS_FASE (orden incluido)
 CARACTERISTICAS_FASE: List[str] = ['cola_n', 'nveh_n', 'ocupacion', 'vel_n',
