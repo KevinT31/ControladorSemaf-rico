@@ -817,6 +817,22 @@
       "chi2": 52.80000000000001,
       "p": 1.2872855550017346e-09,
       "kendall_w": 0.8800000000000002
+    },
+    "tiempo_red_por_veh_s": {
+      "metrica": "tiempo_red_por_veh_s",
+      "estrategias": [
+        "fijo",
+        "actuated",
+        "maxpressure",
+        "webster",
+        "difuso_opt",
+        "difuso_fase",
+        "difuso_fase_cal"
+      ],
+      "n_bloques": 10,
+      "chi2": 52.80000000000001,
+      "p": 1.2872855550017346e-09,
+      "kendall_w": 0.8800000000000002
     }
   },
   "wilcoxon_vs_lineas_base": {

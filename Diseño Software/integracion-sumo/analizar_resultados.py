@@ -132,8 +132,9 @@ def analizar(datos):
         out['wilcoxon_vs_lineas_base'][d] = {
             m: wilcoxon_vs_lineas_base(datos, d, m, [b for b in rivales if b != 'fijo'] + ['fijo'])
             for m in ('demora_media_s', 'tviaje_media_s')}
-    for m in ('demora_media_s', 'tviaje_media_s'):
-        out['friedman'][m] = friedman(datos, m, estrategias)
+    for m in ('demora_media_s', 'tviaje_media_s', 'tiempo_red_por_veh_s'):
+        if m in metricas_presentes(datos):
+            out['friedman'][m] = friedman(datos, m, estrategias)
     # ablaciones: (variante, referencia)
     pares = {'ablacion_ia': ('difuso_ia', 'difuso_fase'),
              'ablacion_ia_cal': ('difuso_ia_cal', 'difuso_fase_cal'),
